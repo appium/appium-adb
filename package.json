@@ -1,0 +1,29 @@
+{
+  "name": "appium-adb",
+  "version": "0.0.0",
+  "description": "appium-adb ==========",
+  "main": "lib/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/appium/appium-adb.git"
+  },
+  "author": "",
+  "license": "LICENCE",
+  "bugs": {
+    "url": "https://github.com/appium/appium-adb/issues"
+  },
+  "homepage": "https://github.com/appium/appium-adb",
+  "dependencies": {
+    "win-spawn": "~2.0.0",
+    "async": "~0.2.10",
+    "ncp": "~0.5.0",
+    "underscore": "~1.6.0",
+    "adm-zip": "~0.4.4",
+    "rimraf": "~2.2.6",
+    "through": "~2.3.4",
+    "winston": "~0.7.2"
+  }
+}
