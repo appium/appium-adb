@@ -1,4 +1,22 @@
 appium-adb
 ==========
 
-Wrapper around adb used by appium + helper libs
+Android adb wrapper used by Appium + helpersjars 
+
+## Installing
+
+```
+npm install  appium-adb
+```
+
+## Usage
+
+TODO
+
+## Publishing
+
+```
+npm version [patch|minor|major]
+git push --tags origin master
+npm publish
+```
