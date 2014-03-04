@@ -11,7 +11,12 @@
     "url": "git://github.com/appium/appium-adb.git"
   },
   "author": "",
-  "license": "apache-2.0",
+  "licenses": [
+    {
+      "type": "apache-2.0",
+      "url": "https://github.com/appium/appium-adb/blob/master/LICENSE"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/appium/appium-adb/issues"
   },
