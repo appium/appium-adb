@@ -14,7 +14,7 @@
   "licenses": [
     {
       "type": "apache-2.0",
-      "url": "https://github.com/appium/appium-adb/blob/master/LICENSE"
+      "url": "https://raw.github.com/appium/appium/master/LICENSE"
     }
   ],
   "bugs": {
