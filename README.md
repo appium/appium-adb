@@ -17,6 +17,7 @@ TODO
 
 ```
 npm version [patch|minor|major]
-git push --tags origin master
+git push origin master
+git push --tags
 npm publish
 ```
