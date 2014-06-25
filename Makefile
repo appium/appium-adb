@@ -5,8 +5,11 @@ DEFAULT: jshint
 
 jshint: 
 	@$(JSHINT_BIN) lib
+
+jscs:
 	@$(JSCS_BIN) lib
 
 .PHONY: \
 	DEFAULT \
-	jshint
+	jshint \
+	jscs	
