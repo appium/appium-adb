@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
-    "win-spawn": "~2.0.0",
     "async": "~0.9.0",
     "ncp": "~0.5.1",
     "underscore": "~1.6.0",
