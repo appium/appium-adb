@@ -1,6 +1,6 @@
 {
   "name": "appium-adb",
-  "version": "1.3.12",
+  "version": "1.3.13",
   "description": "appium-adb",
   "main": "lib/main.js",
   "scripts": {
