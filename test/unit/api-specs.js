@@ -2,9 +2,10 @@
 "use strict";
 
 var ADB = require('../../lib/main'),
-    sinon = require('sinon');
+    sinon = require('sinon'),
+    chai = require('chai');
 
-require('should');
+chai.should();
 
 describe('adb api', function () {
 
