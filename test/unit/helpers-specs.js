@@ -40,5 +40,9 @@ describe('helpers', function () {
     helpers.isScreenOnFully(dumpsys).should.equal(true);
   });
 
+  it('getActivityRelativeName should handle package and activity names with overlapping, but unmatching namespaces', function () {
+    var pkg = "com.test.myapp";
+    helpers.getActivityRelativeName(pkg, "com.test.myapp35.Activity").should.eql("com.test.myapp35.Activity");
+    helpers.getActivityRelativeName(pkg, "com.test.myapp.Activity").should.eql(".Activity");
+  });
 });
-
