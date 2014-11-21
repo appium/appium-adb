@@ -32,6 +32,7 @@
     "temp": "~0.8.0",
     "through": "~2.3.4",
     "underscore": "~1.6.0",
+    "vargs": "^0.1.0",
     "winston": "~0.7.3"
   },
   "devDependencies": {
