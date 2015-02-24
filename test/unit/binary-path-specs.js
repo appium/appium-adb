@@ -20,6 +20,13 @@ describe('binary path', function () {
         done();
       });
     });
+    it('createADB should work', function (done) {
+      ADB.createADB(null, function (e, adb) {
+        chai.expect(e).to.not.exist;
+        adb.should.exist;
+        done();
+      });
+    });
   });
 
   describe('wrapForExec', function () {
