@@ -6,7 +6,7 @@ appium-adb
 [![devDependency Status](https://david-dm.org/appium/appium-adb/dev-status.svg)](https://david-dm.org/appium/appium-adb#info=devDependencies)
 [![Build Status](https://api.travis-ci.org/appium/appium-adb.png?branch=master)](https://travis-ci.org/appium/appium-adb)
 
-Android adb wrapper used by Appium + helpersjars 
+Android adb wrapper used by Appium + helpersjars
 
 ## Installing
 
@@ -14,9 +14,17 @@ Android adb wrapper used by Appium + helpersjars
 npm install  appium-adb
 ```
 
-## Usage
+## Watch
 
-TODO
+```
+npm run watch
+```
+
+## Test
+
+```
+npm test
+```
 
 ## Publishing
 

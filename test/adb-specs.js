@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
-import { ADB } from '../lib/adb.js';
+import ADB from '../lib/adb.js';
 
 const should = chai.should();
 chai.use(chaiAsPromised);
@@ -12,7 +12,7 @@ describe('ADB', () => {
     let temp = await adb.createADB();
     should.exist(temp.path);
   });
-  it('should correctly return adb if present ANDROID_HOME is not present', async () => {
+  it('should correctly return adb from path when ANDROID_HOME is not set', async () => {
     let opts = {sdkRoot: ''};
     let adb = new ADB(opts);
     let temp = await adb.createADB(opts);
@@ -21,19 +21,25 @@ describe('ADB', () => {
   it.skip('should error out if binary not persent', async () => {
     // TODO write a negative test
   });
+  it('should initialize aapt', async () => {
+    let adb = new ADB();
+    await adb.initAapt();
+    adb.binaries.aapt.should.contain('aapt');
+  });
+  it('should initialize zipAlign', async () => {
+    let adb = new ADB();
+    await adb.initZipAlign();
+    adb.binaries.zipalign.should.contain('zipalign');
+  });
 });
 
 describe.skip('ADB To be implemented methods', () => {
-  it('checkAaptPresent', async () => { });
-  it('checkZipAlignPresent', async () => { });
-  it('exec', async () => { });
-  it('shell', async () => { });
-  it('spawn', async () => { });
-  it('processFromManifest', async () => { });
-  it('packageAndLaunchActivityFromManifest', async () => { });
+
+  //it('processFromManifest', async () => { });
+  //it('packageAndLaunchActivityFromManifest', async () => { });
   it('processExists', async () => { });
-  it('compileManifest', async () => { });
-  it('insertManifest', async () => { });
+  //it('compileManifest', async () => { });
+  //it('insertManifest', async () => { });
   it('signWithDefaultCert', async () => { });
   it('signWithCustomCert', async () => { });
   it('sign', async () => { });
@@ -111,7 +117,7 @@ describe.skip('ADB To be implemented methods', () => {
   it('enableIME', async () => { });
   it('disableIME', async () => { });
   it('setIME', async () => { });
-  it('hasInternetPermissionFromManifest', async () => { });
+  //it('hasInternetPermissionFromManifest', async () => { });
   it('reboot', async () => { });
   it('getAdbServerPort', async () => { });
 });

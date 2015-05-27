@@ -1,3 +1,4 @@
-import { ADB } from './lib/adb';
+// transpile:main
+import ADB from './lib/adb';
 
-export { ADB };
+export default ADB;

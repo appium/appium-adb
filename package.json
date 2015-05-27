@@ -4,9 +4,9 @@
   "description": "appium-adb",
   "main": "./build/index.js",
   "scripts": {
-    "prepublish": "./node_modules/.bin/gulp prepublish",
-    "test": "./node_modules/.bin/gulp once",
-    "watch": "./node_modules/.bin/gulp"
+    "prepublish": "gulp prepublish",
+    "test": "gulp once",
+    "watch": "gulp"
   },
   "repository": {
     "type": "git",
@@ -32,11 +32,12 @@
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
     "adm-zip": "~0.4.4",
-    "appium-logger": "^1.0.0",
-    "appium-support": "=0.0.3",
+    "appium-logger": "^1.1.0",
+    "appium-support": "1.1.0",
     "async": "~0.9.0",
     "asyncbox": "^2.0.2",
     "babel-runtime": "^5.3.3",
+    "bluebird": "^2.9.26",
     "chai": "^2.3.0",
     "chai-as-promised": "^5.0.0",
     "lodash": "^3.9.1",
