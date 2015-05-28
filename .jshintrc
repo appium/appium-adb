@@ -1,12 +1,12 @@
 {
   "laxcomma": true,
-  "strict": true,
   "undef": true,
   "unused": true,
-  "trailing": true,
   "node": true,
   "eqeqeq": true,
   "trailing": true,
-  "white": true,
-  "indent": 2    
+  "indent": 2,
+  "esnext": true,
+  "experimental": ["asyncawait"],
+  "white": true
 }
