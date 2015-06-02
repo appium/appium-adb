@@ -23,53 +23,95 @@ const apiLevel = '21',
 
 describe('adb commands', () => {
   let adb = new ADB(), shell;
-  const createStub = function (mockShellValue) {
-    shell = sinon.stub(adb, "shell", async function () {
-      return mockShellValue;
-    });
-  };
-  beforeEach(async () => {
+  before(async () => {
     await adb.createADB();
   });
   describe('shell', () => {
-    afterEach(async () => {
-      adb.shell.restore();
-    });
-    let verifyShellArguments = function (cmd) {
+    const verifyShellArguments = function (cmd) {
       shell.withArgs(cmd);
     };
-    it('getApiLevel should call shell with correct args', async () => {
-      createStub('21');
-      (await adb.getApiLevel()).should.be.equal(apiLevel);
-      verifyShellArguments(['getprop', 'ro.build.version.sdk']);
+    const createStub = function (mockShellValue) {
+      shell = sinon.stub(adb, "shell", async function () {
+        return mockShellValue;
+      });
+    };
+    const clearStub = function () {
+      adb.shell.restore();
+    };
+    describe('getApiLevel', () => {
+      before(() => {
+        createStub('21');
+      });
+      it('should call shell with correct args', async () => {
+        (await adb.getApiLevel()).should.be.equal(apiLevel);
+        verifyShellArguments(['getprop', 'ro.build.version.sdk']);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
-    it('availableIMEs should call shell with correct args', async () => {
-      createStub(imeList);
-      (await adb.availableIMEs()).should.have.length.above(0);
-      verifyShellArguments(['ime', 'list', '-a']);
+    describe('availableIMEs', () => {
+      before(() => {
+        createStub(imeList);
+      });
+      it('should call shell with correct args', async () => {
+        (await adb.availableIMEs()).should.have.length.above(0);
+        verifyShellArguments(['ime', 'list', '-a']);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
-    it('enabledIMEs should call shell with correct args', async () => {
-      createStub(imeList);
-      (await adb.enabledIMEs()).should.have.length.above(0);
-      verifyShellArguments(['ime', 'list']);
+    describe('enabledIMEs', () => {
+      before(() => {
+        createStub(imeList);
+      });
+      it('should call shell with correct args', async () => {
+        (await adb.enabledIMEs()).should.have.length.above(0);
+        verifyShellArguments(['ime', 'list']);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
-    it('defaultIME should call shell with correct args', async () => {
+    describe('defaultIME', () => {
       let defaultIME = 'com.android.inputmethod.latin/.LatinIME';
-      createStub(defaultIME);
-      (await adb.defaultIME()).should.be.equal(defaultIME);
-      verifyShellArguments(['settings', 'get', 'secure', 'default_input_method']);
+      before(() => {
+        createStub(defaultIME);
+      });
+      it('should call shell with correct args', async () => {
+        (await adb.defaultIME()).should.be.equal(defaultIME);
+        verifyShellArguments(['settings', 'get', 'secure', 'default_input_method']);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
-    it('disableIME should call shell with correct args', async () => {
-      createStub('');
-      await adb.disableIME(IME);
-      (await adb.enabledIMEs()).should.not.include(IME);
-      verifyShellArguments(['ime', 'disable', IME]);
+    describe('disableIME', () => {
+      before(() => {
+        createStub('');
+      });
+      it('should call shell with correct args', async () => {
+        await adb.disableIME(IME);
+        (await adb.enabledIMEs()).should.not.include(IME);
+        verifyShellArguments(['ime', 'disable', IME]);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
-    it('enableIME should call shell with correct args', async () => {
-      createStub(imeList);
-      await adb.enableIME(IME);
-      (await adb.enabledIMEs()).should.include(IME);
-      verifyShellArguments(['ime', 'enable', IME]);
+    describe('enableIME', () => {
+      before(() => {
+        createStub(imeList);
+      });
+      it('should call shell with correct args', async () => {
+        await adb.enableIME(IME);
+        (await adb.enabledIMEs()).should.include(IME);
+        verifyShellArguments(['ime', 'enable', IME]);
+      });
+      after(async () => {
+        clearStub();
+      });
     });
   });
   it('isValidClass should correctly validate class names', () => {
