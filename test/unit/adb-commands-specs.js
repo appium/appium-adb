@@ -22,97 +22,74 @@ const apiLevel = '21',
       flags=0x0`;
 
 describe('adb commands', () => {
-  let adb = new ADB(), shell;
+  let adb = new ADB();
   before(async () => {
     await adb.createADB();
   });
   describe('shell', () => {
-    const verifyShellArguments = function (cmd) {
-      shell.withArgs(cmd);
+    let withAdbMock = (fn) => {
+      return () => {
+        let mocks = {};
+        before(() => { mocks.adb = sinon.mock(adb); });
+        after(() => { mocks.adb.restore(); });
+        fn(mocks);
+      };
     };
-    const createStub = function (mockShellValue) {
-      shell = sinon.stub(adb, "shell", async function () {
-        return mockShellValue;
-      });
-    };
-    const clearStub = function () {
-      adb.shell.restore();
-    };
-    describe('getApiLevel', () => {
-      before(() => {
-        createStub('21');
-      });
+    describe('getApiLevel', withAdbMock((mocks) => {
       it('should call shell with correct args', async () => {
-        (await adb.getApiLevel()).should.be.equal(apiLevel);
-        verifyShellArguments(['getprop', 'ro.build.version.sdk']);
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.build.version.sdk'])
+          .returns(apiLevel);
+        (await adb.getApiLevel()).should.equal(apiLevel);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
-    describe('availableIMEs', () => {
-      before(() => {
-        createStub(imeList);
-      });
+    }));
+    describe('availableIMEs', withAdbMock((mocks) => {
       it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ime', 'list', '-a'])
+          .returns(imeList);
         (await adb.availableIMEs()).should.have.length.above(0);
-        verifyShellArguments(['ime', 'list', '-a']);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
-    describe('enabledIMEs', () => {
-      before(() => {
-        createStub(imeList);
-      });
+    }));
+    describe('enabledIMEs', withAdbMock((mocks) => {
       it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ime', 'list'])
+          .returns(imeList);
         (await adb.enabledIMEs()).should.have.length.above(0);
-        verifyShellArguments(['ime', 'list']);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
-    describe('defaultIME', () => {
+    }));
+    describe('defaultIME', withAdbMock((mocks) => {
       let defaultIME = 'com.android.inputmethod.latin/.LatinIME';
-      before(() => {
-        createStub(defaultIME);
-      });
       it('should call shell with correct args', async () => {
-        (await adb.defaultIME()).should.be.equal(defaultIME);
-        verifyShellArguments(['settings', 'get', 'secure', 'default_input_method']);
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['settings', 'get', 'secure', 'default_input_method'])
+          .returns(defaultIME);
+        (await adb.defaultIME()).should.equal(defaultIME);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
-    describe('disableIME', () => {
-      before(() => {
-        createStub('');
-      });
+    }));
+    describe('disableIME', withAdbMock((mocks) => {
       it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ime', 'disable', IME])
+          .returns("");
         await adb.disableIME(IME);
-        (await adb.enabledIMEs()).should.not.include(IME);
-        verifyShellArguments(['ime', 'disable', IME]);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
-    describe('enableIME', () => {
-      before(() => {
-        createStub(imeList);
-      });
+    }));
+    describe('enableIME', withAdbMock((mocks) => {
       it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ime', 'enable', IME])
+          .returns("");
         await adb.enableIME(IME);
-        (await adb.enabledIMEs()).should.include(IME);
-        verifyShellArguments(['ime', 'enable', IME]);
+        mocks.adb.verify();
       });
-      after(async () => {
-        clearStub();
-      });
-    });
+    }));
   });
   it('isValidClass should correctly validate class names', () => {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);

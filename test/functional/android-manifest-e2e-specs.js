@@ -36,8 +36,8 @@ describe('Android-manifest', async () => {
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async () => {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
-    apkPackage.should.be.equal('com.example.android.contactmanager');
-    apkActivity.should.be.equal('com.example.android.contactmanager.ContactManager');
+    apkPackage.should.equal('com.example.android.contactmanager');
+    apkActivity.should.equal('com.example.android.contactmanager.ContactManager');
   });
   it('hasInternetPermissionFromManifest should be true', async () => {
     let flag = await adb.hasInternetPermissionFromManifest(contactMangerSelendroidPath);
