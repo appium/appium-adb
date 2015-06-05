@@ -5,4 +5,5 @@ branches:
   only:
     - master
     - "2.0"
-
+after_success:
+  - gulp coveralls
