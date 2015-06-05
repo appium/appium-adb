@@ -1,10 +1,7 @@
-notifications:
-  email: false
-branches:
-  only:
-    - master
 language: node_js
 node_js:
   - "0.10"
-script:
-  - "make jshint jscs"
+branches:
+  only:
+    - master
+    - 2.0
