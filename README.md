@@ -5,7 +5,9 @@ appium-adb
 [![Downloads](http://img.shields.io/npm/dm/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 [![Dependency Status](https://david-dm.org/appium/appium-adb/2.0.svg)](https://david-dm.org/appium/appium-adb/2.0)
 [![devDependency Status](https://david-dm.org/appium/appium-adb/2.0/dev-status.svg)](https://david-dm.org/appium/appium-adb/2.0#info=devDependencies)
+
 [![Build Status](https://api.travis-ci.org/appium/appium-adb.png?branch=2.0)](https://travis-ci.org/appium/appium-adb)
+[![Coverage Status](https://coveralls.io/repos/appium/appium-base-driver/badge.svg?branch=2.0)](https://coveralls.io/r/appium/appium-base-driver?branch=2.0)
 
 Android adb wrapper used by Appium + helpersjars
 
