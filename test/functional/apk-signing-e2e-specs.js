@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-//import 'mochawait';
 import ADB from '../../lib/adb.js';
 import path from 'path';
 import { exec } from 'teen_process';
@@ -14,7 +13,7 @@ const selendroidTestApp = path.resolve(__dirname, '..', '..', '..', 'test',
       unsignJar = path.resolve(__dirname, '..', '..', '..', 'jars', 'unsign.jar'),
       tmp = system.isWindows() ? 'C:\\Windows\\Temp' : '/tmp',
       keystorePath = path.resolve(__dirname, '..', '..', '..', 'test',
-                                        'appiumtest.keystore'),
+                                  'appiumtest.keystore'),
       keyAlias = 'appiumtest';
 
 chai.use(chaiAsPromised);

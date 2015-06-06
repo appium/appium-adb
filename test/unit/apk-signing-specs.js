@@ -21,8 +21,8 @@ const selendroidTestApp = path.resolve(__dirname, '..', '..', '..', 'test',
       selendroidTestAppPackage = 'io.selendroid.testapp';
 
 describe('signing', async () => {
-  let adb = new ADB(),
-      withExecMock = (fn) => {
+  let adb = new ADB();
+  let withExecMock = (fn) => {
         return () => {
           let mocks = {};
           before(async () => {
@@ -85,8 +85,8 @@ describe('signing', async () => {
       adb.useKeystore = true;
       mocks.teen_process.expects("exec")
         .once().withExactArgs(keytool, ['-v', '-list', '-alias', keyAlias,
-                            '-keystore', keystorePath, '-storepass',
-                             password])
+                                        '-keystore', keystorePath, '-storepass',
+                                        password])
         .returns("");
       (await adb.getKeystoreMd5(keytool, md5));
       mocks.teen_process.verify();
