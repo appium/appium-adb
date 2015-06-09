@@ -26,7 +26,6 @@ describe('signing', async () => {
         return () => {
           let mocks = {};
           before(async () => {
-            await adb.createADB();
             adb.keystorePath = keystorePath;
             adb.keyAlias = keyAlias;
             adb.keystorePassword = password;
