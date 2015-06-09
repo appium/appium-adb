@@ -10,9 +10,6 @@ chai.use(chaiAsPromised);
 describe('System calls', () => {
   const adb = new ADB();
   let execStub, getConnectedDevicesSpy;
-  before(async () => {
-    await adb.createADB();
-  });
   beforeEach(() => {
     getConnectedDevicesSpy = sinon.spy(adb, "getConnectedDevices");
     execStub = sinon.stub(teen_process, "exec");
