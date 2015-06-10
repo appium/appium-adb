@@ -11,11 +11,10 @@ import { tempDir } from 'appium-support';
 
 chai.use(chaiAsPromised);
 
-const selendroidTestApp = path.resolve(__dirname, '..', '..', '..', 'test',
-                                       'selendroid-test-app.apk'),
+const selendroidTestApp = path.resolve(utils.rootDir, 'test', 'selendroid-test-app.apk'),
       java = getJavaForOs(),
-      helperJarPath = path.resolve(__dirname, '..', '..', '..', 'jars'),
-      keystorePath = path.resolve(__dirname, '..', '..', '..', 'test', 'appiumtest.keystore'),
+      helperJarPath = path.resolve(utils.rootDir, 'jars'),
+      keystorePath = path.resolve(utils.rootDir, 'test', 'appiumtest.keystore'),
       keyAlias = 'appiumtest',
       password = 'android',
       selendroidTestAppPackage = 'io.selendroid.testapp';
