@@ -5,12 +5,14 @@ import ADB from '../../lib/adb.js';
 import sinon from 'sinon';
 import net from 'net';
 import events from 'events';
+import Logcat from '../../lib/logcat.js';
+import * as teen_process from 'teen_process';
 
 chai.use(chaiAsPromised);
 const should = chai.should();
 const apiLevel = '21',
       IME = 'com.android.inputmethod.latin/.LatinIME',
-     imeList = `com.android.inputmethod.latin/.LatinIME:
+      imeList = `com.android.inputmethod.latin/.LatinIME:
   mId=com.android.inputmethod.latin/.LatinIME mSettingsActivityName=com.android
   mIsDefaultResId=0x7f070000
   Service:
@@ -21,16 +23,32 @@ const apiLevel = '21',
       labelRes=0x7f0a0037 nonLocalizedLabel=null icon=0x0 banner=0x0
       enabled=true exported=true processName=com.android.inputmethod.latin
       permission=android.permission.BIND_INPUT_METHOD
-      flags=0x0`;
+      flags=0x0`,
+      psOutput = `USER     PID   PPID  VSIZE  RSS     WCHAN    PC   NAME
+u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.contactmanager`,
+      contactManagerPackage = 'com.example.android.contactmanager';
 
 describe('adb commands', () => {
   let adb = new ADB();
+  let logcat = new Logcat({
+    adb: adb
+  , debug: false
+  , debugTrace: false
+  });
   describe('shell', () => {
     let withAdbMock = (fn) => {
       return () => {
         let mocks = {};
-        beforeEach(() => { mocks.adb = sinon.mock(adb); });
-        afterEach(() => { mocks.adb.restore(); });
+        beforeEach(() => {
+          mocks.adb = sinon.mock(adb);
+          mocks.logcat = sinon.mock(logcat);
+          mocks.teen_process = sinon.mock(teen_process);
+        });
+        afterEach(() => {
+          mocks.adb.restore();
+          mocks.logcat.restore();
+          mocks.teen_process.restore();
+        });
         fn(mocks);
       };
     };
@@ -269,6 +287,162 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('processExists', withAdbMock((mocks) => {
+      it('should call shell with correct args and should find process', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs("ps")
+          .returns(psOutput);
+        (await adb.processExists(contactManagerPackage)).should.be.true;
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args and should not find process', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs("ps")
+          .returns("foo");
+        (await adb.processExists(contactManagerPackage)).should.be.false;
+        mocks.adb.verify();
+      });
+    }));
+    describe('forwardPort', withAdbMock((mocks) => {
+      const sysPort = 12345,
+            devicePort = 54321;
+      it('forwardPort should call shell with correct args', async () => {
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs('forward', [`tcp:${sysPort}`, `tcp:${devicePort}`])
+          .returns("");
+        await adb.forwardPort(sysPort, devicePort);
+        mocks.adb.verify();
+      });
+      it('forwardAbstractPort should call shell with correct args', async () => {
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs('forward', [`tcp:${sysPort}`, `localabstract:${devicePort}`])
+          .returns("");
+        await adb.forwardAbstractPort(sysPort, devicePort);
+        mocks.adb.verify();
+      });
+    }));
+    describe('ping', withAdbMock((mocks) => {
+      it('should call shell with correct args and should return true', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(["echo", "ping"])
+          .returns("ping");
+        (await adb.ping()).should.be.true;
+        mocks.adb.verify();
+      });
+    }));
+    describe('restart', withAdbMock((mocks) => {
+      it('should call adb in correct order', async () => {
+        mocks.adb.expects("stopLogcat").once().returns("");
+        mocks.adb.expects("restartAdb").once().returns("");
+        mocks.adb.expects("waitForDevice").once().returns("");
+        mocks.adb.expects("startLogcat").once().returns("");
+        await adb.restart();
+        mocks.adb.verify();
+      });
+    }));
+    describe('stopLogcat', withAdbMock((mocks) => {
+      it('should call stopCapture', async () => {
+        adb.logcat = logcat;
+        mocks.logcat.expects("stopCapture").once().returns("");
+        await adb.stopLogcat();
+        mocks.logcat.verify();
+      });
+    }));
+    describe('getLogcatLogs', withAdbMock((mocks) => {
+      it('should call getLogs', async () => {
+        adb.logcat = logcat;
+        mocks.logcat.expects("getLogs").once().returns("");
+        await adb.getLogcatLogs();
+        mocks.logcat.verify();
+      });
+    }));
+    describe('getPIDsByName', withAdbMock((mocks) => {
+      it('should call shell and parse pids correctly', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(["ps", '.contactmanager'])
+          .returns(psOutput);
+        (await adb.getPIDsByName(contactManagerPackage))[0].should.equal(5078);
+        mocks.adb.verify();
+      });
+    }));
+    describe('killProcessesByName', withAdbMock((mocks) => {
+      it('should call getPIDsByName and kill process correctly', async () => {
+        mocks.adb.expects("getPIDsByName")
+          .once().withExactArgs(contactManagerPackage)
+          .returns([5078]);
+        mocks.adb.expects("killProcessByPID")
+          .once().withExactArgs(5078)
+          .returns("");
+        await adb.killProcessesByName(contactManagerPackage);
+        mocks.adb.verify();
+      });
+    }));
+    describe('killProcessByPID', withAdbMock((mocks) => {
+      it('should call kill process correctly', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['kill', 5078])
+          .returns();
+        await adb.killProcessByPID(5078);
+        mocks.adb.verify();
+      });
+    }));
+    describe('broadcastProcessEnd', withAdbMock((mocks) => {
+      it('should broadcast process end', async () => {
+        let intent = 'intent',
+            processName = 'processName';
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'broadcast', '-a', intent])
+          .returns("");
+        mocks.adb.expects("processExists")
+          .once().withExactArgs(processName)
+          .returns(false);
+        await adb.broadcastProcessEnd(intent, processName);
+        mocks.adb.verify();
+      });
+    }));
+    describe('broadcast', withAdbMock((mocks) => {
+      it('should broadcast intent', async () => {
+        let intent = 'intent';
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'broadcast', '-a', intent])
+          .returns("");
+        await adb.broadcast(intent);
+        mocks.adb.verify();
+      });
+    }));
+    describe('instrument', withAdbMock((mocks) => {
+      it('should call shell with correct arguments', async () => {
+        let intent = 'intent';
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'broadcast', '-a', intent])
+          .returns("");
+        await adb.broadcast(intent);
+        mocks.adb.verify();
+      });
+    }));
+    describe('androidCoverage', withAdbMock((mocks) => {
+      it('should call shell with correct arguments', async () => {
+        adb.adb.defaultArgs = [];
+        adb.adb.path = "dummy_adb_path";
+        let conn = new events.EventEmitter();
+        conn.start = () => { }; // do nothing
+        const instrumentClass = 'instrumentClass',
+              waitPkg = 'waitPkg',
+              waitActivity = 'waitActivity';
+        let args = adb.adb.defaultArgs
+          .concat(['shell', 'am', 'instrument', '-e', 'coverage', 'true', '-w'])
+          .concat([instrumentClass]);
+        mocks.teen_process.expects("SubProcess")
+          .once().withExactArgs('dummy_adb_path', args)
+          .returns(conn);
+        mocks.adb.expects("waitForActivity")
+          .once().withExactArgs(waitPkg, waitActivity)
+          .returns("");
+        await adb.androidCoverage(instrumentClass, waitPkg, waitActivity);
+        mocks.teen_process.verify();
+        mocks.adb.verify();
+      });
+    }));
   });
   describe('sendTelnetCommand', async () => {
     let mocks = {};
@@ -307,7 +481,6 @@ describe('adb commands', () => {
       mocks.net.verify();
     });
   });
-
   it('isValidClass should correctly validate class names', () => {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
     should.not.exist(adb.isValidClass('illegalPackage#/adsasd'));

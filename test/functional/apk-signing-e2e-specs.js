@@ -4,16 +4,17 @@ import ADB from '../../lib/adb.js';
 import path from 'path';
 import { exec } from 'teen_process';
 import { system } from 'appium-support';
+import * as utils from '../../lib/utils.js';
 
 
-const selendroidTestApp = path.resolve(__dirname, '..', '..', '..', 'test',
-                                       'selendroid-test-app.apk'),
-      contactManagerPath = path.resolve(__dirname, '..', '..', '..', 'test',
-                                        'ContactManager.apk'),
-      unsignJar = path.resolve(__dirname, '..', '..', '..', 'jars', 'unsign.jar'),
+const selendroidTestApp = path.resolve(utils.rootDir, 'test',
+                                       'fixtures', 'selendroid-test-app.apk'),
+      contactManagerPath = path.resolve(utils.rootDir, 'test',
+                                        'fixtures', 'ContactManager.apk'),
+      unsignJar = path.resolve(utils.rootDir, 'jars', 'unsign.jar'),
       tmp = system.isWindows() ? 'C:\\Windows\\Temp' : '/tmp',
-      keystorePath = path.resolve(__dirname, '..', '..', '..', 'test',
-                                  'appiumtest.keystore'),
+      keystorePath = path.resolve(utils.rootDir, 'test',
+                                  'fixtures', 'appiumtest.keystore'),
       keyAlias = 'appiumtest';
 
 chai.use(chaiAsPromised);

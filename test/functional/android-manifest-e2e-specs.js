@@ -7,6 +7,7 @@ import _fs from 'fs';
 import B from 'bluebird';
 import { util } from 'appium-support';
 import _rimraf from 'rimraf';
+import * as utils from '../../lib/utils.js';
 
 const fs = {
   mkdir: B.promisify(_fs.mkdir),
@@ -17,15 +18,15 @@ const fs = {
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
 const rimraf = B.promisify(_rimraf),
-      contactManagerPath = path.resolve(__dirname, '..', '..', '..', 'test',
-                                        'ContactManager.apk'),
-      contactMangerSelendroidPath = path.resolve(__dirname, '..', '..', '..', 'test',
-                                                'ContactManager-selendroid.apk'),
-      tmpDir = path.resolve(__dirname, '..', '..', '..', 'test', 'temp'),
-      srcManifest = path.resolve(__dirname, '..', '..', '..', 'test', 'selendroid',
-                                 'AndroidManifest.xml'),
-      serverPath = path.resolve(__dirname, '..', '..', '..', 'test', 'selendroid',
-                                'selendroid.apk');
+      contactManagerPath = path.resolve(utils.rootDir, 'test',
+                                        'fixtures', 'ContactManager.apk'),
+      contactMangerSelendroidPath = path.resolve(utils.rootDir, 'test',
+                                                 'fixtures', 'ContactManager-selendroid.apk'),
+      tmpDir = path.resolve(utils.rootDir, 'test', 'temp'),
+      srcManifest = path.resolve(utils.rootDir, 'test', 'fixtures',
+                                 'selendroid', 'AndroidManifest.xml'),
+      serverPath = path.resolve(utils.rootDir, 'test', 'fixtures',
+                                'selendroid', 'selendroid.apk');
 
 chai.use(chaiAsPromised);
 
