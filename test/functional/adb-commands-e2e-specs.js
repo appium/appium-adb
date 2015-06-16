@@ -2,12 +2,18 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
+import path from 'path';
+import * as utils from '../../lib/utils.js';
 
 chai.use(chaiAsPromised);
 // change according to CI
 const apiLevel = '21',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
-      defaultIME = 'com.android.inputmethod.latin/.LatinIME';
+      defaultIME = 'com.android.inputmethod.latin/.LatinIME',
+      contactManagerPath = path.resolve(utils.rootDir, 'test',
+                                        'fixtures', 'ContactManager.apk'),
+      pkgName = 'com.example.android.contactmanager',
+      actName = 'ContactManager';
 
 describe('adb commands', () => {
   let adb = new ADB();
@@ -32,5 +38,30 @@ describe('adb commands', () => {
     await adb.enableIME(IME);
     (await adb.enabledIMEs()).should.include(IME);
     await adb.enabledIMEs();
+  });
+  it('processExists should be able to find ui process', async () => {
+    (await adb.processExists('com.android.systemui')).should.be.true;
+  });
+  it('ping should return true', async () => {
+    (await adb.ping()).should.be.true;
+  });
+  it('getPIDsByName should return pids', async () => {
+    (await adb.getPIDsByName('m.android.phone')).should.have.length.above(0);
+  });
+  it('killProcessesByName should kill process', async () => {
+    await adb.install(contactManagerPath);
+    await adb.startApp({pkg: pkgName,
+                        activity: actName});
+    await adb.killProcessesByName(pkgName);
+    (await adb.getPIDsByName(pkgName)).should.have.length(0);
+  });
+  it('killProcessByPID should kill process', async () => {
+    await adb.install(contactManagerPath);
+    await adb.startApp({pkg: pkgName,
+                        activity: actName});
+    let pids = await adb.getPIDsByName(pkgName);
+    pids.should.have.length.above(0);
+    await adb.killProcessByPID(pids[0]);
+    (await adb.getPIDsByName(pkgName)).length.should.equal(0);
   });
 });
