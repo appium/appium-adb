@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import net from 'net';
 import events from 'events';
 import Logcat from '../../lib/logcat.js';
-import child_process from 'child_process';
+import * as teen_process from 'teen_process';
 
 chai.use(chaiAsPromised);
 const should = chai.should();
@@ -42,12 +42,12 @@ describe('adb commands', () => {
         beforeEach(() => {
           mocks.adb = sinon.mock(adb);
           mocks.logcat = sinon.mock(logcat);
-          mocks.cp = sinon.mock(child_process);
+          mocks.teen_process = sinon.mock(teen_process);
         });
         afterEach(() => {
           mocks.adb.restore();
           mocks.logcat.restore();
-          mocks.cp.restore();
+          mocks.teen_process.restore();
         });
         fn(mocks);
       };
@@ -425,21 +425,21 @@ describe('adb commands', () => {
         adb.adb.defaultArgs = [];
         adb.adb.path = "dummy_adb_path";
         let conn = new events.EventEmitter();
-        conn.stderr = new events.EventEmitter();
+        conn.start = () => { }; // do nothing
         const instrumentClass = 'instrumentClass',
               waitPkg = 'waitPkg',
               waitActivity = 'waitActivity';
         let args = adb.adb.defaultArgs
           .concat(['shell', 'am', 'instrument', '-e', 'coverage', 'true', '-w'])
           .concat([instrumentClass]);
-        mocks.cp.expects("spawn")
+        mocks.teen_process.expects("SubProcess")
           .once().withExactArgs('dummy_adb_path', args)
           .returns(conn);
         mocks.adb.expects("waitForActivity")
           .once().withExactArgs(waitPkg, waitActivity)
           .returns("");
         await adb.androidCoverage(instrumentClass, waitPkg, waitActivity);
-        mocks.cp.verify();
+        mocks.teen_process.verify();
         mocks.adb.verify();
       });
     }));

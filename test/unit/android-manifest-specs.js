@@ -10,19 +10,19 @@ chai.use(chaiAsPromised);
 describe('android-manifest', async () => {
   let adb = new ADB();
   let withExecMock = (fn) => {
-        return () => {
-          let mocks = {};
-          before(async () => {
-            mocks.teen_process = sinon.mock(teen_process);
-            mocks.adb = sinon.mock(adb);
-          });
-          after(() => {
-            mocks.teen_process.restore();
-            mocks.adb.restore();
-          });
-          fn(mocks);
-        };
+    return () => {
+        let mocks = {};
+        before(async () => {
+          mocks.teen_process = sinon.mock(teen_process);
+          mocks.adb = sinon.mock(adb);
+        });
+        after(() => {
+          mocks.teen_process.restore();
+          mocks.adb.restore();
+        });
+        fn(mocks);
       };
+  };
   describe('processFromManifest', withExecMock((mocks) => {
     it('should correctly parse process from manifest', async () => {
       adb.binaries.aapt = 'dummy_aapt';

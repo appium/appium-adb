@@ -45,7 +45,7 @@ describe('System calls', () => {
     this.timeout(240000);
     let proc = await adb.launchAVD(avdName);
     (await adb.getConnectedEmulators()).length.should.be.above(0);
-    proc.kill();
+    proc.stop();
   });
   it('waitForDevice should get all connected avds', async function () {
     this.timeout(60000);
