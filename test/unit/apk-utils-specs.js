@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
-import sinon from 'sinon';
+import { withMocks } from '../helpers';
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
@@ -16,19 +16,7 @@ const should = chai.should(),
 
 describe('Apk-utils', () => {
   let adb = new ADB();
-  let withExecMock = (fn) => {
-    return () => {
-      let mocks = {};
-      beforeEach(async () => {
-        mocks.adb = sinon.mock(adb);
-      });
-      afterEach(() => {
-        mocks.adb.restore();
-      });
-      fn(mocks);
-    };
-  };
-  describe('isAppInstalled', withExecMock((mocks) => {
+  describe('isAppInstalled', withMocks({adb}, (mocks) => {
     it('should parse correctly and return true', async () => {
       const pkg = 'dummy.package';
       mocks.adb.expects('getApiLevel')
@@ -52,7 +40,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('getFocusedPackageAndActivity', withExecMock((mocks) => {
+  describe('getFocusedPackageAndActivity', withMocks({adb}, (mocks) => {
     it('should parse correctly and return package and activity', async () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
@@ -72,7 +60,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('waitForActivityOrNot', withExecMock((mocks) => {
+  describe('waitForActivityOrNot', withMocks({adb}, (mocks) => {
     it('should call shell once and should return', async () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
@@ -113,7 +101,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('waitForActivity', withExecMock((mocks) => {
+  describe('waitForActivity', withMocks({adb}, (mocks) => {
     it('should call waitForActivityOrNot with correct arguments', async () => {
       mocks.adb.expects('waitForActivityOrNot')
         .once().withExactArgs(pkg, act, false, 20000)
@@ -122,7 +110,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('waitForNotActivity', withExecMock((mocks) => {
+  describe('waitForNotActivity', withMocks({adb}, (mocks) => {
     it('should call waitForActivityOrNot with correct arguments', async () => {
       mocks.adb.expects('waitForActivityOrNot')
         .once().withExactArgs(pkg, act, true, 20000)
@@ -131,7 +119,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('uninstallApk', withExecMock((mocks) => {
+  describe('uninstallApk', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('forceStop')
         .once().withExactArgs(pkg)
@@ -143,7 +131,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('installFromDevicePath', withExecMock((mocks) => {
+  describe('installFromDevicePath', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'install', '-r', 'foo'])
@@ -152,7 +140,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('install', withExecMock((mocks) => {
+  describe('install', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', '-r', 'foo'])
@@ -161,7 +149,7 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
-  describe('startApp', withExecMock((mocks) => {
+  describe('startApp', withMocks({adb}, (mocks) => {
     it('should call getApiLevel and shell with correct arguments', async () => {
       mocks.adb.expects('getApiLevel')
         .once().withExactArgs()
