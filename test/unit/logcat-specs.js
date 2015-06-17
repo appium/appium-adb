@@ -1,29 +1,18 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
-import sinon from 'sinon';
+//import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 import events from 'events';
 import Logcat from '../../lib/logcat';
+import { withMocks } from '../helpers';
 
 chai.use(chaiAsPromised);
 
 describe('logcat', async () => {
   let adb = {path: 'dummyPath', defaultArgs: []};
   let logcat = new Logcat({adb: adb, debug: false, debugTrace: false});
-  let withMocks = (fn) => {
-    return () => {
-      let mocks = {};
-      beforeEach(async () => {
-        mocks.teen_process = sinon.mock(teen_process);
-      });
-      afterEach(() => {
-        mocks.teen_process.restore();
-      });
-      fn(mocks);
-    };
-  };
-  describe('startCapture', withMocks((mocks) => {
+  describe('startCapture', withMocks({teen_process}, (mocks) => {
     it('should correctly call subprocess and should resolve promise', async () => {
       let conn = new events.EventEmitter();
       conn.start = () => { };

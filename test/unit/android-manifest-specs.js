@@ -2,28 +2,14 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
-import sinon from 'sinon';
 import * as teen_process from 'teen_process';
+import { withMocks } from '../helpers';
 
 chai.use(chaiAsPromised);
 
-describe('android-manifest', async () => {
+describe('android-manifest', () => {
   let adb = new ADB();
-  let withExecMock = (fn) => {
-    return () => {
-      let mocks = {};
-      before(async () => {
-        mocks.teen_process = sinon.mock(teen_process);
-        mocks.adb = sinon.mock(adb);
-      });
-      after(() => {
-        mocks.teen_process.restore();
-        mocks.adb.restore();
-      });
-      fn(mocks);
-    };
-  };
-  describe('processFromManifest', withExecMock((mocks) => {
+  describe('processFromManifest', withMocks({adb, teen_process}, (mocks) => {
     it('should correctly parse process from manifest', async () => {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
@@ -40,7 +26,7 @@ describe('android-manifest', async () => {
       mocks.adb.verify();
     });
   }));
-  describe('packageAndLaunchActivityFromManifest', withExecMock((mocks) => {
+  describe('packageAndLaunchActivityFromManifest', withMocks({adb, teen_process}, (mocks) => {
     it('should correctly parse package and activity from manifest', async () => {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
@@ -59,7 +45,7 @@ describe('android-manifest', async () => {
       mocks.adb.verify();
     });
   }));
-  describe('hasInternetPermissionFromManifest', withExecMock((mocks) => {
+  describe('hasInternetPermissionFromManifest', withMocks({adb, teen_process}, (mocks) => {
     it('should correctly parse internet permission from manifest', async () => {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK';
