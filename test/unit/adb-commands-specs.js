@@ -36,7 +36,7 @@ describe('adb commands', () => {
   , debugTrace: false
   });
   describe('shell', () => {
-    describe('getApiLevel', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('getApiLevel', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.build.version.sdk'])
@@ -45,7 +45,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('availableIMEs', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('availableIMEs', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'list', '-a'])
@@ -54,7 +54,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('enabledIMEs', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('enabledIMEs', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'list'])
@@ -63,7 +63,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('defaultIME', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('defaultIME', withMocks({adb}, (mocks) => {
       let defaultIME = 'com.android.inputmethod.latin/.LatinIME';
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
@@ -73,7 +73,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('disableIME', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('disableIME', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'disable', IME])
@@ -82,7 +82,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('enableIME', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('enableIME', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'enable', IME])
@@ -91,7 +91,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('keyevent', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('keyevent', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         let keycode = '29';
         let code = parseInt(keycode, 10);
@@ -102,7 +102,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('lock', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('lock', withMocks({adb}, (mocks) => {
       it('should call keyevent with correct args', async () => {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(26)
@@ -111,7 +111,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('back', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('back', withMocks({adb}, (mocks) => {
       it('should call keyevent with correct args', async () => {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(4)
@@ -120,7 +120,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('goToHome', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('goToHome', withMocks({adb}, (mocks) => {
       it('should call keyevent with correct args', async () => {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(3)
@@ -129,7 +129,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe.skip('isScreenLocked', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe.skip('isScreenLocked', withMocks({adb}, (mocks) => {
       it('should call keyevent with correct args', async () => {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(3)
@@ -138,7 +138,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('isSoftKeyboardPresent', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('isSoftKeyboardPresent', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should return false', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['dumpsys', 'input_method'])
@@ -158,7 +158,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('isAirplaneModeOn', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('isAirplaneModeOn', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should be true', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['settings', 'get', 'global', 'airplane_mode_on'])
@@ -174,7 +174,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('setAirplaneMode', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('setAirplaneMode', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['settings', 'put', 'global', 'airplane_mode_on', 1])
@@ -183,7 +183,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('broadcastAirplaneMode', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('broadcastAirplaneMode', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE',
@@ -193,7 +193,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('isWifiOn', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('isWifiOn', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should be true', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['settings', 'get', 'global', 'wifi_on'])
@@ -209,7 +209,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('setWifiState', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('setWifiState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
@@ -219,7 +219,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('isDataOn', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('isDataOn', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should be true', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['settings', 'get', 'global', 'mobile_data'])
@@ -235,7 +235,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('setDataState', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('setDataState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
@@ -245,7 +245,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('setWifiAndData', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('setWifiAndData', withMocks({adb}, (mocks) => {
       it('should call shell with correct args when only wifi', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
@@ -271,7 +271,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('processExists', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('processExists', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should find process', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs("ps")
@@ -287,7 +287,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('forwardPort', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('forwardPort', withMocks({adb}, (mocks) => {
       const sysPort = 12345,
             devicePort = 54321;
       it('forwardPort should call shell with correct args', async () => {
@@ -305,7 +305,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('ping', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('ping', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should return true', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(["echo", "ping"])
@@ -314,7 +314,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('restart', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('restart', withMocks({adb}, (mocks) => {
       it('should call adb in correct order', async () => {
         mocks.adb.expects("stopLogcat").once().returns("");
         mocks.adb.expects("restartAdb").once().returns("");
@@ -324,7 +324,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('stopLogcat', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('stopLogcat', withMocks({logcat}, (mocks) => {
       it('should call stopCapture', async () => {
         adb.logcat = logcat;
         mocks.logcat.expects("stopCapture").once().returns("");
@@ -332,7 +332,7 @@ describe('adb commands', () => {
         mocks.logcat.verify();
       });
     }));
-    describe('getLogcatLogs', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('getLogcatLogs', withMocks({logcat}, (mocks) => {
       it('should call getLogs', async () => {
         adb.logcat = logcat;
         mocks.logcat.expects("getLogs").once().returns("");
@@ -340,7 +340,7 @@ describe('adb commands', () => {
         mocks.logcat.verify();
       });
     }));
-    describe('getPIDsByName', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('getPIDsByName', withMocks({adb}, (mocks) => {
       it('should call shell and parse pids correctly', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(["ps", '.contactmanager'])
@@ -349,7 +349,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('killProcessesByName', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('killProcessesByName', withMocks({adb}, (mocks) => {
       it('should call getPIDsByName and kill process correctly', async () => {
         mocks.adb.expects("getPIDsByName")
           .once().withExactArgs(contactManagerPackage)
@@ -361,7 +361,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('killProcessByPID', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('killProcessByPID', withMocks({adb}, (mocks) => {
       it('should call kill process correctly', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['kill', 5078])
@@ -370,7 +370,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('broadcastProcessEnd', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('broadcastProcessEnd', withMocks({adb}, (mocks) => {
       it('should broadcast process end', async () => {
         let intent = 'intent',
             processName = 'processName';
@@ -384,7 +384,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('broadcast', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('broadcast', withMocks({adb}, (mocks) => {
       it('should broadcast intent', async () => {
         let intent = 'intent';
         mocks.adb.expects("shell")
@@ -394,7 +394,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('instrument', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('instrument', withMocks({adb}, (mocks) => {
       it('should call shell with correct arguments', async () => {
         let intent = 'intent';
         mocks.adb.expects("shell")
@@ -404,7 +404,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('androidCoverage', withMocks({adb, logcat, teen_process}, (mocks) => {
+    describe('androidCoverage', withMocks({adb, teen_process}, (mocks) => {
       it('should call shell with correct arguments', async () => {
         adb.adb.defaultArgs = [];
         adb.adb.path = "dummy_adb_path";
