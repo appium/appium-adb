@@ -52,6 +52,7 @@
     "appium-gulp-plugins": "^1.1.1",
     "chai-as-promised": "^5.0.0",
     "gulp": "^3.8.11",
-    "mochawait": "^2.0.0"
+    "mochawait": "^2.0.0",
+    "yargs": "^3.10.0"
   }
 }
