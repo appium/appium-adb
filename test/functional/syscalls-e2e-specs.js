@@ -35,10 +35,10 @@ describe('System calls', function () {
     (await adb.getConnectedEmulators()).length.should.be.above(0);
   });
   it('getRunningAVD should get all connected avd', async () => {
-    await adb.getRunningAVD(avdName).should.not.be.null;
+    (await adb.getRunningAVD(avdName)).should.not.be.null;
   });
   it('getRunningAVDWithRetry should get all connected avds', async () => {
-    await adb.getRunningAVDWithRetry(avdName).should.not.be.null;
+    (await adb.getRunningAVDWithRetry(avdName)).should.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI
   it.skip('launchAVD should get all connected avds', async function () {
