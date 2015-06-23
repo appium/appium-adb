@@ -7,7 +7,7 @@ import * as utils from '../../lib/utils.js';
 
 chai.use(chaiAsPromised);
 // change according to CI
-const apiLevel = '21',
+const apiLevel = '18',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIME = 'com.android.inputmethod.latin/.LatinIME',
       contactManagerPath = path.resolve(utils.rootDir, 'test',

@@ -7,9 +7,9 @@ chai.use(chaiAsPromised);
 
 describe('System calls', function () {
   let adb = new ADB();
-  const apiLevel = '21',
+  const apiLevel = '18',
   // TODO change according to avdName on test machine
-        avdName = 'finaltest21';
+        avdName = 'NEXUS_S_18_X86';
   this.timeout(50000);
   before(async () => {
     await adb.createADB();
