@@ -5,12 +5,12 @@ import ADB from '../../lib/adb.js';
 
 chai.use(chaiAsPromised);
 
-describe('System calls', () => {
+describe('System calls', function () {
   let adb = new ADB();
   const apiLevel = '21',
   // TODO change according to avdName on test machine
         avdName = 'finaltest21';
-
+  this.timeout(50000);
   before(async () => {
     await adb.createADB();
   });

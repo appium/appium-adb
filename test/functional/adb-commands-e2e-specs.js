@@ -15,8 +15,9 @@ const apiLevel = '21',
       pkgName = 'com.example.android.contactmanager',
       actName = 'ContactManager';
 
-describe('adb commands', () => {
+describe('adb commands', function () {
   let adb = new ADB();
+  this.timeout(60000);
   before(async () => {
     await adb.createADB();
   });
