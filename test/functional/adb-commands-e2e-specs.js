@@ -7,7 +7,7 @@ import * as utils from '../../lib/utils.js';
 
 chai.use(chaiAsPromised);
 // change according to CI
-const apiLevel = '21',
+const apiLevel = '18',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIME = 'com.android.inputmethod.latin/.LatinIME',
       contactManagerPath = path.resolve(utils.rootDir, 'test',
@@ -15,8 +15,9 @@ const apiLevel = '21',
       pkgName = 'com.example.android.contactmanager',
       actName = 'ContactManager';
 
-describe('adb commands', () => {
+describe('adb commands', function () {
   let adb = new ADB();
+  this.timeout(60000);
   before(async () => {
     await adb.createADB();
   });

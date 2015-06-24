@@ -5,12 +5,12 @@ import ADB from '../../lib/adb.js';
 
 chai.use(chaiAsPromised);
 
-describe('System calls', () => {
+describe('System calls', function () {
   let adb = new ADB();
-  const apiLevel = '21',
+  const apiLevel = '18',
   // TODO change according to avdName on test machine
-        avdName = 'finaltest21';
-
+        avdName = 'NEXUS_S_18_X86';
+  this.timeout(50000);
   before(async () => {
     await adb.createADB();
   });
@@ -35,10 +35,10 @@ describe('System calls', () => {
     (await adb.getConnectedEmulators()).length.should.be.above(0);
   });
   it('getRunningAVD should get all connected avd', async () => {
-    await adb.getRunningAVD(avdName).should.not.be.null;
+    (await adb.getRunningAVD(avdName)).should.not.be.null;
   });
   it('getRunningAVDWithRetry should get all connected avds', async () => {
-    await adb.getRunningAVDWithRetry(avdName).should.not.be.null;
+    (await adb.getRunningAVDWithRetry(avdName)).should.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI
   it.skip('launchAVD should get all connected avds', async function () {

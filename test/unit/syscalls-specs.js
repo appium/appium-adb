@@ -2,62 +2,71 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
-import sinon from 'sinon';
 import * as teen_process from 'teen_process';
+import { withMocks } from '../helpers';
 
 chai.use(chaiAsPromised);
+const adb = new ADB();
+adb.adb.path = 'adb_path';
 
-describe('System calls', () => {
-  const adb = new ADB();
-  let execStub, getConnectedDevicesSpy;
-  beforeEach(() => {
-    getConnectedDevicesSpy = sinon.spy(adb, "getConnectedDevices");
-    execStub = sinon.stub(teen_process, "exec");
-  });
-  afterEach(() => {
-    teen_process.exec.restore();
-    adb.getConnectedDevices.restore();
-  });
-
+describe('System calls', withMocks({teen_process}, (mocks) => {
   it('getConnectedDevices should get all connected devices', async () => {
-    execStub.returns({stdout:"List of devices attached \n emulator-5554	device"});
+    mocks.teen_process.expects("exec")
+      .once().withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"List of devices attached \n emulator-5554	device"});
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
+    mocks.teen_process.verify();
   });
   it('getConnectedDevices should fail when adb devices returns unexpected output', async () => {
-    execStub.returns({stdout:"foobar"});
+    mocks.teen_process.expects("exec")
+      .once().withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"foobar"});
     await adb.getConnectedDevices().should.eventually.be
                                    .rejectedWith("Unexpected output while trying to get devices");
+    mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when there are no connected devices', async () => {
-    execStub.returns({stdout:"List of devices attached"});
+    mocks.teen_process.expects("exec")
+      .atLeast(2).withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"List of devices attached"});
     await adb.getDevicesWithRetry(1000).should.eventually.be
                                        .rejectedWith("Could not find a connected Android device.");
-    getConnectedDevicesSpy.callCount.should.be.at.least(2);
+    mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when adb devices returns unexpected output', async () => {
-    execStub.returns({stdout:"foobar"});
+    mocks.teen_process.expects("exec")
+      .atLeast(2).withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"foobar"});
     await adb.getDevicesWithRetry(1000).should.eventually.be
                                        .rejectedWith("Could not find a connected Android device.");
-    getConnectedDevicesSpy.callCount.should.be.at.least(2);
+    mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should get all connected devices', async () => {
-    execStub.returns({stdout:"List of devices attached \n emulator-5554	device"});
+    mocks.teen_process.expects("exec")
+      .once().withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"List of devices attached \n emulator-5554	device"});
     let devices = await adb.getDevicesWithRetry(1000);
     devices.should.have.length.above(0);
-    getConnectedDevicesSpy.calledOnce.should.be.true;
+    mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should get all connected devices second time', async () => {
-    execStub.onCall(0).returns({stdout:"Foobar"});
-    execStub.returns({stdout:"List of devices attached \n emulator-5554	device"});
+    mocks.teen_process.expects("exec")
+      .onCall(0)
+      .returns({stdout:"Foobar"});
+    mocks.teen_process.expects("exec")
+      .withExactArgs(adb.adb.path, ['devices'])
+      .returns({stdout:"List of devices attached \n emulator-5554	device"});
     let devices = await adb.getDevicesWithRetry(2000);
     devices.should.have.length.above(0);
-    getConnectedDevicesSpy.calledTwice.should.be.true;
+    mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when exec throws an error', async () => {
-    execStub.throws("Error foobar");
+    mocks.teen_process.expects("exec")
+      .atLeast(2)
+      .throws("Error foobar");
     await adb.getDevicesWithRetry(1000).should.eventually.be
                                        .rejectedWith("Could not find a connected Android device.");
-    getConnectedDevicesSpy.callCount.should.be.at.least(2);
+    mocks.teen_process.verify();
   });
-});
+}));

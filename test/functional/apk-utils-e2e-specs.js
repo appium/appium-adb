@@ -7,7 +7,7 @@ import * as utils from '../../lib/utils.js';
 
 chai.use(chaiAsPromised);
 
-describe('apk utils', () => {
+describe('apk utils', function () {
   let adb = new ADB();
   const contactManagerPath = path.resolve(utils.rootDir, 'test',
                                           'fixtures', 'ContactManager.apk');
@@ -17,6 +17,7 @@ describe('apk utils', () => {
     appPackage.should.equal('com.example.android.contactmanager');
     appActivity.should.equal('.ContactManager');
   };
+  this.timeout(60000);
   before(async () => {
     await adb.createADB();
   });
