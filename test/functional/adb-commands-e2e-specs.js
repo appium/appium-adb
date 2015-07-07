@@ -67,6 +67,16 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async () => {
     await adb.getDeviceLanguage().should.eventually.equal('en');
-    await adb.getDeviceCountry().should.eventually.equal('us');
+    await adb.getDeviceCountry().should.eventually.equal('US');
+  });
+  it('should set device language and country', async () => {
+    await adb.setDeviceLanguage('fr');
+    await adb.setDeviceCountry('fr');
+    await adb.reboot();
+    await adb.getDeviceLanguage().should.eventually.equal('fr');
+    await adb.getDeviceCountry().should.eventually.equal('FR');
+    // cleanup
+    await adb.setDeviceLanguage('en');
+    await adb.setDeviceCountry('us');
   });
 });
