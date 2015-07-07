@@ -6,10 +6,10 @@ import Logcat from '../../lib/logcat';
 chai.use(chaiAsPromised);
 
 describe('logcat', () => {
-  let adb = new ADB();
+  let adb;
   let logcat;
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
     logcat = new Logcat({adb: adb.adb, debug: false, debugTrace: false});
   });
   it('getLogs should return logs', async function () {

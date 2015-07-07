@@ -3,16 +3,16 @@ import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
 
+const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
+
 chai.use(chaiAsPromised);
 
 describe('System calls', function () {
-  let adb = new ADB();
-  const apiLevel = '18',
-  // TODO change according to avdName on test machine
-        avdName = 'NEXUS_S_18_X86';
+  let adb;
+  const apiLevel = '18';
   this.timeout(50000);
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
   });
   it('getConnectedDevices should get devices', async () => {
     let devices = await adb.getConnectedDevices();

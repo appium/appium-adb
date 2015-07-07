@@ -8,7 +8,7 @@ import * as utils from '../../lib/utils.js';
 chai.use(chaiAsPromised);
 
 describe('apk utils', function () {
-  let adb = new ADB();
+  let adb;
   const contactManagerPath = path.resolve(utils.rootDir, 'test',
                                           'fixtures', 'ContactManager.apk');
   const deviceTempPath = '/data/local/tmp/';
@@ -19,7 +19,7 @@ describe('apk utils', function () {
   };
   this.timeout(60000);
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
   });
   it('should be able to install/remove app and detect its status', async () => {
     (await adb.isAppInstalled('foo')).should.be.false;

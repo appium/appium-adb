@@ -16,10 +16,10 @@ const apiLevel = '18',
       actName = 'ContactManager';
 
 describe('adb commands', function () {
-  let adb = new ADB();
+  let adb;
   this.timeout(60000);
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
   });
   it('getApiLevel should get correct api level', async () => {
     (await adb.getApiLevel()).should.equal(apiLevel);

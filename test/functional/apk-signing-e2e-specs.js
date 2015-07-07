@@ -20,11 +20,11 @@ const selendroidTestApp = path.resolve(utils.rootDir, 'test',
 chai.use(chaiAsPromised);
 
 describe('Apk-signing', async () => {
-  let adb = new ADB(),
+  let adb,
       unsignApk = async (apk) => { await exec('java', ['-jar', unsignJar, apk]); };
 
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
   });
   it('checkApkCert should return false for unsigned apk', async () => {
     await unsignApk(selendroidTestApp);

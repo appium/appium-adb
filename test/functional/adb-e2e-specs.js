@@ -8,15 +8,13 @@ chai.use(chaiAsPromised);
 
 describe('ADB', () => {
   it('should correctly return adb if present', async () => {
-    let adb = new ADB();
-    let temp = await adb.createADB();
-    should.exist(temp.path);
+    let adb = await ADB.createADB();
+    should.exist(adb.adb.path);
   });
   it('should correctly return adb from path when ANDROID_HOME is not set', async () => {
     let opts = {sdkRoot: ''};
-    let adb = new ADB(opts);
-    let temp = await adb.createADB(opts);
-    should.exist(temp.path);
+    let adb = await ADB.createADB(opts);
+    should.exist(adb.adb.path);
   });
   it.skip('should error out if binary not persent', async () => {
     // TODO write a negative test

@@ -31,9 +31,9 @@ const rimraf = B.promisify(_rimraf),
 chai.use(chaiAsPromised);
 
 describe('Android-manifest', async () => {
-  let adb = new ADB();
+  let adb;
   before(async () => {
-    await adb.createADB();
+    adb = await ADB.createADB();
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async () => {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
