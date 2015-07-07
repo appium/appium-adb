@@ -69,4 +69,15 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
                                        .rejectedWith("Could not find a connected Android device.");
     mocks.teen_process.verify();
   });
+  it('setDeviceId should set the device id', () => {
+    adb.setDeviceId('foobar');
+    adb.curDeviceId.should.equal('foobar');
+    adb.adb.defaultArgs.should.include('foobar');
+  });
+  it('setDevice should set the device id and emu port from obj', () => {
+    adb.setDevice({udid: 'emulator-1234'});
+    adb.curDeviceId.should.equal('emulator-1234');
+    adb.adb.defaultArgs.should.include('emulator-1234');
+    adb.emulatorPort.should.equal(1234);
+  });
 }));
