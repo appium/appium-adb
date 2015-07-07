@@ -65,4 +65,8 @@ describe('adb commands', function () {
     await adb.killProcessByPID(pids[0]);
     (await adb.getPIDsByName(pkgName)).length.should.equal(0);
   });
+  it('should get device language and country', async () => {
+    await adb.getDeviceLanguage().should.eventually.equal('en');
+    await adb.getDeviceCountry().should.eventually.equal('us');
+  });
 });
