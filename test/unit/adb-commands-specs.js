@@ -460,4 +460,7 @@ describe('adb commands', () => {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
     should.not.exist(adb.isValidClass('illegalPackage#/adsasd'));
   });
+  it('getAdbPath should correctly return adbPath', () => {
+    adb.getAdbPath().should.equal(adb.adb.path);
+  });
 });
