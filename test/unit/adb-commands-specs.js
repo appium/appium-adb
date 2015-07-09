@@ -406,14 +406,14 @@ describe('adb commands', () => {
     }));
     describe('androidCoverage', withMocks({adb, teen_process}, (mocks) => {
       it('should call shell with correct arguments', async () => {
-        adb.adb.defaultArgs = [];
-        adb.adb.path = "dummy_adb_path";
+        adb.executable.defaultArgs = [];
+        adb.executable.path = "dummy_adb_path";
         let conn = new events.EventEmitter();
         conn.start = () => { }; // do nothing
         const instrumentClass = 'instrumentClass',
               waitPkg = 'waitPkg',
               waitActivity = 'waitActivity';
-        let args = adb.adb.defaultArgs
+        let args = adb.executable.defaultArgs
           .concat(['shell', 'am', 'instrument', '-e', 'coverage', 'true', '-w'])
           .concat([instrumentClass]);
         mocks.teen_process.expects("SubProcess")
@@ -459,5 +459,8 @@ describe('adb commands', () => {
   it('isValidClass should correctly validate class names', () => {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
     should.not.exist(adb.isValidClass('illegalPackage#/adsasd'));
+  });
+  it('getAdbPath should correctly return adbPath', () => {
+    adb.getAdbPath().should.equal(adb.executable.path);
   });
 });
