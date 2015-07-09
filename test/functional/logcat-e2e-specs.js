@@ -10,7 +10,7 @@ describe('logcat', () => {
   let logcat;
   before(async () => {
     adb = await ADB.createADB();
-    logcat = new Logcat({adb: adb.adb, debug: false, debugTrace: false});
+    logcat = new Logcat({adb: adb.executable, debug: false, debugTrace: false});
   });
   it('getLogs should return logs', async function () {
     this.timeout(30000);
