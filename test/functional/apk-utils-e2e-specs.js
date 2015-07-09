@@ -69,4 +69,8 @@ describe('apk utils', function () {
                         activity: 'ContactManager'});
     await assertPackageAndActivity();
   });
+  it('extractStringsFromApk should get strings for default language', async () => {
+    let strings = await adb.extractStringsFromApk(contactManagerPath, null, '/tmp');
+    strings.save.should.equal('Save');
+  });
 });
