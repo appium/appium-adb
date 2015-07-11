@@ -56,4 +56,12 @@ describe('System calls', function () {
     await adb.reboot();
     await adb.ping();
   });
+  it('fileExists should detect when files do and do not exist', async function () {
+    (await adb.fileExists('/foo/bar/baz.zip')).should.be.false;
+    (await adb.fileExists('/system/etc/system_fonts.xml')).should.be.true;
+  });
+  it('ls should list files', async function () {
+    (await adb.ls('/foo/bar')).should.eql([]);
+    (await adb.ls('/system/etc')).should.contain('system_fonts.xml');
+  });
 });
