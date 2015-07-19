@@ -79,4 +79,7 @@ describe('adb commands', function () {
     await adb.setDeviceLanguage('en');
     await adb.setDeviceCountry('us');
   });
+  it('it should forward the port', async () => {
+    await adb.forwardPort(4724, 4724);
+  });
 });
