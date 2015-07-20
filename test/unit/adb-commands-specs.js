@@ -292,14 +292,14 @@ describe('adb commands', () => {
             devicePort = 54321;
       it('forwardPort should call shell with correct args', async () => {
         mocks.adb.expects("adbExec")
-          .once().withExactArgs('forward', [`tcp:${sysPort}`, `tcp:${devicePort}`])
+          .once().withExactArgs(['forward', `tcp:${sysPort}`, `tcp:${devicePort}`])
           .returns("");
         await adb.forwardPort(sysPort, devicePort);
         mocks.adb.verify();
       });
       it('forwardAbstractPort should call shell with correct args', async () => {
         mocks.adb.expects("adbExec")
-          .once().withExactArgs('forward', [`tcp:${sysPort}`, `localabstract:${devicePort}`])
+          .once().withExactArgs(['forward', `tcp:${sysPort}`, `localabstract:${devicePort}`])
           .returns("");
         await adb.forwardAbstractPort(sysPort, devicePort);
         mocks.adb.verify();
