@@ -79,7 +79,13 @@ describe('adb commands', function () {
     await adb.setDeviceLanguage('en');
     await adb.setDeviceCountry('us');
   });
-  it('it should forward the port', async () => {
+  it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);
+  });
+  it('should start logcat from adb', async () => {
+    await adb.startLogcat();
+    let logs = adb.logcat.getLogs();
+    logs.should.have.length.above(0);
+    await adb.stopLogcat();
   });
 });
