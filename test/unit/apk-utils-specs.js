@@ -143,7 +143,7 @@ describe('Apk-utils', () => {
   describe('install', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', '-r', 'foo'])
+        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
         .returns('');
       (await adb.install('foo'));
       mocks.adb.verify();
