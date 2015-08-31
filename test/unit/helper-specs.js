@@ -1,4 +1,3 @@
-//import chai from 'chai';
 import { getActivityRelativeName } from '../../lib/helpers';
 
 describe('helpers', () => {
