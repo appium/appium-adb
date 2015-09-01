@@ -246,28 +246,52 @@ describe('adb commands', () => {
       });
     }));
     describe('setWifiAndData', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args when only wifi', async () => {
+      it('should call shell with correct args when turning only wifi on', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
                                   '-e', 'wifi', 'on'])
           .returns("");
-        await adb.setWifiAndData({wifi:true});
+        await adb.setWifiAndData({wifi: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when only data', async () => {
+      it('should call shell with correct args when turning only wifi off', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
+                                  '-e', 'wifi', 'off'])
+          .returns("");
+        await adb.setWifiAndData({wifi: false});
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args when turning only data on', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
                                   '-e', 'data', 'on'])
           .returns("");
-        await adb.setWifiAndData({data:true});
+        await adb.setWifiAndData({data: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when wifi and data', async () => {
+      it('should call shell with correct args when turning only data off', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
+                                  '-e', 'data', 'off'])
+          .returns("");
+        await adb.setWifiAndData({data: false});
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args when turning both wifi and data on', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
                                   '-e', 'wifi', 'on', '-e', 'data', 'on'])
           .returns("");
-        await adb.setWifiAndData({wifi:true, data:true});
+        await adb.setWifiAndData({wifi: true, data: true});
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args when turning both wifi and data off', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
+                                  '-e', 'wifi', 'off', '-e', 'data', 'off'])
+          .returns("");
+        await adb.setWifiAndData({wifi: false, data: false});
         mocks.adb.verify();
       });
     }));
