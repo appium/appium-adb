@@ -70,7 +70,7 @@ describe('apk utils', function () {
     await assertPackageAndActivity();
   });
   it('extractStringsFromApk should get strings for default language', async () => {
-    let strings = await adb.extractStringsFromApk(contactManagerPath, null, '/tmp');
-    strings.save.should.equal('Save');
+    let {apkStrings} = await adb.extractStringsFromApk(contactManagerPath, null, '/tmp');
+    apkStrings.save.should.equal('Save');
   });
 });
