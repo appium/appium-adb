@@ -134,7 +134,7 @@ describe('Apk-utils', () => {
   describe('installFromDevicePath', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'install', '-r', 'foo'])
+        .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
       (await adb.installFromDevicePath('foo'));
       mocks.adb.verify();
