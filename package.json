@@ -1,6 +1,6 @@
 {
   "name": "appium-adb",
-  "version": "2.0.0-beta14",
+  "version": "2.0.0-beta15",
   "description": "appium-adb",
   "main": "./build/index.js",
   "scripts": {
