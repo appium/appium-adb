@@ -49,7 +49,7 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "sinon": "~1.14.1",
-    "appium-gulp-plugins": "^1.1.1",
+    "appium-gulp-plugins": "https://github.com/appium/appium-gulp-plugins/archive/sebv-proc-exit.tar.gz",
     "chai-as-promised": "^5.0.0",
     "gulp": "^3.8.11",
     "mochawait": "^2.0.0"
