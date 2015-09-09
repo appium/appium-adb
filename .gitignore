@@ -16,3 +16,4 @@ build
 npm-debug.log
 node_modules
 coverage
+coverage-e2e
