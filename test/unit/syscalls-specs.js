@@ -4,6 +4,7 @@ import 'mochawait';
 import ADB from '../../lib/adb.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '../helpers';
+import B from 'bluebird';
 
 chai.use(chaiAsPromised);
 const adb = new ADB();
@@ -79,5 +80,43 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     adb.curDeviceId.should.equal('emulator-1234');
     adb.executable.defaultArgs.should.include('emulator-1234');
     adb.emulatorPort.should.equal(1234);
+  });
+  it('setEmulatorPort should change emulator port', () => {
+    adb.setEmulatorPort(5554);
+    adb.emulatorPort.should.equal(5554);
+  });
+}));
+
+describe('System calls',  withMocks({adb, B}, (mocks) => {
+  it('fileExists should return true for if ls returns', async () => {
+    mocks.adb.expects("ls")
+      .once().withExactArgs('foo')
+      .returns(['bar']);
+    await adb.fileExists("foo").should.eventually.equal(true);
+    mocks.adb.verify();
+  });
+  it('ls should return list', async () => {
+    mocks.adb.expects("shell")
+      .once().withExactArgs(['ls', 'foo'])
+      .returns('bar');
+    let list = await adb.ls("foo");
+    list.should.deep.equal(['bar']);
+    mocks.adb.verify();
+  });
+  it('reboot should call stop and start using shell', async () => {
+    mocks.adb.expects("shell")
+      .once().withExactArgs(['stop']);
+    mocks.adb.expects("setDeviceProperty")
+      .once().withExactArgs('sys.boot_completed', 0);
+    mocks.adb.expects("shell")
+      .once().withExactArgs(['start']);
+    mocks.adb.expects("getDeviceProperty")
+      .once().withExactArgs('sys.boot_completed')
+      .returns('1');
+    mocks.B.expects("delay")
+      .once().withExactArgs(2000);
+    await adb.reboot().should.eventually.not.be.rejected;
+    mocks.adb.verify();
+    mocks.B.verify();
   });
 }));
