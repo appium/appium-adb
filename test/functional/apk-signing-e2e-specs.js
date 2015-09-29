@@ -4,16 +4,16 @@ import ADB from '../../lib/adb.js';
 import path from 'path';
 import { exec } from 'teen_process';
 import { system } from 'appium-support';
-import * as utils from '../../lib/utils.js';
+import { rootDir } from '../../lib/helpers.js';
 
 
-const selendroidTestApp = path.resolve(utils.rootDir, 'test',
+const selendroidTestApp = path.resolve(rootDir, 'test',
                                        'fixtures', 'selendroid-test-app.apk'),
-      contactManagerPath = path.resolve(utils.rootDir, 'test',
+      contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
-      unsignJar = path.resolve(utils.rootDir, 'jars', 'unsign.jar'),
+      unsignJar = path.resolve(rootDir, 'jars', 'unsign.jar'),
       tmp = system.isWindows() ? 'C:\\Windows\\Temp' : '/tmp',
-      keystorePath = path.resolve(utils.rootDir, 'test',
+      keystorePath = path.resolve(rootDir, 'test',
                                   'fixtures', 'appiumtest.keystore'),
       keyAlias = 'appiumtest';
 

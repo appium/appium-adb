@@ -33,7 +33,6 @@
     "babel-runtime": "=5.8.24",
     "bluebird": "^2.9.26",
     "lodash": "^3.9.1",
-    "rimraf": "~2.3.4",
     "source-map-support": "^0.3.1",
     "teen_process": "^1.2.2",
     "through": "~2.3.4"

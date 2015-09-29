@@ -3,10 +3,10 @@ import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import { getAndroidPlatformAndPath, assertZipArchive } from '../../lib/helpers.js';
 import path from 'path';
-import * as utils from '../../lib/utils.js';
+import { rootDir } from '../../lib/helpers.js';
 
 const should = chai.should(),
-      apkPath = path.resolve(utils.rootDir, 'test',
+      apkPath = path.resolve(rootDir, 'test',
                              'fixtures', 'ContactManager.apk');
 chai.use(chaiAsPromised);
 

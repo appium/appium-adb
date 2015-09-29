@@ -3,13 +3,13 @@ import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
 import path from 'path';
-import * as utils from '../../lib/utils.js';
+import { rootDir } from '../../lib/helpers.js';
 
 chai.use(chaiAsPromised);
 
 describe('apk utils', function () {
   let adb;
-  const contactManagerPath = path.resolve(utils.rootDir, 'test',
+  const contactManagerPath = path.resolve(rootDir, 'test',
                                           'fixtures', 'ContactManager.apk');
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {

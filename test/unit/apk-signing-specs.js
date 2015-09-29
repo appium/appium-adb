@@ -5,16 +5,16 @@ import ADB from '../../lib/adb.js';
 import * as helpers from '../../lib/helpers.js';
 import path from 'path';
 import * as teen_process from 'teen_process';
-import * as utils from '../../lib/utils.js';
+import { rootDir } from '../../lib/helpers.js';
 import * as appiumSupport from 'appium-support';
 import { withMocks } from '../helpers';
 
 chai.use(chaiAsPromised);
 
-const selendroidTestApp = path.resolve(utils.rootDir, 'test', 'fixtures',
+const selendroidTestApp = path.resolve(rootDir, 'test', 'fixtures',
                                        'selendroid-test-app.apk'),
-      helperJarPath = path.resolve(utils.rootDir, 'jars'),
-      keystorePath = path.resolve(utils.rootDir, 'test', 'fixtures',
+      helperJarPath = path.resolve(rootDir, 'jars'),
+      keystorePath = path.resolve(rootDir, 'test', 'fixtures',
                                   'appiumtest.keystore'),
       keyAlias = 'appiumtest',
       password = 'android',

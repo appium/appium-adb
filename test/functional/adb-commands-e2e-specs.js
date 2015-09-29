@@ -3,14 +3,14 @@ import chaiAsPromised from 'chai-as-promised';
 import 'mochawait';
 import ADB from '../../lib/adb.js';
 import path from 'path';
-import * as utils from '../../lib/utils.js';
+import { rootDir } from '../../lib/helpers.js';
 
 chai.use(chaiAsPromised);
 // change according to CI
 const apiLevel = '18',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIME = 'com.android.inputmethod.latin/.LatinIME',
-      contactManagerPath = path.resolve(utils.rootDir, 'test',
+      contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
       pkgName = 'com.example.android.contactmanager',
       actName = 'ContactManager';
