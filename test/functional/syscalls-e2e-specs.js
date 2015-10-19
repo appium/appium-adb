@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-import ADB from '../../lib/adb.js';
+import ADB from '../..';
+
 
 const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
 

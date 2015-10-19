@@ -1,9 +1,8 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-import { getAndroidPlatformAndPath, assertZipArchive } from '../../lib/helpers.js';
+import { getAndroidPlatformAndPath, assertZipArchive, rootDir } from '../../lib/helpers.js';
 import path from 'path';
-import { rootDir } from '../../lib/helpers.js';
+
 
 const should = chai.should(),
       apkPath = path.resolve(rootDir, 'test',

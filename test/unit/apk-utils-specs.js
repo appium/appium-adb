@@ -1,8 +1,8 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-import ADB from '../../lib/adb.js';
-import { withMocks } from '../helpers';
+import ADB from '../..';
+import { withMocks } from 'appium-test-support';
+
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
