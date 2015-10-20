@@ -1,11 +1,10 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-//import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 import events from 'events';
 import Logcat from '../../lib/logcat';
-import { withMocks } from '../helpers';
+import { withMocks } from 'appium-test-support';
+
 
 chai.use(chaiAsPromised);
 

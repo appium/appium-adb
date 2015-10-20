@@ -1,9 +1,9 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-import ADB from '../../lib/adb.js';
+import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
+
 
 chai.use(chaiAsPromised);
 // change according to CI

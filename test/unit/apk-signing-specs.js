@@ -1,13 +1,13 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import 'mochawait';
-import ADB from '../../lib/adb.js';
+import ADB from '../..';
 import * as helpers from '../../lib/helpers.js';
 import path from 'path';
 import * as teen_process from 'teen_process';
 import { rootDir } from '../../lib/helpers.js';
 import * as appiumSupport from 'appium-support';
-import { withMocks } from '../helpers';
+import { withMocks } from 'appium-test-support';
+
 
 chai.use(chaiAsPromised);
 
