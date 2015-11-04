@@ -9,11 +9,12 @@ chai.use(chaiAsPromised);
 // change according to CI
 const apiLevel = '18',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
-      defaultIME = 'com.android.inputmethod.latin/.LatinIME',
+      defaultIMEs = ['com.android.inputmethod.latin/.LatinIME',
+                     'io.appium.android.ime/.UnicodeIME'],
       contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
-      pkgName = 'com.example.android.contactmanager',
-      actName = 'ContactManager';
+      pkg = 'com.example.android.contactmanager',
+      activity = 'ContactManager';
 
 describe('adb commands', function () {
   let adb;
@@ -31,7 +32,7 @@ describe('adb commands', function () {
     (await adb.enabledIMEs()).should.have.length.above(0);
   });
   it('defaultIME should get default IME', async () => {
-    (await adb.defaultIME()).should.equal(defaultIME);
+    defaultIMEs.should.include(await adb.defaultIME());
   });
   it('enableIME and disableIME should enable and disble IME', async () => {
     await adb.disableIME(IME);
@@ -51,23 +52,21 @@ describe('adb commands', function () {
   });
   it('killProcessesByName should kill process', async () => {
     await adb.install(contactManagerPath);
-    await adb.startApp({pkg: pkgName,
-                        activity: actName});
-    await adb.killProcessesByName(pkgName);
-    (await adb.getPIDsByName(pkgName)).should.have.length(0);
+    await adb.startApp({pkg, activity});
+    await adb.killProcessesByName(pkg);
+    (await adb.getPIDsByName(pkg)).should.have.length(0);
   });
   it('killProcessByPID should kill process', async () => {
     await adb.install(contactManagerPath);
-    await adb.startApp({pkg: pkgName,
-                        activity: actName});
-    let pids = await adb.getPIDsByName(pkgName);
+    await adb.startApp({pkg, activity});
+    let pids = await adb.getPIDsByName(pkg);
     pids.should.have.length.above(0);
     await adb.killProcessByPID(pids[0]);
-    (await adb.getPIDsByName(pkgName)).length.should.equal(0);
+    (await adb.getPIDsByName(pkg)).length.should.equal(0);
   });
   it('should get device language and country', async () => {
-    await adb.getDeviceLanguage().should.eventually.equal('en');
-    await adb.getDeviceCountry().should.eventually.equal('US');
+    ['en', 'fr'].should.contain(await adb.getDeviceLanguage());
+    ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceCountry());
   });
   it('should set device language and country', async () => {
     await adb.setDeviceLanguage('fr');
