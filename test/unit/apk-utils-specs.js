@@ -56,7 +56,9 @@ describe('Apk-utils', () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns('mFocusedApp=null');
-      should.not.exist(await adb.getFocusedPackageAndActivity());
+      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      should.not.exist(appPackage);
+      should.not.exist(appActivity);
       mocks.adb.verify();
     });
   }));
