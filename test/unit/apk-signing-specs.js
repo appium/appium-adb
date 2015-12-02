@@ -52,6 +52,9 @@ describe('signing', () => {
   describe('signWithCustomCert', withMocks({teen_process, helpers}, (mocks) => {
     it('should call exec with correct args', async () => {
       let jarsigner = path.resolve(java_home, 'bin', 'jarsigner');
+      if (appiumSupport.system.isWindows()) {
+        jarsigner = jarsigner + '.exe';
+      }
       adb.useKeystore = true;
       mocks.helpers.expects("getJavaHome")
         .returns(java_home);
