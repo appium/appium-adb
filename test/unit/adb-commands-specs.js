@@ -103,7 +103,9 @@ describe('adb commands', () => {
       });
     }));
     describe('lock', withMocks({adb}, (mocks) => {
-      it('should call keyevent with correct args', async () => {
+      it('should call isScreenLocked and keyevent with correct args', async () => {
+        mocks.adb.expects("isScreenLocked")
+          .once().returns(false);
         mocks.adb.expects("keyevent")
           .once().withExactArgs(26)
           .returns("");
