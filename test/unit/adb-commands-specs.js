@@ -4,6 +4,7 @@ import ADB from '../..';
 import net from 'net';
 import events from 'events';
 import Logcat from '../../lib/logcat.js';
+import log from '../../lib/logger.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from 'appium-test-support';
 
@@ -102,13 +103,15 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe('lock', withMocks({adb}, (mocks) => {
-      it('should call isScreenLocked and keyevent with correct args', async () => {
+    describe('lock', withMocks({adb, log}, (mocks) => {
+      it('should call isScreenLocked, keyevent and errorAndThrow', async () => {
         mocks.adb.expects("isScreenLocked")
-          .once().returns(false);
+          .atLeast(2).returns(false);
         mocks.adb.expects("keyevent")
           .once().withExactArgs(26)
           .returns("");
+        mocks.log.expects("errorAndThrow")
+          .once().returns("");
         await adb.lock();
         mocks.adb.verify();
       });
