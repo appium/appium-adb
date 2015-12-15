@@ -8,6 +8,7 @@ import { rootDir } from '../../lib/helpers.js';
 chai.use(chaiAsPromised);
 // change according to CI
 const apiLevel = '18',
+      platformVersion = '4.3',
       IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIMEs = ['com.android.inputmethod.latin/.LatinIME',
                      'io.appium.android.ime/.UnicodeIME'],
@@ -24,6 +25,9 @@ describe('adb commands', function () {
   });
   it('getApiLevel should get correct api level', async () => {
     (await adb.getApiLevel()).should.equal(apiLevel);
+  });
+  it('getPlatformVersion should get correct platform version', async () => {
+    (await adb.getPlatformVersion()).should.equal(platformVersion);
   });
   it('availableIMEs should get list of available IMEs', async () => {
     (await adb.availableIMEs()).should.have.length.above(0);

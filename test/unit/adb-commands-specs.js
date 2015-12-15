@@ -12,6 +12,7 @@ import { withMocks } from 'appium-test-support';
 chai.use(chaiAsPromised);
 const should = chai.should();
 const apiLevel = '21',
+      platformVersion = '4.4.4',
       IME = 'com.android.inputmethod.latin/.LatinIME',
       imeList = `com.android.inputmethod.latin/.LatinIME:
   mId=com.android.inputmethod.latin/.LatinIME mSettingsActivityName=com.android
@@ -43,6 +44,15 @@ describe('adb commands', () => {
           .once().withExactArgs(['getprop', 'ro.build.version.sdk'])
           .returns(apiLevel);
         (await adb.getApiLevel()).should.equal(apiLevel);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getPlatformVersion', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.build.version.release'])
+          .returns(platformVersion);
+        (await adb.getPlatformVersion()).should.equal(platformVersion);
         mocks.adb.verify();
       });
     }));
