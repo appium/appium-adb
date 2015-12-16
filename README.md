@@ -140,6 +140,7 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - checkApkKeystoreMatch
 - isAppInstalled
 - startApp
+- startUri
 - getFocusedPackageAndActivity
 - waitForActivityOrNot
 - waitForActivity
