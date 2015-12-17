@@ -1,6 +1,6 @@
 {
   "name": "appium-adb",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "appium-adb",
   "main": "./build/index.js",
   "scripts": {
