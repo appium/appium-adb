@@ -16,7 +16,7 @@ describe('logcat', async () => {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects("SubProcess")
-        .once().withExactArgs('dummyPath', ['logcat'])
+        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stdout',['- beginning of system\r']);
@@ -30,7 +30,7 @@ describe('logcat', async () => {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects("SubProcess")
-        .once().withExactArgs('dummyPath', ['logcat'])
+        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stderr',['execvp()']);
