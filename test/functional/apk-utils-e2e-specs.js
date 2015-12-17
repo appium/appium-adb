@@ -3,7 +3,9 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
+import { retryInterval } from 'asyncbox';
 
+chai.should();
 chai.use(chaiAsPromised);
 
 describe('apk utils', function () {
@@ -30,6 +32,24 @@ describe('apk utils', function () {
     await adb.rimraf(deviceTempPath + 'ContactManager.apk');
     await adb.push(contactManagerPath, deviceTempPath);
     await adb.installFromDevicePath(deviceTempPath + 'ContactManager.apk');
+  });
+  describe('startUri', async () => {
+    it('should be able to start a uri', async () => {
+      await adb.goToHome();
+      let res = await adb.getFocusedPackageAndActivity();
+      res.appPackage.should.not.equal('com.android.contacts');
+      await adb.install(contactManagerPath);
+      await adb.startUri('content://contacts/people', 'com.android.contacts');
+      await retryInterval(10, 500, async () => {
+        res = await adb.shell(['dumpsys', 'window', 'windows']);
+        // depending on apilevel, app might show up as active in one of these
+        // two dumpsys output formats
+        let focusRe1 = '(mCurrentFocus.+\\.PeopleActivity)';
+        let focusRe2 = '(mFocusedApp.+\\.PeopleActivity)';
+        res.should.match(new RegExp(`${focusRe1}|${focusRe2}`));
+      });
+      await adb.goToHome();
+    });
   });
   describe('startApp', async () => {
     it('should be able to start', async () => {

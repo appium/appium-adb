@@ -7,6 +7,7 @@ import { withMocks } from 'appium-test-support';
 chai.use(chaiAsPromised);
 const should = chai.should(),
       pkg = 'com.example.android.contactmanager',
+      uri = 'content://contacts/people/1',
       act = '.ContactManager',
       startAppOptions = {stopApp: true, action: 'action', category: 'cat',
                          flags: 'flags', pkg: 'pkg', activity: 'act',
@@ -148,6 +149,19 @@ describe('Apk-utils', () => {
         .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
         .returns('');
       (await adb.install('foo'));
+      mocks.adb.verify();
+    });
+  }));
+  describe('startUri', withMocks({adb}, (mocks) => {
+    it('should fail if uri or pkg are not provided', async () => {
+      await adb.startUri().should.eventually.be.rejectedWith(/arguments are required/);
+      await adb.startUri('foo').should.eventually.be.rejectedWith(/arguments are required/);
+    });
+    it('should build a call to a VIEW intent with the uri', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['am', 'start', '-W', '-a',
+                               'android.intent.action.VIEW', '-d', uri, pkg]);
+      await adb.startUri(uri, pkg);
       mocks.adb.verify();
     });
   }));
