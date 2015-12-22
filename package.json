@@ -1,46 +1,48 @@
 {
   "name": "appium-adb",
-  "version": "1.7.6",
+  "version": "2.2.0",
   "description": "appium-adb",
-  "main": "lib/main.js",
+  "main": "./build/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/unit/*-specs.js"
+    "prepublish": "gulp prepublish",
+    "test": "gulp once",
+    "watch": "gulp"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/appium/appium-adb.git"
   },
   "author": "",
-  "licenses": [
-    {
-      "type": "apache-2.0",
-      "url": "https://raw.github.com/appium/appium/master/LICENSE"
-    }
-  ],
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/appium/appium-adb/issues"
   },
+  "engines": [
+    "node"
+  ],
+  "bin": {},
+  "directories": {
+    "lib": "lib"
+  },
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
-    "adm-zip": "~0.4.4",
-    "appium-support": "=0.0.3",
-    "async": "~0.9.0",
-    "mkdirp": "~0.5.0",
-    "mv": "~2.0.0",
-    "ncp": "~0.5.1",
-    "q": "~1.0.1",
-    "rimraf": "~2.2.8",
-    "through": "~2.3.4",
-    "underscore": "~1.6.0",
-    "vargs": "^0.1.0",
-    "winston": "~0.7.3"
+    "adm-zip": "^0.4.7",
+    "appium-logger": "^2.0.0",
+    "appium-support": "^2.0.7",
+    "asyncbox": "^2.3.1",
+    "babel-runtime": "=5.8.24",
+    "bluebird": "^2.10.2",
+    "lodash": "^3.10.1",
+    "source-map-support": "^0.3.2",
+    "teen_process": "^1.3.1",
+    "through": "^2.3.8"
   },
   "devDependencies": {
-    "chai": "~1.9.1",
-    "jscs": "~1.5.4",
-    "jshint": "~2.5.1",
-    "mocha": "^2.1.0",
-    "should": "~4.0.4",
-    "sinon": "~1.10.3"
+    "appium-gulp-plugins": "^1.3.11",
+    "appium-test-support": "0.0.5",
+    "chai": "^3.3.0",
+    "chai-as-promised": "^5.1.0",
+    "gulp": "^3.8.11",
+    "sinon": "^1.17.1"
   }
 }

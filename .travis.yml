@@ -1,11 +1,5 @@
-notifications:
-  email: false
-branches:
-  only:
-    - master
-    - "2.0"
 language: node_js
 node_js:
-  - "0.10"
-script:
-  - "make jshint jscs"
+  - "0.12"
+after_success:
+  - gulp coveralls
