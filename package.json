@@ -1,7 +1,7 @@
 {
   "name": "appium-adb",
-  "version": "2.2.1",
-  "description": "appium-adb",
+  "version": "2.2.2",
+  "description": "Android Debug Bridge interface",
   "main": "./build/index.js",
   "scripts": {
     "prepublish": "gulp prepublish",
