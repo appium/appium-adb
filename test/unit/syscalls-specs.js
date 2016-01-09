@@ -85,6 +85,11 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     adb.setEmulatorPort(5554);
     adb.emulatorPort.should.equal(5554);
   });
+  describe('createSubProcess', () => {
+    it('should return an instance of SubProcess', () => {
+      adb.createSubProcess([]).should.be.an.instanceof(teen_process.SubProcess);
+    });
+  });
 }));
 
 describe('System calls',  withMocks({adb, B}, (mocks) => {
