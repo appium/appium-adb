@@ -1,4 +1,4 @@
-import { getActivityRelativeName, getDirectories, getAndroidPlatformAndPath } from '../../lib/helpers';
+import { getPossibleActivityNames, getDirectories, getAndroidPlatformAndPath } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
@@ -8,19 +8,23 @@ import chai from 'chai';
 const should = chai.should;
 
 describe('helpers', () => {
-  describe('getActivityRelativeName', () => {
+  describe('getPossibleActivityNames', () => {
     it('should correctly remove pkg from pkg.activity.name', () => {
-      getActivityRelativeName('pkg', 'pkg.activity.name')
-        .should.equal('.activity.name');
+      getPossibleActivityNames('pkg', 'pkg.activity.name')
+        .should.include('.activity.name');
     });
     it('should return .act.name when act.name is passed', () => {
-      getActivityRelativeName('pkg', 'act.name')
-        .should.equal('.act.name');
+      getPossibleActivityNames('pkg', 'act.name')
+        .should.include('.act.name');
     });
     it('should not amend a valid activity name', () => {
-      getActivityRelativeName('pkg', '.activity.name')
-        .should.equal('.activity.name');
+      getPossibleActivityNames('pkg', '.activity.name')
+        .should.include('.activity.name');
     });
+    it('should handle case where application id is different from package name', () => {
+       getPossibleActivityNames('com.ga.aaa.android.bbb.activities.local', 'com.ga.aaa.android.bbb.activity.FirstLaunchActivity')
+         .should.include('com.ga.aaa.android.bbb.activity.FirstLaunchActivity');
+     });
   });
 
   describe('getDirectories', withMocks({fs}, (mocks) => {
