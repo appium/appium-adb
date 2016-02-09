@@ -118,7 +118,7 @@ describe('adb commands', () => {
         let text = 'some text';
         let expectedText = 'some%stext';
         mocks.adb.expects("shell")
-          .once().withExactArgs(['input', 'text', `'${expectedText}'`])
+          .once().withExactArgs(['input', 'text', expectedText])
           .returns("");
         await adb.inputText(text);
         mocks.adb.verify();
