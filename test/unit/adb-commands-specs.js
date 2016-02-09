@@ -113,6 +113,17 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('inputText', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        let text = 'some text';
+        let expectedText = 'some%stext';
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['input', 'text', `'${expectedText}'`])
+          .returns("");
+        await adb.inputText(text);
+        mocks.adb.verify();
+      });
+    }));
     describe('lock', withMocks({adb, log}, (mocks) => {
       it('should call isScreenLocked, keyevent and errorAndThrow', async () => {
         mocks.adb.expects("isScreenLocked")
