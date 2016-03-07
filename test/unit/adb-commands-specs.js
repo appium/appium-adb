@@ -13,6 +13,9 @@ chai.use(chaiAsPromised);
 const should = chai.should();
 const apiLevel = '21',
       platformVersion = '4.4.4',
+      language = 'en',
+      country = 'US',
+      locale = 'en-US',
       IME = 'com.android.inputmethod.latin/.LatinIME',
       imeList = `com.android.inputmethod.latin/.LatinIME:
   mId=com.android.inputmethod.latin/.LatinIME mSettingsActivityName=com.android
@@ -53,6 +56,87 @@ describe('adb commands', () => {
           .once().withExactArgs(['getprop', 'ro.build.version.release'])
           .returns(platformVersion);
         (await adb.getPlatformVersion()).should.equal(platformVersion);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceSysLanguage', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'persist.sys.language'])
+          .returns(language);
+        (await adb.getDeviceSysLanguage()).should.equal(language);
+        mocks.adb.verify();
+      });
+    }));
+    describe('setDeviceSysLanguage', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['setprop', 'persist.sys.language', language])
+          .returns("");
+        await adb.setDeviceSysLanguage(language);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceSysCountry', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'persist.sys.country'])
+          .returns(country);
+        (await adb.getDeviceSysCountry()).should.equal(country);
+        mocks.adb.verify();
+      });
+    }));
+    describe('setDeviceSysCountry', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['setprop', 'persist.sys.country', country])
+          .returns("");
+        await adb.setDeviceSysCountry(country);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceSysLocale', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'persist.sys.locale'])
+          .returns(locale);
+        (await adb.getDeviceSysLocale()).should.equal(locale);
+        mocks.adb.verify();
+      });
+    }));
+    describe('setDeviceSysLocale', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
+          .returns("");
+        await adb.setDeviceSysLocale(locale);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceProductLanguage', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.product.locale.language'])
+          .returns(language);
+        (await adb.getDeviceProductLanguage()).should.equal(language);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceProductCountry', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.product.locale.region'])
+          .returns(country);
+        (await adb.getDeviceProductCountry()).should.equal(country);
+        mocks.adb.verify();
+      });
+    }));
+    describe('getDeviceProductLocale', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.product.locale'])
+          .returns(locale);
+        (await adb.getDeviceProductLocale()).should.equal(locale);
         mocks.adb.verify();
       });
     }));

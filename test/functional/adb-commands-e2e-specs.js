@@ -69,18 +69,18 @@ describe('adb commands', function () {
     (await adb.getPIDsByName(pkg)).length.should.equal(0);
   });
   it('should get device language and country', async () => {
-    ['en', 'fr'].should.contain(await adb.getDeviceLanguage());
-    ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceCountry());
+    ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
+    ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
   it('should set device language and country', async () => {
-    await adb.setDeviceLanguage('fr');
-    await adb.setDeviceCountry('fr');
+    await adb.setDeviceSysLanguage('fr');
+    await adb.setDeviceSysCountry('fr');
     await adb.reboot();
-    await adb.getDeviceLanguage().should.eventually.equal('fr');
-    await adb.getDeviceCountry().should.eventually.equal('FR');
+    await adb.getDeviceSysLanguage().should.eventually.equal('fr');
+    await adb.getDeviceSysCountry().should.eventually.equal('FR');
     // cleanup
-    await adb.setDeviceLanguage('en');
-    await adb.setDeviceCountry('us');
+    await adb.setDeviceSysLanguage('en');
+    await adb.setDeviceSysCountry('us');
   });
   it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);

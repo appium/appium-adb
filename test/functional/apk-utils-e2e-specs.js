@@ -92,4 +92,18 @@ describe('apk utils', function () {
     let {apkStrings} = await adb.extractStringsFromApk(contactManagerPath, null, '/tmp');
     apkStrings.save.should.equal('Save');
   });
+  it('should get device language and country', async () => {
+    ['en', 'fr'].should.contain(await adb.getDeviceLanguage());
+    ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceCountry());
+  });
+  it('should set device language and country', async () => {
+    await adb.setDeviceLanguage('fr');
+    await adb.setDeviceCountry('fr');
+    await adb.reboot();
+    await adb.getDeviceLanguage().should.eventually.equal('fr');
+    await adb.getDeviceCountry().should.eventually.equal('FR');
+    // cleanup
+    await adb.setDeviceLanguage('en');
+    await adb.setDeviceCountry('us');
+  });
 });

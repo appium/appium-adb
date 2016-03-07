@@ -13,7 +13,10 @@ const should = chai.should(),
                          flags: 'flags', pkg: 'pkg', activity: 'act',
                          optionalIntentArguments: '-x options'},
       cmd = ['am', 'start', '-n', 'pkg/act', '-S', '-a', 'action', '-c', 'cat',
-             '-f', 'flags', '-x options'];
+             '-f', 'flags', '-x options'],
+      language = 'en',
+      country = 'US',
+      locale = 'en-US';
 
 describe('Apk-utils', () => {
   let adb = new ADB();
@@ -186,6 +189,111 @@ describe('Apk-utils', () => {
       mocks.adb.expects('shell')
         .returns('');
       (await adb.startApp(startAppOptions));
+      mocks.adb.verify();
+    });
+  }));
+  describe('getDeviceLanguage', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args and return language when API < 23', async () => {
+      mocks.adb.expects("getApiLevel").returns(18);
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.language'])
+        .returns(language);
+      (await adb.getDeviceLanguage()).should.equal(language);
+      mocks.adb.verify();
+    });
+    it('should call shell two times with correct args and return language when API < 23', async () => {
+      mocks.adb.expects("getApiLevel").returns(18);
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.language'])
+        .returns('');
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'ro.product.locale.language'])
+        .returns(language);
+      (await adb.getDeviceLanguage()).should.equal(language);
+      mocks.adb.verify();
+    });
+    it('should call shell one time with correct args and return language when API = 23', async () => {
+      mocks.adb.expects("getApiLevel").returns(23);
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.locale'])
+        .returns(locale);
+      (await adb.getDeviceLanguage()).should.equal(language);
+      mocks.adb.verify();
+    });
+    it('should call shell two times with correct args and return language when API = 23', async () => {
+      mocks.adb.expects("getApiLevel").returns(23);
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.locale'])
+        .returns('');
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'ro.product.locale'])
+        .returns(locale);
+      (await adb.getDeviceLanguage()).should.equal(language);
+      mocks.adb.verify();
+    });
+  }));
+  describe('setDeviceLanguage', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args when API < 23', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['setprop', 'persist.sys.language', language])
+        .returns("");
+      await adb.setDeviceLanguage(language);
+      mocks.adb.verify();
+    });
+  }));
+  describe('getDeviceCountry', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args and return country', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.country'])
+        .returns(country);
+      (await adb.getDeviceCountry()).should.equal(country);
+      mocks.adb.verify();
+    });
+    it('should call shell two times with correct args and return country', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.country'])
+        .returns('');
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'ro.product.locale.region'])
+        .returns(country);
+      (await adb.getDeviceCountry()).should.equal(country);
+      mocks.adb.verify();
+    });
+  }));
+  describe('setDeviceCountry', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['setprop', 'persist.sys.country', country])
+        .returns("");
+      await adb.setDeviceCountry(country);
+      mocks.adb.verify();
+    });
+  }));
+  describe('getDeviceLocale', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args and return locale', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.locale'])
+        .returns(locale);
+      (await adb.getDeviceLocale()).should.equal(locale);
+      mocks.adb.verify();
+    });
+    it('should call shell two times with correct args and return locale', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'persist.sys.locale'])
+        .returns('');
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['getprop', 'ro.product.locale'])
+        .returns(locale);
+      (await adb.getDeviceLocale()).should.equal(locale);
+      mocks.adb.verify();
+    });
+  }));
+  describe('setDeviceLocale', withMocks({adb}, (mocks) => {
+    it('should call shell one time with correct args', async () => {
+      mocks.adb.expects("shell")
+        .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
+        .returns("");
+      await adb.setDeviceLocale(locale);
       mocks.adb.verify();
     });
   }));
