@@ -9,6 +9,7 @@ import B from 'bluebird';
 chai.use(chaiAsPromised);
 const adb = new ADB();
 adb.executable.path = 'adb_path';
+const avdName = 'AVD_NAME';
 
 describe('System calls', withMocks({teen_process}, (mocks) => {
   it('getConnectedDevices should get all connected devices', async () => {
@@ -123,5 +124,44 @@ describe('System calls',  withMocks({adb, B}, (mocks) => {
     await adb.reboot().should.eventually.not.be.rejected;
     mocks.adb.verify();
     mocks.B.verify();
+  });
+  it('getRunningAVD should get connected avd', async () => {
+    let udid = 'emulator-5554';
+    let port = 5554;
+    let emulator = {'udid': udid, 'port': port};
+    mocks.adb.expects("getConnectedEmulators")
+      .once().withExactArgs()
+      .returns([emulator]);
+    mocks.adb.expects("setEmulatorPort")
+      .once().withExactArgs(port);
+    mocks.adb.expects("sendTelnetCommand")
+      .once().withExactArgs("avd name")
+      .returns(avdName);
+    mocks.adb.expects("setDeviceId")
+      .once().withExactArgs(udid);
+    (await adb.getRunningAVD(avdName)).should.equal(emulator);
+    mocks.adb.verify();
+  });
+  it('getRunningAVD should return null when expected avd is not connected', async () => {
+    let udid = 'emulator-5554';
+    let port = 5554;
+    let emulator = {'udid': udid, 'port': port};
+    mocks.adb.expects("getConnectedEmulators")
+      .once().withExactArgs()
+      .returns([emulator]);
+    mocks.adb.expects("setEmulatorPort")
+      .once().withExactArgs(port);
+    mocks.adb.expects("sendTelnetCommand")
+      .once().withExactArgs("avd name")
+      .returns('OTHER_AVD');
+    chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
+    mocks.adb.verify();
+  });
+  it('getRunningAVD should return null when no avd is connected', async () => {
+    mocks.adb.expects("getConnectedEmulators")
+      .once().withExactArgs()
+      .returns([]);
+    chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
+    mocks.adb.verify();
   });
 }));
