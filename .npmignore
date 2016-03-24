@@ -22,3 +22,4 @@ node_modules
 coverage
 coverage-e2e
 test/
+build/test/
