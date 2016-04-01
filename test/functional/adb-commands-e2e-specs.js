@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
-
+import { sleep } from 'asyncbox';
 
 chai.use(chaiAsPromised);
 // change according to CI
@@ -90,5 +90,23 @@ describe('adb commands', function () {
     let logs = adb.logcat.getLogs();
     logs.should.have.length.above(0);
     await adb.stopLogcat();
+  });
+  it("should change screen orientation", async () => {
+    await adb.setAutoRotationState('off');
+    if(!(await adb.isAppInstalled(pkg))) {
+      await adb.install(contactManagerPath);
+    }
+    await adb.forceStop(pkg);
+    await adb.startApp({pkg, activity});
+    await sleep(500);
+    await adb.beLandscape();
+    await sleep(500);
+    let isLandscape = await adb.isScreenLandscape();
+    console.log(isLandscape);
+    isLandscape.should.be.true;
+    await adb.bePortrait();
+    await sleep(500);
+    let isPortait = await adb.isScreenPortrait();
+    isPortait.should.be.true;
   });
 });

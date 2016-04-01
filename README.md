@@ -148,3 +148,9 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - uninstallApk
 - installFromDevicePath
 - install
+- setAutoRotationState
+- isScreenLandscape
+- isScreenPortrait
+- setOrientation
+- beLandscape
+- bePortrait
