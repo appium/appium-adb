@@ -332,28 +332,12 @@ describe('adb commands', () => {
         await adb.setOrientation(0);
         mocks.adb.verify();
       });
-      it('should call shell with correct orientation(PORTRAIT) args', async () => {
-        mocks.adb.expects("shell")
-        .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
-              "--bind", "name:s:user_rotation", "--bind", 'value:i:0'])
-        .returns("");
-        await adb.bePortrait();
-        mocks.adb.verify();
-      });
       it('should call shell with correct orientation(LANDSCAPE) args', async () => {
         mocks.adb.expects("shell")
         .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
               "--bind", "name:s:user_rotation", "--bind", 'value:i:1'])
         .returns("");
         await adb.setOrientation(1);
-        mocks.adb.verify();
-      });
-      it('should call shell with correct orientation(LANDSCAPE) args', async () => {
-        mocks.adb.expects("shell")
-        .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
-              "--bind", "name:s:user_rotation", "--bind", 'value:i:1'])
-        .returns("");
-        await adb.beLandscape();
         mocks.adb.verify();
       });
     }));
