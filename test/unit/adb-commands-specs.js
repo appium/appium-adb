@@ -268,6 +268,79 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('setAutoRotationState', withMocks({adb}, (mocks) => {
+      it("should call shell with correct args", async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
+              "--bind", "name:s:accelerometer_rotation", "--bind", 'value:i:0'])
+        .returns("");
+        await adb.setAutoRotationState('off');
+        mocks.adb.verify();
+      });
+      it("should call shell with correct args", async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
+              "--bind", "name:s:accelerometer_rotation", "--bind", 'value:i:1'])
+        .returns("");
+        await adb.setAutoRotationState('on');
+        mocks.adb.verify();
+      });
+    }));
+    describe('isScreenLandscape', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args and should return false', async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(['dumpsys', 'input'])
+        .returns("SurfaceOrientation: 0");
+        let isLandscape = await adb.isScreenLandscape();
+        isLandscape.should.be.false;
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args and should return true', async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(['dumpsys', 'input'])
+        .returns("SurfaceOrientation: 1");
+        let isLandscape = await adb.isScreenLandscape();
+        isLandscape.should.be.true;
+        mocks.adb.verify();
+      });
+    }));
+    describe('isScreenPortrait', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args and should return true', async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(['dumpsys', 'input'])
+        .returns("SurfaceOrientation: 0");
+        let isPortrait = await adb.isScreenPortrait();
+        isPortrait.should.be.true;
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args and should return false', async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(['dumpsys', 'input'])
+        .returns("SurfaceOrientation: 1");
+        let isPortrait = await adb.isScreenPortrait();
+        isPortrait.should.be.false;
+        mocks.adb.verify();
+      });
+    }));
+    describe('setOrientation', withMocks({adb}, (mocks) => {
+      it('should call shell with correct orientation(PORTRAIT) args', async () => {
+        mocks.adb.expects("shell")
+        .atLeast(1)
+        .withExactArgs(["content", "insert", "--uri", "content://settings/system",
+              "--bind", "name:s:user_rotation", "--bind", 'value:i:0'])
+        .returns("");
+        await adb.setOrientation(0);
+        mocks.adb.verify();
+      });
+      it('should call shell with correct orientation(LANDSCAPE) args', async () => {
+        mocks.adb.expects("shell")
+        .once().withExactArgs(["content", "insert", "--uri", "content://settings/system",
+              "--bind", "name:s:user_rotation", "--bind", 'value:i:1'])
+        .returns("");
+        await adb.setOrientation(1);
+        mocks.adb.verify();
+      });
+    }));
     describe('isAirplaneModeOn', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should be true', async () => {
         mocks.adb.expects("shell")
