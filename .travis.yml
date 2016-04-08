@@ -1,5 +1,8 @@
 language: node_js
-node_js: 
+node_js:
   - "0.12"
-after_sucess:
+env:
+  global:
+    - _FORCE_LOGS=1
+after_success:
   - gulp coveralls

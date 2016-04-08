@@ -2,13 +2,14 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
-import log from '../../lib/logger.js';
+
 
 chai.use(chaiAsPromised);
 chai.should();
+
 const emulators = [
   { udid: 'emulator-5554', state: 'device', port: 5554 },
-  { udid: 'emulator-5556', state: 'device', port: 5556 }, 
+  { udid: 'emulator-5556', state: 'device', port: 5556 },
 ];
 const fingerprint = 1111;
 
@@ -26,7 +27,7 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
     }));
-    describe("fingerprint", withMocks({adb, log}, (mocks) => {
+    describe("fingerprint", withMocks({adb}, (mocks) => {
       it("should emit fingerprint without error", async () => {
         mocks.adb.expects("getConnectedEmulators")
           .atLeast(1).withExactArgs()
@@ -35,15 +36,18 @@ describe('adb emulator commands', () => {
           .atLeast(1).withExactArgs()
           .returns("23");
         mocks.adb.expects("setDeviceId")
-          .atLeast(1).withExactArgs("emulator-5554")
+          .once().withExactArgs("emulator-5554")
           .returns();
+          mocks.adb.expects("setDeviceId")
+            .once().withExactArgs("emulator-5556")
+            .returns();
         mocks.adb.expects("adbExec")
           .atLeast(1)
           .withExactArgs(["emu", "finger", "touch", fingerprint])
           .returns("");
-        chai.expect(await adb.fingerprint(fingerprint)).to.be.true;
-        chai.expect(await adb.fingerprint(fingerprint, "emulator-5554")).to.be.true;
-        chai.expect(await adb.fingerprint(fingerprint, "emulator-5556")).to.be.true;
+        await adb.fingerprint(fingerprint);
+        await adb.fingerprint(fingerprint, "emulator-5554");
+        await adb.fingerprint(fingerprint, "emulator-5556");
         mocks.adb.verify();
       });
       it("should throw an error on fingerprint argument undefined", async () => {
@@ -51,6 +55,9 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw an error on emulator not connected", async () => {
+        mocks.adb.expects("getApiLevel")
+          .atLeast(1).withExactArgs()
+          .returns("23");
         mocks.adb.expects("getConnectedEmulators")
           .once().withExactArgs()
           .returns(emulators);
@@ -58,6 +65,9 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw an error on no emulators connected", async () => {
+        mocks.adb.expects("getApiLevel")
+          .atLeast(1).withExactArgs()
+          .returns("23");
         mocks.adb.expects("getConnectedEmulators")
           .atLeast(1).withExactArgs()
           .returns([]);
@@ -65,15 +75,9 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw an error on emulator Api Level < 23", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
         mocks.adb.expects("getApiLevel")
-          .atLeast(1).withExactArgs()
+          .once().withExactArgs()
           .returns("22");
-        mocks.adb.expects("setDeviceId")
-          .atLeast(1).withExactArgs("emulator-5554")
-          .returns();
         await adb.fingerprint(1111).should.eventually.be.rejected;
         mocks.adb.verify();
       });
