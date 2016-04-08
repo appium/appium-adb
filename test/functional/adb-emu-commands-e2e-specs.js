@@ -5,30 +5,39 @@ import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { sleep } from 'asyncbox';
 
+
 chai.use(chaiAsPromised);
 chai.should();
-const fingerprintPath = path.resolve(rootDir, 'test', 'fixtures', 'Fingerprint.apk'),
-  pkg = 'com.example.fingerprint',
-  activity = '.MainActivity',
-  secretActivity = '.SecretActivity';
-  
+
+const fingerprintPath = path.resolve(rootDir, 'test', 'fixtures', 'Fingerprint.apk');
+const pkg = 'com.example.fingerprint';
+const activity = '.MainActivity';
+const secretActivity = '.SecretActivity';
+
 describe('adb emu commands', () => {
   let adb;
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
+
+    // the test here only works if we have API level 23 or above
+    if (parseInt(await adb.getApiLevel(), 10) < 23) {
+      this.skip();
+    }
   });
   it('fingerprint should open the secret activity on emitted valid finger touch event', async () => {
-    if(await adb.isAppInstalled(pkg)) {
+    if (await adb.isAppInstalled(pkg)) {
       await adb.forceStop(pkg);
       await adb.uninstallApk(pkg);
     }
     await adb.install(fingerprintPath);
     await adb.startApp({pkg, activity});
     await sleep(500);
+
     let app = await adb.getFocusedPackageAndActivity();
     app.appActivity.should.equal(activity);
     await adb.fingerprint(1111);
-    await sleep(1500);
+    await sleep(2500);
+
     app = await adb.getFocusedPackageAndActivity();
     app.appActivity.should.equal(secretActivity);
   });
