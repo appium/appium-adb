@@ -57,6 +57,17 @@ describe('Apk-utils', () => {
       appActivity.should.equal(act);
       mocks.adb.verify();
     });
+    it('should parse correctly and return package and activity when a comma is present', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{20fe217e token=Token{21878739 ` +
+                 `ActivityRecord{16425300 u0 ${pkg}/${act}, isShadow:false t10}}}`);
+
+      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal(pkg);
+      appActivity.should.equal(act);
+      mocks.adb.verify();
+    });
     it('should parse correctly and return null', async () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
