@@ -238,8 +238,7 @@ describe('adb commands', () => {
     describe('setWifiState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
-                                 'wifi', 'on'])
+          .once().withExactArgs(['settings', 'put', 'global', 'wifi_on', 1])
           .returns("");
         await adb.setWifiState(true);
         mocks.adb.verify();
@@ -264,8 +263,7 @@ describe('adb commands', () => {
     describe('setDataState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
-                                 'data', 'on'])
+          .once().withExactArgs(["settings", "put", "global", "mobile_data", 1])
           .returns("");
         await adb.setDataState(true);
         mocks.adb.verify();
