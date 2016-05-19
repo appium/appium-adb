@@ -13,9 +13,6 @@ chai.use(chaiAsPromised);
 const should = chai.should();
 const apiLevel = '21',
       platformVersion = '4.4.4',
-      language = 'en',
-      country = 'US',
-      locale = 'en-US',
       IME = 'com.android.inputmethod.latin/.LatinIME',
       imeList = `com.android.inputmethod.latin/.LatinIME:
   mId=com.android.inputmethod.latin/.LatinIME mSettingsActivityName=com.android
@@ -56,87 +53,6 @@ describe('adb commands', () => {
           .once().withExactArgs(['getprop', 'ro.build.version.release'])
           .returns(platformVersion);
         (await adb.getPlatformVersion()).should.equal(platformVersion);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceSysLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'persist.sys.language'])
-          .returns(language);
-        (await adb.getDeviceSysLanguage()).should.equal(language);
-        mocks.adb.verify();
-      });
-    }));
-    describe('setDeviceSysLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.language', language])
-          .returns("");
-        await adb.setDeviceSysLanguage(language);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceSysCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'persist.sys.country'])
-          .returns(country);
-        (await adb.getDeviceSysCountry()).should.equal(country);
-        mocks.adb.verify();
-      });
-    }));
-    describe('setDeviceSysCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.country', country])
-          .returns("");
-        await adb.setDeviceSysCountry(country);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceSysLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'persist.sys.locale'])
-          .returns(locale);
-        (await adb.getDeviceSysLocale()).should.equal(locale);
-        mocks.adb.verify();
-      });
-    }));
-    describe('setDeviceSysLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
-          .returns("");
-        await adb.setDeviceSysLocale(locale);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceProductLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'ro.product.locale.language'])
-          .returns(language);
-        (await adb.getDeviceProductLanguage()).should.equal(language);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceProductCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'ro.product.locale.region'])
-          .returns(country);
-        (await adb.getDeviceProductCountry()).should.equal(country);
-        mocks.adb.verify();
-      });
-    }));
-    describe('getDeviceProductLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'ro.product.locale'])
-          .returns(locale);
-        (await adb.getDeviceProductLocale()).should.equal(locale);
         mocks.adb.verify();
       });
     }));
@@ -322,8 +238,7 @@ describe('adb commands', () => {
     describe('setWifiState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
-                                 'wifi', 'on'])
+          .once().withExactArgs(['settings', 'put', 'global', 'wifi_on', 1])
           .returns("");
         await adb.setWifiState(true);
         mocks.adb.verify();
@@ -348,8 +263,7 @@ describe('adb commands', () => {
     describe('setDataState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings', '-e',
-                                 'data', 'on'])
+          .once().withExactArgs(["settings", "put", "global", "mobile_data", 1])
           .returns("");
         await adb.setDataState(true);
         mocks.adb.verify();
@@ -588,30 +502,6 @@ describe('adb commands', () => {
       commands[1].should.equal("quit\n");
       mocks.adb.verify();
       mocks.net.verify();
-    });
-    it('should return the last line of the output only', async () => {
-      const port = 54321;
-      let conn = new events.EventEmitter();
-      let commands = [];
-      let expected = "desired_command_output";
-      conn.write = function (command) {
-        commands.push(command);
-      };
-      mocks.adb.expects("getEmulatorPort")
-        .once().withExactArgs()
-        .returns(port);
-      mocks.net.expects("createConnection")
-        .once().withExactArgs(port, 'localhost')
-        .returns(conn);
-      let p = adb.sendTelnetCommand('avd name');
-      setTimeout(function () {
-        conn.emit('connect');
-        conn.emit('data','OK');
-        conn.emit('data','OK\nunwanted_echo_output\n' + expected);
-        conn.emit('close');
-      }, 0);
-      let actual = await p;
-      (actual).should.equal(expected);
     });
   }));
   it('isValidClass should correctly validate class names', () => {
