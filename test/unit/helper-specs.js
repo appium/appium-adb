@@ -1,8 +1,10 @@
-import { getPossibleActivityNames, getDirectories, getAndroidPlatformAndPath } from '../../lib/helpers';
+import { getPossibleActivityNames, getDirectories, getAndroidPlatformAndPath,
+         buildStartCmd } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
 import chai from 'chai';
+import _ from 'lodash';
 
 
 const should = chai.should;
@@ -69,4 +71,63 @@ describe('helpers', () => {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
   }));
+
+  describe('buildStartCmd', () => {
+    let startOptions = {
+      pkg: 'com.something',
+      activity: '.SomeActivity'
+    };
+
+    it('should parse optionalIntentArguments with single key', () => {
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
+      cmd[cmd.length-2].should.eql('-d');
+      cmd[cmd.length-1].should.eql('key');
+    });
+    it('should parse optionalIntentArguments with single key/value pair', () => {
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value'}, startOptions), 20);
+      cmd[cmd.length-3].should.eql('-d');
+      cmd[cmd.length-2].should.eql('key');
+      cmd[cmd.length-1].should.eql('value');
+    });
+    it('should parse optionalIntentArguments with single key/value pair with spaces', () => {
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value value2'}, startOptions), 20);
+      cmd[cmd.length-3].should.eql('-d');
+      cmd[cmd.length-2].should.eql('key');
+      cmd[cmd.length-1].should.eql('value value2');
+    });
+    it('should parse optionalIntentArguments with multiple keys', () => {
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions), 20);
+      cmd[cmd.length-4].should.eql('-d');
+      cmd[cmd.length-3].should.eql('key1');
+      cmd[cmd.length-2].should.eql('-e');
+      cmd[cmd.length-1].should.eql('key2');
+    });
+    it('should parse optionalIntentArguments with multiple key/value pairs', () => {
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions), 20);
+      cmd[cmd.length-6].should.eql('-d');
+      cmd[cmd.length-5].should.eql('key1');
+      cmd[cmd.length-4].should.eql('value1');
+      cmd[cmd.length-3].should.eql('-e');
+      cmd[cmd.length-2].should.eql('key2');
+      cmd[cmd.length-1].should.eql('value2');
+    });
+    it('should parse optionalIntentArguments with hyphens', () => {
+      let arg = 'http://some-url-with-hyphens.com/';
+      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: `-d ${arg}`}, startOptions), 20);
+      cmd[cmd.length-2].should.eql('-d');
+      cmd[cmd.length-1].should.eql(arg);
+    });
+    it('should parse optionalIntentArguments with multiple arguments with hyphens', () => {
+      let arg1 = 'http://some-url-with-hyphens.com/';
+      let arg2 = 'http://some-other-url-with-hyphens.com/';
+      let cmd = buildStartCmd(_.defaults({
+        optionalIntentArguments: `-d ${arg1} -e key ${arg2}`
+      }, startOptions), 20);
+      cmd[cmd.length-5].should.eql('-d');
+      cmd[cmd.length-4].should.eql(arg1);
+      cmd[cmd.length-3].should.eql('-e');
+      cmd[cmd.length-2].should.eql('key');
+      cmd[cmd.length-1].should.eql(arg2);
+    });
+  });
 });
