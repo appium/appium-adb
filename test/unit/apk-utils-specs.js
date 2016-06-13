@@ -12,7 +12,7 @@ const should = chai.should(),
       startAppOptions = {stopApp: true, action: 'action', category: 'cat',
                          flags: 'flags', pkg: 'pkg', activity: 'act',
                          optionalIntentArguments: '-x options -y option argument -z option arg with spaces'},
-      cmd = ['am', 'start', '-n', 'pkg/act', '-S', '-a', 'action', '-c', 'cat',
+      cmd = ['am', 'start', '-W', '-n', 'pkg/act', '-S', '-a', 'action', '-c', 'cat',
              '-f', 'flags', '-x', 'options', '-y', 'option', 'argument',
              '-z', 'option', 'arg with spaces'],
       language = 'en',
@@ -146,7 +146,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.SuperManager, .OtherManager', false, 1000)
         .should.eventually.be.rejected;
       mocks.adb.verify();
-    });    
+    });
   }));
   describe('waitForActivity', withMocks({adb}, (mocks) => {
     it('should call waitForActivityOrNot with correct arguments', async () => {
