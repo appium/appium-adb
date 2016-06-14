@@ -208,6 +208,15 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('clearTextField', withMocks({adb}, (mocks) => {
+      it('should call shell with correct args', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['input', 'keyevent', '67', '112', '67', '112', '67', '112', '67', '112'])
+          .returns("");
+        await adb.clearTextField(4);
+        mocks.adb.verify();
+      });
+    }));
     describe('lock', withMocks({adb, log}, (mocks) => {
       it('should call isScreenLocked, keyevent and errorAndThrow', async () => {
         mocks.adb.expects("isScreenLocked")
