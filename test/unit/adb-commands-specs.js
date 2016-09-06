@@ -484,7 +484,7 @@ describe('adb commands', () => {
     describe('getPIDsByName', withMocks({adb}, (mocks) => {
       it('should call shell and parse pids correctly', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(["ps", '.contactmanager'])
+          .once().withExactArgs(["set `ps | grep '.contactmanager'`;echo $2"])
           .returns(psOutput);
         (await adb.getPIDsByName(contactManagerPackage))[0].should.equal(5078);
         mocks.adb.verify();
