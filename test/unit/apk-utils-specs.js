@@ -181,7 +181,7 @@ describe('Apk-utils', () => {
   describe('installFromDevicePath', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
+        .once().withExactArgs(['pm', 'install', '-rg', 'foo'], {})
         .returns('');
       (await adb.installFromDevicePath('foo'));
       mocks.adb.verify();
@@ -190,9 +190,16 @@ describe('Apk-utils', () => {
   describe('install', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
       mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
+        .once().withExactArgs(['install', '-rg', 'foo'], {timeout: 60000})
         .returns('');
       (await adb.install('foo'));
+      mocks.adb.verify();
+    });
+    it('should call forceStop and adbExec with correct arguments when not replacing', async () => {
+      mocks.adb.expects('adbExec')
+        .once().withExactArgs(['install', '-g', 'foo'], {timeout: 60000})
+        .returns('');
+      (await adb.install('foo', false));
       mocks.adb.verify();
     });
   }));
