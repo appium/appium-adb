@@ -36,9 +36,9 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
 describe('adb commands', () => {
   let adb = new ADB();
   let logcat = new Logcat({
-    adb: adb
-  , debug: false
-  , debugTrace: false
+    adb,
+    debug: false,
+    debugTrace: false
   });
   describe('shell', () => {
     describe('getApiLevel', withMocks({adb}, (mocks) => {
@@ -586,8 +586,8 @@ describe('adb commands', () => {
       let p = adb.sendTelnetCommand('avd name');
       setTimeout(function () {
         conn.emit('connect');
-        conn.emit('data','OK');
-        conn.emit('data','OK');
+        conn.emit('data', 'OK');
+        conn.emit('data', 'OK');
         conn.emit('close');
       }, 0);
       await p;
@@ -613,8 +613,8 @@ describe('adb commands', () => {
       let p = adb.sendTelnetCommand('avd name');
       setTimeout(function () {
         conn.emit('connect');
-        conn.emit('data','OK');
-        conn.emit('data','OK\nunwanted_echo_output\n' + expected);
+        conn.emit('data', 'OK');
+        conn.emit('data', 'OK\nunwanted_echo_output\n' + expected);
         conn.emit('close');
       }, 0);
       let actual = await p;
