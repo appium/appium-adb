@@ -38,9 +38,9 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("setDeviceId")
           .once().withExactArgs("emulator-5554")
           .returns();
-          mocks.adb.expects("setDeviceId")
-            .once().withExactArgs("emulator-5556")
-            .returns();
+        mocks.adb.expects("setDeviceId")
+          .once().withExactArgs("emulator-5556")
+          .returns();
         mocks.adb.expects("adbExec")
           .atLeast(1)
           .withExactArgs(["emu", "finger", "touch", fingerprint])

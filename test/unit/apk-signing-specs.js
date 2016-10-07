@@ -4,17 +4,16 @@ import ADB from '../..';
 import * as helpers from '../../lib/helpers.js';
 import path from 'path';
 import * as teen_process from 'teen_process';
-import { rootDir } from '../../lib/helpers.js';
 import * as appiumSupport from 'appium-support';
 import { withMocks } from 'appium-test-support';
 
 
 chai.use(chaiAsPromised);
 
-const selendroidTestApp = path.resolve(rootDir, 'test', 'fixtures',
+const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures',
                                        'selendroid-test-app.apk'),
-      helperJarPath = path.resolve(rootDir, 'jars'),
-      keystorePath = path.resolve(rootDir, 'test', 'fixtures',
+      helperJarPath = path.resolve(helpers.rootDir, 'jars'),
+      keystorePath = path.resolve(helpers.rootDir, 'test', 'fixtures',
                                   'appiumtest.keystore'),
       keyAlias = 'appiumtest',
       password = 'android',
@@ -91,32 +90,31 @@ describe('signing', () => {
   }));
   // Skipping as unable to mock mkdirp, this case is covered in e2e tests for now.
   // TODO: find ways to mock mkdirp
-  describe.skip('zipAlignApk',
-    withMocks({teen_process, adb, appiumSupport, fs, tempDir}, (mocks) => {
-      it('should call exec with correct args', async () => {
-        let alignedApk = "dummy_path";
-        mocks.tempDir.expects('path')
-          .once().withExactArgs({prefix: 'appium', suffix: '.tmp'})
-          .returns(alignedApk);
-        mocks.adb.expects('initZipAlign')
-          .once().withExactArgs()
-          .returns("");
-        mocks.appiumSupport.expects('mkdirp')
-          .once().withExactArgs(path.dirname(alignedApk))
-          .returns("");
-        mocks.teen_process.expects("exec")
-          .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', selendroidTestApp,
-                                                        alignedApk]);
-        mocks.fs.expects("mv")
-          .once().withExactArgs(alignedApk, selendroidTestApp, { mkdirp: true })
-          .returns("");
-        await adb.zipAlignApk(selendroidTestApp);
-        mocks.adb.verify();
-        mocks.appiumSupport.verify();
-        mocks.teen_process.verify();
-        mocks.tempDir.verify();
-        mocks.fs.verify();
-      });
+  describe.skip('zipAlignApk', withMocks({teen_process, adb, appiumSupport, fs, tempDir}, (mocks) => {
+    it('should call exec with correct args', async () => {
+      let alignedApk = "dummy_path";
+      mocks.tempDir.expects('path')
+        .once().withExactArgs({prefix: 'appium', suffix: '.tmp'})
+        .returns(alignedApk);
+      mocks.adb.expects('initZipAlign')
+        .once().withExactArgs()
+        .returns("");
+      mocks.appiumSupport.expects('mkdirp')
+        .once().withExactArgs(path.dirname(alignedApk))
+        .returns("");
+      mocks.teen_process.expects("exec")
+        .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', selendroidTestApp,
+                                                      alignedApk]);
+      mocks.fs.expects("mv")
+        .once().withExactArgs(alignedApk, selendroidTestApp, { mkdirp: true })
+        .returns("");
+      await adb.zipAlignApk(selendroidTestApp);
+      mocks.adb.verify();
+      mocks.appiumSupport.verify();
+      mocks.teen_process.verify();
+      mocks.tempDir.verify();
+      mocks.fs.verify();
+    });
   }));
   describe('checkApkCert', withMocks({teen_process, helpers, adb}, (mocks) => {
     it('should return false for apk not present', async () => {

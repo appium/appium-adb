@@ -2,9 +2,9 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
-import { fs } from 'appium-support';
-import { util } from 'appium-support';
+import { fs, util } from 'appium-support';
 import { rootDir } from '../../lib/helpers.js';
+
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
@@ -49,7 +49,7 @@ describe('Android-manifest', async () => {
     try {
       await fs.rimraf(tmpDir);
     } catch (e) {
-      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`);
+      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`); // eslint-disable-line no-console
     }
     await fs.mkdir(tmpDir);
     await fs.mkdir(dstDir);
@@ -62,7 +62,7 @@ describe('Android-manifest', async () => {
     try {
       await fs.rimraf(tmpDir);
     } catch (e) {
-      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`);
+      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`); // eslint-disable-line no-console
     }
   });
 });

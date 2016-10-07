@@ -24,9 +24,9 @@ describe('helpers', () => {
         .should.include('.activity.name');
     });
     it('should handle case where application id is different from package name', () => {
-       getPossibleActivityNames('com.ga.aaa.android.bbb.activities.local', 'com.ga.aaa.android.bbb.activity.FirstLaunchActivity')
-         .should.include('com.ga.aaa.android.bbb.activity.FirstLaunchActivity');
-     });
+      getPossibleActivityNames('com.ga.aaa.android.bbb.activities.local', 'com.ga.aaa.android.bbb.activity.FirstLaunchActivity')
+        .should.include('com.ga.aaa.android.bbb.activity.FirstLaunchActivity');
+    });
   });
 
   describe('getDirectories', withMocks({fs}, (mocks) => {

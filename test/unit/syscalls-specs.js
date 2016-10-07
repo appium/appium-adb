@@ -128,7 +128,7 @@ describe('System calls',  withMocks({adb, B}, (mocks) => {
   it('getRunningAVD should get connected avd', async () => {
     let udid = 'emulator-5554';
     let port = 5554;
-    let emulator = {'udid': udid, 'port': port};
+    let emulator = {udid, port};
     mocks.adb.expects("getConnectedEmulators")
       .once().withExactArgs()
       .returns([emulator]);
@@ -145,7 +145,7 @@ describe('System calls',  withMocks({adb, B}, (mocks) => {
   it('getRunningAVD should return null when expected avd is not connected', async () => {
     let udid = 'emulator-5554';
     let port = 5554;
-    let emulator = {'udid': udid, 'port': port};
+    let emulator = {udid, port};
     mocks.adb.expects("getConnectedEmulators")
       .once().withExactArgs()
       .returns([emulator]);

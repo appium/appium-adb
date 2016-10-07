@@ -10,7 +10,7 @@ chai.use(chaiAsPromised);
 
 describe('logcat', async () => {
   let adb = {path: 'dummyPath', defaultArgs: []};
-  let logcat = new Logcat({adb: adb, debug: false, debugTrace: false});
+  let logcat = new Logcat({adb, debug: false, debugTrace: false});
   describe('startCapture', withMocks({teen_process}, (mocks) => {
     it('should correctly call subprocess and should resolve promise', async () => {
       let conn = new events.EventEmitter();
@@ -19,7 +19,7 @@ describe('logcat', async () => {
         .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
-        conn.emit('lines-stdout',['- beginning of system\r']);
+        conn.emit('lines-stdout', ['- beginning of system\r']);
       }, 0);
       await logcat.startCapture();
       let logs = logcat.getLogs();
@@ -33,7 +33,7 @@ describe('logcat', async () => {
         .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
-        conn.emit('lines-stderr',['execvp()']);
+        conn.emit('lines-stderr', ['execvp()']);
       }, 0);
       await logcat.startCapture().should.eventually.be.rejectedWith('Logcat');
       mocks.teen_process.verify();
