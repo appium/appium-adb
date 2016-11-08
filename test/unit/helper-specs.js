@@ -56,15 +56,14 @@ describe('helpers', () => {
         .onCall(0).returns(false)
         .onCall(1).returns(true);
       mocks.path.expects('resolve')
-        .exactly(4)
-        .onCall(0).returns('/path/to/apis0')
+        .exactly(3)
+        .onCall(0).returns('/path/to')
         .onCall(1).returns('/path/to/apis1')
-        .onCall(2).returns('/path/to/apis2')
-        .onCall(3).returns('/path/to/apis3');
+        .onCall(2).returns('/path/to/apis2');
 
       let platformAndPath = await getAndroidPlatformAndPath();
       platformAndPath.platform.should.equal('android-23');
-      platformAndPath.platformPath.should.equal('/path/to/apis3');
+      platformAndPath.platformPath.should.equal('/path/to/apis2');
 
       mocks.fs.verify();
       mocks.path.verify();
@@ -128,6 +127,14 @@ describe('helpers', () => {
       cmd[cmd.length-3].should.eql('-e');
       cmd[cmd.length-2].should.eql('key');
       cmd[cmd.length-1].should.eql(arg2);
+    });
+    it('should have -S option when stopApp is set', async () => {
+      let cmd = buildStartCmd(_.defaults({stopApp: true}, startOptions), 20);
+      cmd[cmd.length-1].should.eql('-S');
+    });
+    it('should not have -S option when stopApp is not set', async () => {
+      let cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
+      cmd[cmd.length-1].should.not.eql('-S');
     });
   });
 });
