@@ -1,7 +1,8 @@
 language: node_js
 node_js:
-  - "4"
+  - "7"
   - "6"
+  - "4"
 env:
   global:
     - _FORCE_LOGS=1
