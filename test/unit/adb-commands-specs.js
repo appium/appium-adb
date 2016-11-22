@@ -445,6 +445,13 @@ describe('adb commands', () => {
         await adb.forwardAbstractPort(sysPort, devicePort);
         mocks.adb.verify();
       });
+      it('removePortForward should call shell with correct args', async () => {
+        mocks.adb.expects("adbExec")
+            .once().withExactArgs(['forward', `--remove`, `tcp:${sysPort}`])
+            .returns("");
+        await adb.removePortForward(sysPort, devicePort);
+        mocks.adb.verify();
+      });
     }));
     describe('ping', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should return true', async () => {

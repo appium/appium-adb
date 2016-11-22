@@ -85,6 +85,13 @@ describe('adb commands', function () {
   it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);
   });
+  it('should remove forwarded port', async () => {
+    await adb.forwardPort(8200, 6790);
+    (await adb.adbExec([`forward`, `--list`])).should.contain('tcp:8200');
+    await adb.removePortForward(8200);
+    (await adb.adbExec([`forward`, `--list`])).should.not.contain('tcp:8200');
+
+  });
   it('should start logcat from adb', async () => {
     await adb.startLogcat();
     let logs = adb.logcat.getLogs();
