@@ -16,6 +16,7 @@ const apiLevel = '18',
                                         'fixtures', 'ContactManager.apk'),
       pkg = 'com.example.android.contactmanager',
       activity = 'ContactManager';
+let expect = chai.expect;
 
 describe('adb commands', function () {
   let adb;
@@ -98,4 +99,34 @@ describe('adb commands', function () {
     logs.should.have.length.above(0);
     await adb.stopLogcat();
   });
+  describe('app permissions', async () => {
+    before(async function () {
+      let deviceApiLevel = await adb.getApiLevel();
+      if (deviceApiLevel < 23) {
+        //test should skip if the device API < 23
+        this.skip();
+      }
+      let isInstalled = await adb.isAppInstalled('io.appium.android.apis');
+      if (isInstalled) {
+        await adb.uninstallApk('io.appium.android.apis');
+      }
+    });
+    it('should install and grant all permission', async () => {
+      let apiDemos = path.resolve(rootDir, 'test',
+          'fixtures', 'ApiDemos-debug.apk');
+      await adb.install(apiDemos);
+      (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
+      let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
+      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.have.members(requestedPermissions);
+    });
+    it('should revoke permission', async () => {
+      await adb.revokePermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
+      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.not.have.members(['android.permission.RECEIVE_SMS']);
+    });
+    it('should grant permission', async () => {
+      await adb.grantPermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
+      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.include.members(['android.permission.RECEIVE_SMS']);
+    });
+  });
 });
+

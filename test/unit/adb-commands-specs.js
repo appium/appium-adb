@@ -576,6 +576,20 @@ describe('adb commands', () => {
       });
     }));
   });
+  describe('app permission', withMocks({adb}, (mocks) => {
+    it('should grant requested permission', async () => {
+      mocks.adb.expects("shell")
+          .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
+      await adb.grantPermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
+      mocks.adb.verify();
+    });
+    it('should revoke requested permission', async () => {
+      mocks.adb.expects("shell")
+          .once().withArgs(['pm', 'revoke', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
+      await adb.revokePermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
+      mocks.adb.verify();
+    });
+  }));
   describe('sendTelnetCommand', withMocks({adb, net}, (mocks) => {
     it('should call shell with correct args', async () => {
       const port = 54321;
