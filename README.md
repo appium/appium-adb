@@ -11,6 +11,8 @@ appium-adb
 
 A wrapper over android-adb, implemented using ES6 and along with `async/await`. This package is mainly used by Appium to perform all adb operations on android device.
 
+*Note*: Issue tracking for this repo has been disabled. Please use the [main Appium issue tracker](https://github.com/appium/appium/issues) instead.
+
 ## Installing
 
 ```
