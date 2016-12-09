@@ -116,6 +116,7 @@ describe('adb commands', function () {
           'fixtures', 'ApiDemos-debug.apk');
       await adb.install(apiDemos);
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
+      await adb.grantAllPermissions('io.appium.android.apis');
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
       expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.have.members(requestedPermissions);
     });
