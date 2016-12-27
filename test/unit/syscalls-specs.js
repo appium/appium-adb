@@ -20,6 +20,19 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
   });
+  it('getConnectedDevices should get all connected devices which have valid udid', async () => {
+    let stdoutValue = "List of devices attached \n" +
+                      "adb server version (32) doesn't match this client (36); killing...\n" +
+                      "* daemon started successfully *\n" +
+                      "emulator-5554	device";
+    mocks.teen_process.expects("exec")
+      .once().withExactArgs(adb.executable.path, ['devices'])
+      .returns({stdout:stdoutValue});
+    
+    let devices = await adb.getConnectedDevices();
+    devices.should.have.length.above(0);
+    mocks.teen_process.verify();
+  });
   it('getConnectedDevices should fail when adb devices returns unexpected output', async () => {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['devices'])
