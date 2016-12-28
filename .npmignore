@@ -8,6 +8,11 @@ lib-cov
 *.pid
 *.gz
 
+.jscsrc
+.jscs.json
+.jshintrc
+.travis.yml
+
 pids
 logs
 results
@@ -16,3 +21,5 @@ npm-debug.log
 node_modules
 coverage
 coverage-e2e
+test/
+build/test/
