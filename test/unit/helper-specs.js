@@ -62,7 +62,7 @@ describe('helpers', () => {
         .onCall(2).returns('/path/to/apis2');
 
       let platformAndPath = await getAndroidPlatformAndPath();
-      platformAndPath.platform.should.equal('android-23');
+      platformAndPath.platform.should.equal('android-24');
       platformAndPath.platformPath.should.equal('/path/to/apis2');
 
       mocks.fs.verify();
