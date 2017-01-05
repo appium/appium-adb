@@ -24,22 +24,16 @@ describe('Apk-utils', () => {
   describe('isAppInstalled', withMocks({adb}, (mocks) => {
     it('should parse correctly and return true', async () => {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel')
-        .once().withExactArgs()
-        .returns("17");
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'list', 'packages', '-3', pkg])
+        .once().withExactArgs(['pm', 'list', 'packages', pkg])
         .returns(`package:${pkg}`);
       (await adb.isAppInstalled(pkg)).should.be.true;
       mocks.adb.verify();
     });
     it('should parse correctly and return false', async () => {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel')
-        .once().withExactArgs()
-        .returns("17");
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'list', 'packages', '-3', pkg])
+        .once().withExactArgs(['pm', 'list', 'packages', pkg])
         .returns("");
       (await adb.isAppInstalled(pkg)).should.be.false;
       mocks.adb.verify();
