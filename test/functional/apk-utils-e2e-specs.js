@@ -22,6 +22,9 @@ describe('apk utils', function () {
   before(async () => {
     adb = await ADB.createADB();
   });
+  it('should be able to check status of third party app', async () => {
+    (await adb.isAppInstalled('com.android.phone')).should.be.true;
+  });
   it('should be able to install/remove app and detect its status', async () => {
     (await adb.isAppInstalled('foo')).should.be.false;
     await adb.install(contactManagerPath);
