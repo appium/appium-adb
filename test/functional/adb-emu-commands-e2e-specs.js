@@ -20,7 +20,8 @@ describe('adb emu commands', () => {
     adb = await ADB.createADB();
 
     // the test here only works if we have API level 23 or above
-    if (parseInt(await adb.getApiLevel(), 10) < 23) {
+    // it will also fail on emulators
+    if (parseInt(await adb.getApiLevel(), 10) < 23 || !process.env.REAL_DEVICE) {
       this.skip();
     }
   });

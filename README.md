@@ -35,6 +35,11 @@ npm run test
 
 ### functional tests
 
+By default the functional tests use an avd named `NEXUS_S_18_X86`, with API Level
+18. To change this, you can use the environment variables `PLATFORM_VERSION`,
+`API_LEVEL`, and `ANDROID_AVD`. If `PLATFORM_VERSION` is set then it is not
+necessary to set `API_LEVEL` as it will be inferred.
+
 ```
 gulp e2e-test
 ```

@@ -3,20 +3,20 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
+import { apiLevel, platformVersion } from './setup';
 
 
 chai.use(chaiAsPromised);
+let expect = chai.expect;
+
 // change according to CI
-const apiLevel = '18',
-      platformVersion = '4.3',
-      IME = 'com.example.android.softkeyboard/.SoftKeyboard',
+const IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIMEs = ['com.android.inputmethod.latin/.LatinIME',
                      'io.appium.android.ime/.UnicodeIME'],
       contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
       pkg = 'com.example.android.contactmanager',
       activity = 'ContactManager';
-let expect = chai.expect;
 
 describe('adb commands', function () {
   let adb;
@@ -69,11 +69,15 @@ describe('adb commands', function () {
     await adb.killProcessByPID(pids[0]);
     (await adb.getPIDsByName(pkg)).length.should.equal(0);
   });
-  it('should get device language and country', async () => {
+  it('should get device language and country', async function () {
+    if (parseInt(apiLevel, 10) >= 23) return this.skip();
+
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
-  it('should set device language and country', async () => {
+  it('should set device language and country', async function () {
+    if (parseInt(apiLevel, 10) >= 23) return this.skip();
+
     await adb.setDeviceSysLanguage('fr');
     await adb.setDeviceSysCountry('fr');
     await adb.reboot();
@@ -82,6 +86,11 @@ describe('adb commands', function () {
     // cleanup
     await adb.setDeviceSysLanguage('en');
     await adb.setDeviceSysCountry('us');
+  });
+  it('should get device locale', async function () {
+    if (parseInt(apiLevel, 10) < 23) return this.skip();
+
+    ['us'].should.contain(await adb.getDeviceLocale());
   });
   it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);
