@@ -108,6 +108,15 @@ describe('adb commands', function () {
     logs.should.have.length.above(0);
     await adb.stopLogcat();
   });
+  it('should get model', async () => {
+    (await adb.getModel()).should.not.be.null;
+  });
+  it('should get manufacturer', async () => {
+    (await adb.getManufacturer()).should.not.be.null;
+  });
+  it('should get screen size', async () => {
+    (await adb.getScreenSize()).should.not.be.null;
+  });
   describe('app permissions', async () => {
     before(async function () {
       let deviceApiLevel = await adb.getApiLevel();

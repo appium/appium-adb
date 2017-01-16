@@ -31,7 +31,10 @@ const apiLevel = '21',
       flags=0x0`,
       psOutput = `USER     PID   PPID  VSIZE  RSS     WCHAN    PC   NAME
 u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.contactmanager`,
-      contactManagerPackage = 'com.example.android.contactmanager';
+      contactManagerPackage = 'com.example.android.contactmanager',
+      model = `Android SDK built for X86_64`,
+      manufacturer = `unknown`,
+      screenSize = `768x1280`;
 
 describe('adb commands', () => {
   let adb = new ADB();
@@ -576,6 +579,29 @@ describe('adb commands', () => {
       });
     }));
   });
+  describe('device info', withMocks({adb}, (mocks) => {
+    it('should get device model', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.product.model'])
+          .returns(model);
+      await adb.getModel();
+      mocks.adb.verify();
+    });
+    it('should get device manufacturer', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['getprop', 'ro.product.manufacturer'])
+          .returns(manufacturer);
+      await adb.getManufacturer();
+      mocks.adb.verify();
+    });
+    it('should get device screen size', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['wm', 'size'])
+          .returns(screenSize);
+      await adb.getScreenSize();
+      mocks.adb.verify();
+    });
+  }));
   describe('app permission', withMocks({adb}, (mocks) => {
     it('should grant requested permission', async () => {
       mocks.adb.expects("shell")
