@@ -83,6 +83,34 @@ describe('apk utils', function () {
                           waitActivity: '.ContactManager'});
       await assertPackageAndActivity();
     });
+    it('should start activity when wait activity is a wildcard', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+                          activity: 'ContactManager',
+                          waitActivity: '*'});
+      await assertPackageAndActivity();
+    });
+    it('should start activity when wait activity contains a wildcard', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+                          activity: 'ContactManager',
+                          waitActivity: '*.ContactManager'});
+      await assertPackageAndActivity();
+    });
+    it('should throw error for wrong activity when wait activity contains a wildcard', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+                          activity: 'SuperManager',
+                          waitActivity: '*.ContactManager'}).should.eventually
+                                                            .be.rejectedWith('Activity');
+    });
+    it('should throw error for wrong wait activity which contains wildcard', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+                          activity: 'ContactManager',
+                          waitActivity: '*.SuperManager'}).should.eventually
+                                                          .be.rejectedWith('SuperManager');
+    });
 
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async () => {

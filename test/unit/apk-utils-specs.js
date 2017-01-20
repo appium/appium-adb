@@ -141,6 +141,70 @@ describe('Apk-utils', () => {
         .should.eventually.be.rejected;
       mocks.adb.verify();
     });
+    it('should be able to match activities if waitActivity is a wildcard', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `*`, false);
+      mocks.adb.verify();
+    });
+    it('should be able to match activities if waitActivity is shortened and contains a whildcard', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `.*Manager`, false);
+      mocks.adb.verify();
+    });
+    it('should be able to match activities if waitActivity contains a wildcard alternative to activity', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `${pkg}.*`, false);
+      mocks.adb.verify();
+    });
+    it('should be able to match activities if waitActivity contains a wildcard on head', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `*.contactmanager.ContactManager`, false);
+      mocks.adb.verify();
+    });
+    it('should be able to match activities if waitActivity contains a wildcard across a pkg name and an activity name', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `com.*Manager`, false);
+      mocks.adb.verify();
+    });
+    it('should be able to match activities if waitActivity contains wildcards in both a pkg name and an activity name', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot(pkg, `com.*.contactmanager.*Manager`, false);
+      mocks.adb.verify();
+    });
+    it('should fail if activity not to match from regexp activities', async () => {
+      mocks.adb.expects('shell')
+        .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+                 `ActivityRecord{2 u com.example.android.supermanager/.SuperManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.example.android.supermanager', `${pkg}.*`, false, 1000)
+        .should.eventually.be.rejected;
+      mocks.adb.verify();
+    });
   }));
   describe('waitForActivity', withMocks({adb}, (mocks) => {
     it('should call waitForActivityOrNot with correct arguments', async () => {
