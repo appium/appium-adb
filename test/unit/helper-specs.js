@@ -1,4 +1,4 @@
-import { getPossibleActivityNames, getDirectories, getAndroidPlatformAndPath,
+import { getDirectories, getAndroidPlatformAndPath,
          buildStartCmd } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
@@ -10,25 +10,6 @@ import _ from 'lodash';
 const should = chai.should;
 
 describe('helpers', () => {
-  describe('getPossibleActivityNames', () => {
-    it('should correctly remove pkg from pkg.activity.name', () => {
-      getPossibleActivityNames('pkg', 'pkg.activity.name')
-        .should.include('.activity.name');
-    });
-    it('should return .act.name when act.name is passed', () => {
-      getPossibleActivityNames('pkg', 'act.name')
-        .should.include('.act.name');
-    });
-    it('should not amend a valid activity name', () => {
-      getPossibleActivityNames('pkg', '.activity.name')
-        .should.include('.activity.name');
-    });
-    it('should handle case where application id is different from package name', () => {
-      getPossibleActivityNames('com.ga.aaa.android.bbb.activities.local', 'com.ga.aaa.android.bbb.activity.FirstLaunchActivity')
-        .should.include('com.ga.aaa.android.bbb.activity.FirstLaunchActivity');
-    });
-  });
-
   describe('getDirectories', withMocks({fs}, (mocks) => {
     it('should sort the directories', async () => {
       let rootPath = '/path/to/root';
