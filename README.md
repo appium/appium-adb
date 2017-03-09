@@ -15,13 +15,13 @@ A wrapper over android-adb, implemented using ES6 and along with `async/await`. 
 
 ## Installing
 
-```
+```bash
 npm install appium-adb
 ```
 
 ## Watch
 
-```
+```bash
 npm run watch
 ```
 
@@ -29,7 +29,7 @@ npm run watch
 
 ### unit tests
 
-```
+```bash
 npm run test
 ```
 
@@ -40,7 +40,7 @@ By default the functional tests use an avd named `NEXUS_S_18_X86`, with API Leve
 `API_LEVEL`, and `ANDROID_AVD`. If `PLATFORM_VERSION` is set then it is not
 necessary to set `API_LEVEL` as it will be inferred.
 
-```
+```bash
 gulp e2e-test
 ```
 
@@ -48,7 +48,7 @@ gulp e2e-test
 
 example:
 
-```
+```js
 import ADB from 'appium-adb';
 
 let adb = new ADB();
@@ -58,101 +58,101 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 
 ### List of methods:
 
-- createADB
-- initJars
-- getAdbWithCorrectAdbPath
-- initAapt
-- initZipAlign
-- getApiLevel
-- isDeviceConnected
-- mkdir
-- isValidClass
-- forceStop
-- clear
-- stopAndClear
-- availableIMEs
-- enabledIMEs
-- enableIME
-- disableIME
-- setIME
-- defaultIME
-- keyevent
-- lock
-- back
-- goToHome
-- isScreenLocked
-- isSoftKeyboardPresent
-- sendTelnetCommand
-- isAirplaneModeOn
-- setAirplaneMode
-- broadcastAirplaneMode
-- isWifiOn
-- setWifiState
-- isDataOn
-- setDataState
-- setWifiAndData
-- rimraf
-- push
-- pull
-- processExists
-- forwardPort
-- forwardAbstractPort
-- ping
-- restart
-- startLogcat
-- stopLogcat
-- getLogcatLogs
-- getPIDsByName
-- killProcessesByName
-- killProcessByPID
-- broadcastProcessEnd
-- broadcast
-- endAndroidCoverage
-- instrument
-- androidCoverage
-- processFromManifest
-- packageAndLaunchActivityFromManifest
-- compileManifest
-- insertManifest
-- hasInternetPermissionFromManifest
-- getSdkBinaryPath
-- getCommandForOS
-- getBinaryFromSdkRoot
-- getBinaryFromPath
-- getConnectedDevices
-- getDevicesWithRetry
-- restartAdb
-- adbExec
-- shell
-- getAdbServerPort
-- getEmulatorPort
-- getPortFromEmulatorString
-- getConnectedEmulators
-- setEmulatorPort
-- setDeviceId
-- getRunningAVD
-- getRunningAVDWithRetry
-- killAllEmulators
-- launchAVD
-- waitForEmulatorReady
-- waitForDevice
-- reboot
-- signWithDefaultCert
-- signWithCustomCert
-- sign
-- zipAlignApk
-- checkApkCert
-- checkCustomApkCert
-- getKeystoreMd5
-- checkApkKeystoreMatch
-- isAppInstalled
-- startApp
-- startUri
-- getFocusedPackageAndActivity
-- waitForActivityOrNot
-- waitForActivity
-- waitForNotActivity
-- uninstallApk
-- installFromDevicePath
-- install
-- fingerprint (ApiLevel >=23)
+- `createADB`
+- `initJars`
+- `getAdbWithCorrectAdbPath`
+- `initAapt`
+- `initZipAlign`
+- `getApiLevel`
+- `isDeviceConnected`
+- `mkdir`
+- `isValidClass`
+- `forceStop`
+- `clear`
+- `stopAndClear`
+- `availableIMEs`
+- `enabledIMEs`
+- `enableIME`
+- `disableIME`
+- `setIME`
+- `defaultIME`
+- `keyevent`
+- `lock`
+- `back`
+- `goToHome`
+- `isScreenLocked`
+- `isSoftKeyboardPresent`
+- `sendTelnetCommand`
+- `isAirplaneModeOn`
+- `setAirplaneMode`
+- `broadcastAirplaneMode`
+- `isWifiOn`
+- `setWifiState`
+- `isDataOn`
+- `setDataState`
+- `setWifiAndData`
+- `rimraf`
+- `push`
+- `pull`
+- `processExists`
+- `forwardPort`
+- `forwardAbstractPort`
+- `ping`
+- `restart`
+- `startLogcat`
+- `stopLogcat`
+- `getLogcatLogs`
+- `getPIDsByName`
+- `killProcessesByName`
+- `killProcessByPID`
+- `broadcastProcessEnd`
+- `broadcast`
+- `endAndroidCoverage`
+- `instrument`
+- `androidCoverage`
+- `processFromManifest`
+- `packageAndLaunchActivityFromManifest`
+- `compileManifest`
+- `insertManifest`
+- `hasInternetPermissionFromManifest`
+- `getSdkBinaryPath`
+- `getCommandForOS`
+- `getBinaryFromSdkRoot`
+- `getBinaryFromPath`
+- `getConnectedDevices`
+- `getDevicesWithRetry`
+- `restartAdb`
+- `adbExec`
+- `shell`
+- `getAdbServerPort`
+- `getEmulatorPort`
+- `getPortFromEmulatorString`
+- `getConnectedEmulators`
+- `setEmulatorPort`
+- `setDeviceId`
+- `getRunningAVD`
+- `getRunningAVDWithRetry`
+- `killAllEmulators`
+- `launchAVD`
+- `waitForEmulatorReady`
+- `waitForDevice`
+- `reboot`
+- `signWithDefaultCert`
+- `signWithCustomCert`
+- `sign`
+- `zipAlignApk`
+- `checkApkCert`
+- `checkCustomApkCert`
+- `getKeystoreMd5`
+- `checkApkKeystoreMatch`
+- `isAppInstalled`
+- `startApp`
+- `startUri`
+- `getFocusedPackageAndActivity`
+- `waitForActivityOrNot`
+- `waitForActivity`
+- `waitForNotActivity`
+- `uninstallApk`
+- `installFromDevicePath`
+- `install`
+- `fingerprint` (ApiLevel >=23)
