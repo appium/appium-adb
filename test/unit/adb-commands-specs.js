@@ -603,6 +603,67 @@ describe('adb commands', () => {
     });
   }));
   describe('app permission', withMocks({adb}, (mocks) => {
+    const dumpedOutput = `
+          declared permissions:
+            com.xxx.permission.C2D_MESSAGE: prot=signature, INSTALLED
+            com.xxx.permission.C2D_MESSAGE: prot=signature
+          requested permissions:
+            android.permission.ACCESS_NETWORK_STATE
+            android.permission.WRITE_EXTERNAL_STORAGE
+            android.permission.INTERNET
+            android.permission.READ_CONTACTS
+            android.permission.RECORD_AUDIO
+            android.permission.VIBRATE
+            android.permission.CAMERA
+            android.permission.FLASHLIGHT
+            android.permission.READ_PHONE_STATE
+            android.permission.MODIFY_AUDIO_SETTINGS
+            android.permission.BLUETOOTH
+            android.permission.WAKE_LOCK
+            com.google.android.c2dm.permission.RECEIVE
+            com.xxx.permission.C2D_MESSAGE
+            android.permission.ACCESS_FINE_LOCATION
+            android.permission.READ_EXTERNAL_STORAGE
+            android.permission.RECEIVE_BOOT_COMPLETED
+            .permission.C2D_MESSAGE
+          install permissions:
+            com.google.android.c2dm.permission.RECEIVE: granted=true
+            android.permission.MODIFY_AUDIO_SETTINGS: granted=true
+            android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+            android.permission.BLUETOOTH: granted=true
+            android.permission.INTERNET: granted=true
+            com.xxx.permission.C2D_MESSAGE: granted=true
+            android.permission.FLASHLIGHT: granted=true
+            android.permission.ACCESS_NETWORK_STATE: granted=true
+            android.permission.VIBRATE: granted=true
+            android.permission.WAKE_LOCK: granted=true
+          User 0: ceDataInode=1504712 installed=true hidden=false suspended=false stopped=false notLaunched=false enabled=0
+            gids=[3002, 3003]
+            runtime permissions:
+              android.permission.ACCESS_FINE_LOCATION: granted=true
+              android.permission.READ_EXTERNAL_STORAGE: granted=true
+              android.permission.READ_PHONE_STATE: granted=true
+              android.permission.CAMERA: granted=false, flags=[ USER_SET ]
+              android.permission.WRITE_EXTERNAL_STORAGE: granted=true
+              android.permission.RECORD_AUDIO: granted=true
+              android.permission.READ_CONTACTS: granted=false, flags=[ USER_SET ]
+
+
+      Dexopt state:
+        [com.xxx]
+          Instruction Set: arm
+            path: /data/app/com.xxx-1/base.apk
+            status: /data/app/com.xxxa-1/oat/arm/base.odex [compilation_filter=interpret-only, status=kOatUpToDate]
+
+
+      Compiler stats:
+        [com.xxx]
+           base.apk - 8264
+
+    DUMP OF SERVICE activity:
+      ACTIVITY MANAGER PENDING INTENTS (dumpsys activity intents)
+        (nothing)`;
+
     it('should grant requested permission', async () => {
       mocks.adb.expects("shell")
           .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
@@ -614,6 +675,73 @@ describe('adb commands', () => {
           .once().withArgs(['pm', 'revoke', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
       await adb.revokePermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
       mocks.adb.verify();
+    });
+    it('should properly list requested permissions', async () => {
+      mocks.adb.expects("shell").once().returns(dumpedOutput);
+      const result = await adb.getGrantedPermissions('io.appium.android');
+      for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.INTERNET',
+                        'android.permission.READ_CONTACTS',
+                        'android.permission.RECORD_AUDIO',
+                        'android.permission.VIBRATE',
+                        'android.permission.CAMERA',
+                        'android.permission.FLASHLIGHT',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.MODIFY_AUDIO_SETTINGS',
+                        'android.permission.BLUETOOTH',
+                        'android.permission.WAKE_LOCK',
+                        'android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.RECEIVE_BOOT_COMPLETED']) {
+        result.should.include(perm);
+      }
+    });
+    it('should properly list granted permissions', async () => {
+      mocks.adb.expects("shell").once().returns(dumpedOutput);
+      const result = await adb.getGrantedPermissions('io.appium.android');
+      for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
+                        'android.permission.RECEIVE_BOOT_COMPLETED',
+                        'android.permission.BLUETOOTH',
+                        'android.permission.INTERNET',
+                        'android.permission.FLASHLIGHT',
+                        'android.permission.ACCESS_NETWORK_STATE',
+                        'android.permission.VIBRATE',
+                        'android.permission.WAKE_LOCK',
+                        'android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.RECORD_AUDIO']) {
+        result.should.include(perm);
+      }
+      for (let perm of ['android.permission.READ_CONTACTS',
+                        'android.permission.CAMERA']) {
+        result.should.not.include(perm);
+      }
+    });
+    it('should properly list non-granted permissions', async () => {
+      mocks.adb.expects("shell").once().returns(dumpedOutput);
+      const result = await adb.getNonGrantedPermissions('io.appium.android');
+      for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
+                        'android.permission.RECEIVE_BOOT_COMPLETED',
+                        'android.permission.BLUETOOTH',
+                        'android.permission.INTERNET',
+                        'android.permission.FLASHLIGHT',
+                        'android.permission.ACCESS_NETWORK_STATE',
+                        'android.permission.VIBRATE',
+                        'android.permission.WAKE_LOCK',
+                        'android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.RECORD_AUDIO']) {
+        result.should.not.include(perm);
+      }
+      for (let perm of ['android.permission.READ_CONTACTS',
+                        'android.permission.CAMERA']) {
+        result.should.include(perm);
+      }
     });
   }));
   describe('sendTelnetCommand', withMocks({adb, net}, (mocks) => {
