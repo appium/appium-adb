@@ -1,5 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import * as teen_process from 'teen_process';
+import { fs } from 'appium-support';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
 
@@ -401,6 +403,92 @@ describe('Apk-utils', () => {
         .returns("");
       await adb.setDeviceLocale(locale);
       mocks.adb.verify();
+    });
+  }));
+  describe('getApkInfo', withMocks({adb, teen_process, fs}, (mocks) => {
+    it('should properly parse apk info', async () => {
+      mocks.fs.expects('exists').once().returns(true);
+      mocks.adb.expects('initAapt').once().returns(true);
+      mocks.teen_process.expects('exec').once().returns({stdout: `package: name='io.appium.settings' versionCode='2' versionName='1.1' platformBuildVersionName='6.0-2166767'
+      sdkVersion:'17'
+      targetSdkVersion:'23'
+      uses-permission: name='android.permission.INTERNET'
+      uses-permission: name='android.permission.CHANGE_NETWORK_STATE'
+      uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+      uses-permission: name='android.permission.READ_PHONE_STATE'
+      uses-permission: name='android.permission.WRITE_SETTINGS'
+      uses-permission: name='android.permission.CHANGE_WIFI_STATE'
+      uses-permission: name='android.permission.ACCESS_WIFI_STATE'
+      uses-permission: name='android.permission.ACCESS_FINE_LOCATION'
+      uses-permission: name='android.permission.ACCESS_COARSE_LOCATION'
+      uses-permission: name='android.permission.ACCESS_MOCK_LOCATION'
+      application-label:'Appium Settings'
+      application-icon-120:'res/drawable-ldpi-v4/ic_launcher.png'
+      application-icon-160:'res/drawable-mdpi-v4/ic_launcher.png'
+      application-icon-240:'res/drawable-hdpi-v4/ic_launcher.png'
+      application-icon-320:'res/drawable-xhdpi-v4/ic_launcher.png'
+      application: label='Appium Settings' icon='res/drawable-mdpi-v4/ic_launcher.png'
+      application-debuggable
+      launchable-activity: name='io.appium.settings.Settings'  label='Appium Settings' icon=''
+      feature-group: label=''
+        uses-feature: name='android.hardware.wifi'
+        uses-feature: name='android.hardware.location'
+        uses-implied-feature: name='android.hardware.location' reason='requested android.permission.ACCESS_COARSE_LOCATION permission, requested android.permission.ACCESS_FINE_LOCATION permission, and requested android.permission.ACCESS_MOCK_LOCATION permission'
+        uses-feature: name='android.hardware.location.gps'
+        uses-implied-feature: name='android.hardware.location.gps' reason='requested android.permission.ACCESS_FINE_LOCATION permission'
+        uses-feature: name='android.hardware.location.network'
+        uses-implied-feature: name='android.hardware.location.network' reason='requested android.permission.ACCESS_COARSE_LOCATION permission'
+        uses-feature: name='android.hardware.touchscreen'
+        uses-implied-feature: name='android.hardware.touchscreen' reason='default feature for all apps'
+      main
+      other-receivers
+      other-services
+      supports-screens: 'small' 'normal' 'large' 'xlarge'
+      supports-any-density: 'true'
+      locales: '--_--'
+      densities: '120' '160' '240' '320'`});
+      const result = await adb.getApkInfo('/some/folder/path.apk');
+      for (let [name, value] of [['name', 'io.appium.settings'],
+                                 ['versionCode', 2],
+                                 ['versionName', '1.1']]) {
+        result.should.have.property(name, value);
+      }
+    });
+  }));
+  describe('getPackageInfo', withMocks({adb}, (mocks) => {
+    it('should properly parse installed package info', async () => {
+      mocks.adb.expects('shell').once().returns(`Packages:
+      Package [com.example.testapp.first] (2036fd1):
+        userId=10225
+        pkg=Package{42e7a36 com.example.testapp.first}
+        codePath=/data/app/com.example.testapp.first-1
+        resourcePath=/data/app/com.example.testapp.first-1
+        legacyNativeLibraryDir=/data/app/com.example.testapp.first-1/lib
+        primaryCpuAbi=null
+        secondaryCpuAbi=null
+        versionCode=1 minSdk=21 targetSdk=24
+        versionName=1.0
+        splits=[base]
+        apkSigningVersion=1
+        applicationInfo=ApplicationInfo{29cb2a4 com.example.testapp.first}
+        flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+        privateFlags=[ RESIZEABLE_ACTIVITIES ]
+        dataDir=/data/user/0/com.example.testapp.first
+        supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+        timeStamp=2016-11-03 01:12:08
+        firstInstallTime=2016-11-03 01:12:09
+        lastUpdateTime=2016-11-03 01:12:09
+        signatures=PackageSignatures{9fe380d [53ea108d]}
+        installPermissionsFixed=true installStatus=1
+        pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+        User 0: ceDataInode=474317 installed=true hidden=false suspended=false stopped=true notLaunched=true enabled=0
+          runtime permissions:`);
+      const result = await adb.getPackageInfo('com.example.testapp.first');
+      for (let [name, value] of [['name', 'com.example.testapp.first'],
+                                 ['versionCode', 1],
+                                 ['versionName', '1.0']]) {
+        result.should.have.property(name, value);
+      }
     });
   }));
 });
