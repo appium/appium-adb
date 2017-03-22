@@ -720,9 +720,9 @@ describe('adb commands', () => {
         result.should.not.include(perm);
       }
     });
-    it('should properly list non-granted permissions', async () => {
+    it('should properly list denied permissions', async () => {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
-      const result = await adb.getNonGrantedPermissions('io.appium.android');
+      const result = await adb.getDeniedPermissions('io.appium.android');
       for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
                         'android.permission.RECEIVE_BOOT_COMPLETED',
                         'android.permission.BLUETOOTH',
