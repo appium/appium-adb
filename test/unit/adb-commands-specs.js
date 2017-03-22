@@ -678,7 +678,7 @@ describe('adb commands', () => {
     });
     it('should properly list requested permissions', async () => {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
-      const result = await adb.getGrantedPermissions('io.appium.android');
+      const result = await adb.getReqPermissions('io.appium.android');
       for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
                         'android.permission.WRITE_EXTERNAL_STORAGE',
                         'android.permission.INTERNET',
