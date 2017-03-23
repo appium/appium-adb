@@ -491,4 +491,111 @@ describe('Apk-utils', () => {
       }
     });
   }));
+  describe('installOrUpgrade', withMocks({adb}, (mocks) => {
+    const pkgId = 'io.appium.settings';
+    const apkPath = '/path/to/my.apk';
+
+    it('should execute install if the package is not present', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(false);
+      mocks.adb.expects('adbExec').once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should return if the same package version is already installed', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      await adb.installOrUpgrade(apkPath, pkgId);
+    });
+    it('should return if newer package version is already installed', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId,
+        versionCode: 1
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 2
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should not throw an error if apk version code cannot be read', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 2
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should not throw an error if pkg version code cannot be read', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId,
+        versionCode: 1
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({});
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should not throw an error if pkg id cannot be read', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({});
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should perform upgrade if older package version is installed', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId,
+        versionCode: 2
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      mocks.adb.expects('adbExec').once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
+    it('should throw an exception if upgrade and reinstall fail', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId,
+        versionCode: 2
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      mocks.adb.expects('uninstallApk').withExactArgs([pkgId]).once().returns(true);
+      mocks.adb.expects('adbExec').twice().throws();
+      let isExceptionThrown = false;
+      try {
+        await adb.installOrUpgrade(apkPath);
+      } catch (e) {
+        isExceptionThrown = true;
+      }
+      isExceptionThrown.should.be.true();
+    });
+    it('should throw an exception if upgrade and uninstall fail', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs([apkPath]).once().returns({
+        name: pkgId,
+        versionCode: 2
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs([pkgId]).once().returns(true);
+      mocks.adb.expects('uninstallApk').withExactArgs([pkgId]).once().returns(false);
+      mocks.adb.expects('adbExec').once().throws();
+      let isExceptionThrown = false;
+      try {
+        await adb.installOrUpgrade(apkPath);
+      } catch (e) {
+        isExceptionThrown = true;
+      }
+      isExceptionThrown.should.be.true();
+    });
+  }));
 });
