@@ -367,7 +367,7 @@ describe('adb commands', () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection', '--es', 'setstatus', 'disable'])
           .returns("");
-        await adb.setDataState(true);
+        await adb.setDataState(false);
         mocks.adb.verify();
       });
       it('should call shell with correct args for simulator', async () => {
@@ -388,7 +388,7 @@ describe('adb commands', () => {
       });
       it('should call shell with correct args when turning only wifi off for simulator', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['svc', 'data', 'disable'])
+          .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
         await adb.setWifiAndData({wifi: false}, true);
         mocks.adb.verify();
