@@ -338,7 +338,7 @@ describe('adb commands', () => {
         await adb.setWifiState(true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args for simulator', async () => {
+      it('should call shell with correct args for emulator', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
@@ -370,7 +370,7 @@ describe('adb commands', () => {
         await adb.setDataState(false);
         mocks.adb.verify();
       });
-      it('should call shell with correct args for simulator', async () => {
+      it('should call shell with correct args for emulator', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
@@ -386,14 +386,14 @@ describe('adb commands', () => {
         await adb.setWifiAndData({wifi: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only wifi off for simulator', async () => {
+      it('should call shell with correct args when turning only wifi off for emulator', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
         await adb.setWifiAndData({wifi: false}, true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only data on for simulator', async () => {
+      it('should call shell with correct args when turning only data on for emulator', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
@@ -412,7 +412,7 @@ describe('adb commands', () => {
         await adb.setWifiAndData({wifi: true, data: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning both wifi and data off for simulator', async () => {
+      it('should call shell with correct args when turning both wifi and data off for emulator', async () => {
         mocks.adb.expects("shell").twice().returns("");
         await adb.setWifiAndData({wifi: false, data: false}, true);
         mocks.adb.verify();
