@@ -418,6 +418,26 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('setGeoLocation', withMocks({adb}, (mocks) => {
+      const location = {longitude: '50.5',
+                        latitude: '50.1'};
+
+      it('should call shell with correct args for real device', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['am', 'startservice', '-e', 'longitude', location.longitude,
+                                 '-e', 'latitude', location.latitude, `io.appium.settings/.LocationService`])
+          .returns("");
+        await adb.setGeoLocation(location);
+        mocks.adb.verify();
+      });
+      it('should call adb with correct args for emulator', async () => {
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(['emu', 'geo', 'fix', location.longitude, location.latitude])
+          .returns("");
+        await adb.setGeoLocation(location, true);
+        mocks.adb.verify();
+      });
+    }));
     describe('processExists', withMocks({adb}, (mocks) => {
       it('should call shell with correct args and should find process', async () => {
         mocks.adb.expects("shell")
