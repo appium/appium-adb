@@ -28,7 +28,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['devices'])
       .returns({stdout:stdoutValue});
-    
+
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
@@ -106,7 +106,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
   });
 }));
 
-describe('System calls',  withMocks({adb, B}, (mocks) => {
+describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
   it('fileExists should return true for if ls returns', async () => {
     mocks.adb.expects("ls")
       .once().withExactArgs('foo')
@@ -125,6 +125,27 @@ describe('System calls',  withMocks({adb, B}, (mocks) => {
   it('reboot should call stop and start using shell', async () => {
     mocks.adb.expects("shell")
       .once().withExactArgs(['stop']);
+    mocks.adb.expects("setDeviceProperty")
+      .once().withExactArgs('sys.boot_completed', 0);
+    mocks.adb.expects("shell")
+      .once().withExactArgs(['start']);
+    mocks.adb.expects("getDeviceProperty")
+      .once().withExactArgs('sys.boot_completed')
+      .returns('1');
+    mocks.B.expects("delay")
+      .once().withExactArgs(2000);
+    await adb.reboot().should.eventually.not.be.rejected;
+    mocks.adb.verify();
+    mocks.B.verify();
+  });
+  it('reboot should restart adbd as root if necessary', async () => {
+    mocks.teen_process.expects("exec")
+      .once().withExactArgs(adb.executable.path, ['root']);
+    mocks.adb.expects("shell")
+      .twice().withExactArgs(['stop'])
+      .onFirstCall()
+        .throws(new Error(`Error executing adbExec. Original error: 'Command 'adb shell stop' exited with code 1'; Stderr: 'stop: must be root'; Code: '1'`))
+      .onSecondCall().returns();
     mocks.adb.expects("setDeviceProperty")
       .once().withExactArgs('sys.boot_completed', 0);
     mocks.adb.expects("shell")
