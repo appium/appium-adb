@@ -434,6 +434,10 @@ describe('adb commands', () => {
         mocks.adb.expects("adbExec")
           .once().withExactArgs(['emu', 'geo', 'fix', location.longitude, location.latitude])
           .returns("");
+        // A workaround for https://code.google.com/p/android/issues/detail?id=206180
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(['emu', 'geo', 'fix', location.longitude.replace('.', ','), location.latitude.replace('.', ',')])
+          .returns("");
         await adb.setGeoLocation(location, true);
         mocks.adb.verify();
       });
