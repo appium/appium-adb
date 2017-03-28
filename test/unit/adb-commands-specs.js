@@ -431,6 +431,8 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
       it('should call adb with correct args for emulator', async () => {
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().returns(true);
         mocks.adb.expects("adbExec")
           .once().withExactArgs(['emu', 'geo', 'fix', location.longitude, location.latitude])
           .returns("");
