@@ -308,8 +308,7 @@ describe('adb commands', () => {
     describe('broadcastAirplaneMode', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE',
-                                 '--ez', 'state', 'true'])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE', '--ez', 'state', 'true'])
           .returns("");
         await adb.broadcastAirplaneMode(true);
         mocks.adb.verify();
@@ -332,11 +331,18 @@ describe('adb commands', () => {
       });
     }));
     describe('setWifiState', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['settings', 'put', 'global', 'wifi_on', 1])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi', '--es', 'setstatus', 'enable'])
           .returns("");
         await adb.setWifiState(true);
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args for emulator', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['svc', 'wifi', 'disable'])
+          .returns("");
+        await adb.setWifiState(false, true);
         mocks.adb.verify();
       });
     }));
@@ -357,61 +363,84 @@ describe('adb commands', () => {
       });
     }));
     describe('setDataState', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(["settings", "put", "global", "mobile_data", 1])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection', '--es', 'setstatus', 'disable'])
           .returns("");
-        await adb.setDataState(true);
+        await adb.setDataState(false);
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args for emulator', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['svc', 'data', 'enable'])
+          .returns("");
+        await adb.setDataState(true, true);
         mocks.adb.verify();
       });
     }));
     describe('setWifiAndData', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args when turning only wifi on', async () => {
+      it('should call shell with correct args when turning only wifi on for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'wifi', 'on'])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi', '--es', 'setstatus', 'enable'])
           .returns("");
         await adb.setWifiAndData({wifi: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only wifi off', async () => {
+      it('should call shell with correct args when turning only wifi off for emulator', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'wifi', 'off'])
+          .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
-        await adb.setWifiAndData({wifi: false});
+        await adb.setWifiAndData({wifi: false}, true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only data on', async () => {
+      it('should call shell with correct args when turning only data on for emulator', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'data', 'on'])
+          .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
-        await adb.setWifiAndData({data: true});
+        await adb.setWifiAndData({data: true}, true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only data off', async () => {
+      it('should call shell with correct args when turning only data off for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'data', 'off'])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection', '--es', 'setstatus', 'disable'])
           .returns("");
         await adb.setWifiAndData({data: false});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning both wifi and data on', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'wifi', 'on', '-e', 'data', 'on'])
-          .returns("");
+      it('should call shell with correct args when turning both wifi and data on for real device', async () => {
+        mocks.adb.expects("shell").twice().returns("");
         await adb.setWifiAndData({wifi: true, data: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning both wifi and data off', async () => {
+      it('should call shell with correct args when turning both wifi and data off for emulator', async () => {
+        mocks.adb.expects("shell").twice().returns("");
+        await adb.setWifiAndData({wifi: false, data: false}, true);
+        mocks.adb.verify();
+      });
+    }));
+    describe('setGeoLocation', withMocks({adb}, (mocks) => {
+      const location = {longitude: '50.5',
+                        latitude: '50.1'};
+
+      it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'start', '-n', 'io.appium.settings/.Settings',
-                                  '-e', 'wifi', 'off', '-e', 'data', 'off'])
+          .once().withExactArgs(['am', 'startservice', '-e', 'longitude', location.longitude,
+                                 '-e', 'latitude', location.latitude, `io.appium.settings/.LocationService`])
           .returns("");
-        await adb.setWifiAndData({wifi: false, data: false});
+        await adb.setGeoLocation(location);
+        mocks.adb.verify();
+      });
+      it('should call adb with correct args for emulator', async () => {
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().returns(true);
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(['emu', 'geo', 'fix', location.longitude, location.latitude])
+          .returns("");
+        // A workaround for https://code.google.com/p/android/issues/detail?id=206180
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(['emu', 'geo', 'fix', location.longitude.replace('.', ','), location.latitude.replace('.', ',')])
+          .returns("");
+        await adb.setGeoLocation(location, true);
         mocks.adb.verify();
       });
     }));
