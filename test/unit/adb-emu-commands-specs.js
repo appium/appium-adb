@@ -83,6 +83,12 @@ describe('adb emulator commands', () => {
         await adb.rotate();
         mocks.adb.verify();
       });
+      it("should call adb exec with the correct rotate args", async () => {
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "rotate"]);
+        await adb.rotate();
+        mocks.adb.verify();
+      });
     }));
   });
 });
