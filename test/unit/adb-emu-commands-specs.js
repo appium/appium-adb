@@ -41,8 +41,9 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("setDeviceId")
           .once().withExactArgs("emulator-5556")
           .returns();
+        mocks.adb.expects('resetTelnetAuthToken').atLeast(3);
         mocks.adb.expects("adbExec")
-          .atLeast(1)
+          .atLeast(3)
           .withExactArgs(["emu", "finger", "touch", fingerprint])
           .returns("");
         await adb.fingerprint(fingerprint);
@@ -82,12 +83,14 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should call adb exec with the correct rotate args", async () => {
+        mocks.adb.expects('resetTelnetAuthToken').once();
         mocks.adb.expects("adbExec")
           .once().withExactArgs(["emu", "rotate"]);
         await adb.rotate();
         mocks.adb.verify();
       });
       it("should call adb exec with the correct rotate args", async () => {
+        mocks.adb.expects('resetTelnetAuthToken').once();
         mocks.adb.expects("adbExec")
           .once().withExactArgs(["emu", "rotate"]);
         mocks.adb.expects("setDeviceId")
