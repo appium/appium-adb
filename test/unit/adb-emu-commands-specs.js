@@ -84,12 +84,14 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should call adb exec with the correct rotate args", async () => {
+        mocks.adb.expects('resetTelnetAuthToken').once();
         mocks.adb.expects("adbExec")
           .once().withExactArgs(["emu", "rotate"]);
         await adb.rotate();
         mocks.adb.verify();
       });
       it("should call adb exec with the correct rotate args", async () => {
+        mocks.adb.expects('resetTelnetAuthToken').once();
         mocks.adb.expects("adbExec")
           .once().withExactArgs(["emu", "rotate"]);
         mocks.adb.expects("setDeviceId")
