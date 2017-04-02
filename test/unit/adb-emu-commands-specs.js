@@ -83,6 +83,19 @@ describe('adb emulator commands', () => {
         await adb.rotate();
         mocks.adb.verify();
       });
+      it("should call deviceId on checkEmulatorConnected", async () => {
+        mocks.adb.expects("getConnectedEmulators")
+          .atLeast(1).withExactArgs()
+          .returns(emulators);
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs("emulator-5554")
+          .returns(true);
+        mocks.adb.expects('setDeviceId')
+          .once()
+          .withExactArgs('emulator-5554');
+        await adb.checkEmulatorConnected("emulator-5554");
+        mocks.adb.verify();
+      });
       it("should call adb exec with the correct rotate args", async () => {
         mocks.adb.expects("getConnectedEmulators")
           .atLeast(1).withExactArgs()
@@ -100,7 +113,8 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("setDeviceId")
           .once().withExactArgs("emulator-5554")
           .returns();
-        mocks.adb.expects('resetTelnetAuthToken').once();
+        mocks.adb.expects('resetTelnetAuthToken')
+          .once();
         mocks.adb.expects("adbExec")
           .once().withExactArgs(["emu", "rotate"]);
         await adb.rotate("emulator-5554");
