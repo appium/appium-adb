@@ -45,6 +45,16 @@ describe('adb emulator commands', () => {
         await adb.checkEmulatorConnected("emulator-5554").should.eventually.be.rejected;
         mocks.adb.verify();
       });
+      it("should setDeviceId on emulator connected", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs("emulator-5554")
+          .returns(true);
+        mocks.adb.expects("setDeviceId")
+          .once().withExactArgs("emulator-5554")
+          .returns(emulators);
+        await adb.checkEmulatorConnected("emulator-5554");
+        mocks.adb.verify();
+      });
     }));
     describe("fingerprint", withMocks({adb}, (mocks) => {
       it("should throw exception on undefined fingerprintId", async () => {
