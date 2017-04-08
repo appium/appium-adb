@@ -11,7 +11,7 @@ const emulators = [
   { udid: 'emulator-5554', state: 'device', port: 5554 },
   { udid: 'emulator-5556', state: 'device', port: 5556 },
 ];
-// const fingerprint = 1111;
+const fingerprintId = 1111;
 
 describe('adb emulator commands', () => {
   let adb = new ADB();
@@ -65,7 +65,7 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("getApiLevel")
           .once().withExactArgs()
           .returns(21);
-        await adb.fingerprint("1111").should.eventually.be.rejected;
+        await adb.fingerprint(fingerprintId).should.eventually.be.rejected;
         mocks.adb.verify();
       });
       it("should call adbExec with the correct args", async () => {
@@ -79,9 +79,9 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "finger", "touch", "1111"])
+          .once().withExactArgs(["emu", "finger", "touch", fingerprintId])
           .returns();
-        await adb.fingerprint("1111");
+        await adb.fingerprint(fingerprintId);
         mocks.adb.verify();
       });
     }));
