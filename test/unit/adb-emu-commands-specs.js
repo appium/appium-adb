@@ -11,112 +11,83 @@ const emulators = [
   { udid: 'emulator-5554', state: 'device', port: 5554 },
   { udid: 'emulator-5556', state: 'device', port: 5556 },
 ];
-const fingerprint = 1111;
+// const fingerprint = 1111;
 
 describe('adb emulator commands', () => {
   let adb = new ADB();
   describe("emu", () => {
-    describe("isEmulatorConnected", withMocks({adb}, (mocks) => {
-      it("should check emulator is connected", async () => {
+    describe("getEmulators", withMocks({adb}, (mocks) => {
+      it("should cache emulators list", async () => {
         mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
+          .once().withExactArgs()
           .returns(emulators);
+        (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
+        (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
+        adb.emulators.should.equal(emulators);
+        mocks.adb.verify();
+      });
+    }));
+    describe("isEmulatorConnected", withMocks({adb}, (mocks) => {
+      it("should verify emulators state", async () => {
         (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
         (await adb.isEmulatorConnected("emulator-5556")).should.equal(true);
         (await adb.isEmulatorConnected("emulator-5558")).should.equal(false);
         mocks.adb.verify();
       });
     }));
-    describe("fingerprint", withMocks({adb}, (mocks) => {
-      it("should emit fingerprint without error", async () => {
+    describe("checkEmulatorConnected", withMocks({adb}, (mocks) => {
+      it("should throw exception no emulators connected", async () => {
+        delete adb.emulators;
         mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects("getApiLevel")
-          .atLeast(1).withExactArgs()
-          .returns("23");
-        mocks.adb.expects("setDeviceId")
-          .once().withExactArgs("emulator-5554")
-          .returns();
-        mocks.adb.expects("setDeviceId")
-          .once().withExactArgs("emulator-5556")
-          .returns();
-        mocks.adb.expects('resetTelnetAuthToken').atLeast(3);
-        mocks.adb.expects("adbExec")
-          .atLeast(3)
-          .withExactArgs(["emu", "finger", "touch", fingerprint])
-          .returns("");
-        await adb.fingerprint(fingerprint);
-        await adb.fingerprint(fingerprint, "emulator-5554");
-        await adb.fingerprint(fingerprint, "emulator-5556");
+          .once().withExactArgs()
+          .returns([]);
+        await adb.checkEmulatorConnected().should.eventually.be.rejected;
+        await adb.checkEmulatorConnected("emulator-5554").should.eventually.be.rejected;
         mocks.adb.verify();
       });
-      it("should throw an error on fingerprint argument undefined", async () => {
+    }));
+    describe("fingerprint", withMocks({adb}, (mocks) => {
+      it("should throw exception on undefined fingerprintId", async () => {
         await adb.fingerprint().should.eventually.be.rejected;
         mocks.adb.verify();
       });
-      it("should throw an error on emulator not connected", async () => {
+      it("should throw exception on apiLevel lower than 23", async () => {
         mocks.adb.expects("getApiLevel")
-          .atLeast(1).withExactArgs()
-          .returns("23");
+          .once().withExactArgs()
+          .returns(21);
+        await adb.fingerprint("1111").should.eventually.be.rejected;
+        mocks.adb.verify();
+      });
+      it("should call adbExec with the correct args", async () => {
+        mocks.adb.expects("getApiLevel")
+          .once().withExactArgs()
+          .returns(23);
         mocks.adb.expects("getConnectedEmulators")
           .once().withExactArgs()
           .returns(emulators);
-        await adb.fingerprint(1111, "emulator-5558").should.eventually.be.rejected;
-        mocks.adb.verify();
-      });
-      it("should throw an error on no emulators connected", async () => {
-        mocks.adb.expects("getApiLevel")
-          .atLeast(1).withExactArgs()
-          .returns("23");
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns([]);
-        await adb.fingerprint(1111).should.eventually.be.rejected;
-        mocks.adb.verify();
-      });
-      it("should throw an error on emulator Api Level < 23", async () => {
-        mocks.adb.expects("getApiLevel")
+        mocks.adb.expects("resetTelnetAuthToken")
           .once().withExactArgs()
-          .returns("22");
-        await adb.fingerprint(1111).should.eventually.be.rejected;
-        mocks.adb.verify();
-      });
-      it("should call deviceId on checkEmulatorConnected", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs("emulator-5554")
-          .returns(true);
-        mocks.adb.expects('setDeviceId')
-          .once()
-          .withExactArgs('emulator-5554');
-        await adb.checkEmulatorConnected("emulator-5554");
-        mocks.adb.verify();
-      });
-      it("should call adb exec with the correct rotate args", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects('resetTelnetAuthToken').once();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "rotate"]);
-        await adb.rotate();
-        mocks.adb.verify();
-      });
-      it("should call adb exec with the correct rotate args and set the deviceId", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects("setDeviceId")
-          .once().withExactArgs("emulator-5554")
           .returns();
-        mocks.adb.expects('resetTelnetAuthToken')
-          .once();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "rotate"]);
-        await adb.rotate("emulator-5554");
+          .once().withExactArgs(["emu", "finger", "touch", "1111"])
+          .returns();
+        await adb.fingerprint("1111");
+        mocks.adb.verify();
+      });
+    }));
+    describe("rotate", withMocks({adb}, (mocks) => {
+      it("should call adbExec with the correct args", async () => {
+        delete adb.emulators;
+        mocks.adb.expects("getConnectedEmulators")
+          .once().withExactArgs()
+          .returns(emulators);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "rotate"])
+          .returns();
+        await adb.rotate();
         mocks.adb.verify();
       });
     }));
