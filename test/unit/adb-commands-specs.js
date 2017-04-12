@@ -832,4 +832,23 @@ describe('adb commands', () => {
   it('getAdbPath should correctly return adbPath', () => {
     adb.getAdbPath().should.equal(adb.executable.path);
   });
+  describe('setHttpProxy', withMocks({adb}, (mocks) => {
+    it('should throw an error on undefined proxy_host', async () => {
+      await adb.setHttpProxy().should.eventually.be.rejected;
+    });
+    it('should throw an error on undefined proxy_port', async () => {
+      await adb.setHttpProxy("http://localhost").should.eventually.be.rejected;
+    });
+    it('should call shell settings methods with correct args', async () => {
+      let proxyHost = "http://localhost";
+      let proxyPort = 4723;
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'global', 'http_proxy', `${proxyHost}:${proxyPort}`]);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'secure', 'http_proxy', `${proxyHost}:${proxyPort}`]);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'system', 'http_proxy', `${proxyHost}:${proxyPort}`]);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'system', 'global_http_proxy_host', proxyHost]);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'system', 'global_http_proxy_port', proxyPort]);
+      await adb.setHttpProxy(proxyHost, proxyPort);
+      mocks.adb.verify();
+    });
+  }));
 });
