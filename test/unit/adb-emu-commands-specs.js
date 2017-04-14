@@ -21,38 +21,22 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("getConnectedEmulators")
           .once().withExactArgs()
           .returns(emulators);
-        (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
-        (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
+        await adb.getEmulators();
         adb.emulators.should.equal(emulators);
         mocks.adb.verify();
       });
     }));
     describe("isEmulatorConnected", withMocks({adb}, (mocks) => {
       it("should verify emulators state", async () => {
-        (await adb.isEmulatorConnected("emulator-5554")).should.equal(true);
-        (await adb.isEmulatorConnected("emulator-5556")).should.equal(true);
-        (await adb.isEmulatorConnected("emulator-5558")).should.equal(false);
-        mocks.adb.verify();
-      });
-    }));
-    describe("checkEmulatorConnected", withMocks({adb}, (mocks) => {
-      it("should throw exception no emulators connected", async () => {
-        delete adb.emulators;
-        mocks.adb.expects("getConnectedEmulators")
-          .once().withExactArgs()
-          .returns([]);
-        await adb.checkEmulatorConnected().should.eventually.be.rejected;
-        await adb.checkEmulatorConnected("emulator-5554").should.eventually.be.rejected;
-        mocks.adb.verify();
-      });
-      it("should setDeviceId on emulator connected", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs("emulator-5554")
-          .returns(true);
-        mocks.adb.expects("setDeviceId")
-          .once().withExactArgs("emulator-5554")
+        mocks.adb.expects("getEmulators")
+          .atLeast(3)
           .returns(emulators);
-        await adb.checkEmulatorConnected("emulator-5554");
+        adb.curDeviceId = "emulator-5554";
+        (await adb.isEmulatorConnected()).should.equal(true);
+        adb.curDeviceId = "emulator-5556";
+        (await adb.isEmulatorConnected()).should.equal(true);
+        adb.curDeviceId = "emulator-5558";
+        (await adb.isEmulatorConnected()).should.equal(false);
         mocks.adb.verify();
       });
     }));
@@ -72,9 +56,9 @@ describe('adb emulator commands', () => {
         mocks.adb.expects("getApiLevel")
           .once().withExactArgs()
           .returns(23);
-        mocks.adb.expects("getConnectedEmulators")
+        mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
-          .returns(emulators);
+          .returns(true);
         mocks.adb.expects("resetTelnetAuthToken")
           .once().withExactArgs()
           .returns();
@@ -87,10 +71,9 @@ describe('adb emulator commands', () => {
     }));
     describe("rotate", withMocks({adb}, (mocks) => {
       it("should call adbExec with the correct args", async () => {
-        delete adb.emulators;
-        mocks.adb.expects("getConnectedEmulators")
+        mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
-          .returns(emulators);
+          .returns(true);
         mocks.adb.expects("resetTelnetAuthToken")
           .once().withExactArgs()
           .returns();
