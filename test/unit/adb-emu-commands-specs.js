@@ -40,6 +40,16 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe("checkEmulatorConnected", withMocks({adb}, (mocks) => {
+      it("should throw an exception on emulator not connected", async () => {
+        adb.curDeviceId = "emulator-5558";
+        mocks.adb.expects("isEmulatorConnected")
+          .once()
+          .returns(false);
+        await adb.checkEmulatorConnected().should.eventually.be.rejected;
+        mocks.adb.verify();
+      });
+    }));
     describe("fingerprint", withMocks({adb}, (mocks) => {
       it("should throw exception on undefined fingerprintId", async () => {
         await adb.fingerprint().should.eventually.be.rejected;
