@@ -4,11 +4,14 @@ import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
+import { MOCHA_TIMEOUT } from './setup';
 
 chai.should();
 chai.use(chaiAsPromised);
 
 describe('apk utils', function () {
+  this.timeout(MOCHA_TIMEOUT);
+
   let adb;
   const contactManagerPath = path.resolve(rootDir, 'test',
                                           'fixtures', 'ContactManager.apk');
@@ -18,7 +21,7 @@ describe('apk utils', function () {
     appPackage.should.equal('com.example.android.contactmanager');
     appActivity.should.equal('.ContactManager');
   };
-  this.timeout(60000);
+
   before(async () => {
     adb = await ADB.createADB();
   });
