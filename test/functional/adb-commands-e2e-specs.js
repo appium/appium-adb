@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
-import { apiLevel, platformVersion } from './setup';
+import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 
 
 chai.use(chaiAsPromised);
@@ -19,8 +19,9 @@ const IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       activity = 'ContactManager';
 
 describe('adb commands', function () {
+  this.timeout(MOCHA_TIMEOUT);
+
   let adb;
-  this.timeout(60000);
   before(async () => {
     adb = await ADB.createADB();
   });
@@ -71,12 +72,14 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip();
+    if (process.env.TRAVIS) return this.skip();
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
   it('should set device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip();
+    if (process.env.TRAVIS) return this.skip();
 
     await adb.setDeviceSysLanguage('fr');
     await adb.setDeviceSysCountry('fr');

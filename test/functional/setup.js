@@ -17,4 +17,7 @@ const platformVersion = process.env.PLATFORM_VERSION || '4.3';
 let apiLevel = process.env.API_LEVEL ||
                API_LEVEL_MAP[parseFloat(platformVersion).toString()];
 
-export { apiLevel, platformVersion, avdName };
+let MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
+let MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 4;
+
+export { apiLevel, platformVersion, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT };
