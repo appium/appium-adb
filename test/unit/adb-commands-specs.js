@@ -202,8 +202,8 @@ describe('adb commands', () => {
     }));
     describe('inputText', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
-        let text = 'some text';
-        let expectedText = 'some%stext';
+        let text = 'some text with spaces';
+        let expectedText = 'some%stext%swith%sspaces';
         mocks.adb.expects("shell")
           .once().withExactArgs(['input', 'text', expectedText])
           .returns("");
