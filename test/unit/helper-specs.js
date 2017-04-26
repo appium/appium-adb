@@ -1,19 +1,13 @@
 import { getDirectories, getAndroidPlatformAndPath,
-         buildStartCmd, unzipFile } from '../../lib/helpers';
+         buildStartCmd } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
-import { system, fs, tempDir } from 'appium-support';
+import { fs } from 'appium-support';
 import path from 'path';
 import chai from 'chai';
 import _ from 'lodash';
-import sinon from 'sinon';
 
 
 const should = chai.should;
-
-function getFixture (file) {
-  return path.resolve(__dirname, '..', '..', '..', 'test',
-                      'fixtures', file);
-}
 
 describe('helpers', () => {
   describe('getDirectories', withMocks({fs}, (mocks) => {
@@ -122,25 +116,6 @@ describe('helpers', () => {
     it('should not have -S option when stopApp is not set', async () => {
       let cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
       cmd[cmd.length-1].should.not.eql('-S');
-    });
-  });
-  describe('unzipFile', () => {
-    it('should unzip a .zip file', async () => {
-      const temp = await tempDir.openDir();
-      await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
-      await unzipFile(path.resolve(temp, 'TestZip.zip'));
-      await fs.readFile(path.resolve(temp, 'TestZip', 'a.txt'), 'utf8').should.eventually.equal('Hello World');
-      await fs.readFile(path.resolve(temp, 'TestZip', 'b.txt'), 'utf8').should.eventually.equal('Foobar');
-    });
-
-    it('should unzip a .zip file (force isWindows to be true so we can test the internal zip library)', async () => {
-      const forceWindows = sinon.stub(system, 'isWindows', () => true);
-      const temp = await tempDir.openDir();
-      await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
-      await unzipFile(path.resolve(temp, 'TestZip.zip'));
-      await fs.readFile(path.resolve(temp, 'TestZip', 'a.txt'), 'utf8').should.eventually.equal('Hello World');
-      await fs.readFile(path.resolve(temp, 'TestZip', 'b.txt'), 'utf8').should.eventually.equal('Foobar');
-      forceWindows.restore();
     });
   });
 });
