@@ -112,11 +112,11 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
       .once()
       .withExactArgs('version')
       .returns("Android Debug Bridge version 1.0.39\nRevision 5943271ace17-android");
-    let version = await adb.getAdbVersion();
-    version.should.equal("1.0.39");
+    let adbVersion = await adb.getAdbVersion();
+    adbVersion.versionString.should.equal("1.0.39");
+    adbVersion.versionFloat.should.equal("1.0");
     // verify adb exec is called once, since we are caching the result
     await adb.getAdbVersion();
-    adb.adbVersion.should.equal("1.0.39");
     mocks.adb.verify();
   });
   it('fileExists should return true for if ls returns', async () => {
