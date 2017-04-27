@@ -1,7 +1,14 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getAndroidPlatformAndPath, assertZipArchive, rootDir } from '../../lib/helpers.js';
+import { getAndroidPlatformAndPath, assertZipArchive, rootDir, unzipFile } from '../../lib/helpers.js';
+import { fs, tempDir, system } from 'appium-support';
+import sinon from 'sinon';
 import path from 'path';
+
+function getFixture (file) {
+  return path.resolve(__dirname, '..', '..', '..', 'test',
+                      'fixtures', file);
+}
 
 
 const should = chai.should(),
@@ -28,6 +35,26 @@ describe('Helpers', () => {
   // TODO make it work on CI
   it.skip('assertZipArchive should assert zip existing', async () => {
     await assertZipArchive(apkPath);
+  });
+
+  describe('unzipFile', () => {
+    it('should unzip a .zip file', async () => {
+      const temp = await tempDir.openDir();
+      await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
+      await unzipFile(path.resolve(temp, 'TestZip.zip'));
+      await fs.readFile(path.resolve(temp, 'TestZip', 'a.txt'), 'utf8').should.eventually.equal('Hello World');
+      await fs.readFile(path.resolve(temp, 'TestZip', 'b.txt'), 'utf8').should.eventually.equal('Foobar');
+    });
+
+    it('should unzip a .zip file (force isWindows to be true so we can test the internal zip library)', async () => {
+      const forceWindows = sinon.stub(system, 'isWindows', () => true);
+      const temp = await tempDir.openDir();
+      await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
+      await unzipFile(path.resolve(temp, 'TestZip.zip'));
+      await fs.readFile(path.resolve(temp, 'TestZip', 'a.txt'), 'utf8').should.eventually.equal('Hello World');
+      await fs.readFile(path.resolve(temp, 'TestZip', 'b.txt'), 'utf8').should.eventually.equal('Foobar');
+      forceWindows.restore();
+    });
   });
 
 });
