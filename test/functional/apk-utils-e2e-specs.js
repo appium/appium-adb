@@ -114,7 +114,22 @@ describe('apk utils', function () {
                           waitActivity: '*.SuperManager'}).should.eventually
                                                           .be.rejectedWith('SuperManager');
     });
-
+    it('should start activity with comma separated wait packages list', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+        waitPkg: 'com.android.settings, com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: '.ContactManager'});
+      await assertPackageAndActivity();
+    });
+    it('should throw error for wrong activity when packages provided as comma separated list', async () => {
+      await adb.install(contactManagerPath);
+      await adb.startApp({pkg: 'com.example.android.contactmanager',
+        waitPkg: 'com.android.settings, com.example.somethingelse',
+        activity: 'SuperManager',
+        waitActivity: '*.ContactManager'}).should.eventually
+        .be.rejectedWith('Activity');
+    });
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async () => {
     await adb.install(contactManagerPath);
