@@ -824,6 +824,29 @@ describe('adb commands', () => {
       let actual = await p;
       (actual).should.equal(expected);
     });
+    it('should throw error if network connection errors', async () => {
+      const port = 54321;
+      let conn = new events.EventEmitter();
+      let commands = [];
+      let expected = "desired_command_output";
+      conn.write = function (command) {
+        commands.push(command);
+      };
+      mocks.adb.expects("getEmulatorPort")
+        .once().withExactArgs()
+        .returns(port);
+      mocks.net.expects("createConnection")
+        .once().withExactArgs(port, 'localhost')
+        .returns(conn);
+      let p = adb.sendTelnetCommand('avd name');
+      setTimeout(function () {
+        conn.emit('connect');
+        conn.emit('data', 'OK');
+        conn.emit('data', 'OK\nunwanted_echo_output\n' + expected);
+        conn.emit('error', new Error('ouch!'));
+      }, 0);
+      await p.should.eventually.be.rejectedWith(/ouch/);
+    });
   }));
   it('isValidClass should correctly validate class names', () => {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
