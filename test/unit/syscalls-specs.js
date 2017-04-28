@@ -114,7 +114,10 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
       .returns("Android Debug Bridge version 1.0.39\nRevision 5943271ace17-android");
     let adbVersion = await adb.getAdbVersion();
     adbVersion.versionString.should.equal("1.0.39");
-    adbVersion.versionFloat.should.be.within(1.039, 1.039);
+    adbVersion.versionFloat.should.be.within(1.0, 1.0);
+    adbVersion.major.should.equal(1);
+    adbVersion.minor.should.equal(0);
+    adbVersion.patch.should.equal(39);
     // verify adb exec is called once, since we are caching the result
     await adb.getAdbVersion();
     mocks.adb.verify();
