@@ -4,6 +4,7 @@ import ADB from '../..';
 import * as teen_process from 'teen_process';
 import { withMocks } from 'appium-test-support';
 import B from 'bluebird';
+import _ from 'lodash';
 
 
 chai.use(chaiAsPromised);
@@ -118,7 +119,16 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     adbVersion.major.should.equal(1);
     adbVersion.minor.should.equal(0);
     adbVersion.patch.should.equal(39);
-    // verify adb exec is called once, since we are caching the result
+    mocks.adb.verify();
+  });
+  it('should cache adb results', async () => {
+    let memoizeFunc = adb.getAdbVersion;
+    memoizeFunc.cache = new _.memoize.Cache();
+    mocks.adb.expects("adbExec")
+      .once()
+      .withExactArgs('version')
+      .returns("Android Debug Bridge version 1.0.39\nRevision 5943271ace17-android");
+    await adb.getAdbVersion();
     await adb.getAdbVersion();
     mocks.adb.verify();
   });
