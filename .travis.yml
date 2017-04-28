@@ -21,7 +21,7 @@ env:
 before_script:
   # node stuff
   - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
-  - nvm install 6
+  - nvm install 4
   - npm install -g gulp
   - npm install -g mocha
   - npm install

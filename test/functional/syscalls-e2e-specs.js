@@ -50,7 +50,8 @@ describe('System calls', function () {
     await adb.waitForDevice(2);
   });
   it('reboot should reboot the device', async function () {
-    await adb.reboot();
+    this.timeout(MOCHA_LONG_TIMEOUT);
+    await adb.reboot(process.env.TRAVIS ? 200 : undefined);
     await adb.ping();
   });
   it('fileExists should detect when files do and do not exist', async function () {
