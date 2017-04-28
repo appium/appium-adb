@@ -122,8 +122,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('should cache adb results', async () => {
-    let memoizeFunc = adb.getAdbVersion;
-    memoizeFunc.cache = new _.memoize.Cache();
+    adb.getAdbVersion.cache = new _.memoize.Cache();
     mocks.adb.expects("adbExec")
       .once()
       .withExactArgs('version')
