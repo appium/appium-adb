@@ -216,6 +216,52 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.Settings$AppDrawOverlaySettingsActivity', false);
       mocks.adb.verify();
     });
+    it('should be able to get first activity from first package in a comma-separated list of packages + activities', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+          `ActivityRecord{2 u com.android.settings/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      mocks.adb.verify();
+    });
+    it('should be able to get first activity from second package in a comma-separated list of packages + activities', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+          `ActivityRecord{2 u com.example.android.supermanager/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      mocks.adb.verify();
+    });
+    it('should be able to get second activity from first package in a comma-separated list of packages + activities', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+          `ActivityRecord{2 u com.android.settings/.OtherManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      mocks.adb.verify();
+    });
+    it('should be able to get second activity from second package in a comma-separated list of packages', async () => {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+          `ActivityRecord{2 u com.example.android.supermanager/.OtherManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      mocks.adb.verify();
+    });
+    it('should fail to get activity when focused activity matches none of the provided list of packages', async () => {
+      mocks.adb.expects('shell')
+        .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
+          `ActivityRecord{2 u com.otherpackage/.ContactManager t181}}}`);
+
+      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager, .OtherManager', false, 1000)
+        .should.eventually.be.rejected;
+      mocks.adb.verify();
+    });
   }));
   describe('waitForActivity', withMocks({adb}, (mocks) => {
     it('should call waitForActivityOrNot with correct arguments', async () => {
