@@ -216,15 +216,6 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.Settings$AppDrawOverlaySettingsActivity', false);
       mocks.adb.verify();
     });
-    it('should be able to get an activity that is an inner class', async () => {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
-        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
-          `ActivityRecord{2 u ${pkg}/.Settings$AppDrawOverlaySettingsActivity t181}}}`);
-
-      await adb.waitForActivityOrNot(pkg, '.Settings$AppDrawOverlaySettingsActivity', false);
-      mocks.adb.verify();
-    });
     it('should be able to get first activity from first package in a comma-separated list of packages + activities', async () => {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
