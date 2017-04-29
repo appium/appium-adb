@@ -16,19 +16,9 @@ const fingerprintId = 1111;
 describe('adb emulator commands', () => {
   let adb = new ADB();
   describe("emu", () => {
-    describe("getEmulators", withMocks({adb}, (mocks) => {
-      it("should cache emulators list", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .once().withExactArgs()
-          .returns(emulators);
-        await adb.getEmulators();
-        adb.emulators.should.equal(emulators);
-        mocks.adb.verify();
-      });
-    }));
     describe("isEmulatorConnected", withMocks({adb}, (mocks) => {
       it("should verify emulators state", async () => {
-        mocks.adb.expects("getEmulators")
+        mocks.adb.expects("getConnectedEmulators")
           .atLeast(3)
           .returns(emulators);
         adb.curDeviceId = "emulator-5554";
