@@ -61,6 +61,7 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `createADB`
 - `initJars`
 - `getAdbWithCorrectAdbPath`
+- `getAdbVersion`
 - `initAapt`
 - `initZipAlign`
 - `getApiLevel`
