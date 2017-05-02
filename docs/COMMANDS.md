@@ -1,5 +1,10 @@
+# Usage
 
-# getAdbVersion()
+# getAdbVersion
+
+```javascript
+await adb.getAdbVersion();
+```
 
 ```json
 {
@@ -9,4 +14,10 @@
   "minor": 0,
   "patch": 39
 }
+```
+
+# sendSMS
+
+```javascript
+await adb.senSMS(4509, "Hello Appium");
 ```
