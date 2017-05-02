@@ -85,22 +85,17 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("sendSMS", withMocks({adb}, (mocks) => {
-      it("should throw exception on undefined phoneNumber", async () => {
-        await adb.sendSMS().should.eventually.be.rejectedWith("phoneNumber param is undefined");
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
         mocks.adb.verify();
       });
       it("should throw exception on invalid phoneNumber", async () => {
-        await adb.sendSMS("00549341a312345678").should.eventually.be.rejectedWith("Invalid phoneNumber");
+        await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid phoneNumber");
         mocks.adb.verify();
       });
-      it("should throw exception on invalid phoneNumber", async () => {
-        await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("message param is undefined");
-        mocks.adb.verify();
-      });
-
       it("should call adbExec with the correct args", async () => {
         let phoneNumber = 4509;
-        let message = "Hello Emu World ";
+        let message = " Hello Appium ";
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -108,7 +103,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "sms", "send", "4509", "Hello Emu World"])
+          .once().withExactArgs(["emu", "sms", "send", "4509", "Hello Appium"])
           .returns();
         await adb.sendSMS(phoneNumber, message);
         mocks.adb.verify();
