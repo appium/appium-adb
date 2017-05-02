@@ -83,41 +83,34 @@ describe('adb emulator commands', () => {
         await adb.rotate();
         mocks.adb.verify();
       });
-      it("should call deviceId on checkEmulatorConnected", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
+    }));
+    describe("sendSMS", withMocks({adb}, (mocks) => {
+      it("should throw exception on undefined phoneNumber", async () => {
+        await adb.sendSMS().should.eventually.be.rejectedWith("phoneNumber param is undefined");
+        mocks.adb.verify();
+      });
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.sendSMS("00549341a312345678").should.eventually.be.rejectedWith("Invalid phoneNumber");
+        mocks.adb.verify();
+      });
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("message param is undefined");
+        mocks.adb.verify();
+      });
+
+      it("should call adbExec with the correct args", async () => {
+        let phoneNumber = 4509;
+        let message = "Hello Emu World ";
         mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs("emulator-5554")
+          .once().withExactArgs()
           .returns(true);
-        mocks.adb.expects('setDeviceId')
-          .once()
-          .withExactArgs('emulator-5554');
-        await adb.checkEmulatorConnected("emulator-5554");
-        mocks.adb.verify();
-      });
-      it("should call adb exec with the correct rotate args", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects('resetTelnetAuthToken').once();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "rotate"]);
-        await adb.rotate();
-        mocks.adb.verify();
-      });
-      it("should call adb exec with the correct rotate args and set the deviceId", async () => {
-        mocks.adb.expects("getConnectedEmulators")
-          .atLeast(1).withExactArgs()
-          .returns(emulators);
-        mocks.adb.expects("setDeviceId")
-          .once().withExactArgs("emulator-5554")
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
           .returns();
-        mocks.adb.expects('resetTelnetAuthToken')
-          .once();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "rotate"]);
-        await adb.rotate("emulator-5554");
+          .once().withExactArgs(["emu", "sms", "send", "4509", "Hello Emu World"])
+          .returns();
+        await adb.sendSMS(phoneNumber, message);
         mocks.adb.verify();
       });
     }));
