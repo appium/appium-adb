@@ -84,5 +84,30 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe("sendSMS", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
+        mocks.adb.verify();
+      });
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid phoneNumber");
+        mocks.adb.verify();
+      });
+      it("should call adbExec with the correct args", async () => {
+        let phoneNumber = 4509;
+        let message = " Hello Appium ";
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "sms", "send", "4509", "Hello Appium"])
+          .returns();
+        await adb.sendSMS(phoneNumber, message);
+        mocks.adb.verify();
+      });
+    }));
   });
 });
