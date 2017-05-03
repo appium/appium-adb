@@ -19,7 +19,7 @@ await adb.getAdbVersion();
 # sendSMS
 
 ```javascript
-await adb.senSMS(4509, "Hello Appium");
+await adb.sendSMS(4509, "Hello Appium");
 ```
 
-<img src="static/send-sms-screen.png" />
+<img src="static/send-sms-screen.png" width="200" />
