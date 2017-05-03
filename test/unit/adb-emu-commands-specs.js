@@ -108,6 +108,6 @@ describe('adb emulator commands', () => {
         await adb.sendSMS(phoneNumber, message);
         mocks.adb.verify();
       });
-    }));
+    }));    
   });
 });
