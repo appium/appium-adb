@@ -85,7 +85,7 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("sendSMS", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid phoneNumber", async () => {
+      it("should throw exception on invalid message", async () => {
         await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
         mocks.adb.verify();
       });
@@ -106,6 +106,72 @@ describe('adb emulator commands', () => {
           .once().withExactArgs(["emu", "sms", "send", "4509", "Hello Appium"])
           .returns();
         await adb.sendSMS(phoneNumber, message);
+        mocks.adb.verify();
+      });
+    }));
+    describe("gsm call methods", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid action", async () => {
+        await adb.gsmCall("+549341312345678").should.eventually.be.rejectedWith("Invalid gsm action");
+        mocks.adb.verify();
+      });
+      it("should throw exception on invalid phoneNumber", async () => {
+        await adb.gsmCall("+5493413a12345678", "call").should.eventually.be.rejectedWith("Invalid phoneNumber");
+        mocks.adb.verify();
+      });
+      it("should set the correct method for making gsm call", async () => {
+        let phoneNumber = 4509;
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL, "4509"])
+          .returns();
+        await adb.gsmCall(phoneNumber, "call");
+        mocks.adb.verify();
+      });
+      it("should set the correct method for accepting gsm call", async () => {
+        let phoneNumber = 4509;
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", adb.GSM_ACCEPT, "4509"])
+          .returns();
+        await adb.gsmCall(phoneNumber, "accept");
+        mocks.adb.verify();
+      });
+      it("should set the correct method for refusing gsm call", async () => {
+        let phoneNumber = 4509;
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CANCEL, "4509"])
+          .returns();
+        await adb.gsmCall(phoneNumber, "cancel");
+        mocks.adb.verify();
+      });
+      it("should set the correct method for holding gsm call", async () => {
+        let phoneNumber = 4509;
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", adb.GSM_HOLD, "4509"])
+          .returns();
+        await adb.gsmCall(phoneNumber, "hold");
         mocks.adb.verify();
       });
     }));
