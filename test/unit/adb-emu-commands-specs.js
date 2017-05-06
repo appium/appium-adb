@@ -109,6 +109,26 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe("gsm signal method", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid strength", async () => {
+        await adb.gsmSignal(5).should.eventually.be.rejectedWith("Invalid signal strength");
+        mocks.adb.verify();
+      });
+      it("should call adbExecEmu with the correct args", async () => {
+        let signalStrength = 0;
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", 'signal-profile', signalStrength])
+          .returns();
+        await adb.gsmSignal(signalStrength);
+        mocks.adb.verify();
+      });
+    }));
     describe("gsm call methods", withMocks({adb}, (mocks) => {
       it("should throw exception on invalid action", async () => {
         await adb.gsmCall("+549341312345678").should.eventually.be.rejectedWith("Invalid gsm action");
@@ -172,6 +192,103 @@ describe('adb emulator commands', () => {
           .once().withExactArgs(["emu", "gsm", adb.GSM_HOLD, "4509"])
           .returns();
         await adb.gsmCall(phoneNumber, "hold");
+        mocks.adb.verify();
+      });
+    }));
+    describe("gsm voice method", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid strength", async () => {
+        await adb.gsmVoice('weird').should.eventually.be.rejectedWith("Invalid gsm voice state");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to unregistered", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_UNREGISTERED])
+          .returns();
+        await adb.gsmVoice("unregistered");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to home", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_HOME])
+          .returns();
+        await adb.gsmVoice("home");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to roaming", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_ROAMING])
+          .returns();
+        await adb.gsmVoice("roaming");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to searching", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_SEARCHING])
+          .returns();
+        await adb.gsmVoice("searching");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to denied", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_DENIED])
+          .returns();
+        await adb.gsmVoice("denied");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to off", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_OFF])
+          .returns();
+        await adb.gsmVoice("off");
+        mocks.adb.verify();
+      });
+      it("should set gsm voice to on", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_ON])
+          .returns();
+        await adb.gsmVoice("on");
         mocks.adb.verify();
       });
     }));
