@@ -84,6 +84,57 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe("power methods", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid power ac state", async () => {
+        await adb.powerAC('dead').should.eventually.be.rejectedWith("Wrong power AC state");
+        mocks.adb.verify();
+      });
+      it("should set the power ac off", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_OFF])
+          .returns();
+        await adb.powerAC('off');
+        mocks.adb.verify();
+      });
+      it("should set the power ac on", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_ON])
+          .returns();
+        await adb.powerAC('on');
+        mocks.adb.verify();
+      });
+      it("should throw exception on invalid power battery percent", async () => {
+        await adb.powerCapacity(-1).should.eventually.be.rejectedWith("Wrong power percent");
+        await adb.powerCapacity("a").should.eventually.be.rejectedWith("Wrong power percent");
+        await adb.powerCapacity(500).should.eventually.be.rejectedWith("Wrong power percent");
+        mocks.adb.verify();
+      });
+      it("should set the power capacity", async () => {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "power", "capacity", 50])
+          .returns();
+        await adb.powerCapacity(50);
+        mocks.adb.verify();
+      });
+    })),
     describe("sendSMS", withMocks({adb}, (mocks) => {
       it("should throw exception on invalid phoneNumber", async () => {
         await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
