@@ -134,7 +134,7 @@ describe('adb emulator commands', () => {
         await adb.powerCapacity(50);
         mocks.adb.verify();
       });
-    })),
+    }));
     describe("sendSMS", withMocks({adb}, (mocks) => {
       it("should throw exception on invalid phoneNumber", async () => {
         await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
