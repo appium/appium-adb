@@ -116,9 +116,9 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw exception on invalid power battery percent", async () => {
-        await adb.powerCapacity(-1).should.eventually.be.rejectedWith("Wrong power percent");
-        await adb.powerCapacity("a").should.eventually.be.rejectedWith("Wrong power percent");
-        await adb.powerCapacity(500).should.eventually.be.rejectedWith("Wrong power percent");
+        await adb.powerCapacity(-1).should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
+        await adb.powerCapacity("a").should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
+        await adb.powerCapacity(500).should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
         mocks.adb.verify();
       });
       it("should set the power capacity", async () => {
@@ -129,9 +129,19 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "power", "capacity", 50])
+          .once().withExactArgs(["emu", "power", "capacity", 0])
           .returns();
-        await adb.powerCapacity(50);
+        await adb.powerCapacity(0);
+        mocks.adb.verify();
+      });
+      it("should call methods to power off the emulator", async () => {
+        mocks.adb.expects("powerAC")
+          .once().withExactArgs('off')
+          .returns();
+        mocks.adb.expects("powerCapacity")
+          .once().withExactArgs(0)
+          .returns();
+        await adb.powerOFF();
         mocks.adb.verify();
       });
     }));
