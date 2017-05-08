@@ -354,6 +354,19 @@ describe('Apk-utils', () => {
       (await adb.startApp(startAppOptions));
       mocks.adb.verify();
     });
+    it('should call getApiLevel and shell with correct arguments when activity is inner class', async () => {
+      const startAppOptionsWithInnerClass = { pkg: 'pkg', activity: 'act$InnerAct'},
+            cmdWithInnerClass = ['am', 'start', '-W', '-n', 'pkg/act\\$InnerAct', '-S'];
+
+      mocks.adb.expects('getApiLevel')
+        .once().withExactArgs()
+        .returns('17');
+      mocks.adb.expects('shell')
+        .once().withExactArgs(cmdWithInnerClass)
+        .returns('');
+      (await adb.startApp(startAppOptionsWithInnerClass));
+      mocks.adb.verify();
+    });
   }));
   describe('getDeviceLanguage', withMocks({adb}, (mocks) => {
     it('should call shell one time with correct args and return language when API < 23', async () => {
