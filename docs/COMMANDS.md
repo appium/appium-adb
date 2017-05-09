@@ -19,7 +19,8 @@ await adb.getAdbVersion();
 # gsmCall
 ```javascript
 let action = 'call';
-await adb.gsmCall(4509, action);
+let phoneNumber = 4509;
+await adb.gsmCall(phoneNumber, action);
 ```
 
 Possible values:
@@ -54,7 +55,9 @@ Possible values:
 # sendSMS
 
 ```javascript
-await adb.sendSMS(4509, "Hello Appium");
+let phoneNumber = 4509;
+let message = "Hello Appium"
+await adb.sendSMS(phoneNumber, message);
 ```
 
 <img src="static/send-sms-screen.png" width="200" />
