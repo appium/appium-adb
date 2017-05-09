@@ -90,7 +90,7 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw exception on invalid phoneNumber", async () => {
-        await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid phoneNumber");
+        await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid sendSMS phoneNumber");
         mocks.adb.verify();
       });
       it("should call adbExec with the correct args", async () => {
@@ -135,7 +135,7 @@ describe('adb emulator commands', () => {
         mocks.adb.verify();
       });
       it("should throw exception on invalid phoneNumber", async () => {
-        await adb.gsmCall("+5493413a12345678", "call").should.eventually.be.rejectedWith("Invalid phoneNumber");
+        await adb.gsmCall("+5493413a12345678", "call").should.eventually.be.rejectedWith("Invalid gsmCall phoneNumber");
         mocks.adb.verify();
       });
       it("should set the correct method for making gsm call", async () => {
