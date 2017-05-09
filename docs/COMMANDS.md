@@ -16,6 +16,27 @@ await adb.getAdbVersion();
 }
 ```
 
+# powerAC
+
+```javascript
+let state = 'off';
+await adb.powerAC(state);
+```
+Possible values:
+ * on
+ * off
+
+# powerCapacity
+```javascript
+let batteryPercent = 50;
+await adb.powerAC(batteryPercent);
+```
+
+# powerOFF
+```javascript
+await adb.powerOFF();
+```
+
 # sendSMS
 
 ```javascript
