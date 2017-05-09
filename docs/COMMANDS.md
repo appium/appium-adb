@@ -16,6 +16,41 @@ await adb.getAdbVersion();
 }
 ```
 
+# gsmCall
+```javascript
+let action = 'call';
+await adb.gsmCall(4509, action);
+```
+
+Possible values:
+ * call
+ * accept
+ * hold
+ * cancel
+
+# gsmSignal
+```javascript
+let signalStrengh = 0;
+await adb.gsmSignal(signalStrengh);
+```
+Possible values: 0..4
+
+# gsmVoice
+```javascript
+let state = 'roaming';
+await adb.gsmVoice(state);
+```
+
+Possible values:
+
+ * unregistered
+ * home
+ * roaming
+ * searching
+ * denied
+ * off (unregistered alias)
+ * on (home alias)
+
 # sendSMS
 
 ```javascript

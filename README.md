@@ -157,3 +157,6 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `installFromDevicePath`
 - `install`
 - `fingerprint` (ApiLevel >=23)
+- `gsmCall` (emulator only)
+- `gsmSignal` (emulator only)
+- `gsmVoice` (emulator only)
