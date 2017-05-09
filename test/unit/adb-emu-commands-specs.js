@@ -97,7 +97,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_OFF])
+          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_STATES.POWER_AC_OFF])
           .returns();
         await adb.powerAC('off');
         mocks.adb.verify();
@@ -110,7 +110,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_ON])
+          .once().withExactArgs(["emu", "power", "ac", adb.POWER_AC_STATES.POWER_AC_ON])
           .returns();
         await adb.powerAC('on');
         mocks.adb.verify();
