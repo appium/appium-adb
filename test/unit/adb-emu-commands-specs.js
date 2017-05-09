@@ -147,7 +147,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL, "4509"])
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_CALL, "4509"])
           .returns();
         await adb.gsmCall(phoneNumber, "call");
         mocks.adb.verify();
@@ -161,7 +161,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", adb.GSM_ACCEPT, "4509"])
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_ACCEPT, "4509"])
           .returns();
         await adb.gsmCall(phoneNumber, "accept");
         mocks.adb.verify();
@@ -175,7 +175,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", adb.GSM_CANCEL, "4509"])
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_CANCEL, "4509"])
           .returns();
         await adb.gsmCall(phoneNumber, "cancel");
         mocks.adb.verify();
@@ -189,7 +189,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", adb.GSM_HOLD, "4509"])
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_HOLD, "4509"])
           .returns();
         await adb.gsmCall(phoneNumber, "hold");
         mocks.adb.verify();
@@ -208,7 +208,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_UNREGISTERED])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_UNREGISTERED])
           .returns();
         await adb.gsmVoice("unregistered");
         mocks.adb.verify();
@@ -221,7 +221,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_HOME])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_HOME])
           .returns();
         await adb.gsmVoice("home");
         mocks.adb.verify();
@@ -234,7 +234,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_ROAMING])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_ROAMING])
           .returns();
         await adb.gsmVoice("roaming");
         mocks.adb.verify();
@@ -247,7 +247,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_SEARCHING])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_SEARCHING])
           .returns();
         await adb.gsmVoice("searching");
         mocks.adb.verify();
@@ -260,7 +260,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_DENIED])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_DENIED])
           .returns();
         await adb.gsmVoice("denied");
         mocks.adb.verify();
@@ -273,7 +273,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_OFF])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_OFF])
           .returns();
         await adb.gsmVoice("off");
         mocks.adb.verify();
@@ -286,7 +286,7 @@ describe('adb emulator commands', () => {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_ON])
+          .once().withExactArgs(["emu", "gsm", "voice", adb.GSM_VOICE_STATES.GSM_VOICE_ON])
           .returns();
         await adb.gsmVoice("on");
         mocks.adb.verify();
