@@ -43,4 +43,7 @@ await adb.powerOFF();
 await adb.sendSMS(4509, "Hello Appium");
 ```
 
-<img src="static/send-sms-screen.png" width="200" />
+<details>
+  <summary></summary>
+  <img src="static/send-sms-screen.png" width="200" />
+</details>
