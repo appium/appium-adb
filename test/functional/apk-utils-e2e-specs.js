@@ -131,6 +131,15 @@ describe('apk utils', function () {
         .be.rejectedWith('Activity');
     });
   });
+  it('should start activity when start activity is an inner class', async () => {
+    await adb.install(contactManagerPath);
+    await adb.startApp({pkg: 'com.android.settings',
+      activity: '.Settings$NotificationAppListActivity'});
+
+    let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+    appPackage.should.equal('com.android.settings');
+    appActivity.should.equal('.Settings$NotificationAppListActivity');
+  });
   it('getFocusedPackageAndActivity should be able get package and activity', async () => {
     await adb.install(contactManagerPath);
     await adb.startApp({pkg: 'com.example.android.contactmanager',

@@ -160,3 +160,6 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `powerAC` (emulator only)
 - `powerCapacity` (emulator only)
 - `powerOFF` (emulator only)
+- `gsmCall` (emulator only)
+- `gsmSignal` (emulator only)
+- `gsmVoice` (emulator only)
