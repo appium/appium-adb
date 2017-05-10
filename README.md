@@ -157,6 +157,8 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `installFromDevicePath`
 - `install`
 - `fingerprint` (ApiLevel >=23 | emulator only)
+- `sendSMS` (emulator only)
+- `rotate` (emulator only)
 - `powerAC` (emulator only)
 - `powerCapacity` (emulator only)
 - `powerOFF` (emulator only)

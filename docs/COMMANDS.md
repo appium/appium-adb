@@ -85,3 +85,9 @@ await adb.sendSMS(phoneNumber, message);
   <summary></summary>
   <img src="static/send-sms-screen.png" width="200" />
 </details>
+
+# rotate
+
+```javascript
+await adb.rotate();
+```
