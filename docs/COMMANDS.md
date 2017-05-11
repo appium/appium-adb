@@ -16,6 +16,27 @@ await adb.getAdbVersion();
 }
 ```
 
+# powerAC
+
+```javascript
+let state = 'off';
+await adb.powerAC(state);
+```
+Possible values:
+ * on
+ * off
+
+# powerCapacity
+```javascript
+let batteryPercent = 50;
+await adb.powerAC(batteryPercent);
+```
+
+# powerOFF
+```javascript
+await adb.powerOFF();
+```
+
 # gsmCall
 ```javascript
 let action = 'call';
@@ -60,4 +81,13 @@ let message = "Hello Appium"
 await adb.sendSMS(phoneNumber, message);
 ```
 
-<img src="static/send-sms-screen.png" width="200" />
+<details>
+  <summary></summary>
+  <img src="static/send-sms-screen.png" width="200" />
+</details>
+
+# rotate
+
+```javascript
+await adb.rotate();
+```

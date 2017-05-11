@@ -156,7 +156,12 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `uninstallApk`
 - `installFromDevicePath`
 - `install`
-- `fingerprint` (ApiLevel >=23)
+- `fingerprint` (ApiLevel >=23 | emulator only)
+- `sendSMS` (emulator only)
+- `rotate` (emulator only)
+- `powerAC` (emulator only)
+- `powerCapacity` (emulator only)
+- `powerOFF` (emulator only)
 - `gsmCall` (emulator only)
 - `gsmSignal` (emulator only)
 - `gsmVoice` (emulator only)
