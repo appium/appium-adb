@@ -29,7 +29,7 @@ Possible values:
 # powerCapacity
 ```javascript
 let batteryPercent = 50;
-await adb.powerAC(batteryPercent);
+await adb.powerCapacity(batteryPercent);
 ```
 
 # powerOFF
