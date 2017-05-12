@@ -9,7 +9,7 @@ import _ from 'lodash';
 
 chai.use(chaiAsPromised);
 const adb = new ADB();
-adb.executable.path = '/Users/vruno/Library/Android/sdk/platform-tools/adb';
+adb.executable.path = 'adb_path';
 const avdName = 'AVD_NAME';
 
 describe('System calls', withMocks({teen_process}, (mocks) => {
