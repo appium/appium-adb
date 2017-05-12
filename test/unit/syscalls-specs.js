@@ -108,26 +108,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
 }));
 
 describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
-  it('root', async () => {
-    mocks.teen_process.expects("exec")
-      .once().withExactArgs(adb.executable.path, ['root'])
-      .returns({stdout:undefined, stderr: "", code:1});
-    (await adb.root()).should.equal(false);
-    mocks.teen_process.expects("exec")
-      .once().withExactArgs(adb.executable.path, ['root'])
-      .returns({stdout:"", stderr: undefined, code:0});
-    (await adb.root()).should.equal(true);
-  });
-  it('unroot', async () => {
-    mocks.teen_process.expects("exec")
-      .once().withExactArgs(adb.executable.path, ['unroot'])
-      .returns({stdout:undefined, stderr: "", code:1});
-    (await adb.unroot()).should.equal(false);
-    mocks.teen_process.expects("exec")
-      .once().withExactArgs(adb.executable.path, ['unroot'])
-      .returns({stdout:"", stderr: undefined, code:0});
-    (await adb.unroot()).should.equal(true);
-  });
   it('should return adb version', async () => {
     mocks.adb.expects("adbExec")
       .once()
