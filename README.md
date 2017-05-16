@@ -165,3 +165,5 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `gsmCall` (emulator only)
 - `gsmSignal` (emulator only)
 - `gsmVoice` (emulator only)
+- `root`
+- `unroot`

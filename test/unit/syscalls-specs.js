@@ -164,7 +164,8 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
   });
   it('reboot should restart adbd as root if necessary', async () => {
     mocks.teen_process.expects("exec")
-      .once().withExactArgs(adb.executable.path, ['root']);
+      .once().withExactArgs(adb.executable.path, ['root'])
+      .returns(false);
     mocks.adb.expects("shell")
       .twice().withExactArgs(['stop'])
       .onFirstCall()

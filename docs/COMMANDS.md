@@ -91,3 +91,15 @@ await adb.sendSMS(phoneNumber, message);
 ```javascript
 await adb.rotate();
 ```
+
+# root
+
+```javascript
+await adb.root();
+```
+
+# unroot
+
+```javascript
+await adb.unroot();
+```
