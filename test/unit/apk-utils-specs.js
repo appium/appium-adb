@@ -410,6 +410,8 @@ describe('Apk-utils', () => {
   }));
   describe('setDeviceLanguage', withMocks({adb}, (mocks) => {
     it('should call shell one time with correct args when API < 23', async () => {
+      mocks.adb.expects("getApiLevel")
+        .once().returns(21);
       mocks.adb.expects("shell")
         .once().withExactArgs(['setprop', 'persist.sys.language', language])
         .returns("");
@@ -438,6 +440,8 @@ describe('Apk-utils', () => {
   }));
   describe('setDeviceCountry', withMocks({adb}, (mocks) => {
     it('should call shell one time with correct args', async () => {
+      mocks.adb.expects("getApiLevel")
+        .once().returns(21);
       mocks.adb.expects("shell")
         .once().withExactArgs(['setprop', 'persist.sys.country', country])
         .returns("");
@@ -466,6 +470,8 @@ describe('Apk-utils', () => {
   }));
   describe('setDeviceLocale', withMocks({adb}, (mocks) => {
     it('should call shell one time with correct args', async () => {
+      mocks.adb.expects("getApiLevel")
+        .once().returns(21);
       mocks.adb.expects("shell")
         .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
         .returns("");

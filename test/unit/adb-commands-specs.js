@@ -143,6 +143,30 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('setDeviceProperty', withMocks({adb}, (mocks) => {
+      it('should call setprop with correct args without root', async () => {
+        mocks.adb.expects("getApiLevel")
+          .once().returns(21);
+        mocks.adb.expects("shell")
+          .withExactArgs(['setprop', 'persist.sys.locale', locale])
+          .returns("");
+        await adb.setDeviceProperty('persist.sys.locale', locale);
+        mocks.adb.verify();
+      });
+      it('should call setprop with correct args with root', async () => {
+        mocks.adb.expects("getApiLevel")
+          .once().returns(26);
+        mocks.adb.expects("root")
+          .once().returns("");
+        mocks.adb.expects("shell")
+          .withExactArgs(['setprop', 'persist.sys.locale', locale])
+          .returns("");
+        mocks.adb.expects("unroot")
+          .once().returns("");
+        await adb.setDeviceProperty('persist.sys.locale', locale);
+        mocks.adb.verify();
+      });
+    }));
     describe('availableIMEs', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("shell")
