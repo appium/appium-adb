@@ -146,11 +146,19 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     list.should.deep.equal(['bar']);
     mocks.adb.verify();
   });
-  it('fileSize should return the file size', async function () {
+  it('fileSize should return the file size when digit is after permissions', async function () {
     let remotePath = '/sdcard/test.mp4';
     mocks.adb.expects('shell')
       .once().withExactArgs(['ls', '-la', remotePath])
       .returns(`-rw-rw---- 1 root sdcard_rw 39571 2017-06-23 07:33 ${remotePath}`);
+    let size = await adb.fileSize(remotePath);
+    size.should.eql(39571);
+  });
+  it('fileSize should return the file size when digit is not after permissions', async function () {
+    let remotePath = '/sdcard/test.mp4';
+    mocks.adb.expects('shell')
+      .once().withExactArgs(['ls', '-la', remotePath])
+      .returns(`-rw-rw---- root sdcard_rw 39571 2017-06-23 07:33 ${remotePath}`);
     let size = await adb.fileSize(remotePath);
     size.should.eql(39571);
   });
