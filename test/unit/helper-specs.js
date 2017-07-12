@@ -3,11 +3,8 @@ import { getDirectories, getAndroidPlatformAndPath,
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
-import chai from 'chai';
 import _ from 'lodash';
 
-
-const should = chai.should;
 
 describe('helpers', () => {
   describe('getDirectories', withMocks({fs}, (mocks) => {
@@ -27,7 +24,13 @@ describe('helpers', () => {
 
   describe('getAndroidPlatformAndPath', withMocks({fs, path}, (mocks) => {
     it('should return null if no ANDROID_HOME is set', async () => {
-      should(await getAndroidPlatformAndPath()).not.exist;
+      let oldAndroidHome = process.env.ANDROID_HOME;
+      delete process.env.ANDROID_HOME;
+
+      let result = await getAndroidPlatformAndPath();
+      result.should.eql({platform: null, platformPath: null});
+
+      process.env.ANDROID_HOME = oldAndroidHome;
     });
     it('should get the latest available API', async () => {
       let oldAndroidHome = process.env.ANDROID_HOME;
