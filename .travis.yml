@@ -25,7 +25,7 @@ env:
     - ANDROID_EMU_TARGET=android-21
     - ANDROID_EMU_ABI=armeabi-v7a
   matrix:
-    - TEST=unit
+    - TEST=unit START_EMU=0
     - TEST=functional RECURSIVE=--recursive
 before_script:
   # node stuff
