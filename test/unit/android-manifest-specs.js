@@ -64,7 +64,7 @@ describe('android-manifest', () => {
       let oldAndroidHome = process.env.ANDROID_HOME;
       delete process.env.ANDROID_HOME;
 
-      await adb.compileManifest().should.eventually.be.rejectedWith(/Required platform doesn't exist/);
+      await adb.compileManifest().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
 
       process.env.ANDROID_HOME = oldAndroidHome;
     });

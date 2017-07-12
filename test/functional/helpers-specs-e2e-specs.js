@@ -20,8 +20,7 @@ describe('Helpers', () => {
     // temp setting android_home to null.
     delete process.env.ANDROID_HOME;
 
-    let result = await getAndroidPlatformAndPath();
-    result.should.eql({platform: null, platformPath: null});
+    await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
 
     // resetting ANDROID_HOME
     process.env.ANDROID_HOME = android_home;
