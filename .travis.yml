@@ -24,6 +24,8 @@ env:
     - ANDROID_EMU_NAME=test
     - ANDROID_EMU_TARGET=android-21
     - ANDROID_EMU_ABI=armeabi-v7a
+    - ANDROID_AVD=test
+    - PLATFORM_VERSION=5.0.2
   matrix:
     - TEST=unit START_EMU=0
     - TEST=functional RECURSIVE=--recursive
