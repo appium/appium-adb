@@ -11,18 +11,17 @@ function getFixture (file) {
 }
 
 
-const should = chai.should(),
-      apkPath = path.resolve(rootDir, 'test',
-                             'fixtures', 'ContactManager.apk');
+const apkPath = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
 chai.use(chaiAsPromised);
 
 describe('Helpers', () => {
-  it('getAndroidPlatformAndPath should return null', async () => {
+  it('getAndroidPlatformAndPath should return empty object when no ANDROID_HOME is set', async () => {
     let android_home = process.env.ANDROID_HOME;
     // temp setting android_home to null.
-    process.env.ANDROID_HOME = null;
-    let result = await getAndroidPlatformAndPath();
-    should.not.exist(result);
+    delete process.env.ANDROID_HOME;
+
+    await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
+
     // resetting ANDROID_HOME
     process.env.ANDROID_HOME = android_home;
   });

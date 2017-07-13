@@ -59,4 +59,14 @@ describe('android-manifest', () => {
       mocks.adb.verify();
     });
   }));
+  describe('compileManifest', function () {
+    it('should throw an error if no ANDROID_HOME set', async function () {
+      let oldAndroidHome = process.env.ANDROID_HOME;
+      delete process.env.ANDROID_HOME;
+
+      await adb.compileManifest().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
+
+      process.env.ANDROID_HOME = oldAndroidHome;
+    });
+  });
 });
