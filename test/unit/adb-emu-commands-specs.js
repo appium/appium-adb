@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
-
+import _ from 'lodash';
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -261,122 +261,31 @@ describe('adb emulator commands', () => {
         await adb.networkSpeed('light').should.eventually.be.rejectedWith("Invalid network speed");
         mocks.adb.verify();
       });
-      it("should set network speed to gsm", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.GSM])
-          .returns();
-        await adb.networkSpeed("gsm");
-        mocks.adb.verify();
-      });
-      it("should set network speed to scsd", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.SCSD])
-          .returns();
-        await adb.networkSpeed("scsd");
-        mocks.adb.verify();
-      });
-      it("should set network speed to gprs", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.GPRS])
-          .returns();
-        await adb.networkSpeed("gprs");
-        mocks.adb.verify();
-      });
-      it("should set network speed to edge", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.EDGE])
-          .returns();
-        await adb.networkSpeed("edge");
-        mocks.adb.verify();
-      });
-      it("should set network speed to umts", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.UMTS])
-          .returns();
-        await adb.networkSpeed("umts");
-        mocks.adb.verify();
-      });
-      it("should set network speed to hsdpa", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.HSDPA])
-          .returns();
-        await adb.networkSpeed("hsdpa");
-        mocks.adb.verify();
-      });
-      it("should set network speed to let", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.LTE])
-          .returns();
-        await adb.networkSpeed("lte");
-        mocks.adb.verify();
-      });
-      it("should set network speed to evdo", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.EVDO])
-          .returns();
-        await adb.networkSpeed("evdo");
-        mocks.adb.verify();
-      });
-      it("should set network speed to full", async () => {
-        mocks.adb.expects("isEmulatorConnected")
-          .once().withExactArgs()
-          .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
-          .once().withExactArgs()
-          .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "network", "speed", adb.NETWORK_SPEED.FULL])
-          .returns();
-        await adb.networkSpeed("full");
-        mocks.adb.verify();
+      let speeds = {
+        'gsm': adb.NETWORK_SPEED.GSM,
+        'scsd': adb.NETWORK_SPEED.SCSD,
+        'gprs': adb.NETWORK_SPEED.GPRS,
+        'edge': adb.NETWORK_SPEED.EDGE,
+        'umts': adb.NETWORK_SPEED.UMTS,
+        'hsdpa': adb.NETWORK_SPEED.HSDPA,
+        'lte': adb.NETWORK_SPEED.LTE,
+        'evdo': adb.NETWORK_SPEED.EVDO,
+        'full': adb.NETWORK_SPEED.FULL
+      };
+      _.keys(speeds).forEach( (s) => {
+        it("should set network speed correctly", async () => {
+          mocks.adb.expects("isEmulatorConnected")
+            .once().withExactArgs()
+            .returns(true);
+          mocks.adb.expects("resetTelnetAuthToken")
+            .once().withExactArgs()
+            .returns();
+          mocks.adb.expects("adbExec")
+            .once().withExactArgs(["emu", "network", "speed", speeds[s]])
+            .returns();
+          await adb.networkSpeed(s);
+          mocks.adb.verify();
+        });
       });
     }));
     describe("gsm voice method", withMocks({adb}, (mocks) => {
