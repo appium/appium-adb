@@ -273,7 +273,7 @@ describe('adb emulator commands', () => {
         'full': adb.NETWORK_SPEED.FULL
       };
       _.keys(speeds).forEach( (s) => {
-        it("should set network speed correctly", async () => {
+        it(`should set network speed(${s}) correctly`, async () => {
           mocks.adb.expects("isEmulatorConnected")
             .once().withExactArgs()
             .returns(true);
