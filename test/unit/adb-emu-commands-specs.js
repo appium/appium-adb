@@ -272,7 +272,7 @@ describe('adb emulator commands', () => {
         'evdo': adb.NETWORK_SPEED.EVDO,
         'full': adb.NETWORK_SPEED.FULL
       };
-      _.keys(speeds).forEach( (s) => {
+      for (let s of _.keys(speeds)) {
         it(`should set network speed(${s}) correctly`, async () => {
           mocks.adb.expects("isEmulatorConnected")
             .once().withExactArgs()
@@ -286,7 +286,7 @@ describe('adb emulator commands', () => {
           await adb.networkSpeed(s);
           mocks.adb.verify();
         });
-      });
+      }
     }));
     describe("gsm voice method", withMocks({adb}, (mocks) => {
       it("should throw exception on invalid strength", async () => {
