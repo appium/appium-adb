@@ -261,19 +261,8 @@ describe('adb emulator commands', () => {
         await adb.networkSpeed('light').should.eventually.be.rejectedWith("Invalid network speed");
         mocks.adb.verify();
       });
-      let speeds = {
-        'gsm': adb.NETWORK_SPEED.GSM,
-        'scsd': adb.NETWORK_SPEED.SCSD,
-        'gprs': adb.NETWORK_SPEED.GPRS,
-        'edge': adb.NETWORK_SPEED.EDGE,
-        'umts': adb.NETWORK_SPEED.UMTS,
-        'hsdpa': adb.NETWORK_SPEED.HSDPA,
-        'lte': adb.NETWORK_SPEED.LTE,
-        'evdo': adb.NETWORK_SPEED.EVDO,
-        'full': adb.NETWORK_SPEED.FULL
-      };
-      for (let s of _.keys(speeds)) {
-        it(`should set network speed(${s}) correctly`, async () => {
+      for (let [key, value] of _.pairs(adb.NETWORK_SPEED)) {
+        it(`should set network speed(${key}) correctly`, async () => {
           mocks.adb.expects("isEmulatorConnected")
             .once().withExactArgs()
             .returns(true);
@@ -281,9 +270,9 @@ describe('adb emulator commands', () => {
             .once().withExactArgs()
             .returns();
           mocks.adb.expects("adbExec")
-            .once().withExactArgs(["emu", "network", "speed", speeds[s]])
+            .once().withExactArgs(["emu", "network", "speed", value])
             .returns();
-          await adb.networkSpeed(s);
+          await adb.networkSpeed(value);
           mocks.adb.verify();
         });
       }
