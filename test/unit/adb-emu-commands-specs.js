@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
-
+import _ from 'lodash';
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -255,6 +255,27 @@ describe('adb emulator commands', () => {
         await adb.gsmCall(phoneNumber, "hold");
         mocks.adb.verify();
       });
+    }));
+    describe("network speed method", withMocks({adb}, (mocks) => {
+      it("should throw exception on invalid speed", async () => {
+        await adb.networkSpeed('light').should.eventually.be.rejectedWith("Invalid network speed");
+        mocks.adb.verify();
+      });
+      for (let [key, value] of _.pairs(adb.NETWORK_SPEED)) {
+        it(`should set network speed(${key}) correctly`, async () => {
+          mocks.adb.expects("isEmulatorConnected")
+            .once().withExactArgs()
+            .returns(true);
+          mocks.adb.expects("resetTelnetAuthToken")
+            .once().withExactArgs()
+            .returns();
+          mocks.adb.expects("adbExec")
+            .once().withExactArgs(["emu", "network", "speed", value])
+            .returns();
+          await adb.networkSpeed(value);
+          mocks.adb.verify();
+        });
+      }
     }));
     describe("gsm voice method", withMocks({adb}, (mocks) => {
       it("should throw exception on invalid strength", async () => {
