@@ -38,5 +38,17 @@ describe('logcat', async () => {
       await logcat.startCapture().should.eventually.be.rejectedWith('Logcat');
       mocks.teen_process.verify();
     });
+    it('should correctly call subprocess and should resolve promise if it fails on startup', async () => {
+      let conn = new events.EventEmitter();
+      conn.start = () => { };
+      mocks.teen_process.expects("SubProcess")
+        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .returns(conn);
+      setTimeout(function () {
+        conn.emit('lines-stderr', ['something']);
+      }, 0);
+      await logcat.startCapture().should.eventually.not.be.rejectedWith('Logcat');
+      mocks.teen_process.verify();
+    });
   }));
 });

@@ -6,7 +6,10 @@
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp once",
-    "watch": "gulp",
+    "watch": "gulp watch",
+    "build": "gulp transpile",
+    "mocha": "mocha",
+    "e2e-test": "gulp e2e-test",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "lint": "gulp eslint"
   },
