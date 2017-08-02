@@ -4,6 +4,7 @@ import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
 import _ from 'lodash';
+import B from 'bluebird';
 
 
 describe('helpers', () => {
@@ -16,7 +17,7 @@ describe('helpers', () => {
         .returns(directories);
       mocks.fs.expects('lstat')
         .exactly(5)
-        .returns(Promise.resolve({isDirectory: () => {return true;}}));
+        .returns(B.resolve({isDirectory: () => {return true;}}));
       (await getDirectories(rootPath)).should.eql(['1', '2', 'a', 'b', 'c']);
       mocks.fs.verify();
     });
