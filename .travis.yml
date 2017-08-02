@@ -42,13 +42,11 @@ before_script:
   - $(npm bin)/android-emu-travis-pre
 
   # npm stuff
-  - npm install -g gulp
-  - npm install -g mocha
   - npm install
 
   # make sure emulator started
   - $(npm bin)/android-emu-travis-post
 script:
-  - gulp eslint && mocha -t 900000 -R spec $RECURSIVE build/test/$TEST
+  - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST
 after_success:
   - gulp coveralls
