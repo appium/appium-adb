@@ -90,14 +90,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getLocationProviders', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['settings', 'get', 'secure', 'location_providers_allowed'])
-          .returns('');
-        await adb.getLocationProviders();
-        mocks.adb.verify();
-      });
-      it('should return empty location_providers_allowed', async () => {
+      it('should call shell with correct args and return empty location_providers_allowed', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['settings', 'get', 'secure', 'location_providers_allowed'])
           .returns('');
@@ -131,15 +124,10 @@ describe('adb commands', () => {
     describe('toggleGPSLocationProvider', withMocks({adb}, (mocks) => {
       it('should call shell with correct args on gps enabled', async () => {
         mocks.adb.expects("shell")
-          .once()
           .withExactArgs(['settings', 'put', 'secure', 'location_providers_allowed', '+gps']);
-        await adb.toggleGPSLocationProvider(true);
-        mocks.adb.verify();
-      });
-      it('should call shell with correct args on gps disabled', async () => {
         mocks.adb.expects("shell")
-          .once()
           .withExactArgs(['settings', 'put', 'secure', 'location_providers_allowed', '-gps']);
+        await adb.toggleGPSLocationProvider(true);
         await adb.toggleGPSLocationProvider(false);
         mocks.adb.verify();
       });
