@@ -71,15 +71,15 @@ describe('adb commands', function () {
     (await adb.getPIDsByName(pkg)).length.should.equal(0);
   });
   it('should get device language and country', async function () {
-    if (parseInt(apiLevel, 10) >= 23) return this.skip();
-    if (process.env.TRAVIS) return this.skip();
+    if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
+    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
   it('should set device language and country', async function () {
-    if (parseInt(apiLevel, 10) >= 23) return this.skip();
-    if (process.env.TRAVIS) return this.skip();
+    if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
+    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
 
     await adb.setDeviceSysLanguage('fr');
     await adb.setDeviceSysCountry('fr');
@@ -91,7 +91,7 @@ describe('adb commands', function () {
     await adb.setDeviceSysCountry('us');
   });
   it('should get device locale', async function () {
-    if (parseInt(apiLevel, 10) < 23) return this.skip();
+    if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
 
     ['us'].should.contain(await adb.getDeviceLocale());
   });

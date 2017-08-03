@@ -261,7 +261,7 @@ describe('adb emulator commands', () => {
         await adb.networkSpeed('light').should.eventually.be.rejectedWith("Invalid network speed");
         mocks.adb.verify();
       });
-      for (let [key, value] of _.pairs(adb.NETWORK_SPEED)) {
+      for (let [key, value] of _.toPairs(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async () => {
           mocks.adb.expects("isEmulatorConnected")
             .once().withExactArgs()
