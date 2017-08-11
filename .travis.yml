@@ -49,4 +49,4 @@ before_script:
 script:
   - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST
 after_success:
-  - gulp coveralls
+  - npm run coverage
