@@ -42,7 +42,8 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
                                    .rejectedWith("Unexpected output while trying to get devices");
     mocks.teen_process.verify();
   });
-  it('getDevicesWithRetry should fail when there are no connected devices', async () => {
+  it('getDevicesWithRetry should fail when there are no connected devices', async function () {
+    this.timeout(20000);
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"List of devices attached"});

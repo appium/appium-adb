@@ -4,6 +4,8 @@ import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
+import { fs, mkdirp } from 'appium-support';
+import temp from 'temp';
 
 
 chai.use(chaiAsPromised);
@@ -93,7 +95,7 @@ describe('adb commands', function () {
   it('should get device locale', async function () {
     if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
 
-    ['us'].should.contain(await adb.getDeviceLocale());
+    ['us', 'en', 'ca_en'].should.contain(await adb.getDeviceLocale());
   });
   it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);
@@ -148,6 +150,47 @@ describe('adb commands', function () {
     it('should grant permission', async () => {
       await adb.grantPermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
       expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.include.members(['android.permission.RECEIVE_SMS']);
+    });
+  });
+
+  describe('push file', function () {
+    function getRandomDir () {
+      return `/data/local/tmp/test${Math.random()}`;
+    }
+
+    let localFile = temp.path({prefix: 'appium', suffix: '.tmp'});
+    let tempFile = temp.path({prefix: 'appium', suffix: '.tmp'});
+    const stringData = `random string data ${Math.random()}`;
+    before(async function () {
+      await mkdirp(path.dirname(localFile));
+      await mkdirp(path.dirname(tempFile));
+
+      await fs.writeFile(localFile, stringData);
+    });
+    after(async function () {
+      if (await fs.exists(localFile)) {
+        await fs.unlink(localFile);
+      }
+    });
+    afterEach(async function () {
+      if (await fs.exists(tempFile)) {
+        await fs.unlink(tempFile);
+      }
+    });
+    it('should push file to a valid location', async function () {
+      let remoteFile = `${getRandomDir()}/remote.txt`;
+
+      await adb.push(localFile, remoteFile);
+
+      // get the file and its contents, to check
+      await adb.pull(remoteFile, tempFile);
+      let remoteData = await fs.readFile(tempFile);
+      remoteData.toString().should.equal(stringData);
+    });
+    it('should throw error if it cannot write to the remote file', async function () {
+      let remoteFile = '/foo/bar/remote.txt';
+
+      await adb.push(localFile, remoteFile).should.be.rejectedWith(/\/foo\/bar\/remote.txt/);
     });
   });
 });
