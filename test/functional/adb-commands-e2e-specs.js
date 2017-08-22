@@ -95,7 +95,7 @@ describe('adb commands', function () {
   it('should get device locale', async function () {
     if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
 
-    ['us'].should.contain(await adb.getDeviceLocale());
+    ['us', 'en', 'ca_en'].should.contain(await adb.getDeviceLocale());
   });
   it('should forward the port', async () => {
     await adb.forwardPort(4724, 4724);
