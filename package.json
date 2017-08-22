@@ -12,6 +12,7 @@
     "e2e-test": "gulp e2e-test",
     "coverage": "gulp coveralls",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
+    "precommit-test": "REPORTER=dot gulp once",
     "lint": "gulp eslint"
   },
   "repository": {
@@ -42,11 +43,10 @@
   },
   "pre-commit": [
     "precommit-msg",
-    "lint",
-    "test"
+    "precommit-test"
   ],
   "devDependencies": {
-    "appium-gulp-plugins": "^2.1.4",
+    "appium-gulp-plugins": "^2.2.0",
     "appium-test-support": "^0.4.0",
     "babel-eslint": "^7.2.3",
     "chai": "^4.1.0",
