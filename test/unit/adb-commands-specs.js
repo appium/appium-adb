@@ -434,7 +434,7 @@ describe('adb commands', () => {
     describe('setDataState', withMocks({adb}, (mocks) => {
       it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection', 
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionStatusReceiver',
             '--es', 'setstatus', 'disable'])
           .returns("");
@@ -475,7 +475,7 @@ describe('adb commands', () => {
       });
       it('should call shell with correct args when turning only data off for real device', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection', 
+          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionStatusReceiver',
             '--es', 'setstatus', 'disable'])
           .returns("");
