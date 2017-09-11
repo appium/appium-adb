@@ -7,7 +7,7 @@ import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
 
-
+const should = chai.should();
 chai.use(chaiAsPromised);
 let expect = chai.expect;
 
@@ -121,6 +121,24 @@ describe('adb commands', function () {
   });
   it('should get screen size', async () => {
     (await adb.getScreenSize()).should.not.be.null;
+  });
+  it('should be able to toggle gps location provider', async () => {
+    await adb.toggleGPSLocationProvider(true);
+    (await adb.getLocationProviders()).should.include('gps');
+    await adb.toggleGPSLocationProvider(false);
+    (await adb.getLocationProviders()).should.not.include('gps');
+  });
+  it('should be able to toogle airplane mode', async () => {
+    await adb.setAirplaneMode(true);
+    (await adb.isAirplaneModeOn()).should.be.true;
+    await adb.setAirplaneMode(false);
+    (await adb.isAirplaneModeOn()).should.be.false;
+  });
+  it('should be able to toogle wifi', async () => {
+    await adb.setWifiState(true);
+    (await adb.isWifiOn()).should.be.true;
+    await adb.setWifiState(false);
+    (await adb.isWifiOn()).should.be.false;
   });
   describe('app permissions', async () => {
     before(async function () {
