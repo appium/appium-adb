@@ -46,8 +46,8 @@ describe('adb commands', () => {
   describe('shell', () => {
     describe('getApiLevel', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'ro.build.version.sdk'])
+        mocks.adb.expects("getDeviceProperty")
+          .once().withExactArgs('ro.build.version.sdk')
           .returns(apiLevel);
         (await adb.getApiLevel()).should.equal(apiLevel);
         mocks.adb.verify();
@@ -55,8 +55,8 @@ describe('adb commands', () => {
     }));
     describe('getPlatformVersion', withMocks({adb}, (mocks) => {
       it('should call shell with correct args', async () => {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['getprop', 'ro.build.version.release'])
+        mocks.adb.expects("getDeviceProperty")
+          .once().withExactArgs('ro.build.version.release')
           .returns(platformVersion);
         (await adb.getPlatformVersion()).should.equal(platformVersion);
         mocks.adb.verify();
@@ -929,7 +929,7 @@ describe('adb commands', () => {
     it('should throw an error on undefined proxy_port', async () => {
       await adb.setHttpProxy("http://localhost").should.eventually.be.rejected;
     });
-    it('should call shell settings methods with correct args', async () => {
+    it('should call setSetting method with correct args', async () => {
       let proxyHost = "http://localhost";
       let proxyPort = 4723;
       mocks.adb.expects('setSetting').once().withExactArgs('global', 'http_proxy', `${proxyHost}:${proxyPort}`);
@@ -938,6 +938,23 @@ describe('adb commands', () => {
       mocks.adb.expects('setSetting').once().withExactArgs('system', 'global_http_proxy_host', proxyHost);
       mocks.adb.expects('setSetting').once().withExactArgs('system', 'global_http_proxy_port', proxyPort);
       await adb.setHttpProxy(proxyHost, proxyPort);
+      mocks.adb.verify();
+    });
+  }));
+  describe('setSetting', withMocks({adb}, (mocks) => {
+    it('should call shell settings put', async () => {
+      mocks.adb.expects('shell').once()
+        .withExactArgs(['settings', 'put', 'namespace', 'setting', 'value']);
+      await adb.setSetting('namespace', 'setting', 'value');
+      mocks.adb.verify();
+    });
+  }));
+  describe('getSetting', withMocks({adb}, (mocks) => {
+    it('should call shell settings get', async () => {
+      mocks.adb.expects('shell').once()
+        .withExactArgs(['settings', 'get', 'namespace', 'setting'])
+        .returns('value');
+      (await adb.getSetting('namespace', 'setting')).should.be.equal('value');
       mocks.adb.verify();
     });
   }));
