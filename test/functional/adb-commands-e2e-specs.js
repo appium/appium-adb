@@ -25,6 +25,11 @@ describe('adb commands', function () {
 
   let adb;
   before(async () => {
+    /*
+    * TODO:  Update https://github.com/appium/eslint-config-appium
+    *        to ignore no-unused-vars for chai `should|expect`
+    */
+    should;
     adb = await ADB.createADB();
   });
   it('getApiLevel should get correct api level', async () => {
