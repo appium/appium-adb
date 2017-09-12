@@ -7,7 +7,7 @@ import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
 
-const should = chai.should();
+chai.should();
 chai.use(chaiAsPromised);
 let expect = chai.expect;
 
@@ -25,11 +25,6 @@ describe('adb commands', function () {
 
   let adb;
   before(async () => {
-    /*
-    * TODO:  Update https://github.com/appium/eslint-config-appium
-    *        to ignore no-unused-vars for chai `should|expect`
-    */
-    should;
     adb = await ADB.createADB();
   });
   it('getApiLevel should get correct api level', async () => {
