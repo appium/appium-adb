@@ -283,6 +283,9 @@ describe('Apk-utils', () => {
   }));
   describe('uninstallApk', withMocks({adb}, (mocks) => {
     it('should call forceStop and adbExec with correct arguments', async () => {
+      mocks.adb.expects('isAppInstalled')
+        .once().withExactArgs(pkg)
+        .returns(true);
       mocks.adb.expects('forceStop')
         .once().withExactArgs(pkg)
         .returns('');
@@ -290,6 +293,17 @@ describe('Apk-utils', () => {
         .once().withExactArgs(['uninstall', pkg], {timeout: 20000})
         .returns('Success');
       (await adb.uninstallApk(pkg)).should.be.true;
+      mocks.adb.verify();
+    });
+    it('should not call forceStop and adbExec if app not installed', async () => {
+      mocks.adb.expects('isAppInstalled')
+        .once().withExactArgs(pkg)
+        .returns(false);
+      mocks.adb.expects('forceStop')
+        .never();
+      mocks.adb.expects('adbExec')
+        .never();
+      (await adb.uninstallApk(pkg)).should.be.false;
       mocks.adb.verify();
     });
   }));
