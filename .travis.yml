@@ -48,6 +48,6 @@ before_script:
   # make sure emulator started
   - $(npm bin)/android-emu-travis-post
 script:
-  - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST
+  - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST -ig @skip-ci
 after_success:
   - npm run coverage

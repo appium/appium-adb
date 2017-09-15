@@ -7,6 +7,7 @@ import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
 
+
 chai.should();
 chai.use(chaiAsPromised);
 let expect = chai.expect;
@@ -134,7 +135,9 @@ describe('adb commands', function () {
     await adb.setAirplaneMode(false);
     (await adb.isAirplaneModeOn()).should.be.false;
   });
-  it('should be able to toogle wifi', async () => {
+  it('should be able to toogle wifi @skip-ci', async function () {
+    this.retries(3);
+
     await adb.setWifiState(true);
     (await adb.isWifiOn()).should.be.true;
     await adb.setWifiState(false);
