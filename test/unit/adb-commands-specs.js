@@ -617,11 +617,43 @@ describe('adb commands', () => {
       });
     }));
     describe('killProcessByPID', withMocks({adb}, (mocks) => {
+      const pid = 5078;
+
       it('should call kill process correctly', async () => {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['kill', 5078])
-          .returns();
-        await adb.killProcessByPID(5078);
+          .once().withExactArgs(['kill', '-0', pid])
+          .returns('');
+        mocks.adb.expects("shell")
+          .withExactArgs(['kill', pid])
+          .onCall(0)
+          .returns('');
+        mocks.adb.expects("shell")
+          .withExactArgs(['kill', pid])
+          .onCall(1)
+          .throws();
+        await adb.killProcessByPID(pid);
+        mocks.adb.verify();
+      });
+
+      it('should force kill process if normal kill fails', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['kill', '-0', pid])
+          .returns('');
+        mocks.adb.expects("shell")
+          .atLeast(2).withExactArgs(['kill', pid])
+          .returns('');
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['kill', '-9', pid])
+          .returns('');
+        await adb.killProcessByPID(pid);
+        mocks.adb.verify();
+      });
+
+      it('should throw an error if a process with given ID does not exist', async () => {
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['kill', '-0', pid])
+          .throws();
+        adb.killProcessByPID(pid).should.eventually.be.rejected;
         mocks.adb.verify();
       });
     }));
