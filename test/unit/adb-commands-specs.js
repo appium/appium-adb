@@ -401,7 +401,7 @@ describe('adb commands', () => {
       it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
-            '-n', 'io.appium.settings/.receivers.WiFiStatusReceiver',
+            '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
             '--es', 'setstatus', 'enable'])
           .returns("");
         await adb.setWifiState(true);
@@ -435,7 +435,7 @@ describe('adb commands', () => {
       it('should call shell with correct args for real device', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
-            '-n', 'io.appium.settings/.receivers.DataConnectionStatusReceiver',
+            '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
             '--es', 'setstatus', 'disable'])
           .returns("");
         await adb.setDataState(false);
@@ -453,7 +453,7 @@ describe('adb commands', () => {
       it('should call shell with correct args when turning only wifi on for real device', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
-            '-n', 'io.appium.settings/.receivers.WiFiStatusReceiver',
+            '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
             '--es', 'setstatus', 'enable'])
           .returns("");
         await adb.setWifiAndData({wifi: true});
@@ -476,7 +476,7 @@ describe('adb commands', () => {
       it('should call shell with correct args when turning only data off for real device', async () => {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
-            '-n', 'io.appium.settings/.receivers.DataConnectionStatusReceiver',
+            '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
             '--es', 'setstatus', 'disable'])
           .returns("");
         await adb.setWifiAndData({data: false});
