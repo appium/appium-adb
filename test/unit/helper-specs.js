@@ -1,5 +1,5 @@
 import { getDirectories, getAndroidPlatformAndPath,
-         buildStartCmd } from '../../lib/helpers';
+         buildStartCmd, isShowingLockscreen } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
@@ -54,6 +54,25 @@ describe('helpers', () => {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
   }));
+
+  describe('isShowingLockscreen', () => {
+    it('should return mShowingLockscreen value', async () => {
+      let dumpsys = 'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.true;
+      dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+    it('should use mDreamingLockscreen value if mShowingLockscreen is missing', async () => {
+      let dumpsys = 'mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.true;
+      dumpsys = 'mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+    it('should assume that screen is unlocked if can not determine lock state', async () => {
+      let dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+  });
 
   describe('buildStartCmd', () => {
     let startOptions = {
