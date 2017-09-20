@@ -56,16 +56,16 @@ describe('helpers', () => {
   }));
 
   describe('isShowingLockscreen', () => {
-    it('should return mShowingLockscreen value', async () => {
+    it('should return true if mShowingLockscreen is true', async () => {
       let dumpsys = 'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
-      dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
-      (await isShowingLockscreen(dumpsys)).should.be.false;
     });
-    it('should use mDreamingLockscreen value if mShowingLockscreen is missing', async () => {
-      let dumpsys = 'mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
+    it('should return true if mDreamingLockscreen is true', async () => {
+      let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
-      dumpsys = 'mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+    });
+    it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async () => {
+      let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
     it('should assume that screen is unlocked if can not determine lock state', async () => {
