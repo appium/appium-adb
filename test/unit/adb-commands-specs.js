@@ -493,6 +493,51 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('setAnimationState', withMocks({adb}, (mocks) => {
+      const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.animation',
+                      '-n', 'io.appium.settings/.receivers.AnimationSettingReceiver',
+                      '--es', 'setstatus'];
+      it('should call shell with correct args to enable animation', async () => {
+        mocks.adb.expects("shell").once().withExactArgs(adbArgs.concat('enable'));
+        await adb.setAnimationState(true);
+        mocks.adb.verify();
+      });
+      it('should call shell with correct args to disable animation', async () => {
+        mocks.adb.expects("shell").once().withExactArgs(adbArgs.concat('disable'));
+        await adb.setAnimationState(false);
+        mocks.adb.verify();
+      });
+    }));
+    describe('isAnimationOn', withMocks({adb}, (mocks) => {
+      const mockSetting = async function (duration_scale, transition_scale, window_scale) {
+        mocks.adb.expects("getSetting").once().withExactArgs('global', 'animator_duration_scale')
+          .returns(duration_scale);
+        mocks.adb.expects("getSetting").once().withExactArgs('global', 'transition_animation_scale')
+          .returns(transition_scale);
+        mocks.adb.expects("getSetting").once().withExactArgs('global', 'window_animation_scale')
+          .returns(window_scale);
+      };
+      it('should return false if all animation settings are equal to zero', async () => {
+        await mockSetting("0.0", "0.0", "0.0");
+        (await adb.isAnimationOn()).should.be.false;
+        mocks.adb.verify();
+      });
+      it('should return true if animator_duration_scale setting is NOT equal to zero', async () => {
+        await mockSetting("0.5", "0.0", "0.0");
+        (await adb.isAnimationOn()).should.be.true;
+        mocks.adb.verify();
+      });
+      it('should return true if transition_animation_scale setting is NOT equal to zero', async () => {
+        await mockSetting("0.0", "0.5", "0.0");
+        (await adb.isAnimationOn()).should.be.true;
+        mocks.adb.verify();
+      });
+      it('should return true if window_animation_scale setting is NOT equal to zero', async () => {
+        await mockSetting("0.0", "0.0", "0.5");
+        (await adb.isAnimationOn()).should.be.true;
+        mocks.adb.verify();
+      });
+    }));
     describe('setGeoLocation', withMocks({adb}, (mocks) => {
       const location = {longitude: '50.5',
                         latitude: '50.1'};

@@ -143,6 +143,14 @@ describe('adb commands', function () {
     await adb.setWifiState(false);
     (await adb.isWifiOn()).should.be.false;
   });
+  it('should be able to turn off animation @skip-ci', async () => {
+    await adb.setAnimationState(false);
+    (await adb.isAnimationOn()).should.be.false;
+  });
+  it('should be able to turn on animation @skip-ci', async () => {
+    await adb.setAnimationState(true);
+    (await adb.isAnimationOn()).should.be.true;
+  });
   describe('app permissions', async () => {
     before(async function () {
       let deviceApiLevel = await adb.getApiLevel();
