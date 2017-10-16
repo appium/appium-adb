@@ -592,13 +592,6 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should execute uninstall then install if fullReinstall set', async () => {
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns();
-      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(false);
-      mocks.adb.expects('install').withArgs(apkPath, false).once().returns(true);
-      await adb.installOrUpgrade(apkPath, pkgId, true);
-      mocks.adb.verify();
-    });
     it('should return if the same package version is already installed', async () => {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         versionCode: 1
@@ -658,6 +651,21 @@ describe('Apk-utils', () => {
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath, true).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+      mocks.adb.verify();
+    });
+    it('should uninstall and re-install if older package version is installed and upgrade fails', async () => {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+        name: pkgId,
+        versionCode: 2
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, true).once().throws();
+      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, false).once().returns(true);
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
