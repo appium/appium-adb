@@ -11,7 +11,7 @@ import { withMocks } from 'appium-test-support';
 
 chai.use(chaiAsPromised);
 const should = chai.should();
-const apiLevel = '21',
+const apiLevel = 21,
       platformVersion = '4.4.4',
       language = 'en',
       country = 'US',
@@ -48,7 +48,7 @@ describe('adb commands', () => {
       it('should call shell with correct args', async () => {
         mocks.adb.expects("getDeviceProperty")
           .once().withExactArgs('ro.build.version.sdk')
-          .returns(apiLevel);
+          .returns(`${apiLevel}`);
         (await adb.getApiLevel()).should.equal(apiLevel);
         mocks.adb.verify();
       });

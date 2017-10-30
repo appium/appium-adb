@@ -21,7 +21,7 @@ describe('adb emu commands', () => {
 
     // the test here only works if we have API level 23 or above
     // it will also fail on emulators
-    if (parseInt(await adb.getApiLevel(), 10) < 23 || !process.env.REAL_DEVICE) {
+    if (await adb.getApiLevel() < 23 || !process.env.REAL_DEVICE) {
       this.skip();
     }
   });
