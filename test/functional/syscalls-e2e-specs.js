@@ -28,7 +28,7 @@ describe('System calls', function () {
     (await adb.isDeviceConnected()).should.be.true;
   });
   it('shell should execute command in adb shell ', async () => {
-    (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(apiLevel);
+    (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
   it('getConnectedEmulators should get all connected emulators', async () => {
     (await adb.getConnectedEmulators()).length.should.be.above(0);

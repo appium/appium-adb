@@ -349,7 +349,7 @@ describe('Apk-utils', () => {
     it('should call getApiLevel and shell with correct arguments', async () => {
       mocks.adb.expects('getApiLevel')
         .once().withExactArgs()
-        .returns('17');
+        .returns(17);
       mocks.adb.expects('shell')
         .once().withExactArgs(cmd)
         .returns('');
@@ -359,7 +359,7 @@ describe('Apk-utils', () => {
     it('should call getApiLevel and shell with correct arguments', async () => {
       mocks.adb.expects('getApiLevel')
         .twice()
-        .returns('17');
+        .returns(17);
       mocks.adb.expects('shell')
         .onCall(0)
         .returns('Error: Activity class foo does not exist');
@@ -374,7 +374,7 @@ describe('Apk-utils', () => {
 
       mocks.adb.expects('getApiLevel')
         .once().withExactArgs()
-        .returns('17');
+        .returns(17);
       mocks.adb.expects('shell')
         .once().withExactArgs(cmdWithInnerClass)
         .returns('');
