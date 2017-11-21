@@ -157,10 +157,10 @@ describe('adb commands', function () {
     await adb.grantPermission('io.appium.settings', 'android.permission.CHANGE_CONFIGURATION');
 
     await adb.setDeviceSysLocaleViaSettingApp('fr', 'fr');
-    (await adb.getDeviceSysLocale().should.equal('fr-FR'));
+    (await adb.getDeviceSysLocale()).should.equal('fr-FR');
 
     await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
-    (await adb.getDeviceSysLocale().should.equal('en-US'));
+    (await adb.getDeviceSysLocale()).should.equal('en-US');
   });
   describe('app permissions', async () => {
     before(async function () {
