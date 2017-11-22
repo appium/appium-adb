@@ -39,6 +39,7 @@ before_script:
   - npm install appium-test-support # get the travis emu scripts
 
   # android stuff
+  - echo $ANDROID_HOME
   - android list targets
   - $(npm bin)/android-emu-travis-pre
 
