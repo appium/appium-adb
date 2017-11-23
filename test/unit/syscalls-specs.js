@@ -14,9 +14,6 @@ const avdName = 'AVD_NAME';
 
 describe('System calls', withMocks({teen_process}, (mocks) => {
   it('getConnectedDevices should get all connected devices', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"List of devices attached \n emulator-5554	device"});
@@ -25,9 +22,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getConnectedDevices should get all connected devices which have valid udid', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     let stdoutValue = "List of devices attached \n" +
                       "adb server version (32) doesn't match this client (36); killing...\n" +
                       "* daemon started successfully *\n" +
@@ -41,9 +35,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getConnectedDevices should fail when adb devices returns unexpected output', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"foobar"});
@@ -52,9 +43,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when there are no connected devices', async function () {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     this.timeout(20000);
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
@@ -64,9 +52,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when adb devices returns unexpected output', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"foobar"});
@@ -75,9 +60,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should get all connected devices', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"List of devices attached \n emulator-5554	device"});
@@ -86,9 +68,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should get all connected devices second time', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .onCall(0)
       .returns({stdout:"Foobar"});
@@ -100,9 +79,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     mocks.teen_process.verify();
   });
   it('getDevicesWithRetry should fail when exec throws an error', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .atLeast(2)
       .throws("Error foobar");
@@ -127,9 +103,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
   });
   describe('createSubProcess', () => {
     it('should return an instance of SubProcess', () => {
-      // Because of  ExpectationError: Unexpected call: resolve(...)
-      if (process.env.TRAVIS) { return this.skip(); }
-
       adb.createSubProcess([]).should.be.an.instanceof(teen_process.SubProcess);
     });
   });
@@ -137,9 +110,6 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
 
 describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
   it('should return adb version', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.adb.expects("adbExec")
       .once()
       .withExactArgs('version')
@@ -153,9 +123,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('should cache adb results', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     adb.getAdbVersion.cache = new _.memoize.Cache();
     mocks.adb.expects("adbExec")
       .once()
@@ -166,9 +133,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('fileExists should return true for if ls returns', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.adb.expects("ls")
       .once().withExactArgs('foo')
       .returns(['bar']);
@@ -176,9 +140,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('ls should return list', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.adb.expects("shell")
       .once().withExactArgs(['ls', 'foo'])
       .returns('bar');
@@ -187,9 +148,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('fileSize should return the file size when digit is after permissions', async function () {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     let remotePath = '/sdcard/test.mp4';
     mocks.adb.expects('shell')
       .once().withExactArgs(['ls', '-la', remotePath])
@@ -198,9 +156,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     size.should.eql(39571);
   });
   it('fileSize should return the file size when digit is not after permissions', async function () {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     let remotePath = '/sdcard/test.mp4';
     mocks.adb.expects('shell')
       .once().withExactArgs(['ls', '-la', remotePath])
@@ -209,9 +164,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     size.should.eql(39571);
   });
   it('reboot should call stop and start using shell', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.adb.expects("shell")
       .once().withExactArgs(['stop']);
     mocks.adb.expects("setDeviceProperty")
@@ -228,9 +180,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.B.verify();
   });
   it('reboot should restart adbd as root if necessary', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['root'])
       .returns(false);
@@ -253,9 +202,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.B.verify();
   });
   it('getRunningAVD should get connected avd', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     let udid = 'emulator-5554';
     let port = 5554;
     let emulator = {udid, port};
@@ -273,9 +219,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('getRunningAVD should return null when expected avd is not connected', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     let udid = 'emulator-5554';
     let port = 5554;
     let emulator = {udid, port};
@@ -291,9 +234,6 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
   });
   it('getRunningAVD should return null when no avd is connected', async () => {
-    // Because of  ExpectationError: Unexpected call: resolve(...)
-    if (process.env.TRAVIS) { return this.skip(); }
-
     mocks.adb.expects("getConnectedEmulators")
       .once().withExactArgs()
       .returns([]);
