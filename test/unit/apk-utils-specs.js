@@ -566,6 +566,26 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
+    it('should not set language and country if no language when API 24+', async () => {
+      mocks.adb.expects("getApiLevel").withExactArgs()
+          .once().returns(24);
+      mocks.adb.expects("getDeviceLocale").withExactArgs()
+          .once().returns(locale);
+      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").never();
+      mocks.adb.expects('reboot').never();
+      await adb.setDeviceLanguageCountry(country);
+      mocks.adb.verify();
+    });
+    it('should not set language and country if no country when API 24+', async () => {
+      mocks.adb.expects("getApiLevel").withExactArgs()
+          .once().returns(24);
+      mocks.adb.expects("getDeviceLocale").withExactArgs()
+          .once().returns(locale);
+      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").never();
+      mocks.adb.expects('reboot').never();
+      await adb.setDeviceLanguageCountry(language);
+      mocks.adb.verify();
+    });
   }));
   describe('getApkInfo', withMocks({adb, teen_process, fs}, (mocks) => {
     it('should properly parse apk info', async () => {
