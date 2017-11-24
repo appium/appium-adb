@@ -482,6 +482,29 @@ describe('Apk-utils', () => {
       mocks.adb.verify();
     });
   }));
+  describe('setDeviceLocale', withMocks({adb}, (mocks) => {
+    it('should not call setDeviceLanguageCountry because of empty', async() => {
+      mocks.adb.expects('setDeviceLanguageCountry').never();
+      await adb.setDeviceLocale();
+      mocks.adb.verify();
+    });
+    it('should not call setDeviceLanguageCountry because of invalid format no -', async() => {
+      mocks.adb.expects('setDeviceLanguageCountry').never();
+      await adb.setDeviceLocale('jp');
+      mocks.adb.verify();
+    });
+    it('should not call setDeviceLanguageCountry because of invalid format /', async() => {
+      mocks.adb.expects('setDeviceLanguageCountry').never();
+      await adb.setDeviceLocale('en/US');
+      mocks.adb.verify();
+    });
+    it('should call setDeviceLanguageCountry', async() => {
+      mocks.adb.expects('setDeviceLanguageCountry').withExactArgs(language, country)
+          .once().returns("");
+      await adb.setDeviceLocale('en-US');
+      mocks.adb.verify();
+    });
+  }));
   describe('setDeviceLanguageCountry', withMocks({adb}, (mocks) => {
     it('should return if language and country are not passed', async () => {
       mocks.adb.expects('getDeviceLanguage').never();
