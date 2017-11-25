@@ -504,6 +504,12 @@ describe('Apk-utils', () => {
       await adb.setDeviceLocale('en-US');
       mocks.adb.verify();
     });
+    it('should call setDeviceLanguageCountry with degits for country', async() => {
+      mocks.adb.expects('setDeviceLanguageCountry').withExactArgs(language, country + "0")
+          .once().returns("");
+      await adb.setDeviceLocale('en-US0');
+      mocks.adb.verify();
+    });
   }));
   describe('setDeviceLanguageCountry', withMocks({adb}, (mocks) => {
     it('should return if language and country are not passed', async () => {
