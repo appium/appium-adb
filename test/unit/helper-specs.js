@@ -23,17 +23,20 @@ describe('helpers', () => {
   }));
 
   describe('getAndroidPlatformAndPath', withMocks({fs, path}, (mocks) => {
+    let oldAndroidHome;
+    beforeEach(function () {
+      oldAndroidHome = process.env.ANDROID_HOME;
+    });
+    afterEach(function () {
+      process.env.ANDROID_HOME = oldAndroidHome;
+    });
+
     it('should return null if no ANDROID_HOME is set', async () => {
-      let oldAndroidHome = process.env.ANDROID_HOME;
       delete process.env.ANDROID_HOME;
 
       await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
-
-      process.env.ANDROID_HOME = oldAndroidHome;
     });
-    // Because of  ExpectationError: Unexpected call: resolve(...) on Travis
-    it.skip('should get the latest available API', async () => {
-      let oldAndroidHome = process.env.ANDROID_HOME;
+    it('should get the latest available API', async () => {
       process.env.ANDROID_HOME = '/path/to/android/home';
       mocks.fs.expects('exists')
         .exactly(2)
@@ -51,7 +54,6 @@ describe('helpers', () => {
 
       mocks.fs.verify();
       mocks.path.verify();
-      process.env.ANDROID_HOME = oldAndroidHome;
     });
   }));
 
