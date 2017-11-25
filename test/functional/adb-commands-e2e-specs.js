@@ -151,6 +151,17 @@ describe('adb commands', function () {
     await adb.setAnimationState(true);
     (await adb.isAnimationOn()).should.be.true;
   });
+  it('should be able to set device locale via setting app @skip-ci', async () => {
+    // Operation not allowed: java.lang.SecurityException: Package io.appium.settings has not requested permission android.permission.CHANGE_CONFIGURATION
+    // is shown if the setting apk is not updated.
+    await adb.grantPermission('io.appium.settings', 'android.permission.CHANGE_CONFIGURATION');
+
+    await adb.setDeviceSysLocaleViaSettingApp('fr', 'fr');
+    (await adb.getDeviceSysLocale()).should.equal('fr-FR');
+
+    await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
+    (await adb.getDeviceSysLocale()).should.equal('en-US');
+  });
   describe('app permissions', async () => {
     before(async function () {
       let deviceApiLevel = await adb.getApiLevel();

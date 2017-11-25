@@ -538,6 +538,16 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
     }));
+    describe('setDeviceSysLocaleViaSettingApp', withMocks({adb}, (mocks) => {
+      const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.locale',
+        '-n', 'io.appium.settings/.receivers.LocaleSettingReceiver',
+        '--es', 'lang', 'en', '--es', 'country', 'US'];
+      it('should call shell with locale settings', async () => {
+        mocks.adb.expects("shell").once().withExactArgs(adbArgs);
+        await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
+        mocks.adb.verify();
+      });
+    }));
     describe('setGeoLocation', withMocks({adb}, (mocks) => {
       const location = {longitude: '50.5',
                         latitude: '50.1'};
