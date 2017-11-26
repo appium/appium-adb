@@ -31,12 +31,12 @@ describe('helpers', () => {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
 
-    it.skip('should return null if no ANDROID_HOME is set', async () => {
+    it('should return null if no ANDROID_HOME is set', async () => {
       delete process.env.ANDROID_HOME;
 
       await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
     });
-    it('should get the latest available API', async () => {
+    it.skip('should get the latest available API', async () => {
       process.env.ANDROID_HOME = '/path/to/android/home';
       mocks.fs.expects('exists')
         .exactly(2)
