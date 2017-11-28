@@ -35,7 +35,7 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
       screenSize = `768x1280`,
-      screenDensity = `420`;
+      screenDensity = 420;
 
 describe('adb commands', () => {
   let adb = new ADB();
