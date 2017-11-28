@@ -6,6 +6,7 @@ import path from 'path';
 import _ from 'lodash';
 import B from 'bluebird';
 
+
 describe('helpers', () => {
   describe('getDirectories', withMocks({fs}, (mocks) => {
     it('should sort the directories', async () => {
@@ -22,38 +23,58 @@ describe('helpers', () => {
     });
   }));
 
-  describe('getAndroidPlatformAndPath', withMocks({fs, path}, (mocks) => {
+  describe('getAndroidPlatformAndPath', withMocks({fs}, (mocks) => {
     let oldAndroidHome;
-    beforeEach(function () {
+    let oldResolve;
+    before(function () {
       oldAndroidHome = process.env.ANDROID_HOME;
     });
-    afterEach(function () {
+    after(function () {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
+    afterEach(function () {
+      if (oldResolve) {
+        path.resolve = oldResolve;
+      }
+    });
 
-    it('should return null if no ANDROID_HOME is set', async () => {
+    it('should return null if no ANDROID_HOME is set', async function () {
       delete process.env.ANDROID_HOME;
 
       await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
     });
-    it.skip('should get the latest available API', async () => {
+    it('should get the latest available API', async function () {
       process.env.ANDROID_HOME = '/path/to/android/home';
+
       mocks.fs.expects('exists')
         .exactly(2)
         .onCall(0).returns(false)
         .onCall(1).returns(true);
-      mocks.path.expects('resolve')
-        .exactly(3)
-        .onCall(0).returns('/path/to')
-        .onCall(1).returns('/path/to/apis1')
-        .onCall(2).returns('/path/to/apis2');
+      // manually mock `path`, to allow system to work
+      oldResolve = path.resolve;
+      let count = 0;
+      path.resolve = function (...args) {
+        // ensure that underlying system calls still work
+        if (args[1] !== 'platforms' && args[1].indexOf('android') !== 0) {
+          return oldResolve(...args);
+        }
 
+        switch (count++) {
+          case 0:
+            return '/path/to';
+          case 1:
+            return '/path/to/apis1';
+          case 2:
+            return '/path/to/apis2';
+          case 3:
+            return '/error/getting/here';
+        }
+      };
       let platformAndPath = await getAndroidPlatformAndPath();
       platformAndPath.platform.should.equal('android-24');
       platformAndPath.platformPath.should.equal('/path/to/apis2');
-
       mocks.fs.verify();
-      mocks.path.verify();
+      count.should.eql(3);
     });
   }));
 
