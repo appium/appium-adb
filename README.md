@@ -88,6 +88,8 @@ console.log(await adb.getPIDsByName('m.android.phone'));
 - `setAirplaneMode`
 - `broadcastAirplaneMode`
 - `isWifiOn`
+- `getScreenSize`
+- `getScreenDensity`
 - `setWifiState`
 - `isDataOn`
 - `setDataState`

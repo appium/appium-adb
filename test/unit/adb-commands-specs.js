@@ -34,7 +34,8 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
       contactManagerPackage = 'com.example.android.contactmanager',
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
-      screenSize = `768x1280`;
+      screenSize = `768x1280`,
+      screenDensity = `420`;
 
 describe('adb commands', () => {
   let adb = new ADB();
@@ -790,6 +791,13 @@ describe('adb commands', () => {
           .once().withExactArgs(['wm', 'size'])
           .returns(screenSize);
       await adb.getScreenSize();
+      mocks.adb.verify();
+    });
+    it('should get device screen density', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['wm', 'density'])
+          .returns(screenDensity);
+      await adb.getScreenDensity();
       mocks.adb.verify();
     });
   }));
