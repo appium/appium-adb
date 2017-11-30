@@ -483,6 +483,9 @@ describe('Apk-utils', () => {
     });
   }));
   describe('ensureCurrentLocale', withMocks({adb}, (mocks) => {
+    it('should return false if no arguments', async() => {
+      (await adb.ensureCurrentLocale()).should.be.false;
+    });
     it('should return true when API 22', async() => {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("fr");
