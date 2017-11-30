@@ -792,6 +792,22 @@ describe('adb commands', () => {
       await adb.getScreenSize();
       mocks.adb.verify();
     });
+    it('should get device screen density', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['wm', 'density'])
+          .returns("Physical density: 420");
+      let density = await adb.getScreenDensity();
+      density.should.equal(420);
+      mocks.adb.verify();
+    });
+    it('should return null for invalid screen density', async () => {
+      mocks.adb.expects("shell")
+          .once().withExactArgs(['wm', 'density'])
+          .returns("Physical density: unknown");
+      let density = await adb.getScreenDensity();
+      should.equal(density, null);
+      mocks.adb.verify();
+    });
   }));
   describe('app permission', withMocks({adb}, (mocks) => {
     const dumpedOutput = `

@@ -123,6 +123,9 @@ describe('adb commands', function () {
   it('should get screen size', async () => {
     (await adb.getScreenSize()).should.not.be.null;
   });
+  it('should get screen density', async() => {
+    (await adb.getScreenDensity()).should.not.be.null;
+  });
   it('should be able to toggle gps location provider', async () => {
     await adb.toggleGPSLocationProvider(true);
     (await adb.getLocationProviders()).should.include('gps');
