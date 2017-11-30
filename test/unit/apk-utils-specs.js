@@ -495,7 +495,7 @@ describe('Apk-utils', () => {
     });
     it('should return false when API 22', async() => {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
-      mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("fr");
+      mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("");
       mocks.adb.expects("getDeviceCountry").withExactArgs().once().returns("FR");
       (await adb.ensureCurrentLocale('en', 'US')).should.be.false;
       mocks.adb.verify();
@@ -508,7 +508,7 @@ describe('Apk-utils', () => {
     });
     it('should return false when API 23', async() => {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(23);
-      mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("fr-FR");
+      mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("");
       (await adb.ensureCurrentLocale('en', 'us')).should.be.false;
       mocks.adb.verify();
     });
@@ -560,7 +560,7 @@ describe('Apk-utils', () => {
       mocks.adb.expects("getDeviceLanguage").withExactArgs()
           .once().returns("fr");
       mocks.adb.expects("getDeviceCountry").withExactArgs()
-          .once().returns("FR");
+          .once().returns("");
       mocks.adb.expects("setDeviceLanguage").withExactArgs(language)
           .once().returns("");
       mocks.adb.expects("setDeviceCountry").withExactArgs(country)
