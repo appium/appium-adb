@@ -39,7 +39,7 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
 describe('adb commands', () => {
   let adb = new ADB();
   let logcat = new Logcat({
-    adb,
+    adb: adb.executable,
     debug: false,
     debugTrace: false
   });
