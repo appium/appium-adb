@@ -173,11 +173,11 @@ describe('signing', () => {
       (await adb.checkApkCert('dummyPath', 'dummyPackage')).should.be.false;
     });
 
-    it('should call exec and zipAlign when not using keystore', async function () {
+    it('should call exec when not using keystore', async function () {
       adb.useKeystore = false;
 
       mocks.helpers.expects("getApksignerForOs")
-        .returns(apksignerDummyPath);
+        .twice().returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
         .once().withExactArgs(apksignerDummyPath,
           ['verify', selendroidTestApp],
