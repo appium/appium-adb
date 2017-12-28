@@ -17,4 +17,5 @@ node_modules
 coverage
 coverage-e2e
 
-test/fixtures
+test
+build/test
