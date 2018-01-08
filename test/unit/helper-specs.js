@@ -1,28 +1,12 @@
-import { getDirectories, getAndroidPlatformAndPath,
+import { getAndroidPlatformAndPath,
          buildStartCmd, isShowingLockscreen } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
 import _ from 'lodash';
-import B from 'bluebird';
 
 
 describe('helpers', () => {
-  describe('getDirectories', withMocks({fs}, (mocks) => {
-    it('should sort the directories', async () => {
-      let rootPath = '/path/to/root';
-      let directories = ['c', 'b', 'a', '1', '2'];
-      mocks.fs.expects('readdir')
-        .once().withExactArgs(rootPath)
-        .returns(directories);
-      mocks.fs.expects('lstat')
-        .exactly(5)
-        .returns(B.resolve({isDirectory: () => {return true;}}));
-      (await getDirectories(rootPath)).should.eql(['1', '2', 'a', 'b', 'c']);
-      mocks.fs.verify();
-    });
-  }));
-
   describe('getAndroidPlatformAndPath', withMocks({fs}, (mocks) => {
     let oldAndroidHome;
     let oldResolve;

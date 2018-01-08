@@ -39,8 +39,7 @@
     "bluebird": "^3.4.7",
     "lodash": "^4.0.0",
     "source-map-support": "^0.4.8",
-    "teen_process": "^1.11.0",
-    "semver": "^5.4.1"
+    "teen_process": "^1.11.0"
   },
   "pre-commit": [
     "precommit-msg",
