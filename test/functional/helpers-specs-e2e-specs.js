@@ -14,8 +14,8 @@ function getFixture (file) {
 const apkPath = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
 chai.use(chaiAsPromised);
 
-describe('Helpers', () => {
-  it('getAndroidPlatformAndPath should return empty object when no ANDROID_HOME is set', async () => {
+describe('Helpers', function () {
+  it('getAndroidPlatformAndPath should return empty object when no ANDROID_HOME is set', async function () {
     let android_home = process.env.ANDROID_HOME;
     // temp setting android_home to null.
     delete process.env.ANDROID_HOME;
@@ -26,7 +26,7 @@ describe('Helpers', () => {
     process.env.ANDROID_HOME = android_home;
   });
 
-  it('getAndroidPlatformAndPath should return platform and path for android', async () => {
+  it('getAndroidPlatformAndPath should return platform and path for android', async function () {
     let {platform, platformPath} = await getAndroidPlatformAndPath();
     platform.should.exist;
     platformPath.should.exist;
@@ -36,8 +36,8 @@ describe('Helpers', () => {
     await assertZipArchive(apkPath);
   });
 
-  describe('unzipFile', () => {
-    it('should unzip a .zip file', async () => {
+  describe('unzipFile', function () {
+    it('should unzip a .zip file', async function () {
       const temp = await tempDir.openDir();
       await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
       await unzipFile(path.resolve(temp, 'TestZip.zip'));
@@ -45,7 +45,7 @@ describe('Helpers', () => {
       await fs.readFile(path.resolve(temp, 'TestZip', 'b.txt'), 'utf8').should.eventually.equal('Foobar');
     });
 
-    it('should unzip a .zip file (force isWindows to be true so we can test the internal zip library)', async () => {
+    it('should unzip a .zip file (force isWindows to be true so we can test the internal zip library)', async function () {
       const forceWindows = sinon.stub(system, 'isWindows', () => true);
       const temp = await tempDir.openDir();
       await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));

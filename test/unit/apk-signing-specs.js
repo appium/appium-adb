@@ -24,7 +24,7 @@ const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures', 'sel
       tempDir = appiumSupport.tempDir,
       fs = appiumSupport.fs;
 
-describe('signing', () => {
+describe('signing', function () {
   let adb = new ADB();
   adb.keystorePath = keystorePath;
   adb.keyAlias = keyAlias;

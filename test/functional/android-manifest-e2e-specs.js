@@ -20,21 +20,21 @@ const contactManagerPath = path.resolve(rootDir, 'test',
 
 chai.use(chaiAsPromised);
 
-describe('Android-manifest', async () => {
+describe('Android-manifest', async function () {
   let adb;
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
   });
-  it('packageAndLaunchActivityFromManifest should parse package and Activity', async () => {
+  it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
     apkPackage.should.equal('com.example.android.contactmanager');
     apkActivity.should.equal('com.example.android.contactmanager.ContactManager');
   });
-  it('hasInternetPermissionFromManifest should be true', async () => {
+  it('hasInternetPermissionFromManifest should be true', async function () {
     let flag = await adb.hasInternetPermissionFromManifest(contactMangerSelendroidPath);
     flag.should.be.true;
   });
-  it('hasInternetPermissionFromManifest should be false', async () => {
+  it('hasInternetPermissionFromManifest should be false', async function () {
     let flag = await adb.hasInternetPermissionFromManifest(contactManagerPath);
     flag.should.be.false;
   });
@@ -67,6 +67,6 @@ describe('Android-manifest', async () => {
   });
 });
 
-describe.skip('Android-manifest To be implemented methods', () => {
-  it('should return correct processFromManifest', async () => { });
+describe.skip('Android-manifest To be implemented methods', function () {
+  it('should return correct processFromManifest', async function () { });
 });

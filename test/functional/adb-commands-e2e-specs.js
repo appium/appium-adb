@@ -25,47 +25,47 @@ describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
   });
-  it('getApiLevel should get correct api level', async () => {
+  it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
   });
-  it('getPlatformVersion should get correct platform version', async () => {
+  it('getPlatformVersion should get correct platform version', async function () {
     (await adb.getPlatformVersion()).should.include(platformVersion);
   });
-  it('availableIMEs should get list of available IMEs', async () => {
+  it('availableIMEs should get list of available IMEs', async function () {
     (await adb.availableIMEs()).should.have.length.above(0);
   });
-  it('enabledIMEs should get list of enabled IMEs', async () => {
+  it('enabledIMEs should get list of enabled IMEs', async function () {
     (await adb.enabledIMEs()).should.have.length.above(0);
   });
-  it('defaultIME should get default IME', async () => {
+  it('defaultIME should get default IME', async function () {
     defaultIMEs.should.include(await adb.defaultIME());
   });
-  it('enableIME and disableIME should enable and disble IME', async () => {
+  it('enableIME and disableIME should enable and disble IME', async function () {
     await adb.disableIME(IME);
     (await adb.enabledIMEs()).should.not.include(IME);
     await adb.enableIME(IME);
     (await adb.enabledIMEs()).should.include(IME);
     await adb.enabledIMEs();
   });
-  it('processExists should be able to find ui process', async () => {
+  it('processExists should be able to find ui process', async function () {
     (await adb.processExists('com.android.systemui')).should.be.true;
   });
-  it('ping should return true', async () => {
+  it('ping should return true', async function () {
     (await adb.ping()).should.be.true;
   });
-  it('getPIDsByName should return pids', async () => {
+  it('getPIDsByName should return pids', async function () {
     (await adb.getPIDsByName('m.android.phone')).should.have.length.above(0);
   });
-  it('killProcessesByName should kill process', async () => {
+  it('killProcessesByName should kill process', async function () {
     await adb.install(contactManagerPath);
     await adb.startApp({pkg, activity});
     await adb.killProcessesByName(pkg);
     (await adb.getPIDsByName(pkg)).should.have.length(0);
   });
-  it('killProcessByPID should kill process', async () => {
+  it('killProcessByPID should kill process', async function () {
     await adb.install(contactManagerPath);
     await adb.startApp({pkg, activity});
     let pids = await adb.getPIDsByName(pkg);
@@ -98,41 +98,41 @@ describe('adb commands', function () {
 
     ['us', 'en', 'ca_en'].should.contain(await adb.getDeviceLocale());
   });
-  it('should forward the port', async () => {
+  it('should forward the port', async function () {
     await adb.forwardPort(4724, 4724);
   });
-  it('should remove forwarded port', async () => {
+  it('should remove forwarded port', async function () {
     await adb.forwardPort(8200, 6790);
     (await adb.adbExec([`forward`, `--list`])).should.contain('tcp:8200');
     await adb.removePortForward(8200);
     (await adb.adbExec([`forward`, `--list`])).should.not.contain('tcp:8200');
 
   });
-  it('should start logcat from adb', async () => {
+  it('should start logcat from adb', async function () {
     await adb.startLogcat();
     let logs = adb.logcat.getLogs();
     logs.should.have.length.above(0);
     await adb.stopLogcat();
   });
-  it('should get model', async () => {
+  it('should get model', async function () {
     (await adb.getModel()).should.not.be.null;
   });
-  it('should get manufacturer', async () => {
+  it('should get manufacturer', async function () {
     (await adb.getManufacturer()).should.not.be.null;
   });
-  it('should get screen size', async () => {
+  it('should get screen size', async function () {
     (await adb.getScreenSize()).should.not.be.null;
   });
-  it('should get screen density', async() => {
+  it('should get screen density', async function () {
     (await adb.getScreenDensity()).should.not.be.null;
   });
-  it('should be able to toggle gps location provider', async () => {
+  it('should be able to toggle gps location provider', async function () {
     await adb.toggleGPSLocationProvider(true);
     (await adb.getLocationProviders()).should.include('gps');
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
   });
-  it('should be able to toogle airplane mode', async () => {
+  it('should be able to toogle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
@@ -146,15 +146,15 @@ describe('adb commands', function () {
     await adb.setWifiState(false);
     (await adb.isWifiOn()).should.be.false;
   });
-  it('should be able to turn off animation @skip-ci', async () => {
+  it('should be able to turn off animation @skip-ci', async function () {
     await adb.setAnimationState(false);
     (await adb.isAnimationOn()).should.be.false;
   });
-  it('should be able to turn on animation @skip-ci', async () => {
+  it('should be able to turn on animation @skip-ci', async function () {
     await adb.setAnimationState(true);
     (await adb.isAnimationOn()).should.be.true;
   });
-  it('should be able to set device locale via setting app @skip-ci', async () => {
+  it('should be able to set device locale via setting app @skip-ci', async function () {
     // Operation not allowed: java.lang.SecurityException: Package io.appium.settings has not requested permission android.permission.CHANGE_CONFIGURATION
     // is shown if the setting apk is not updated.
     await adb.grantPermission('io.appium.settings', 'android.permission.CHANGE_CONFIGURATION');
@@ -165,7 +165,7 @@ describe('adb commands', function () {
     await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
     (await adb.getDeviceSysLocale()).should.equal('en-US');
   });
-  describe('app permissions', async () => {
+  describe('app permissions', async function () {
     before(async function () {
       let deviceApiLevel = await adb.getApiLevel();
       if (deviceApiLevel < 23) {
@@ -177,7 +177,7 @@ describe('adb commands', function () {
         await adb.uninstallApk('io.appium.android.apis');
       }
     });
-    it('should install and grant all permission', async () => {
+    it('should install and grant all permission', async function () {
       let apiDemos = path.resolve(rootDir, 'test',
           'fixtures', 'ApiDemos-debug.apk');
       await adb.install(apiDemos);
@@ -186,11 +186,11 @@ describe('adb commands', function () {
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
       expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.have.members(requestedPermissions);
     });
-    it('should revoke permission', async () => {
+    it('should revoke permission', async function () {
       await adb.revokePermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
       expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.not.have.members(['android.permission.RECEIVE_SMS']);
     });
-    it('should grant permission', async () => {
+    it('should grant permission', async function () {
       await adb.grantPermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
       expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.include.members(['android.permission.RECEIVE_SMS']);
     });

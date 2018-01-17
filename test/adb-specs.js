@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
-describe.skip('ADB To be implemented methods', () => {
+describe.skip('ADB To be implemented methods', function () {
 
   //it('processFromManifest', async () => { });
   //it('packageAndLaunchActivityFromManifest', async () => { });
@@ -41,18 +41,18 @@ describe.skip('ADB To be implemented methods', () => {
 //  it('setEmulatorPort', async () => { });
 //  it('waitForDevice', async () => { });
 //  it('restartAdb', async () => { });
-  it('restart', async () => { });
-  it('stopLogcatstartLogcat', async () => { });
-  it('getLogcatLogs', async () => { });
-  it('getPIDsByName', async () => { });
-  it('killProcessesByName', async () => { });
-  it('killProcessByPID', async () => { });
+  it('restart', async function () { });
+  it('stopLogcatstartLogcat', async function () { });
+  it('getLogcatLogs', async function () { });
+  it('getPIDsByName', async function () { });
+  it('killProcessesByName', async function () { });
+  it('killProcessByPID', async function () { });
 //  it('startApp', async () => { });
   //it('isValidClass', async () => { });
-  it('broadcastProcessEnd', async () => { });
-  it('broadcast', async () => { });
-  it('endAndroidCoverage', async () => { });
-  it('androidCoverage', async () => { });
+  it('broadcastProcessEnd', async function () { });
+  it('broadcast', async function () { });
+  it('endAndroidCoverage', async function () { });
+  it('androidCoverage', async function () { });
 //  it('getFocusedPackageAndActivity', async () => { });
 //  it('waitForActivityOrNot', async () => { });
 //  it('waitForActivity', async () => { });
@@ -61,7 +61,7 @@ describe.skip('ADB To be implemented methods', () => {
 //  it('installRemote', async () => { });
 //  it('install', async () => { });
 //  it('mkdir', async () => { });
-  it('instrument', async () => { });
+  it('instrument', async function () { });
   // TODO should deprecate not used in appium
 //  it('checkAndSignApk', async () => { });
 //  it('forceStop', async () => { });
@@ -90,6 +90,6 @@ describe.skip('ADB To be implemented methods', () => {
 //  it('disableIME', async () => { });
 //  it('setIME', async () => { });
   //it('hasInternetPermissionFromManifest', async () => { });
-  it('reboot', async () => { });
+  it('reboot', async function () { });
 //  it('getAdbServerPort', async () => { });
 });
