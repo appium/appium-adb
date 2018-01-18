@@ -36,16 +36,16 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
       manufacturer = `unknown`,
       screenSize = `768x1280`;
 
-describe('adb commands', () => {
+describe('adb commands', function () {
   let adb = new ADB();
   let logcat = new Logcat({
     adb: adb.executable,
     debug: false,
     debugTrace: false
   });
-  describe('shell', () => {
+  describe('shell', function () {
     describe('getApiLevel', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("getDeviceProperty")
           .once().withExactArgs('ro.build.version.sdk')
           .returns(`${apiLevel}`);
@@ -54,7 +54,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getPlatformVersion', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("getDeviceProperty")
           .once().withExactArgs('ro.build.version.release')
           .returns(platformVersion);
@@ -63,7 +63,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceSysLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'persist.sys.language'])
           .returns(language);
@@ -72,7 +72,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setDeviceSysLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['setprop', 'persist.sys.language', language])
           .returns("");
@@ -81,7 +81,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceSysCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'persist.sys.country'])
           .returns(country);
@@ -90,7 +90,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getLocationProviders', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and return empty location_providers_allowed', async () => {
+      it('should call shell with correct args and return empty location_providers_allowed', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('');
@@ -99,7 +99,7 @@ describe('adb commands', () => {
         providers.length.should.equal(0);
         mocks.adb.verify();
       });
-      it('should return one location_providers_allowed', async () => {
+      it('should return one location_providers_allowed', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('gps');
@@ -109,7 +109,7 @@ describe('adb commands', () => {
         providers.should.include('gps');
         mocks.adb.verify();
       });
-      it('should return both location_providers_allowed', async () => {
+      it('should return both location_providers_allowed', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('gps ,wifi');
@@ -122,7 +122,7 @@ describe('adb commands', () => {
       });
     }));
     describe('toggleGPSLocationProvider', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args on gps enabled', async () => {
+      it('should call shell with correct args on gps enabled', async function () {
         mocks.adb.expects("setSetting")
           .withExactArgs('secure', 'location_providers_allowed', '+gps');
         mocks.adb.expects("setSetting")
@@ -133,7 +133,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setDeviceSysCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['setprop', 'persist.sys.country', country])
           .returns("");
@@ -142,7 +142,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceSysLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'persist.sys.locale'])
           .returns(locale);
@@ -151,7 +151,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setDeviceSysLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
           .returns("");
@@ -160,7 +160,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceProductLanguage', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.product.locale.language'])
           .returns(language);
@@ -169,7 +169,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceProductCountry', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.product.locale.region'])
           .returns(country);
@@ -178,7 +178,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getDeviceProductLocale', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.product.locale'])
           .returns(locale);
@@ -187,7 +187,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setDeviceProperty', withMocks({adb}, (mocks) => {
-      it('should call setprop with correct args without root', async () => {
+      it('should call setprop with correct args without root', async function () {
         mocks.adb.expects("getApiLevel")
           .once().returns(21);
         mocks.adb.expects("shell")
@@ -196,7 +196,7 @@ describe('adb commands', () => {
         await adb.setDeviceProperty('persist.sys.locale', locale);
         mocks.adb.verify();
       });
-      it('should call setprop with correct args with root', async () => {
+      it('should call setprop with correct args with root', async function () {
         mocks.adb.expects("getApiLevel")
           .once().returns(26);
         mocks.adb.expects("root")
@@ -211,7 +211,7 @@ describe('adb commands', () => {
       });
     }));
     describe('availableIMEs', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'list', '-a'])
           .returns(imeList);
@@ -220,7 +220,7 @@ describe('adb commands', () => {
       });
     }));
     describe('enabledIMEs', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'list'])
           .returns(imeList);
@@ -230,7 +230,7 @@ describe('adb commands', () => {
     }));
     describe('defaultIME', withMocks({adb}, (mocks) => {
       let defaultIME = 'com.android.inputmethod.latin/.LatinIME';
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('secure', 'default_input_method')
           .returns(defaultIME);
@@ -239,7 +239,7 @@ describe('adb commands', () => {
       });
     }));
     describe('disableIME', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'disable', IME])
           .returns("");
@@ -248,7 +248,7 @@ describe('adb commands', () => {
       });
     }));
     describe('enableIME', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ime', 'enable', IME])
           .returns("");
@@ -257,7 +257,7 @@ describe('adb commands', () => {
       });
     }));
     describe('keyevent', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         let keycode = '29';
         let code = parseInt(keycode, 10);
         mocks.adb.expects("shell")
@@ -268,7 +268,7 @@ describe('adb commands', () => {
       });
     }));
     describe('inputText', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         let text = 'some text with spaces';
         let expectedText = 'some%stext%swith%sspaces';
         mocks.adb.expects("shell")
@@ -279,7 +279,7 @@ describe('adb commands', () => {
       });
     }));
     describe('clearTextField', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['input', 'keyevent', '67', '112', '67', '112', '67', '112', '67', '112'])
           .returns("");
@@ -288,7 +288,7 @@ describe('adb commands', () => {
       });
     }));
     describe('lock', withMocks({adb, log}, (mocks) => {
-      it('should call isScreenLocked, keyevent and errorAndThrow', async () => {
+      it('should call isScreenLocked, keyevent and errorAndThrow', async function () {
         mocks.adb.expects("isScreenLocked")
           .atLeast(2).returns(false);
         mocks.adb.expects("keyevent")
@@ -301,7 +301,7 @@ describe('adb commands', () => {
       });
     }));
     describe('back', withMocks({adb}, (mocks) => {
-      it('should call keyevent with correct args', async () => {
+      it('should call keyevent with correct args', async function () {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(4)
           .returns("");
@@ -310,7 +310,7 @@ describe('adb commands', () => {
       });
     }));
     describe('goToHome', withMocks({adb}, (mocks) => {
-      it('should call keyevent with correct args', async () => {
+      it('should call keyevent with correct args', async function () {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(3)
           .returns("");
@@ -319,7 +319,7 @@ describe('adb commands', () => {
       });
     }));
     describe.skip('isScreenLocked', withMocks({adb}, (mocks) => {
-      it('should call keyevent with correct args', async () => {
+      it('should call keyevent with correct args', async function () {
         mocks.adb.expects("keyevent")
           .once().withExactArgs(3)
           .returns("");
@@ -328,7 +328,7 @@ describe('adb commands', () => {
       });
     }));
     describe('isSoftKeyboardPresent', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should return false', async () => {
+      it('should call shell with correct args and should return false', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['dumpsys', 'input_method'])
           .returns("mInputShown=false");
@@ -337,7 +337,7 @@ describe('adb commands', () => {
         isKeyboardShown.should.be.false;
         mocks.adb.verify();
       });
-      it('should call shell with correct args and should return true', async () => {
+      it('should call shell with correct args and should return true', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['dumpsys', 'input_method'])
           .returns("mInputShown=true mIsInputViewShown=true");
@@ -348,14 +348,14 @@ describe('adb commands', () => {
       });
     }));
     describe('isAirplaneModeOn', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should be true', async () => {
+      it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'airplane_mode_on')
           .returns("1");
         (await adb.isAirplaneModeOn()).should.be.true;
         mocks.adb.verify();
       });
-      it('should call shell with correct args and should be false', async () => {
+      it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'airplane_mode_on')
           .returns("0");
@@ -364,7 +364,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setAirplaneMode', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("setSetting")
           .once().withExactArgs('global', 'airplane_mode_on', 1)
           .returns("");
@@ -373,7 +373,7 @@ describe('adb commands', () => {
       });
     }));
     describe('broadcastAirplaneMode', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args', async () => {
+      it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE', '--ez', 'state', 'true'])
           .returns("");
@@ -382,14 +382,14 @@ describe('adb commands', () => {
       });
     }));
     describe('isWifiOn', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should be true', async () => {
+      it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'wifi_on')
           .returns("1");
         (await adb.isWifiOn()).should.be.true;
         mocks.adb.verify();
       });
-      it('should call shell with correct args and should be false', async () => {
+      it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'wifi_on')
           .returns("0");
@@ -398,7 +398,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setWifiState', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args for real device', async () => {
+      it('should call shell with correct args for real device', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
             '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
@@ -407,7 +407,7 @@ describe('adb commands', () => {
         await adb.setWifiState(true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args for emulator', async () => {
+      it('should call shell with correct args for emulator', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
@@ -416,14 +416,14 @@ describe('adb commands', () => {
       });
     }));
     describe('isDataOn', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should be true', async () => {
+      it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'mobile_data')
           .returns("1");
         (await adb.isDataOn()).should.be.true;
         mocks.adb.verify();
       });
-      it('should call shell with correct args and should be false', async () => {
+      it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects("getSetting")
           .once().withExactArgs('global', 'mobile_data')
           .returns("0");
@@ -432,7 +432,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setDataState', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args for real device', async () => {
+      it('should call shell with correct args for real device', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
@@ -441,7 +441,7 @@ describe('adb commands', () => {
         await adb.setDataState(false);
         mocks.adb.verify();
       });
-      it('should call shell with correct args for emulator', async () => {
+      it('should call shell with correct args for emulator', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
@@ -450,7 +450,7 @@ describe('adb commands', () => {
       });
     }));
     describe('setWifiAndData', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args when turning only wifi on for real device', async () => {
+      it('should call shell with correct args when turning only wifi on for real device', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
             '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
@@ -459,21 +459,21 @@ describe('adb commands', () => {
         await adb.setWifiAndData({wifi: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only wifi off for emulator', async () => {
+      it('should call shell with correct args when turning only wifi off for emulator', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
         await adb.setWifiAndData({wifi: false}, true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only data on for emulator', async () => {
+      it('should call shell with correct args when turning only data on for emulator', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
         await adb.setWifiAndData({data: true}, true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning only data off for real device', async () => {
+      it('should call shell with correct args when turning only data off for real device', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
@@ -482,12 +482,12 @@ describe('adb commands', () => {
         await adb.setWifiAndData({data: false});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning both wifi and data on for real device', async () => {
+      it('should call shell with correct args when turning both wifi and data on for real device', async function () {
         mocks.adb.expects("shell").twice().returns("");
         await adb.setWifiAndData({wifi: true, data: true});
         mocks.adb.verify();
       });
-      it('should call shell with correct args when turning both wifi and data off for emulator', async () => {
+      it('should call shell with correct args when turning both wifi and data off for emulator', async function () {
         mocks.adb.expects("shell").twice().returns("");
         await adb.setWifiAndData({wifi: false, data: false}, true);
         mocks.adb.verify();
@@ -497,12 +497,12 @@ describe('adb commands', () => {
       const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.animation',
                       '-n', 'io.appium.settings/.receivers.AnimationSettingReceiver',
                       '--es', 'setstatus'];
-      it('should call shell with correct args to enable animation', async () => {
+      it('should call shell with correct args to enable animation', async function () {
         mocks.adb.expects("shell").once().withExactArgs(adbArgs.concat('enable'));
         await adb.setAnimationState(true);
         mocks.adb.verify();
       });
-      it('should call shell with correct args to disable animation', async () => {
+      it('should call shell with correct args to disable animation', async function () {
         mocks.adb.expects("shell").once().withExactArgs(adbArgs.concat('disable'));
         await adb.setAnimationState(false);
         mocks.adb.verify();
@@ -517,22 +517,22 @@ describe('adb commands', () => {
         mocks.adb.expects("getSetting").once().withExactArgs('global', 'window_animation_scale')
           .returns(window_scale);
       };
-      it('should return false if all animation settings are equal to zero', async () => {
+      it('should return false if all animation settings are equal to zero', async function () {
         await mockSetting("0.0", "0.0", "0.0");
         (await adb.isAnimationOn()).should.be.false;
         mocks.adb.verify();
       });
-      it('should return true if animator_duration_scale setting is NOT equal to zero', async () => {
+      it('should return true if animator_duration_scale setting is NOT equal to zero', async function () {
         await mockSetting("0.5", "0.0", "0.0");
         (await adb.isAnimationOn()).should.be.true;
         mocks.adb.verify();
       });
-      it('should return true if transition_animation_scale setting is NOT equal to zero', async () => {
+      it('should return true if transition_animation_scale setting is NOT equal to zero', async function () {
         await mockSetting("0.0", "0.5", "0.0");
         (await adb.isAnimationOn()).should.be.true;
         mocks.adb.verify();
       });
-      it('should return true if window_animation_scale setting is NOT equal to zero', async () => {
+      it('should return true if window_animation_scale setting is NOT equal to zero', async function () {
         await mockSetting("0.0", "0.0", "0.5");
         (await adb.isAnimationOn()).should.be.true;
         mocks.adb.verify();
@@ -542,7 +542,7 @@ describe('adb commands', () => {
       const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.locale',
         '-n', 'io.appium.settings/.receivers.LocaleSettingReceiver',
         '--es', 'lang', 'en', '--es', 'country', 'US'];
-      it('should call shell with locale settings', async () => {
+      it('should call shell with locale settings', async function () {
         mocks.adb.expects("shell").once().withExactArgs(adbArgs);
         await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
         mocks.adb.verify();
@@ -552,7 +552,7 @@ describe('adb commands', () => {
       const location = {longitude: '50.5',
                         latitude: '50.1'};
 
-      it('should call shell with correct args for real device', async () => {
+      it('should call shell with correct args for real device', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'startservice', '-e', 'longitude', location.longitude,
                                  '-e', 'latitude', location.latitude, `io.appium.settings/.LocationService`])
@@ -560,7 +560,7 @@ describe('adb commands', () => {
         await adb.setGeoLocation(location);
         mocks.adb.verify();
       });
-      it('should call adb with correct args for emulator', async () => {
+      it('should call adb with correct args for emulator', async function () {
         mocks.adb.expects("resetTelnetAuthToken")
           .once().returns(true);
         mocks.adb.expects("adbExec")
@@ -575,14 +575,14 @@ describe('adb commands', () => {
       });
     }));
     describe('processExists', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should find process', async () => {
+      it('should call shell with correct args and should find process', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs("ps")
           .returns(psOutput);
         (await adb.processExists(contactManagerPackage)).should.be.true;
         mocks.adb.verify();
       });
-      it('should call shell with correct args and should not find process', async () => {
+      it('should call shell with correct args and should not find process', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs("ps")
           .returns("foo");
@@ -593,21 +593,21 @@ describe('adb commands', () => {
     describe('forwardPort', withMocks({adb}, (mocks) => {
       const sysPort = 12345,
             devicePort = 54321;
-      it('forwardPort should call shell with correct args', async () => {
+      it('forwardPort should call shell with correct args', async function () {
         mocks.adb.expects("adbExec")
           .once().withExactArgs(['forward', `tcp:${sysPort}`, `tcp:${devicePort}`])
           .returns("");
         await adb.forwardPort(sysPort, devicePort);
         mocks.adb.verify();
       });
-      it('forwardAbstractPort should call shell with correct args', async () => {
+      it('forwardAbstractPort should call shell with correct args', async function () {
         mocks.adb.expects("adbExec")
           .once().withExactArgs(['forward', `tcp:${sysPort}`, `localabstract:${devicePort}`])
           .returns("");
         await adb.forwardAbstractPort(sysPort, devicePort);
         mocks.adb.verify();
       });
-      it('removePortForward should call shell with correct args', async () => {
+      it('removePortForward should call shell with correct args', async function () {
         mocks.adb.expects("adbExec")
             .once().withExactArgs(['forward', `--remove`, `tcp:${sysPort}`])
             .returns("");
@@ -616,7 +616,7 @@ describe('adb commands', () => {
       });
     }));
     describe('ping', withMocks({adb}, (mocks) => {
-      it('should call shell with correct args and should return true', async () => {
+      it('should call shell with correct args and should return true', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(["echo", "ping"])
           .returns("ping");
@@ -625,7 +625,7 @@ describe('adb commands', () => {
       });
     }));
     describe('restart', withMocks({adb}, (mocks) => {
-      it('should call adb in correct order', async () => {
+      it('should call adb in correct order', async function () {
         mocks.adb.expects("stopLogcat").once().returns("");
         mocks.adb.expects("restartAdb").once().returns("");
         mocks.adb.expects("waitForDevice").once().returns("");
@@ -635,7 +635,7 @@ describe('adb commands', () => {
       });
     }));
     describe('stopLogcat', withMocks({logcat}, (mocks) => {
-      it('should call stopCapture', async () => {
+      it('should call stopCapture', async function () {
         adb.logcat = logcat;
         mocks.logcat.expects("stopCapture").once().returns("");
         await adb.stopLogcat();
@@ -643,7 +643,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getLogcatLogs', withMocks({logcat}, (mocks) => {
-      it('should call getLogs', async () => {
+      it('should call getLogs', async function () {
         adb.logcat = logcat;
         mocks.logcat.expects("getLogs").once().returns("");
         await adb.getLogcatLogs();
@@ -651,7 +651,7 @@ describe('adb commands', () => {
       });
     }));
     describe('getPIDsByName', withMocks({adb}, (mocks) => {
-      it('should call shell and parse pids correctly', async () => {
+      it('should call shell and parse pids correctly', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['ps'])
           .returns(psOutput);
@@ -660,7 +660,7 @@ describe('adb commands', () => {
       });
     }));
     describe('killProcessesByName', withMocks({adb}, (mocks) => {
-      it('should call getPIDsByName and kill process correctly', async () => {
+      it('should call getPIDsByName and kill process correctly', async function () {
         mocks.adb.expects("getPIDsByName")
           .once().withExactArgs(contactManagerPackage)
           .returns([5078]);
@@ -674,7 +674,7 @@ describe('adb commands', () => {
     describe('killProcessByPID', withMocks({adb}, (mocks) => {
       const pid = 5078;
 
-      it('should call kill process correctly', async () => {
+      it('should call kill process correctly', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['kill', '-0', pid])
           .returns('');
@@ -690,7 +690,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
 
-      it('should force kill process if normal kill fails', async () => {
+      it('should force kill process if normal kill fails', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['kill', '-0', pid])
           .returns('');
@@ -704,7 +704,7 @@ describe('adb commands', () => {
         mocks.adb.verify();
       });
 
-      it('should throw an error if a process with given ID does not exist', async () => {
+      it('should throw an error if a process with given ID does not exist', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['kill', '-0', pid])
           .throws();
@@ -713,7 +713,7 @@ describe('adb commands', () => {
       });
     }));
     describe('broadcastProcessEnd', withMocks({adb}, (mocks) => {
-      it('should broadcast process end', async () => {
+      it('should broadcast process end', async function () {
         let intent = 'intent',
             processName = 'processName';
         mocks.adb.expects("shell")
@@ -727,7 +727,7 @@ describe('adb commands', () => {
       });
     }));
     describe('broadcast', withMocks({adb}, (mocks) => {
-      it('should broadcast intent', async () => {
+      it('should broadcast intent', async function () {
         let intent = 'intent';
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', intent])
@@ -737,7 +737,7 @@ describe('adb commands', () => {
       });
     }));
     describe('instrument', withMocks({adb}, (mocks) => {
-      it('should call shell with correct arguments', async () => {
+      it('should call shell with correct arguments', async function () {
         let intent = 'intent';
         mocks.adb.expects("shell")
           .once().withExactArgs(['am', 'broadcast', '-a', intent])
@@ -747,7 +747,7 @@ describe('adb commands', () => {
       });
     }));
     describe('androidCoverage', withMocks({adb, teen_process}, (mocks) => {
-      it('should call shell with correct arguments', async () => {
+      it('should call shell with correct arguments', async function () {
         adb.executable.defaultArgs = [];
         adb.executable.path = "dummy_adb_path";
         let conn = new events.EventEmitter();
@@ -771,28 +771,28 @@ describe('adb commands', () => {
     }));
   });
   describe('device info', withMocks({adb}, (mocks) => {
-    it('should get device model', async () => {
+    it('should get device model', async function () {
       mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.product.model'])
           .returns(model);
       await adb.getModel();
       mocks.adb.verify();
     });
-    it('should get device manufacturer', async () => {
+    it('should get device manufacturer', async function () {
       mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'ro.product.manufacturer'])
           .returns(manufacturer);
       await adb.getManufacturer();
       mocks.adb.verify();
     });
-    it('should get device screen size', async () => {
+    it('should get device screen size', async function () {
       mocks.adb.expects("shell")
           .once().withExactArgs(['wm', 'size'])
           .returns(screenSize);
       await adb.getScreenSize();
       mocks.adb.verify();
     });
-    it('should get device screen density', async () => {
+    it('should get device screen density', async function () {
       mocks.adb.expects("shell")
           .once().withExactArgs(['wm', 'density'])
           .returns("Physical density: 420");
@@ -800,7 +800,7 @@ describe('adb commands', () => {
       density.should.equal(420);
       mocks.adb.verify();
     });
-    it('should return null for invalid screen density', async () => {
+    it('should return null for invalid screen density', async function () {
       mocks.adb.expects("shell")
           .once().withExactArgs(['wm', 'density'])
           .returns("Physical density: unknown");
@@ -871,19 +871,19 @@ describe('adb commands', () => {
       ACTIVITY MANAGER PENDING INTENTS (dumpsys activity intents)
         (nothing)`;
 
-    it('should grant requested permission', async () => {
+    it('should grant requested permission', async function () {
       mocks.adb.expects("shell")
           .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
       await adb.grantPermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
       mocks.adb.verify();
     });
-    it('should revoke requested permission', async () => {
+    it('should revoke requested permission', async function () {
       mocks.adb.expects("shell")
           .once().withArgs(['pm', 'revoke', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
       await adb.revokePermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
       mocks.adb.verify();
     });
-    it('should properly list requested permissions', async () => {
+    it('should properly list requested permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getReqPermissions('io.appium.android');
       for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
@@ -904,7 +904,7 @@ describe('adb commands', () => {
         result.should.include(perm);
       }
     });
-    it('should properly list granted permissions', async () => {
+    it('should properly list granted permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getGrantedPermissions('io.appium.android');
       for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
@@ -927,7 +927,7 @@ describe('adb commands', () => {
         result.should.not.include(perm);
       }
     });
-    it('should properly list denied permissions', async () => {
+    it('should properly list denied permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getDeniedPermissions('io.appium.android');
       for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
@@ -952,7 +952,7 @@ describe('adb commands', () => {
     });
   }));
   describe('sendTelnetCommand', withMocks({adb, net}, (mocks) => {
-    it('should call shell with correct args', async () => {
+    it('should call shell with correct args', async function () {
       const port = 54321;
       let conn = new events.EventEmitter();
       let commands = [];
@@ -978,7 +978,7 @@ describe('adb commands', () => {
       mocks.adb.verify();
       mocks.net.verify();
     });
-    it('should return the last line of the output only', async () => {
+    it('should return the last line of the output only', async function () {
       const port = 54321;
       let conn = new events.EventEmitter();
       let commands = [];
@@ -1002,7 +1002,7 @@ describe('adb commands', () => {
       let actual = await p;
       (actual).should.equal(expected);
     });
-    it('should throw error if network connection errors', async () => {
+    it('should throw error if network connection errors', async function () {
       const port = 54321;
       let conn = new events.EventEmitter();
       let commands = [];
@@ -1026,21 +1026,21 @@ describe('adb commands', () => {
       await p.should.eventually.be.rejectedWith(/ouch/);
     });
   }));
-  it('isValidClass should correctly validate class names', () => {
+  it('isValidClass should correctly validate class names', function () {
     adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
     should.not.exist(adb.isValidClass('illegalPackage#/adsasd'));
   });
-  it('getAdbPath should correctly return adbPath', () => {
+  it('getAdbPath should correctly return adbPath', function () {
     adb.getAdbPath().should.equal(adb.executable.path);
   });
   describe('setHttpProxy', withMocks({adb}, (mocks) => {
-    it('should throw an error on undefined proxy_host', async () => {
+    it('should throw an error on undefined proxy_host', async function () {
       await adb.setHttpProxy().should.eventually.be.rejected;
     });
-    it('should throw an error on undefined proxy_port', async () => {
+    it('should throw an error on undefined proxy_port', async function () {
       await adb.setHttpProxy("http://localhost").should.eventually.be.rejected;
     });
-    it('should call setSetting method with correct args', async () => {
+    it('should call setSetting method with correct args', async function () {
       let proxyHost = "http://localhost";
       let proxyPort = 4723;
       mocks.adb.expects('setSetting').once().withExactArgs('global', 'http_proxy', `${proxyHost}:${proxyPort}`);
@@ -1053,7 +1053,7 @@ describe('adb commands', () => {
     });
   }));
   describe('setSetting', withMocks({adb}, (mocks) => {
-    it('should call shell settings put', async () => {
+    it('should call shell settings put', async function () {
       mocks.adb.expects('shell').once()
         .withExactArgs(['settings', 'put', 'namespace', 'setting', 'value']);
       await adb.setSetting('namespace', 'setting', 'value');
@@ -1061,7 +1061,7 @@ describe('adb commands', () => {
     });
   }));
   describe('getSetting', withMocks({adb}, (mocks) => {
-    it('should call shell settings get', async () => {
+    it('should call shell settings get', async function () {
       mocks.adb.expects('shell').once()
         .withExactArgs(['settings', 'get', 'namespace', 'setting'])
         .returns('value');

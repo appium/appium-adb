@@ -21,10 +21,10 @@ const should = chai.should(),
       country = 'US',
       locale = 'en-US';
 
-describe('Apk-utils', () => {
+describe('Apk-utils', function () {
   let adb = new ADB();
   describe('isAppInstalled', withMocks({adb}, (mocks) => {
-    it('should parse correctly and return true', async () => {
+    it('should parse correctly and return true', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'list', 'packages', pkg])
@@ -32,7 +32,7 @@ describe('Apk-utils', () => {
       (await adb.isAppInstalled(pkg)).should.be.true;
       mocks.adb.verify();
     });
-    it('should parse correctly and return false', async () => {
+    it('should parse correctly and return false', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'list', 'packages', pkg])
@@ -42,7 +42,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getFocusedPackageAndActivity', withMocks({adb}, (mocks) => {
-    it('should parse correctly and return package and activity', async () => {
+    it('should parse correctly and return package and activity', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -53,7 +53,7 @@ describe('Apk-utils', () => {
       appActivity.should.equal(act);
       mocks.adb.verify();
     });
-    it('should parse correctly and return package and activity when a comma is present', async () => {
+    it('should parse correctly and return package and activity when a comma is present', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{20fe217e token=Token{21878739 ` +
@@ -64,7 +64,7 @@ describe('Apk-utils', () => {
       appActivity.should.equal(act);
       mocks.adb.verify();
     });
-    it('should parse correctly and return null', async () => {
+    it('should parse correctly and return null', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns('mFocusedApp=null');
@@ -75,7 +75,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('waitForActivityOrNot', withMocks({adb}, (mocks) => {
-    it('should call shell once and should return', async () => {
+    it('should call shell once and should return', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -84,7 +84,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, act, false);
       mocks.adb.verify();
     });
-    it('should call shell multiple times and return', async () => {
+    it('should call shell multiple times and return', async function () {
       mocks.adb.expects('shell').onCall(0)
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
                  'ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
@@ -95,7 +95,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, act, false);
       mocks.adb.verify();
     });
-    it('should call shell once return for not', async () => {
+    it('should call shell once return for not', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
@@ -104,7 +104,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, act, true);
       mocks.adb.verify();
     });
-    it('should call shell multiple times and return for not', async () => {
+    it('should call shell multiple times and return for not', async function () {
       mocks.adb.expects('shell').onCall(0)
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/${act} t181}}}`);
@@ -114,7 +114,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, act, true);
       mocks.adb.verify();
     });
-    it('should be able to get first of a comma-separated list of activities', async () => {
+    it('should be able to get first of a comma-separated list of activities', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -123,7 +123,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.ContactManager, .OtherManager', false);
       mocks.adb.verify();
     });
-    it('should be able to get second of a comma-separated list of activities', async () => {
+    it('should be able to get second of a comma-separated list of activities', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -132,7 +132,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.ContactManager, .OtherManager', false);
       mocks.adb.verify();
     });
-    it('should fail if no activity in a comma-separated list is available', async () => {
+    it('should fail if no activity in a comma-separated list is available', async function () {
       mocks.adb.expects('shell')
         .atLeast(1)
         .withExactArgs(['dumpsys', 'window', 'windows'])
@@ -143,7 +143,7 @@ describe('Apk-utils', () => {
         .should.eventually.be.rejected;
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity is a wildcard', async () => {
+    it('should be able to match activities if waitActivity is a wildcard', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -152,7 +152,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `*`, false);
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity is shortened and contains a whildcard', async () => {
+    it('should be able to match activities if waitActivity is shortened and contains a whildcard', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -161,7 +161,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `.*Manager`, false);
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity contains a wildcard alternative to activity', async () => {
+    it('should be able to match activities if waitActivity contains a wildcard alternative to activity', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -170,7 +170,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `${pkg}.*`, false);
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity contains a wildcard on head', async () => {
+    it('should be able to match activities if waitActivity contains a wildcard on head', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -179,7 +179,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `*.contactmanager.ContactManager`, false);
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity contains a wildcard across a pkg name and an activity name', async () => {
+    it('should be able to match activities if waitActivity contains a wildcard across a pkg name and an activity name', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -188,7 +188,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `com.*Manager`, false);
       mocks.adb.verify();
     });
-    it('should be able to match activities if waitActivity contains wildcards in both a pkg name and an activity name', async () => {
+    it('should be able to match activities if waitActivity contains wildcards in both a pkg name and an activity name', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -197,7 +197,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, `com.*.contactmanager.*Manager`, false);
       mocks.adb.verify();
     });
-    it('should fail if activity not to match from regexp activities', async () => {
+    it('should fail if activity not to match from regexp activities', async function () {
       mocks.adb.expects('shell')
         .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -207,7 +207,7 @@ describe('Apk-utils', () => {
         .should.eventually.be.rejected;
       mocks.adb.verify();
     });
-    it('should be able to get an activity that is an inner class', async () => {
+    it('should be able to get an activity that is an inner class', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -216,7 +216,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot(pkg, '.Settings$AppDrawOverlaySettingsActivity', false);
       mocks.adb.verify();
     });
-    it('should be able to get first activity from first package in a comma-separated list of packages + activities', async () => {
+    it('should be able to get first activity from first package in a comma-separated list of packages + activities', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -225,7 +225,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
       mocks.adb.verify();
     });
-    it('should be able to get first activity from second package in a comma-separated list of packages + activities', async () => {
+    it('should be able to get first activity from second package in a comma-separated list of packages + activities', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -234,7 +234,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
       mocks.adb.verify();
     });
-    it('should be able to get second activity from first package in a comma-separated list of packages + activities', async () => {
+    it('should be able to get second activity from first package in a comma-separated list of packages + activities', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -243,7 +243,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
       mocks.adb.verify();
     });
-    it('should be able to get second activity from second package in a comma-separated list of packages', async () => {
+    it('should be able to get second activity from second package in a comma-separated list of packages', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -252,7 +252,7 @@ describe('Apk-utils', () => {
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
       mocks.adb.verify();
     });
-    it('should fail to get activity when focused activity matches none of the provided list of packages', async () => {
+    it('should fail to get activity when focused activity matches none of the provided list of packages', async function () {
       mocks.adb.expects('shell')
         .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
@@ -264,7 +264,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('waitForActivity', withMocks({adb}, (mocks) => {
-    it('should call waitForActivityOrNot with correct arguments', async () => {
+    it('should call waitForActivityOrNot with correct arguments', async function () {
       mocks.adb.expects('waitForActivityOrNot')
         .once().withExactArgs(pkg, act, false, 20000)
         .returns('');
@@ -273,7 +273,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('waitForNotActivity', withMocks({adb}, (mocks) => {
-    it('should call waitForActivityOrNot with correct arguments', async () => {
+    it('should call waitForActivityOrNot with correct arguments', async function () {
       mocks.adb.expects('waitForActivityOrNot')
         .once().withExactArgs(pkg, act, true, 20000)
         .returns('');
@@ -282,7 +282,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('uninstallApk', withMocks({adb}, (mocks) => {
-    it('should call forceStop and adbExec with correct arguments', async () => {
+    it('should call forceStop and adbExec with correct arguments', async function () {
       mocks.adb.expects('isAppInstalled')
         .once().withExactArgs(pkg)
         .returns(true);
@@ -295,7 +295,7 @@ describe('Apk-utils', () => {
       (await adb.uninstallApk(pkg)).should.be.true;
       mocks.adb.verify();
     });
-    it('should not call forceStop and adbExec if app not installed', async () => {
+    it('should not call forceStop and adbExec if app not installed', async function () {
       mocks.adb.expects('isAppInstalled')
         .once().withExactArgs(pkg)
         .returns(false);
@@ -308,7 +308,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('installFromDevicePath', withMocks({adb}, (mocks) => {
-    it('should call forceStop and adbExec with correct arguments', async () => {
+    it('should call forceStop and adbExec with correct arguments', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
@@ -317,14 +317,14 @@ describe('Apk-utils', () => {
     });
   }));
   describe('install', withMocks({adb}, (mocks) => {
-    it('should call forceStop and adbExec with correct arguments', async () => {
+    it('should call forceStop and adbExec with correct arguments', async function () {
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
         .returns('');
       (await adb.install('foo'));
       mocks.adb.verify();
     });
-    it('should call forceStop and adbExec with correct arguments when not replacing', async () => {
+    it('should call forceStop and adbExec with correct arguments when not replacing', async function () {
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', 'foo'], {timeout: 60000})
         .returns('');
@@ -333,11 +333,11 @@ describe('Apk-utils', () => {
     });
   }));
   describe('startUri', withMocks({adb}, (mocks) => {
-    it('should fail if uri or pkg are not provided', async () => {
+    it('should fail if uri or pkg are not provided', async function () {
       await adb.startUri().should.eventually.be.rejectedWith(/arguments are required/);
       await adb.startUri('foo').should.eventually.be.rejectedWith(/arguments are required/);
     });
-    it('should build a call to a VIEW intent with the uri', async () => {
+    it('should build a call to a VIEW intent with the uri', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['am', 'start', '-W', '-a',
                                'android.intent.action.VIEW', '-d', uri, pkg]);
@@ -346,7 +346,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('startApp', withMocks({adb}, (mocks) => {
-    it('should call getApiLevel and shell with correct arguments', async () => {
+    it('should call getApiLevel and shell with correct arguments', async function () {
       mocks.adb.expects('getApiLevel')
         .once().withExactArgs()
         .returns(17);
@@ -356,7 +356,7 @@ describe('Apk-utils', () => {
       (await adb.startApp(startAppOptions));
       mocks.adb.verify();
     });
-    it('should call getApiLevel and shell with correct arguments', async () => {
+    it('should call getApiLevel and shell with correct arguments', async function () {
       mocks.adb.expects('getApiLevel')
         .twice()
         .returns(17);
@@ -368,7 +368,7 @@ describe('Apk-utils', () => {
       (await adb.startApp(startAppOptions));
       mocks.adb.verify();
     });
-    it('should call getApiLevel and shell with correct arguments when activity is inner class', async () => {
+    it('should call getApiLevel and shell with correct arguments when activity is inner class', async function () {
       const startAppOptionsWithInnerClass = { pkg: 'pkg', activity: 'act$InnerAct'},
             cmdWithInnerClass = ['am', 'start', '-W', '-n', 'pkg/act\\$InnerAct', '-S'];
 
@@ -383,7 +383,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getDeviceLanguage', withMocks({adb}, (mocks) => {
-    it('should call shell one time with correct args and return language when API < 23', async () => {
+    it('should call shell one time with correct args and return language when API < 23', async function () {
       mocks.adb.expects("getApiLevel").returns(18);
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.language'])
@@ -391,7 +391,7 @@ describe('Apk-utils', () => {
       (await adb.getDeviceLanguage()).should.equal(language);
       mocks.adb.verify();
     });
-    it('should call shell two times with correct args and return language when API < 23', async () => {
+    it('should call shell two times with correct args and return language when API < 23', async function () {
       mocks.adb.expects("getApiLevel").returns(18);
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.language'])
@@ -402,7 +402,7 @@ describe('Apk-utils', () => {
       (await adb.getDeviceLanguage()).should.equal(language);
       mocks.adb.verify();
     });
-    it('should call shell one time with correct args and return language when API = 23', async () => {
+    it('should call shell one time with correct args and return language when API = 23', async function () {
       mocks.adb.expects("getApiLevel").returns(23);
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.locale'])
@@ -410,7 +410,7 @@ describe('Apk-utils', () => {
       (await adb.getDeviceLanguage()).should.equal(language);
       mocks.adb.verify();
     });
-    it('should call shell two times with correct args and return language when API = 23', async () => {
+    it('should call shell two times with correct args and return language when API = 23', async function () {
       mocks.adb.expects("getApiLevel").returns(23);
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.locale'])
@@ -423,7 +423,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('setDeviceLanguage', withMocks({adb}, (mocks) => {
-    it('should call shell one time with correct args when API < 23', async () => {
+    it('should call shell one time with correct args when API < 23', async function () {
       mocks.adb.expects("getApiLevel")
         .once().returns(21);
       mocks.adb.expects("shell")
@@ -434,14 +434,14 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getDeviceCountry', withMocks({adb}, (mocks) => {
-    it('should call shell one time with correct args and return country', async () => {
+    it('should call shell one time with correct args and return country', async function () {
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.country'])
         .returns(country);
       (await adb.getDeviceCountry()).should.equal(country);
       mocks.adb.verify();
     });
-    it('should call shell two times with correct args and return country', async () => {
+    it('should call shell two times with correct args and return country', async function () {
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.country'])
         .returns('');
@@ -453,7 +453,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('setDeviceCountry', withMocks({adb}, (mocks) => {
-    it('should call shell one time with correct args', async () => {
+    it('should call shell one time with correct args', async function () {
       mocks.adb.expects("getApiLevel")
         .once().returns(21);
       mocks.adb.expects("shell")
@@ -464,14 +464,14 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getDeviceLocale', withMocks({adb}, (mocks) => {
-    it('should call shell one time with correct args and return locale', async () => {
+    it('should call shell one time with correct args and return locale', async function () {
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.locale'])
         .returns(locale);
       (await adb.getDeviceLocale()).should.equal(locale);
       mocks.adb.verify();
     });
-    it('should call shell two times with correct args and return locale', async () => {
+    it('should call shell two times with correct args and return locale', async function () {
       mocks.adb.expects("shell")
         .once().withExactArgs(['getprop', 'persist.sys.locale'])
         .returns('');
@@ -483,44 +483,44 @@ describe('Apk-utils', () => {
     });
   }));
   describe('ensureCurrentLocale', withMocks({adb}, (mocks) => {
-    it('should return false if no arguments', async() => {
+    it('should return false if no arguments', async function () {
       (await adb.ensureCurrentLocale()).should.be.false;
     });
-    it('should return true when API 22 and only language', async() => {
+    it('should return true when API 22 and only language', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("fr");
       mocks.adb.expects("getDeviceCountry").withExactArgs().never();
       (await adb.ensureCurrentLocale("fr", null)).should.be.true;
       mocks.adb.verify();
     });
-    it('should return true when API 22 and only country', async() => {
+    it('should return true when API 22 and only country', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
       mocks.adb.expects("getDeviceCountry").withExactArgs().once().returns("FR");
       mocks.adb.expects("getDeviceLanguage").withExactArgs().never();
       (await adb.ensureCurrentLocale(null, "FR")).should.be.true;
       mocks.adb.verify();
     });
-    it('should return true when API 22', async() => {
+    it('should return true when API 22', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("fr");
       mocks.adb.expects("getDeviceCountry").withExactArgs().once().returns("FR");
       (await adb.ensureCurrentLocale('FR', 'fr')).should.be.true;
       mocks.adb.verify();
     });
-    it('should return false when API 22', async() => {
+    it('should return false when API 22', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs().once().returns("");
       mocks.adb.expects("getDeviceCountry").withExactArgs().once().returns("FR");
       (await adb.ensureCurrentLocale('en', 'US')).should.be.false;
       mocks.adb.verify();
     });
-    it('should return true when API 23', async() => {
+    it('should return true when API 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(23);
       mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("fr-FR");
       (await adb.ensureCurrentLocale('fr', 'fr')).should.be.true;
       mocks.adb.verify();
     });
-    it('should return false when API 23', async() => {
+    it('should return false when API 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs().once().returns(23);
       mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("");
       (await adb.ensureCurrentLocale('en', 'us')).should.be.false;
@@ -528,28 +528,28 @@ describe('Apk-utils', () => {
     });
   }));
   describe('setDeviceLocale', withMocks({adb}, (mocks) => {
-    it('should not call setDeviceLanguageCountry because of empty', async() => {
+    it('should not call setDeviceLanguageCountry because of empty', async function () {
       mocks.adb.expects('setDeviceLanguageCountry').never();
       await adb.setDeviceLocale();
       mocks.adb.verify();
     });
-    it('should not call setDeviceLanguageCountry because of invalid format no -', async() => {
+    it('should not call setDeviceLanguageCountry because of invalid format no -', async function () {
       mocks.adb.expects('setDeviceLanguageCountry').never();
       await adb.setDeviceLocale('jp');
       mocks.adb.verify();
     });
-    it('should not call setDeviceLanguageCountry because of invalid format /', async() => {
+    it('should not call setDeviceLanguageCountry because of invalid format /', async function () {
       mocks.adb.expects('setDeviceLanguageCountry').never();
       await adb.setDeviceLocale('en/US');
       mocks.adb.verify();
     });
-    it('should call setDeviceLanguageCountry', async() => {
+    it('should call setDeviceLanguageCountry', async function () {
       mocks.adb.expects('setDeviceLanguageCountry').withExactArgs(language, country)
           .once().returns("");
       await adb.setDeviceLocale('en-US');
       mocks.adb.verify();
     });
-    it('should call setDeviceLanguageCountry with degits for country', async() => {
+    it('should call setDeviceLanguageCountry with degits for country', async function () {
       mocks.adb.expects('setDeviceLanguageCountry').withExactArgs(language, country + "0")
           .once().returns("");
       await adb.setDeviceLocale('en-US0');
@@ -557,7 +557,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('setDeviceLanguageCountry', withMocks({adb}, (mocks) => {
-    it('should return if language and country are not passed', async () => {
+    it('should return if language and country are not passed', async function () {
       mocks.adb.expects('getDeviceLanguage').never();
       mocks.adb.expects('getDeviceCountry').never();
       mocks.adb.expects('getDeviceLocale').never();
@@ -568,7 +568,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry();
       mocks.adb.verify();
     });
-    it('should set language, country and reboot the device when API < 23', async () => {
+    it('should set language, country and reboot the device when API < 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs()
@@ -584,7 +584,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
-    it('should not set language and country if it does not change when API < 23', async () => {
+    it('should not set language and country if it does not change when API < 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(22);
       mocks.adb.expects('getDeviceLanguage').once().returns('en');
@@ -597,7 +597,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language.toLowerCase(), country.toLowerCase());
       mocks.adb.verify();
     });
-    it('should set locale when API is 23', async () => {
+    it('should set locale when API is 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(23);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -609,7 +609,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
-    it('should not set language and country if it does not change when API is 23', async () => {
+    it('should not set language and country if it does not change when API is 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(23);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -619,7 +619,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
-    it('should call set locale via setting app when API 24+', async () => {
+    it('should call set locale via setting app when API 24+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -630,7 +630,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
-    it('should not set language and country if it does not change when API 24+', async () => {
+    it('should not set language and country if it does not change when API 24+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -640,7 +640,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(language, country);
       mocks.adb.verify();
     });
-    it('should not set language and country if no language when API 24+', async () => {
+    it('should not set language and country if no language when API 24+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -650,7 +650,7 @@ describe('Apk-utils', () => {
       await adb.setDeviceLanguageCountry(country);
       mocks.adb.verify();
     });
-    it('should not set language and country if no country when API 24+', async () => {
+    it('should not set language and country if no country when API 24+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
@@ -662,7 +662,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getApkInfo', withMocks({adb, teen_process, fs}, (mocks) => {
-    it('should properly parse apk info', async () => {
+    it('should properly parse apk info', async function () {
       mocks.fs.expects('exists').once().returns(true);
       mocks.adb.expects('initAapt').once().returns(true);
       mocks.teen_process.expects('exec').once().returns({stdout: `package: name='io.appium.settings' versionCode='2' versionName='1.1' platformBuildVersionName='6.0-2166767'
@@ -712,7 +712,7 @@ describe('Apk-utils', () => {
     });
   }));
   describe('getPackageInfo', withMocks({adb}, (mocks) => {
-    it('should properly parse installed package info', async () => {
+    it('should properly parse installed package info', async function () {
       mocks.adb.expects('shell').once().returns(`Packages:
       Package [com.example.testapp.first] (2036fd1):
         userId=10225
@@ -751,7 +751,7 @@ describe('Apk-utils', () => {
     const pkgId = 'io.appium.settings';
     const apkPath = '/path/to/my.apk';
 
-    it('should execute install if the package is not present', async () => {
+    it('should execute install if the package is not present', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId
       });
@@ -760,7 +760,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should return if the same package version is already installed', async () => {
+    it('should return if the same package version is already installed', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         versionCode: 1
       });
@@ -771,7 +771,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath, pkgId);
       mocks.adb.verify();
     });
-    it('should return if newer package version is already installed', async () => {
+    it('should return if newer package version is already installed', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 1
@@ -783,7 +783,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should not throw an error if apk version code cannot be read', async () => {
+    it('should not throw an error if apk version code cannot be read', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId
       });
@@ -794,7 +794,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should not throw an error if pkg version code cannot be read', async () => {
+    it('should not throw an error if pkg version code cannot be read', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 1
@@ -804,12 +804,12 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should not throw an error if pkg id cannot be read', async () => {
+    it('should not throw an error if pkg id cannot be read', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({});
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should perform upgrade if older package version is installed', async () => {
+    it('should perform upgrade if older package version is installed', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 2
@@ -822,7 +822,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should uninstall and re-install if older package version is installed and upgrade fails', async () => {
+    it('should uninstall and re-install if older package version is installed and upgrade fails', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 2
@@ -837,7 +837,7 @@ describe('Apk-utils', () => {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
-    it('should throw an exception if upgrade and reinstall fail', async () => {
+    it('should throw an exception if upgrade and reinstall fail', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 2
@@ -857,7 +857,7 @@ describe('Apk-utils', () => {
       isExceptionThrown.should.be.true;
       mocks.adb.verify();
     });
-    it('should throw an exception if upgrade and uninstall fail', async () => {
+    it('should throw an exception if upgrade and uninstall fail', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
         versionCode: 2

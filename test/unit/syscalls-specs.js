@@ -13,7 +13,7 @@ adb.executable.path = 'adb_path';
 const avdName = 'AVD_NAME';
 
 describe('System calls', withMocks({teen_process}, (mocks) => {
-  it('getConnectedDevices should get all connected devices', async () => {
+  it('getConnectedDevices should get all connected devices', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"List of devices attached \n emulator-5554	device"});
@@ -21,7 +21,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
   });
-  it('getConnectedDevices should get all connected devices which have valid udid', async () => {
+  it('getConnectedDevices should get all connected devices which have valid udid', async function () {
     let stdoutValue = "List of devices attached \n" +
                       "adb server version (32) doesn't match this client (36); killing...\n" +
                       "* daemon started successfully *\n" +
@@ -34,7 +34,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
   });
-  it('getConnectedDevices should fail when adb devices returns unexpected output', async () => {
+  it('getConnectedDevices should fail when adb devices returns unexpected output', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"foobar"});
@@ -51,7 +51,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
                                        .rejectedWith("Could not find a connected Android device.");
     mocks.teen_process.verify();
   });
-  it('getDevicesWithRetry should fail when adb devices returns unexpected output', async () => {
+  it('getDevicesWithRetry should fail when adb devices returns unexpected output', async function () {
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"foobar"});
@@ -59,7 +59,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
                                        .rejectedWith("Could not find a connected Android device.");
     mocks.teen_process.verify();
   });
-  it('getDevicesWithRetry should get all connected devices', async () => {
+  it('getDevicesWithRetry should get all connected devices', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
       .returns({stdout:"List of devices attached \n emulator-5554	device"});
@@ -67,7 +67,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
   });
-  it('getDevicesWithRetry should get all connected devices second time', async () => {
+  it('getDevicesWithRetry should get all connected devices second time', async function () {
     mocks.teen_process.expects("exec")
       .onCall(0)
       .returns({stdout:"Foobar"});
@@ -78,7 +78,7 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
     devices.should.have.length.above(0);
     mocks.teen_process.verify();
   });
-  it('getDevicesWithRetry should fail when exec throws an error', async () => {
+  it('getDevicesWithRetry should fail when exec throws an error', async function () {
     mocks.teen_process.expects("exec")
       .atLeast(2)
       .throws("Error foobar");
@@ -86,30 +86,30 @@ describe('System calls', withMocks({teen_process}, (mocks) => {
                                        .rejectedWith("Could not find a connected Android device.");
     mocks.teen_process.verify();
   });
-  it('setDeviceId should set the device id', () => {
+  it('setDeviceId should set the device id', function () {
     adb.setDeviceId('foobar');
     adb.curDeviceId.should.equal('foobar');
     adb.executable.defaultArgs.should.include('foobar');
   });
-  it('setDevice should set the device id and emu port from obj', () => {
+  it('setDevice should set the device id and emu port from obj', function () {
     adb.setDevice({udid: 'emulator-1234'});
     adb.curDeviceId.should.equal('emulator-1234');
     adb.executable.defaultArgs.should.include('emulator-1234');
     adb.emulatorPort.should.equal(1234);
   });
-  it('setEmulatorPort should change emulator port', () => {
+  it('setEmulatorPort should change emulator port', function () {
     adb.setEmulatorPort(5554);
     adb.emulatorPort.should.equal(5554);
   });
-  describe('createSubProcess', () => {
-    it('should return an instance of SubProcess', () => {
+  describe('createSubProcess', function () {
+    it('should return an instance of SubProcess', function () {
       adb.createSubProcess([]).should.be.an.instanceof(teen_process.SubProcess);
     });
   });
 }));
 
 describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
-  it('should return adb version', async () => {
+  it('should return adb version', async function () {
     mocks.adb.expects("adbExec")
       .once()
       .withExactArgs('version')
@@ -122,7 +122,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     adbVersion.patch.should.equal(39);
     mocks.adb.verify();
   });
-  it('should cache adb results', async () => {
+  it('should cache adb results', async function () {
     adb.getAdbVersion.cache = new _.memoize.Cache();
     mocks.adb.expects("adbExec")
       .once()
@@ -132,14 +132,14 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     await adb.getAdbVersion();
     mocks.adb.verify();
   });
-  it('fileExists should return true for if ls returns', async () => {
+  it('fileExists should return true for if ls returns', async function () {
     mocks.adb.expects("ls")
       .once().withExactArgs('foo')
       .returns(['bar']);
     await adb.fileExists("foo").should.eventually.equal(true);
     mocks.adb.verify();
   });
-  it('ls should return list', async () => {
+  it('ls should return list', async function () {
     mocks.adb.expects("shell")
       .once().withExactArgs(['ls', 'foo'])
       .returns('bar');
@@ -163,7 +163,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     let size = await adb.fileSize(remotePath);
     size.should.eql(39571);
   });
-  it('reboot should call stop and start using shell', async () => {
+  it('reboot should call stop and start using shell', async function () {
     mocks.adb.expects("shell")
       .once().withExactArgs(['stop']);
     mocks.adb.expects("setDeviceProperty")
@@ -179,7 +179,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
     mocks.B.verify();
   });
-  it('reboot should restart adbd as root if necessary', async () => {
+  it('reboot should restart adbd as root if necessary', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['root'])
       .returns(false);
@@ -201,7 +201,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     mocks.adb.verify();
     mocks.B.verify();
   });
-  it('getRunningAVD should get connected avd', async () => {
+  it('getRunningAVD should get connected avd', async function () {
     let udid = 'emulator-5554';
     let port = 5554;
     let emulator = {udid, port};
@@ -218,7 +218,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     (await adb.getRunningAVD(avdName)).should.equal(emulator);
     mocks.adb.verify();
   });
-  it('getRunningAVD should return null when expected avd is not connected', async () => {
+  it('getRunningAVD should return null when expected avd is not connected', async function () {
     let udid = 'emulator-5554';
     let port = 5554;
     let emulator = {udid, port};
@@ -233,7 +233,7 @@ describe('System calls',  withMocks({adb, B, teen_process}, (mocks) => {
     chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
     mocks.adb.verify();
   });
-  it('getRunningAVD should return null when no avd is connected', async () => {
+  it('getRunningAVD should return null when no avd is connected', async function () {
     mocks.adb.expects("getConnectedEmulators")
       .once().withExactArgs()
       .returns([]);

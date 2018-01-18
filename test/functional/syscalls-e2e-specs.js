@@ -10,33 +10,33 @@ describe('System calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
   });
-  it('getConnectedDevices should get devices', async () => {
+  it('getConnectedDevices should get devices', async function () {
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
   });
-  it('getDevicesWithRetry should get devices', async () => {
+  it('getDevicesWithRetry should get devices', async function () {
     let devices = await adb.getDevicesWithRetry();
     devices.should.have.length.above(0);
   });
-  it('adbExec should get devices when with devices', async () => {
+  it('adbExec should get devices when with devices', async function () {
     (await adb.adbExec("devices")).should.contain("List of devices attached");
   });
-  it('isDeviceConnected should be true', async () => {
+  it('isDeviceConnected should be true', async function () {
     (await adb.isDeviceConnected()).should.be.true;
   });
-  it('shell should execute command in adb shell ', async () => {
+  it('shell should execute command in adb shell ', async function () {
     (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
-  it('getConnectedEmulators should get all connected emulators', async () => {
+  it('getConnectedEmulators should get all connected emulators', async function () {
     (await adb.getConnectedEmulators()).length.should.be.above(0);
   });
-  it('getRunningAVD should get all connected avd', async () => {
+  it('getRunningAVD should get all connected avd', async function () {
     (await adb.getRunningAVD(avdName)).should.not.be.null;
   });
-  it('getRunningAVDWithRetry should get all connected avds', async () => {
+  it('getRunningAVDWithRetry should get all connected avds', async function () {
     (await adb.getRunningAVDWithRetry(avdName)).should.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI

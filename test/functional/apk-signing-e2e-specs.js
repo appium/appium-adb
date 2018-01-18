@@ -19,26 +19,26 @@ const selendroidTestApp = path.resolve(rootDir, 'test',
 
 chai.use(chaiAsPromised);
 
-describe('Apk-signing', async () => {
+describe('Apk-signing', async function () {
   let adb,
       unsignApk = async (apk) => { await exec('java', ['-jar', unsignJar, apk]); };
 
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
   });
-  it('checkApkCert should return false for unsigned apk', async () => {
+  it('checkApkCert should return false for unsigned apk', async function () {
     await unsignApk(selendroidTestApp);
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.false;
   });
-  it('checkApkCert should return true for signed apk', async () => {
+  it('checkApkCert should return true for signed apk', async function () {
     (await adb.checkApkCert(contactManagerPath, 'com.example.android.contactmanager')).should.be.true;
   });
-  it('signWithDefaultCert should sign apk', async () => {
+  it('signWithDefaultCert should sign apk', async function () {
     await unsignApk(selendroidTestApp);
     (await adb.signWithDefaultCert(selendroidTestApp));
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.true;
   });
-  it('signWithCustomCert should sign apk with custom certificate', async () => {
+  it('signWithCustomCert should sign apk with custom certificate', async function () {
     await unsignApk(selendroidTestApp);
     adb.keystorePath = keystorePath;
     adb.keyAlias = keyAlias;

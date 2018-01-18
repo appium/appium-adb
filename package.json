@@ -13,7 +13,8 @@
     "coverage": "gulp coveralls",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "precommit-test": "REPORTER=dot gulp once",
-    "lint": "gulp eslint"
+    "lint": "gulp eslint",
+    "lint:fix": "gulp eslint --fix"
   },
   "repository": {
     "type": "git",
@@ -52,7 +53,7 @@
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^3.10.2",
-    "eslint-config-appium": "^2.0.1",
+    "eslint-config-appium": "^2.1.0",
     "eslint-plugin-babel": "^3.3.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-mocha": "^4.11.0",

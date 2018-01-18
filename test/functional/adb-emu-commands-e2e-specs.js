@@ -14,7 +14,7 @@ const pkg = 'com.example.fingerprint';
 const activity = '.MainActivity';
 const secretActivity = '.SecretActivity';
 
-describe('adb emu commands', () => {
+describe('adb emu commands', function () {
   let adb;
   before(async function () {
     adb = await ADB.createADB();
@@ -25,7 +25,7 @@ describe('adb emu commands', () => {
       this.skip();
     }
   });
-  it('fingerprint should open the secret activity on emitted valid finger touch event', async () => {
+  it('fingerprint should open the secret activity on emitted valid finger touch event', async function () {
     if (await adb.isAppInstalled(pkg)) {
       await adb.forceStop(pkg);
       await adb.uninstallApk(pkg);

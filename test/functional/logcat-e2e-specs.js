@@ -25,7 +25,7 @@ describe('logcat', function () {
 
   let adb;
   let logcat;
-  before(async () => {
+  before(async function () {
     adb = await ADB.createADB();
   });
   afterEach(async function () {
@@ -34,7 +34,7 @@ describe('logcat', function () {
     }
   });
   describe('clearDeviceLogsOnStart = false', function () {
-    before(async () => {
+    before(async function () {
       logcat = new Logcat({
         adb: adb.executable,
         debug: false,
@@ -56,7 +56,7 @@ describe('logcat', function () {
     });
   });
   describe('clearDeviceLogsOnStart = true', function () {
-    before(async () => {
+    before(async function () {
       logcat = new Logcat({
         adb: adb.executable,
         debug: false,

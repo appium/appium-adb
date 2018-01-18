@@ -6,7 +6,7 @@ import path from 'path';
 import _ from 'lodash';
 
 
-describe('helpers', () => {
+describe('helpers', function () {
   describe('getAndroidPlatformAndPath', withMocks({fs}, (mocks) => {
     let oldAndroidHome;
     let oldResolve;
@@ -62,56 +62,56 @@ describe('helpers', () => {
     });
   }));
 
-  describe('isShowingLockscreen', () => {
-    it('should return true if mShowingLockscreen is true', async () => {
+  describe('isShowingLockscreen', function () {
+    it('should return true if mShowingLockscreen is true', async function () {
       let dumpsys = 'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
-    it('should return true if mDreamingLockscreen is true', async () => {
+    it('should return true if mDreamingLockscreen is true', async function () {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
-    it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async () => {
+    it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
-    it('should assume that screen is unlocked if can not determine lock state', async () => {
+    it('should assume that screen is unlocked if can not determine lock state', async function () {
       let dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
   });
 
-  describe('buildStartCmd', () => {
+  describe('buildStartCmd', function () {
     let startOptions = {
       pkg: 'com.something',
       activity: '.SomeActivity'
     };
 
-    it('should parse optionalIntentArguments with single key', () => {
+    it('should parse optionalIntentArguments with single key', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
       cmd[cmd.length-2].should.eql('-d');
       cmd[cmd.length-1].should.eql('key');
     });
-    it('should parse optionalIntentArguments with single key/value pair', () => {
+    it('should parse optionalIntentArguments with single key/value pair', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value'}, startOptions), 20);
       cmd[cmd.length-3].should.eql('-d');
       cmd[cmd.length-2].should.eql('key');
       cmd[cmd.length-1].should.eql('value');
     });
-    it('should parse optionalIntentArguments with single key/value pair with spaces', () => {
+    it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value value2'}, startOptions), 20);
       cmd[cmd.length-3].should.eql('-d');
       cmd[cmd.length-2].should.eql('key');
       cmd[cmd.length-1].should.eql('value value2');
     });
-    it('should parse optionalIntentArguments with multiple keys', () => {
+    it('should parse optionalIntentArguments with multiple keys', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions), 20);
       cmd[cmd.length-4].should.eql('-d');
       cmd[cmd.length-3].should.eql('key1');
       cmd[cmd.length-2].should.eql('-e');
       cmd[cmd.length-1].should.eql('key2');
     });
-    it('should parse optionalIntentArguments with multiple key/value pairs', () => {
+    it('should parse optionalIntentArguments with multiple key/value pairs', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions), 20);
       cmd[cmd.length-6].should.eql('-d');
       cmd[cmd.length-5].should.eql('key1');
@@ -120,13 +120,13 @@ describe('helpers', () => {
       cmd[cmd.length-2].should.eql('key2');
       cmd[cmd.length-1].should.eql('value2');
     });
-    it('should parse optionalIntentArguments with hyphens', () => {
+    it('should parse optionalIntentArguments with hyphens', function () {
       let arg = 'http://some-url-with-hyphens.com/';
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: `-d ${arg}`}, startOptions), 20);
       cmd[cmd.length-2].should.eql('-d');
       cmd[cmd.length-1].should.eql(arg);
     });
-    it('should parse optionalIntentArguments with multiple arguments with hyphens', () => {
+    it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
       let arg1 = 'http://some-url-with-hyphens.com/';
       let arg2 = 'http://some-other-url-with-hyphens.com/';
       let cmd = buildStartCmd(_.defaults({
@@ -138,11 +138,11 @@ describe('helpers', () => {
       cmd[cmd.length-2].should.eql('key');
       cmd[cmd.length-1].should.eql(arg2);
     });
-    it('should have -S option when stopApp is set', async () => {
+    it('should have -S option when stopApp is set', async function () {
       let cmd = buildStartCmd(_.defaults({stopApp: true}, startOptions), 20);
       cmd[cmd.length-1].should.eql('-S');
     });
-    it('should not have -S option when stopApp is not set', async () => {
+    it('should not have -S option when stopApp is not set', async function () {
       let cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
       cmd[cmd.length-1].should.not.eql('-S');
     });

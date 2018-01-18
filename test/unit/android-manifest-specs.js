@@ -7,10 +7,10 @@ import { withMocks } from 'appium-test-support';
 
 chai.use(chaiAsPromised);
 
-describe('android-manifest', () => {
+describe('android-manifest', function () {
   let adb = new ADB();
   describe('processFromManifest', withMocks({adb, teen_process}, (mocks) => {
-    it('should correctly parse process from manifest', async () => {
+    it('should correctly parse process from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
             dummyProcess = 'dummyProcess';
@@ -27,7 +27,7 @@ describe('android-manifest', () => {
     });
   }));
   describe('packageAndLaunchActivityFromManifest', withMocks({adb, teen_process}, (mocks) => {
-    it('should correctly parse package and activity from manifest', async () => {
+    it('should correctly parse package and activity from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
             dummyPackageName = 'package',
@@ -46,7 +46,7 @@ describe('android-manifest', () => {
     });
   }));
   describe('hasInternetPermissionFromManifest', withMocks({adb, teen_process}, (mocks) => {
-    it('should correctly parse internet permission from manifest', async () => {
+    it('should correctly parse internet permission from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK';
       mocks.adb.expects("initAapt")

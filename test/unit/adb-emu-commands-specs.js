@@ -13,11 +13,11 @@ const emulators = [
 ];
 const fingerprintId = 1111;
 
-describe('adb emulator commands', () => {
+describe('adb emulator commands', function () {
   let adb = new ADB();
-  describe("emu", () => {
+  describe("emu", function () {
     describe("isEmulatorConnected", withMocks({adb}, (mocks) => {
-      it("should verify emulators state", async () => {
+      it("should verify emulators state", async function () {
         mocks.adb.expects("getConnectedEmulators")
           .atLeast(3)
           .returns(emulators);
@@ -31,7 +31,7 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("verifyEmulatorConnected", withMocks({adb}, (mocks) => {
-      it("should throw an exception on emulator not connected", async () => {
+      it("should throw an exception on emulator not connected", async function () {
         adb.curDeviceId = "emulator-5558";
         mocks.adb.expects("isEmulatorConnected")
           .once()
@@ -41,18 +41,18 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("fingerprint", withMocks({adb}, (mocks) => {
-      it("should throw exception on undefined fingerprintId", async () => {
+      it("should throw exception on undefined fingerprintId", async function () {
         await adb.fingerprint().should.eventually.be.rejected;
         mocks.adb.verify();
       });
-      it("should throw exception on apiLevel lower than 23", async () => {
+      it("should throw exception on apiLevel lower than 23", async function () {
         mocks.adb.expects("getApiLevel")
           .once().withExactArgs()
           .returns(21);
         await adb.fingerprint(fingerprintId).should.eventually.be.rejected;
         mocks.adb.verify();
       });
-      it("should call adbExec with the correct args", async () => {
+      it("should call adbExec with the correct args", async function () {
         mocks.adb.expects("getApiLevel")
           .once().withExactArgs()
           .returns(23);
@@ -70,7 +70,7 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("rotate", withMocks({adb}, (mocks) => {
-      it("should call adbExec with the correct args", async () => {
+      it("should call adbExec with the correct args", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -85,11 +85,11 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("power methods", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid power ac state", async () => {
+      it("should throw exception on invalid power ac state", async function () {
         await adb.powerAC('dead').should.eventually.be.rejectedWith("Wrong power AC state");
         mocks.adb.verify();
       });
-      it("should set the power ac off", async () => {
+      it("should set the power ac off", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -102,7 +102,7 @@ describe('adb emulator commands', () => {
         await adb.powerAC('off');
         mocks.adb.verify();
       });
-      it("should set the power ac on", async () => {
+      it("should set the power ac on", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -115,13 +115,13 @@ describe('adb emulator commands', () => {
         await adb.powerAC('on');
         mocks.adb.verify();
       });
-      it("should throw exception on invalid power battery percent", async () => {
+      it("should throw exception on invalid power battery percent", async function () {
         await adb.powerCapacity(-1).should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
         await adb.powerCapacity("a").should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
         await adb.powerCapacity(500).should.eventually.be.rejectedWith("should be valid integer between 0 and 100");
         mocks.adb.verify();
       });
-      it("should set the power capacity", async () => {
+      it("should set the power capacity", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -134,7 +134,7 @@ describe('adb emulator commands', () => {
         await adb.powerCapacity(0);
         mocks.adb.verify();
       });
-      it("should call methods to power off the emulator", async () => {
+      it("should call methods to power off the emulator", async function () {
         mocks.adb.expects("powerAC")
           .once().withExactArgs('off')
           .returns();
@@ -146,15 +146,15 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("sendSMS", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid message", async () => {
+      it("should throw exception on invalid message", async function () {
         await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
         mocks.adb.verify();
       });
-      it("should throw exception on invalid phoneNumber", async () => {
+      it("should throw exception on invalid phoneNumber", async function () {
         await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid sendSMS phoneNumber");
         mocks.adb.verify();
       });
-      it("should call adbExec with the correct args", async () => {
+      it("should call adbExec with the correct args", async function () {
         let phoneNumber = 4509;
         let message = " Hello Appium ";
         mocks.adb.expects("isEmulatorConnected")
@@ -171,11 +171,11 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("gsm signal method", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid strength", async () => {
+      it("should throw exception on invalid strength", async function () {
         await adb.gsmSignal(5).should.eventually.be.rejectedWith("Invalid signal strength");
         mocks.adb.verify();
       });
-      it("should call adbExecEmu with the correct args", async () => {
+      it("should call adbExecEmu with the correct args", async function () {
         let signalStrength = 0;
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
@@ -191,15 +191,15 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("gsm call methods", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid action", async () => {
+      it("should throw exception on invalid action", async function () {
         await adb.gsmCall("+549341312345678").should.eventually.be.rejectedWith("Invalid gsm action");
         mocks.adb.verify();
       });
-      it("should throw exception on invalid phoneNumber", async () => {
+      it("should throw exception on invalid phoneNumber", async function () {
         await adb.gsmCall("+5493413a12345678", "call").should.eventually.be.rejectedWith("Invalid gsmCall phoneNumber");
         mocks.adb.verify();
       });
-      it("should set the correct method for making gsm call", async () => {
+      it("should set the correct method for making gsm call", async function () {
         let phoneNumber = 4509;
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
@@ -213,7 +213,7 @@ describe('adb emulator commands', () => {
         await adb.gsmCall(phoneNumber, "call");
         mocks.adb.verify();
       });
-      it("should set the correct method for accepting gsm call", async () => {
+      it("should set the correct method for accepting gsm call", async function () {
         let phoneNumber = 4509;
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
@@ -227,7 +227,7 @@ describe('adb emulator commands', () => {
         await adb.gsmCall(phoneNumber, "accept");
         mocks.adb.verify();
       });
-      it("should set the correct method for refusing gsm call", async () => {
+      it("should set the correct method for refusing gsm call", async function () {
         let phoneNumber = 4509;
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
@@ -241,7 +241,7 @@ describe('adb emulator commands', () => {
         await adb.gsmCall(phoneNumber, "cancel");
         mocks.adb.verify();
       });
-      it("should set the correct method for holding gsm call", async () => {
+      it("should set the correct method for holding gsm call", async function () {
         let phoneNumber = 4509;
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
@@ -257,12 +257,12 @@ describe('adb emulator commands', () => {
       });
     }));
     describe("network speed method", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid speed", async () => {
+      it("should throw exception on invalid speed", async function () {
         await adb.networkSpeed('light').should.eventually.be.rejectedWith("Invalid network speed");
         mocks.adb.verify();
       });
       for (let [key, value] of _.toPairs(adb.NETWORK_SPEED)) {
-        it(`should set network speed(${key}) correctly`, async () => {
+        it(`should set network speed(${key}) correctly`, async function () {
           mocks.adb.expects("isEmulatorConnected")
             .once().withExactArgs()
             .returns(true);
@@ -278,11 +278,11 @@ describe('adb emulator commands', () => {
       }
     }));
     describe("gsm voice method", withMocks({adb}, (mocks) => {
-      it("should throw exception on invalid strength", async () => {
+      it("should throw exception on invalid strength", async function () {
         await adb.gsmVoice('weird').should.eventually.be.rejectedWith("Invalid gsm voice state");
         mocks.adb.verify();
       });
-      it("should set gsm voice to unregistered", async () => {
+      it("should set gsm voice to unregistered", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -295,7 +295,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("unregistered");
         mocks.adb.verify();
       });
-      it("should set gsm voice to home", async () => {
+      it("should set gsm voice to home", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -308,7 +308,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("home");
         mocks.adb.verify();
       });
-      it("should set gsm voice to roaming", async () => {
+      it("should set gsm voice to roaming", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -321,7 +321,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("roaming");
         mocks.adb.verify();
       });
-      it("should set gsm voice to searching", async () => {
+      it("should set gsm voice to searching", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -334,7 +334,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("searching");
         mocks.adb.verify();
       });
-      it("should set gsm voice to denied", async () => {
+      it("should set gsm voice to denied", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -347,7 +347,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("denied");
         mocks.adb.verify();
       });
-      it("should set gsm voice to off", async () => {
+      it("should set gsm voice to off", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
@@ -360,7 +360,7 @@ describe('adb emulator commands', () => {
         await adb.gsmVoice("off");
         mocks.adb.verify();
       });
-      it("should set gsm voice to on", async () => {
+      it("should set gsm voice to on", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
