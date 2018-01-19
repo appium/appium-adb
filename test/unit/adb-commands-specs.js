@@ -871,6 +871,56 @@ describe('adb commands', function () {
       ACTIVITY MANAGER PENDING INTENTS (dumpsys activity intents)
         (nothing)`;
 
+    const dumpedLimitedOutput = `
+          declared permissions:
+            com.xxx.permission.C2D_MESSAGE: prot=signature, INSTALLED
+            com.xxx.permission.C2D_MESSAGE: prot=signature
+          requested permissions:
+            android.permission.ACCESS_NETWORK_STATE
+            android.permission.WRITE_EXTERNAL_STORAGE
+            android.permission.INTERNET
+            android.permission.READ_CONTACTS
+            android.permission.RECORD_AUDIO
+            android.permission.VIBRATE
+            android.permission.CAMERA
+            android.permission.FLASHLIGHT
+            android.permission.READ_PHONE_STATE
+            android.permission.MODIFY_AUDIO_SETTINGS
+            android.permission.BLUETOOTH
+            android.permission.WAKE_LOCK
+            com.google.android.c2dm.permission.RECEIVE
+            com.xxx.permission.C2D_MESSAGE
+            android.permission.ACCESS_FINE_LOCATION
+            android.permission.READ_EXTERNAL_STORAGE
+            android.permission.RECEIVE_BOOT_COMPLETED
+            .permission.C2D_MESSAGE
+          User 0: ceDataInode=1504712 installed=true hidden=false suspended=false stopped=false notLaunched=false enabled=0
+            gids=[3002, 3003]
+            runtime permissions:
+              android.permission.ACCESS_FINE_LOCATION: granted=true
+              android.permission.READ_EXTERNAL_STORAGE: granted=true
+              android.permission.READ_PHONE_STATE: granted=true
+              android.permission.CAMERA: granted=false, flags=[ USER_SET ]
+              android.permission.WRITE_EXTERNAL_STORAGE: granted=true
+              android.permission.RECORD_AUDIO: granted=true
+              android.permission.READ_CONTACTS: granted=false, flags=[ USER_SET ]
+
+
+      Dexopt state:
+        [com.xxx]
+          Instruction Set: arm
+            path: /data/app/com.xxx-1/base.apk
+            status: /data/app/com.xxxa-1/oat/arm/base.odex [compilation_filter=interpret-only, status=kOatUpToDate]
+
+
+      Compiler stats:
+        [com.xxx]
+           base.apk - 8264
+
+    DUMP OF SERVICE activity:
+      ACTIVITY MANAGER PENDING INTENTS (dumpsys activity intents)
+        (nothing)`;
+
     it('should grant requested permission', async function () {
       mocks.adb.expects("shell")
           .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
@@ -885,6 +935,27 @@ describe('adb commands', function () {
     });
     it('should properly list requested permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
+      const result = await adb.getReqPermissions('io.appium.android');
+      for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.INTERNET',
+                        'android.permission.READ_CONTACTS',
+                        'android.permission.RECORD_AUDIO',
+                        'android.permission.VIBRATE',
+                        'android.permission.CAMERA',
+                        'android.permission.FLASHLIGHT',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.MODIFY_AUDIO_SETTINGS',
+                        'android.permission.BLUETOOTH',
+                        'android.permission.WAKE_LOCK',
+                        'android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.RECEIVE_BOOT_COMPLETED']) {
+        result.should.include(perm);
+      }
+    });
+    it('should properly list requested permissions for output without install permissions', async function () {
+      mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
       const result = await adb.getReqPermissions('io.appium.android');
       for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
                         'android.permission.WRITE_EXTERNAL_STORAGE',
@@ -927,6 +998,21 @@ describe('adb commands', function () {
         result.should.not.include(perm);
       }
     });
+    it('should properly list granted permissions for output without install permissions', async function () {
+      mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
+      const result = await adb.getGrantedPermissions('io.appium.android');
+      for (let perm of ['android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.RECORD_AUDIO']) {
+        result.should.include(perm);
+      }
+      for (let perm of ['android.permission.READ_CONTACTS',
+                        'android.permission.CAMERA']) {
+        result.should.not.include(perm);
+      }
+    });
     it('should properly list denied permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getDeniedPermissions('io.appium.android');
@@ -939,6 +1025,21 @@ describe('adb commands', function () {
                         'android.permission.VIBRATE',
                         'android.permission.WAKE_LOCK',
                         'android.permission.ACCESS_FINE_LOCATION',
+                        'android.permission.READ_EXTERNAL_STORAGE',
+                        'android.permission.READ_PHONE_STATE',
+                        'android.permission.WRITE_EXTERNAL_STORAGE',
+                        'android.permission.RECORD_AUDIO']) {
+        result.should.not.include(perm);
+      }
+      for (let perm of ['android.permission.READ_CONTACTS',
+                        'android.permission.CAMERA']) {
+        result.should.include(perm);
+      }
+    });
+    it('should properly list denied permissions for output without install permissions', async function () {
+      mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
+      const result = await adb.getDeniedPermissions('io.appium.android');
+      for (let perm of ['android.permission.ACCESS_FINE_LOCATION',
                         'android.permission.READ_EXTERNAL_STORAGE',
                         'android.permission.READ_PHONE_STATE',
                         'android.permission.WRITE_EXTERNAL_STORAGE',
