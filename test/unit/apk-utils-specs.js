@@ -328,7 +328,7 @@ describe('Apk-utils', function () {
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', 'foo'], {timeout: 60000})
         .returns('');
-      (await adb.install('foo', false));
+      (await adb.install('foo', {replace: false}));
       mocks.adb.verify();
     });
   }));
@@ -756,7 +756,7 @@ describe('Apk-utils', function () {
         name: pkgId
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(false);
-      mocks.adb.expects('install').withArgs(apkPath, false).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
@@ -818,7 +818,7 @@ describe('Apk-utils', function () {
         versionCode: 1
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, true).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
@@ -831,9 +831,9 @@ describe('Apk-utils', function () {
         versionCode: 1
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, true).once().throws();
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().throws();
       mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, false).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: false, timeout: 60000}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
@@ -867,7 +867,7 @@ describe('Apk-utils', function () {
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
       mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(false);
-      mocks.adb.expects('install').withArgs(apkPath, true).once().throws();
+      mocks.adb.expects('install').withArgs(apkPath).once().throws();
       let isExceptionThrown = false;
       try {
         await adb.installOrUpgrade(apkPath);
