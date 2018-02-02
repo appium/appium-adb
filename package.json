@@ -39,6 +39,7 @@
     "babel-runtime": "=5.8.24",
     "bluebird": "^3.4.7",
     "lodash": "^4.0.0",
+    "semver": "^5.5.0",
     "source-map-support": "^0.4.8",
     "teen_process": "^1.11.0"
   },
