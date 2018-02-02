@@ -822,6 +822,21 @@ describe('Apk-utils', function () {
       await adb.installOrUpgrade(apkPath);
       mocks.adb.verify();
     });
+    it('should perform upgrade if older package version is installed, but version codes are not maintained', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+        name: pkgId,
+        versionCode: 1,
+        versionName: '2.0.0',
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1,
+        versionName: '1.0.0',
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+      mocks.adb.verify();
+    });
     it('should uninstall and re-install if older package version is installed and upgrade fails', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
