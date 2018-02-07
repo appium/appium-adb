@@ -1,5 +1,5 @@
 import { getAndroidPlatformAndPath,
-         buildStartCmd, isShowingLockscreen } from '../../lib/helpers';
+         buildStartCmd, isShowingLockscreen, getBuildToolsDirs } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
@@ -147,4 +147,20 @@ describe('helpers', function () {
       cmd[cmd.length-1].should.not.eql('-S');
     });
   });
+
+  describe('getBuildToolsDirs', withMocks({fs}, (mocks) => {
+    it('should sort build-tools folder names by semantic version', async function () {
+      mocks.fs.expects('glob').once().returns([
+        '/some/path/1.2.3',
+        '/some/path/4.5.6',
+        '/some/path/2.3.1',
+      ]);
+      (await getBuildToolsDirs('/dummy/path')).should.be.eql([
+        '/some/path/4.5.6',
+        '/some/path/2.3.1',
+        '/some/path/1.2.3',
+      ]);
+      mocks.fs.verify();
+    });
+  }));
 });
