@@ -41,7 +41,9 @@
     "lodash": "^4.0.0",
     "semver": "^5.5.0",
     "source-map-support": "^0.4.8",
-    "teen_process": "^1.11.0"
+    "teen_process": "^1.11.0",
+    "xmldom": "^0.1.27",
+    "xpath": "^0.0.27"
   },
   "pre-commit": [
     "precommit-msg",
