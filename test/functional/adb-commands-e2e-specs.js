@@ -238,20 +238,8 @@ describe('adb commands', function () {
   });
 
   describe('bugreport', function () {
-    it('should return the report as raw string by default', async function () {
+    it('should return the report as a raw string', async function () {
       (await adb.bugreport()).should.not.be.empty;
-    });
-
-    it('should return the report as base64-encoded .zip archive if needed', async function () {
-      if (process.env.TRAVIS) {
-        // This option does not work with older adb versions (<1.0.39)
-        return this.skip();
-      }
-      const base64 = await adb.bugreport(false);
-      Buffer.from(base64, 'base64')
-        .toString('ascii')
-        .startsWith('PK')
-        .should.be.true;
     });
   });
 
