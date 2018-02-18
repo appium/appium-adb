@@ -236,4 +236,19 @@ describe('adb commands', function () {
       await adb.push(localFile, remoteFile).should.be.rejectedWith(/\/foo\/bar\/remote.txt/);
     });
   });
+
+  describe('bugreport', function () {
+    it('should return bugreport as raw string by default', async function () {
+      (await adb.bugreport()).should.not.be.empty;
+    });
+
+    it('should return bugreport as base-64 encoded .zip archive if needed', async function () {
+      const base64 = await adb.bugreport(false);
+      Buffer.from(base64, 'base64')
+        .toString('ascii')
+        .startsWith('PK')
+        .should.be.true;
+    });
+  });
+
 });
