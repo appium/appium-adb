@@ -243,8 +243,8 @@ describe('adb commands', function () {
     });
 
     it('should return the report as base64-encoded .zip archive if needed', async function () {
-      if (await adb.getApiLevel() < 23) {
-        // This option does not work with older APIs
+      if (process.env.TRAVIS) {
+        // This option does not work with older adb versions (<1.0.39)
         return this.skip();
       }
       const base64 = await adb.bugreport(false);
