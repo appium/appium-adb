@@ -238,11 +238,15 @@ describe('adb commands', function () {
   });
 
   describe('bugreport', function () {
-    it('should return bugreport as raw string by default', async function () {
+    it('should return the report as raw string by default', async function () {
       (await adb.bugreport()).should.not.be.empty;
     });
 
-    it('should return bugreport as base-64 encoded .zip archive if needed', async function () {
+    it('should return the report as base64-encoded .zip archive if needed', async function () {
+      if (await adb.getApiLevel() < 23) {
+        // This option does not work with older APIs
+        return this.skip();
+      }
       const base64 = await adb.bugreport(false);
       Buffer.from(base64, 'base64')
         .toString('ascii')
