@@ -236,4 +236,11 @@ describe('adb commands', function () {
       await adb.push(localFile, remoteFile).should.be.rejectedWith(/\/foo\/bar\/remote.txt/);
     });
   });
+
+  describe('bugreport', function () {
+    it('should return the report as a raw string', async function () {
+      (await adb.bugreport()).should.not.be.empty;
+    });
+  });
+
 });
