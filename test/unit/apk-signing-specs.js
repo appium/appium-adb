@@ -158,7 +158,7 @@ describe('signing', function () {
         .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', selendroidTestApp, alignedApk]);
       mocks.fs.expects("mv")
         .once().withExactArgs(alignedApk, selendroidTestApp, { mkdirp: true })
-        .returns({});
+        .returns("");
       await adb.zipAlignApk(selendroidTestApp);
       mocks.adb.verify();
       mocks.appiumSupport.verify();
@@ -182,7 +182,12 @@ describe('signing', function () {
         .once().withExactArgs(apksignerDummyPath,
           ['verify', '--print-certs', selendroidTestApp],
           {shell: true, cwd: path.dirname(apksignerDummyPath)})
-        .returns({});
+        .returns({
+          stdout: `Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
+                   Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
+                   Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
+                   Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`,
+        });
       (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
       mocks.adb.verify();
       mocks.teen_process.verify();
