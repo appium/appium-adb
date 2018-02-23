@@ -39,7 +39,7 @@ describe('signing', function () {
         .once().withExactArgs(apksignerDummyPath, ['sign',
           '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
           {shell: true, cwd: path.dirname(apksignerDummyPath)})
-        .returns("");
+        .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
       mocks.teen_process.verify();
       mocks.helpers.verify();
@@ -58,7 +58,7 @@ describe('signing', function () {
         .returns(javaDummyPath);
       mocks.teen_process.expects("exec")
         .once().withExactArgs(javaDummyPath, ['-jar', signPath, selendroidTestApp, '--override'])
-        .returns("");
+        .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
       mocks.teen_process.verify();
       mocks.helpers.verify();
@@ -83,7 +83,7 @@ describe('signing', function () {
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
           selendroidTestApp], {shell: true, cwd: path.dirname(apksignerDummyPath)})
-        .returns("");
+        .returns({});
       await adb.signWithCustomCert(selendroidTestApp);
       mocks.teen_process.verify();
       mocks.helpers.verify();
@@ -112,12 +112,12 @@ describe('signing', function () {
         .returns(javaDummyPath);
       mocks.teen_process.expects("exec")
         .withExactArgs(javaDummyPath, ['-jar', path.resolve(helperJarPath, 'unsign.jar'), selendroidTestApp])
-        .returns("");
+        .returns({});
       mocks.teen_process.expects("exec")
         .withExactArgs(jarsigner, ['-sigalg', 'MD5withRSA', '-digestalg', 'SHA1',
           '-keystore', keystorePath, '-storepass', password,
           '-keypass', password, selendroidTestApp, keyAlias])
-        .returns("");
+        .returns({});
       await adb.signWithCustomCert(selendroidTestApp);
       mocks.teen_process.verify();
       mocks.helpers.verify();
@@ -134,7 +134,7 @@ describe('signing', function () {
       mocks.teen_process.expects("exec")
         .once().withExactArgs(keytool, ['-v', '-list', '-alias', keyAlias,
           '-keystore', keystorePath, '-storepass', password])
-        .returns("");
+        .returns({});
       (await adb.getKeystoreMd5(keytool, md5));
       mocks.teen_process.verify();
     });
@@ -153,12 +153,12 @@ describe('signing', function () {
         .returns("");
       mocks.appiumSupport.expects('mkdirp')
         .once().withExactArgs(path.dirname(alignedApk))
-        .returns("");
+        .returns({});
       mocks.teen_process.expects("exec")
         .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', selendroidTestApp, alignedApk]);
       mocks.fs.expects("mv")
         .once().withExactArgs(alignedApk, selendroidTestApp, { mkdirp: true })
-        .returns("");
+        .returns({});
       await adb.zipAlignApk(selendroidTestApp);
       mocks.adb.verify();
       mocks.appiumSupport.verify();
@@ -180,9 +180,9 @@ describe('signing', function () {
         .twice().returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
         .once().withExactArgs(apksignerDummyPath,
-          ['verify', selendroidTestApp],
+          ['verify', '--print-certs', selendroidTestApp],
           {shell: true, cwd: path.dirname(apksignerDummyPath)})
-        .returns("");
+        .returns({});
       (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
       mocks.adb.verify();
       mocks.teen_process.verify();
@@ -198,7 +198,7 @@ describe('signing', function () {
         .returns(javaDummyPath);
       mocks.teen_process.expects("exec")
         .withExactArgs(javaDummyPath, ['-jar', path.resolve(helperJarPath, 'verify.jar'), selendroidTestApp])
-        .returns("");
+        .returns({});
       (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
       mocks.adb.verify();
       mocks.teen_process.verify();
