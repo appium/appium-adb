@@ -20,10 +20,12 @@ describe('Helpers', function () {
     // temp setting android_home to null.
     delete process.env.ANDROID_HOME;
 
-    await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
-
-    // resetting ANDROID_HOME
-    process.env.ANDROID_HOME = android_home;
+    try {
+      await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
+    } finally {
+      // resetting ANDROID_HOME
+      process.env.ANDROID_HOME = android_home;
+    }
   });
 
   it('getAndroidPlatformAndPath should return platform and path for android', async function () {
@@ -31,9 +33,8 @@ describe('Helpers', function () {
     platform.should.exist;
     platformPath.should.exist;
   });
-  // TODO make it work on CI
-  it.skip('assertZipArchive should assert zip existing', async () => {
-    await assertZipArchive(apkPath);
+  it('assertZipArchive should assert valid ZIP archives', async function () {
+    await assertZipArchive(apkPath).should.be.fulfilled;
   });
 
   describe('unzipFile', function () {
