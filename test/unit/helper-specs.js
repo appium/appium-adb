@@ -9,56 +9,43 @@ import _ from 'lodash';
 describe('helpers', function () {
   describe('getAndroidPlatformAndPath', withMocks({fs}, (mocks) => {
     let oldAndroidHome;
-    let oldResolve;
     before(function () {
       oldAndroidHome = process.env.ANDROID_HOME;
     });
     after(function () {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
-    afterEach(function () {
-      if (oldResolve) {
-        path.resolve = oldResolve;
-      }
-    });
 
-    it('should return null if no ANDROID_HOME is set', async function () {
-      delete process.env.ANDROID_HOME;
-
-      await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
-    });
     it('should get the latest available API', async function () {
       process.env.ANDROID_HOME = '/path/to/android/home';
 
-      mocks.fs.expects('exists')
-        .exactly(2)
-        .onCall(0).returns(false)
-        .onCall(1).returns(true);
-      // manually mock `path`, to allow system to work
-      oldResolve = path.resolve;
-      let count = 0;
-      path.resolve = function (...args) {
-        // ensure that underlying system calls still work
-        if (args[1] !== 'platforms' && args[1].indexOf('android') !== 0) {
-          return oldResolve(...args);
-        }
-
-        switch (count++) {
-          case 0:
-            return '/path/to';
-          case 1:
-            return '/path/to/apis1';
-          case 2:
-            return '/path/to/apis2';
-          case 3:
-            return '/error/getting/here';
-        }
-      };
+      mocks.fs.expects('glob').returns([
+        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-17', 'build.prop'),
+        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-25', 'build.prop'),
+        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-22', 'build.prop'),
+      ]);
+      mocks.fs.expects('readFile')
+        .exactly(3)
+        .onCall(0).returns(`
+          ro.build.version.incremental=1425461
+          ro.build.version.sdk=17
+          ro.build.version.codename=REL
+          ro.build.version.release=4.2.2`)
+        .onCall(1).returns(`
+          ro.build.version.incremental=1425461
+          ro.build.version.sdk=25
+          ro.build.version.codename=REL
+          ro.build.version.release=7.0`)
+        .onCall(2).returns(`
+          ro.build.version.incremental=1425461
+          ro.build.version.sdk=22
+          ro.build.version.codename=REL
+          ro.build.version.release=5.1`);
       let platformAndPath = await getAndroidPlatformAndPath();
-      platformAndPath.platform.should.equal('android-24');
-      platformAndPath.platformPath.should.equal('/path/to/apis2');
+      platformAndPath.platform.should.equal('android-25');
+      platformAndPath.platformPath.should
+        .equal(path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-25'));
       mocks.fs.verify();
-      count.should.eql(3);
     });
   }));
 
