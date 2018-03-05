@@ -51,8 +51,7 @@ example:
 ```js
 import ADB from 'appium-adb';
 
-let adb = new ADB();
-await adb.createADB();
+const adb = await ADB.createADB();
 console.log(await adb.getPIDsByName('m.android.phone'));
 ```
 
