@@ -239,7 +239,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      (await adb.bugreport()).should.not.be.empty;
+      (await adb.bugreport()).should.be.a('string');
     });
   });
 
