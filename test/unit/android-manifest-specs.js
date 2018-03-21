@@ -84,40 +84,6 @@ describe('android-manifest', function () {
                           android:name="android.intent.action.MAIN" />
 
                       <category
-                          android:name="android.intent.category.DEFAULT" />
-
-                      <category
-                          android:name="android.intent.category.LAUNCHER" />
-                  </intent-filter>
-              </activity>
-
-              <activity
-                  android:name="io.appium.mainactivity.MainTabActivity"
-                  android:exported="true"
-                  android:clearTaskOnLaunch="false"
-                  android:launchMode="1"
-                  android:screenOrientation="1"
-                  android:configChanges="0x4a0"
-                  android:alwaysRetainTaskState="true"
-                  android:windowSoftInputMode="0x30" />
-
-              <activity-alias
-                  android:name="${dummyActivityName}"
-                  android:exported="true"
-                  android:clearTaskOnLaunch="false"
-                  android:launchMode="1"
-                  android:screenOrientation="1"
-                  android:configChanges="0x4a0"
-                  android:targetActivity="io.appium.mainactivity.MainTabActivity"
-                  android:alwaysRetainTaskState="true"
-                  android:windowSoftInputMode="0x30">
-
-                  <intent-filter>
-
-                      <action
-                          android:name="android.intent.action.MAIN" />
-
-                      <category
                           android:name="android.intent.category.LAUNCHER" />
                   </intent-filter>
 
