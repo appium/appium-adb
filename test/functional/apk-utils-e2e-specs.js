@@ -15,6 +15,8 @@ describe('apk utils', function () {
   let adb;
   const contactManagerPath = path.resolve(rootDir, 'test',
                                           'fixtures', 'ContactManager.apk');
+  const apiDemosPath = path.resolve(rootDir, 'test',
+                                    'fixtures', 'ApiDemos-debug.apk');
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
@@ -149,5 +151,13 @@ describe('apk utils', function () {
   it('extractStringsFromApk should get strings for default language', async function () {
     let {apkStrings} = await adb.extractStringsFromApk(contactManagerPath, null, '/tmp');
     apkStrings.save.should.equal('Save');
+  });
+  it('extractStringsFromApk should get strings for non-default language', async function () {
+    let {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, 'fr', '/tmp');
+    apkStrings.linear_layout_8_horizontal.should.equal('Horizontal');
+  });
+  it('extractStringsFromApk should get strings for en language', async function () {
+    let {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, 'en', '/tmp');
+    apkStrings.linear_layout_8_horizontal.should.equal('Horizontal');
   });
 });

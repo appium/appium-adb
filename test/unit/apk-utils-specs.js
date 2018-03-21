@@ -43,6 +43,58 @@ describe('Apk-utils', function () {
     });
   }));
   describe('extractStringsFromApk', withMocks({adb, fs, teen_process}, (mocks) => {
+    it('should fallback to default if en locale is not present in the config', async function () {
+      mocks.teen_process.expects('exec').onCall(0)
+      .returns({stdout: `
+      Package Groups (1)
+      Package Group 0 id=0x7f packageCount=1 name=io.appium.android.apis
+      Package 0 id=0x7f name=io.appium.android.apis
+        type 0 configCount=1 entryCount=6
+          config (default):
+            resource 0x7f0c0215 io.appium.android.apis:string/linear_layout_8_vertical: t=0x03 d=0x0000044c (s=0x0008 r=0x00)
+              (string16) "Vertical"
+            resource 0x7f0c0216 io.appium.android.apis:string/linear_layout_8_horizontal: t=0x03 d=0x0000044d (s=0x0008 r=0x00)
+              (string16) "Horizontal"
+          config fr:
+            resource 0x7f0c0215 io.appium.android.apis:string/linear_layout_8_vertical: t=0x03 d=0x0000044c (s=0x0008 r=0x00)
+              (string16) "Vertical"
+            resource 0x7f0c0216 io.appium.android.apis:string/linear_layout_8_horizontal: t=0x03 d=0x0000044d (s=0x0008 r=0x00)
+              (string16) "Horizontal"
+      `});
+      mocks.teen_process.expects('exec')
+      .returns({stdout: `
+      nodpi-v4
+
+      xlarge-v4
+      v9
+      v11
+      v12
+      v13
+      w600dp-v13
+      w720dp-v13
+      w1024dp-v13
+      h550dp-v13
+      h670dp-v13
+      h974dp-v13
+      sw480dp-v13
+      sw600dp-v13
+      sw720dp-v13
+      v14
+      v16
+      v17
+      land
+      land-v13
+      ldpi-v4
+      mdpi-v4
+      hdpi-v4
+      xhdpi-v4
+      fr
+      `});
+      mocks.fs.expects('writeFile').once();
+      const {apkStrings, localPath} = await adb.extractStringsFromApk('/fake/path.apk', 'en', '/output');
+      apkStrings.linear_layout_8_horizontal.should.eql('Horizontal');
+      localPath.should.eql(path.resolve('/output', 'strings.json'));
+    });
     it('should properly parse aapt output', async function () {
       mocks.teen_process.expects('exec').once()
         .returns({stdout: `
