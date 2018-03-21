@@ -91,9 +91,9 @@ describe('Apk-utils', function () {
       fr
       `});
       mocks.fs.expects('writeFile').once();
-      const {apkStrings, localPath} = await adb.extractStringsFromApk('/fake/path.apk', 'en', '/output');
+      const {apkStrings, localPath} = await adb.extractStringsFromApk('/fake/path.apk', 'en', '/tmp');
       apkStrings.linear_layout_8_horizontal.should.eql('Horizontal');
-      localPath.should.eql(path.resolve('/output', 'strings.json'));
+      localPath.should.eql(path.resolve('/tmp', 'strings.json'));
     });
     it('should properly parse aapt output', async function () {
       mocks.teen_process.expects('exec').once()
@@ -163,13 +163,13 @@ describe('Apk-utils', function () {
                   (string8) "res/menu/toolbar_sketch.xml"
         `});
       mocks.fs.expects('writeFile').once();
-      const {apkStrings, localPath} = await adb.extractStringsFromApk('/fake/path.apk', 'de-DE', '/output');
+      const {apkStrings, localPath} = await adb.extractStringsFromApk('/fake/path.apk', 'de-DE', '/tmp');
       apkStrings.abc_action_bar_home_description.should.eql('Navigate "home"');
       apkStrings.calling__conversation_full__message.should.eql([
         'Calls work in conversations with up to 1 person.',
         'Calls work in conversations with up to %1$d people. "blabla"',
       ]);
-      localPath.should.eql(path.resolve('/output', 'strings.json'));
+      localPath.should.eql(path.resolve('/tmp', 'strings.json'));
     });
   }));
 
