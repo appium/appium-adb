@@ -208,7 +208,7 @@ describe('android-manifest', function () {
                   android:process=":browser" />
           </application>
       </manifest>`});
-      let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
+      let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(localApk);
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(dummyActivityName);
       mocks.teen_process.verify();
@@ -266,7 +266,7 @@ describe('android-manifest', function () {
                 android:process=":browser" />
         </application>
       </manifest>`});
-      let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
+      let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(localApk);
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(`${apkPackage}.${dummyActivityName}`);
       mocks.teen_process.verify();
@@ -325,7 +325,7 @@ describe('android-manifest', function () {
                 android:process=":browser" />
         </application>
       </manifest>`});
-      let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
+      let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(localApk);
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(dummyActivityName);
       mocks.teen_process.verify();
@@ -345,7 +345,7 @@ describe('android-manifest', function () {
         .once().withExactArgs('dummy_aapt', ['dump', 'badging', localApk])
         .returns({stdout: ` package: name='${dummyPackageName}'
                           launchable-activity: name='${dummyActivityName}'`});
-      let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
+      let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(localApk);
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(dummyActivityName);
       mocks.adb.verify();
