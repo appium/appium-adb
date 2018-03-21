@@ -210,7 +210,7 @@ describe('android-manifest', function () {
       </manifest>`});
       let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
       apkPackage.should.equal(dummyPackageName);
-      apkActivity.should.equal(dummyActivityName);
+      apkActivity.should.equal(apkPackage + '.' + dummyActivityName);
       mocks.teen_process.verify();
       mocks.helpers.verify();
     });
