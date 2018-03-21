@@ -268,7 +268,66 @@ describe('android-manifest', function () {
       </manifest>`});
       let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
       apkPackage.should.equal(dummyPackageName);
-      apkActivity.should.equal(apkPackage + '.' + dummyActivityName);
+      apkActivity.should.equal(`${apkPackage}.${dummyActivityName}`);
+      mocks.teen_process.verify();
+      mocks.helpers.verify();
+    });
+
+
+    it('should correctly parse package and activity from manifest with apkanalyzer tool and activity name without package name', async function () {
+      const apkanalyzerDummyPath = 'apkanalyzer';
+      mocks.helpers.expects("getApkanalyzerForOs").returns(apkanalyzerDummyPath);
+      const localApk = 'dummyAPK';
+      const dummyPackageName = 'io.appium.android';
+      const dummyActivityName = '.app.HelloWorld';
+      mocks.teen_process.expects("exec")
+          .once().withArgs(apkanalyzerDummyPath)
+          .returns({stdout: `
+      <?xml version="1.0" encoding="utf-8"?>
+      <manifest
+        xmlns:amazon="http://schemas.amazon.com/apk/res/android"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:versionCode="1234"
+        android:versionName="3.0.0"
+        android:installLocation="0"
+        package="${dummyPackageName}">
+  
+        <application
+            android:theme="@ref/0x7f0f00ef"
+            android:label="@ref/0x7f0e00b4"
+            android:icon="@ref/0x7f0b0001"
+            android:name="io.appium.app.testappAppShell"
+            android:debuggable="false"
+            android:allowTaskReparenting="true"
+            android:allowBackup="false"
+            android:hardwareAccelerated="true"
+            android:supportsRtl="true">
+  
+            <activity
+                android:name="${dummyActivityName}">
+    
+                <intent-filter>
+    
+                    <action
+                        android:name="android.intent.action.MAIN" />
+    
+                    <category
+                        android:name="android.intent.category.DEFAULT" />
+    
+                    <category
+                        android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+            </activity>
+  
+            <service
+                android:name="io.appium.browser.lite.BrowserLiteIntentService"
+                android:exported="false"
+                android:process=":browser" />
+        </application>
+      </manifest>`});
+      let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
+      apkPackage.should.equal(dummyPackageName);
+      apkActivity.should.equal(dummyActivityName);
       mocks.teen_process.verify();
       mocks.helpers.verify();
     });
