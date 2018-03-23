@@ -40,6 +40,7 @@
     "bluebird": "^3.4.7",
     "lodash": "^4.0.0",
     "semver": "^5.5.0",
+    "shell-quote": "^1.6.1",
     "source-map-support": "^0.4.8",
     "teen_process": "^1.11.0",
     "xmldom": "^0.1.27",
