@@ -39,7 +39,7 @@ describe('Android-manifest', async function () {
     flag.should.be.false;
   });
   // TODO fix this test
-  it.skip('should compile and insert manifest', async () => {
+  it.skip('should compile and insert manifest', async function () {
     let appPackage = 'com.example.android.contactmanager',
         newServerPath = path.resolve(tmpDir, `selendroid.${appPackage}.apk`),
         newPackage = 'com.example.android.contactmanager.selendroid',

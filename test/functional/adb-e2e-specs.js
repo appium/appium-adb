@@ -15,7 +15,7 @@ describe('ADB', function () {
     let adb = await ADB.createADB(opts);
     should.exist(adb.executable.path);
   });
-  it.skip('should error out if binary not persent', async () => {
+  it.skip('should error out if binary not persent', async function () {
     // TODO write a negative test
   });
   it('should initialize aapt', async function () {
