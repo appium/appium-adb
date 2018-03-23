@@ -465,9 +465,6 @@ describe('Apk-utils', function () {
     });
   }));
   describe('startUri', withMocks({adb}, (mocks) => {
-    before(async function () {
-
-    });
     it('should fail if uri or pkg are not provided', async function () {
       await adb.startUri().should.eventually.be.rejectedWith(/arguments are required/);
       await adb.startUri('foo').should.eventually.be.rejectedWith(/arguments are required/);
