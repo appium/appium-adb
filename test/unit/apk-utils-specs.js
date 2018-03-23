@@ -469,10 +469,25 @@ describe('Apk-utils', function () {
       await adb.startUri().should.eventually.be.rejectedWith(/arguments are required/);
       await adb.startUri('foo').should.eventually.be.rejectedWith(/arguments are required/);
     });
+    it('should fail if "unable to resolve intent" appears in shell command result', async function () {
+      mocks.adb.expects('shell')
+        .once().withExactArgs([
+          'am', 'start', '-W', '-a',
+          'android.intent.action.VIEW', '-d', uri, pkg
+        ])
+        .returns('Something something something Unable to resolve intent something something');
+
+      await adb.startUri(uri, pkg).should.eventually.be.rejectedWith(/Unable to resolve intent/);
+      mocks.adb.verify();
+    });
     it('should build a call to a VIEW intent with the uri', async function () {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['am', 'start', '-W', '-a',
-                               'android.intent.action.VIEW', '-d', uri, pkg]);
+        .once().withExactArgs([
+          'am', 'start', '-W', '-a',
+          'android.intent.action.VIEW', '-d', uri, pkg
+        ])
+        .returns('Passable result');
+
       await adb.startUri(uri, pkg);
       mocks.adb.verify();
     });
