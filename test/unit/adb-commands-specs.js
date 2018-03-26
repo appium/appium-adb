@@ -288,14 +288,15 @@ describe('adb commands', function () {
       });
     }));
     describe('lock', withMocks({adb, log}, (mocks) => {
-      it('should call isScreenLocked, keyevent and errorAndThrow', async function () {
+      it('should call isScreenLocked, keyevent', async function () {
         mocks.adb.expects("isScreenLocked")
-          .atLeast(2).returns(false);
+          .exactly(3)
+          .onCall(0).returns(false)
+          .onCall(1).returns(false)
+          .onCall(2).returns(true);
         mocks.adb.expects("keyevent")
           .once().withExactArgs(26)
           .returns("");
-        mocks.log.expects("errorAndThrow")
-          .once().returns("");
         await adb.lock();
         mocks.adb.verify();
       });
