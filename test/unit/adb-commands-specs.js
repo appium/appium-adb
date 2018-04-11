@@ -409,9 +409,14 @@ describe('adb commands', function () {
         mocks.adb.verify();
       });
       it('should call shell with correct args for emulator', async function () {
+        mocks.adb.expects("root")
+          .once()
+          .returns(true);
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
+        mocks.adb.expects("unroot")
+          .once();
         await adb.setWifiState(false, true);
         mocks.adb.verify();
       });
@@ -443,9 +448,14 @@ describe('adb commands', function () {
         mocks.adb.verify();
       });
       it('should call shell with correct args for emulator', async function () {
+        mocks.adb.expects("root")
+          .once()
+          .returns(true);
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
+        mocks.adb.expects("unroot")
+          .once();
         await adb.setDataState(true, true);
         mocks.adb.verify();
       });
@@ -461,16 +471,26 @@ describe('adb commands', function () {
         mocks.adb.verify();
       });
       it('should call shell with correct args when turning only wifi off for emulator', async function () {
+        mocks.adb.expects("root")
+          .once()
+          .returns(true);
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'wifi', 'disable'])
           .returns("");
+        mocks.adb.expects("unroot")
+          .once();
         await adb.setWifiAndData({wifi: false}, true);
         mocks.adb.verify();
       });
       it('should call shell with correct args when turning only data on for emulator', async function () {
+        mocks.adb.expects("root")
+          .once()
+          .returns(true);
         mocks.adb.expects("shell")
           .once().withExactArgs(['svc', 'data', 'enable'])
           .returns("");
+        mocks.adb.expects("unroot")
+          .once();
         await adb.setWifiAndData({data: true}, true);
         mocks.adb.verify();
       });
@@ -489,7 +509,12 @@ describe('adb commands', function () {
         mocks.adb.verify();
       });
       it('should call shell with correct args when turning both wifi and data off for emulator', async function () {
+        mocks.adb.expects("root")
+          .atLeast(1)
+          .returns(true);
         mocks.adb.expects("shell").twice().returns("");
+        mocks.adb.expects("unroot")
+          .atLeast(1);
         await adb.setWifiAndData({wifi: false, data: false}, true);
         mocks.adb.verify();
       });
