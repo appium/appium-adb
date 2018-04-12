@@ -38,7 +38,7 @@ describe('signing', function () {
       mocks.teen_process.expects("exec")
         .once().withExactArgs(apksignerDummyPath, ['sign',
           '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
-          {shell: true, cwd: path.dirname(apksignerDummyPath)})
+          {cwd: path.dirname(apksignerDummyPath)})
         .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
       mocks.teen_process.verify();
@@ -52,7 +52,7 @@ describe('signing', function () {
       mocks.teen_process.expects("exec")
         .once().withExactArgs(apksignerDummyPath, ['sign',
           '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
-          {shell: true, cwd: path.dirname(apksignerDummyPath)})
+          {cwd: path.dirname(apksignerDummyPath)})
         .throws();
       mocks.helpers.expects("getJavaForOs")
         .returns(javaDummyPath);
@@ -82,7 +82,7 @@ describe('signing', function () {
           '--ks-key-alias', keyAlias,
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
-          selendroidTestApp], {shell: true, cwd: path.dirname(apksignerDummyPath)})
+          selendroidTestApp], {cwd: path.dirname(apksignerDummyPath)})
         .returns({});
       await adb.signWithCustomCert(selendroidTestApp);
       mocks.teen_process.verify();
@@ -104,7 +104,7 @@ describe('signing', function () {
           '--ks-key-alias', keyAlias,
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
-          selendroidTestApp], {shell: true, cwd: path.dirname(apksignerDummyPath)})
+          selendroidTestApp], {cwd: path.dirname(apksignerDummyPath)})
         .throws();
       mocks.helpers.expects("getJavaHome")
         .returns(javaHome);
@@ -181,7 +181,7 @@ describe('signing', function () {
       mocks.teen_process.expects("exec")
         .once().withExactArgs(apksignerDummyPath,
           ['verify', '--print-certs', selendroidTestApp],
-          {shell: true, cwd: path.dirname(apksignerDummyPath)})
+          {cwd: path.dirname(apksignerDummyPath)})
         .returns({
           stdout: `Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
                    Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
