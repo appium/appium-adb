@@ -47,7 +47,7 @@ describe('Helpers', function () {
     });
 
     it('should unzip a .zip file (force isWindows to be true so we can test the internal zip library)', async function () {
-      const forceWindows = sinon.stub(system, 'isWindows', () => true);
+      const forceWindows = sinon.stub(system, 'isWindows').returns(true);
       const temp = await tempDir.openDir();
       await fs.copyFile(getFixture('TestZip.zip'), path.resolve(temp, 'TestZip.zip'));
       await unzipFile(path.resolve(temp, 'TestZip.zip'));
