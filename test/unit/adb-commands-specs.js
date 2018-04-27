@@ -706,14 +706,13 @@ describe('adb commands', function () {
           .returns('');
         mocks.adb.expects("shell")
           .withExactArgs(['kill', pid])
+          .twice()
           .onCall(0)
-          .returns('');
-        mocks.adb.expects("shell")
-          .withExactArgs(['kill', pid])
+          .returns('')
           .onCall(1)
           .throws();
         await adb.killProcessByPID(pid);
-        mocks.adb.verify();
+        mocks.verify();
       });
 
       it('should force kill process if normal kill fails', async function () {
