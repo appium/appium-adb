@@ -8,9 +8,14 @@ import { withMocks } from 'appium-test-support';
 
 chai.use(chaiAsPromised);
 
-describe('android-manifest', function () {
-  let adb = new ADB();
-  describe('processFromManifest', withMocks({adb, teen_process}, (mocks) => {
+const adb = new ADB();
+
+describe('android-manifest', withMocks({adb, teen_process, helpers}, function (mocks) {
+  afterEach(function () {
+    mocks.verify();
+  });
+
+  describe('processFromManifest', function () {
     it('should correctly parse process from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
@@ -24,10 +29,9 @@ describe('android-manifest', function () {
         .returns({stdout: ` E: application (line=234)
                           A: android:process(0x01010011)="${dummyProcess}"`});
       (await adb.processFromManifest(localApk)).should.equal(dummyProcess);
-      mocks.adb.verify();
     });
-  }));
-  describe('packageAndLaunchActivityFromManifest', withMocks({adb, helpers, teen_process}, (mocks) => {
+  });
+  describe('packageAndLaunchActivityFromManifest', function () {
     it('should correctly parse package and activity from manifest with apkanalyzer tool', async function () {
       const apkanalyzerDummyPath = 'apkanalyzer';
       mocks.helpers.expects("getApkanalyzerForOs").returns(apkanalyzerDummyPath);
@@ -211,8 +215,6 @@ describe('android-manifest', function () {
       let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(dummyActivityName);
-      mocks.teen_process.verify();
-      mocks.helpers.verify();
     });
 
     it('should correctly parse package and activity from manifest with Appium Apk Tools fallback', async function () {
@@ -231,12 +233,9 @@ describe('android-manifest', function () {
       let {apkPackage, apkActivity} = (await adb.packageAndLaunchActivityFromManifest(localApk));
       apkPackage.should.equal(dummyPackageName);
       apkActivity.should.equal(dummyActivityName);
-      mocks.adb.verify();
-      mocks.teen_process.verify();
-      mocks.helpers.verify();
     });
-  }));
-  describe('hasInternetPermissionFromManifest', withMocks({adb, teen_process}, (mocks) => {
+  });
+  describe('hasInternetPermissionFromManifest', function () {
     it('should correctly parse internet permission from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK';
@@ -247,9 +246,8 @@ describe('android-manifest', function () {
         .once().withExactArgs('dummy_aapt', ['dump', 'badging', localApk])
         .returns({stdout: ` uses-permission:.*'android.permission.INTERNET'`});
       (await adb.hasInternetPermissionFromManifest(localApk)).should.be.true;
-      mocks.adb.verify();
     });
-  }));
+  });
   describe('compileManifest', function () {
     it('should throw an error if no ANDROID_HOME set', async function () {
       let oldAndroidHome = process.env.ANDROID_HOME;
@@ -260,4 +258,4 @@ describe('android-manifest', function () {
       process.env.ANDROID_HOME = oldAndroidHome;
     });
   });
-});
+}));
