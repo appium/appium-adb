@@ -6,8 +6,12 @@ import path from 'path';
 import _ from 'lodash';
 
 
-describe('helpers', function () {
-  describe('getAndroidPlatformAndPath', withMocks({fs}, (mocks) => {
+describe('helpers', withMocks({fs}, function (mocks) {
+  afterEach(function () {
+    mocks.verify();
+  });
+
+  describe('getAndroidPlatformAndPath', function () {
     let oldAndroidHome;
     before(function () {
       oldAndroidHome = process.env.ANDROID_HOME;
@@ -45,9 +49,8 @@ describe('helpers', function () {
       platformAndPath.platform.should.equal('android-25');
       platformAndPath.platformPath.should
         .equal(path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-25'));
-      mocks.fs.verify();
     });
-  }));
+  });
 
   describe('isShowingLockscreen', function () {
     it('should return true if mShowingLockscreen is true', async function () {
@@ -135,7 +138,7 @@ describe('helpers', function () {
     });
   });
 
-  describe('getBuildToolsDirs', withMocks({fs}, (mocks) => {
+  describe('getBuildToolsDirs', function () {
     it('should sort build-tools folder names by semantic version', async function () {
       mocks.fs.expects('glob').once().returns([
         '/some/path/1.2.3',
@@ -147,7 +150,6 @@ describe('helpers', function () {
         '/some/path/2.3.1',
         '/some/path/1.2.3',
       ]);
-      mocks.fs.verify();
     });
-  }));
-});
+  });
+}));
