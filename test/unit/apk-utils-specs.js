@@ -181,7 +181,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
-                 `ActivityRecord{2 u ${pkg}/${act} t181}}}`);
+                 `ActivityRecord{2 u ${pkg}/${act} t181}}}\n` +
+                 `mCurrentFocus=Window{4330b6c0 com.android.settings/com.android.settings.SubSettings paused=false}`);
 
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       appPackage.should.equal(pkg);
@@ -197,10 +198,27 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appPackage.should.equal(pkg);
       appActivity.should.equal(act);
     });
-    it('should parse correctly and return null', async function () {
+    it('should parse correctly and return package and activity of only mCurrentFocus is set', async function () {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns(`mFocusedApp=null\nmCurrentFocus=Window{4330b6c0 ${pkg}/${act} paused=false}`);
+
+      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal(pkg);
+      appActivity.should.equal(act);
+    });
+    it('should return null if mFocusedApp=null', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns('mFocusedApp=null');
+      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      should.not.exist(appPackage);
+      should.not.exist(appActivity);
+    });
+    it('should return null if mCurrentFocus=null', async function () {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+        .returns('mCurrentFocus=null');
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       should.not.exist(appPackage);
       should.not.exist(appActivity);
