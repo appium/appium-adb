@@ -201,7 +201,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should parse correctly and return package and activity of only mCurrentFocus is set', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
-        .returns(`mFocusedApp=null\nmCurrentFocus=Window{4330b6c0 ${pkg}/${act} paused=false}`);
+        .returns(`mFocusedApp=null\n  mCurrentFocus=Window{4330b6c0 u0 ${pkg}/${act} paused=false}`);
 
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       appPackage.should.equal(pkg);
