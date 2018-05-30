@@ -7,7 +7,8 @@ appium-adb
 [![devDependency Status](https://david-dm.org/appium/appium-adb/dev-status.svg)](https://david-dm.org/appium/appium-adb#info=devDependencies)
 
 [![Build Status](https://api.travis-ci.org/appium/appium-adb.png?branch=master)](https://travis-ci.org/appium/appium-adb)
-[![Coverage Status](https://coveralls.io/repos/appium/appium-adb/badge.svg?branch=master)](https://coveralls.io/r/appium/appium-adb?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/appium/appium-adb.svg)](https://greenkeeper.io/)
+[![Coverage Status](https://coveralls.io/repos/appium/appium-adb/badge.svg?branch=master)](https://coveralls.io/r/appium/appium-adb?branch=master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/appium/appium-adb.svg)](https://greenkeeper.io/)
 
 A wrapper over android-adb, implemented using ES6 and along with `async/await`. This package is mainly used by Appium to perform all adb operations on android device.
 
