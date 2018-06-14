@@ -932,6 +932,20 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
+    it('should perform upgrade if the same version is installed, but version codes are different', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+        name: pkgId,
+        versionCode: 2,
+        versionName: '2.0.0',
+      });
+      mocks.adb.expects('getPackageInfo').once().returns({
+        versionCode: 1,
+        versionName: '2.0.0',
+      });
+      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
+      await adb.installOrUpgrade(apkPath);
+    });
     it('should uninstall and re-install if older package version is installed and upgrade fails', async function () {
       mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
         name: pkgId,
