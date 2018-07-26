@@ -4,6 +4,7 @@
   "description": "Android Debug Bridge interface",
   "main": "./build/index.js",
   "scripts": {
+    "clean": "rm -rf node_modules && rm -f package-lock.json && npm install",
     "prepublish": "gulp prepublish",
     "test": "gulp once",
     "watch": "gulp watch",
