@@ -63,11 +63,6 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
     });
-
-    it('should throw error for invalid file path', async function () {
-      let dummyPath = "dummyPath";
-      await adb.signWithDefaultCert(dummyPath).should.eventually.be.rejected;
-    });
   });
 
   describe('signWithCustomCert', function () {
