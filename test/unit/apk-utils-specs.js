@@ -34,11 +34,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'package', pkg])
-        .returns(`Dexopt state:
-        [${pkg}]
-          Instruction Set: x86
-            path: /system/priv-app/Shell/Shell.apk
-            status: /system/priv-app/Shell/oat/x86/Shell.odex [compilation_filter=speed, status=kOatUpToDate]`);
+        .returns(`Packages:
+          Package [${pkg}] (2469669):
+            userId=2000`);
       (await adb.isAppInstalled(pkg)).should.be.true;
     });
     it('should parse correctly and return false', async function () {
