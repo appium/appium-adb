@@ -33,15 +33,18 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should parse correctly and return true', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'list', 'packages', pkg])
-        .returns(`package:${pkg}`);
+        .once().withExactArgs(['dumpsys', 'package', pkg])
+        .returns(`Packages:
+          Package [${pkg}] (2469669):
+            userId=2000`);
       (await adb.isAppInstalled(pkg)).should.be.true;
     });
     it('should parse correctly and return false', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'list', 'packages', pkg])
-        .returns("");
+        .once().withExactArgs(['dumpsys', 'package', pkg])
+        .returns(`Dexopt state:
+          Unable to find package: ${pkg}`);
       (await adb.isAppInstalled(pkg)).should.be.false;
     });
   });
