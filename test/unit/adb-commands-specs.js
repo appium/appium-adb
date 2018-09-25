@@ -475,9 +475,11 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setAnimationState', function () {
-      const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.animation',
-                      '-n', 'io.appium.settings/.receivers.AnimationSettingReceiver',
-                      '--es', 'setstatus'];
+      const adbArgs = [
+        'am', 'broadcast', '-a', 'io.appium.settings.animation',
+        '-n', 'io.appium.settings/.receivers.AnimationSettingReceiver',
+        '--es', 'setstatus'
+      ];
       it('should call shell with correct args to enable animation', async function () {
         mocks.adb.expects("shell").once().withExactArgs(adbArgs.concat('enable'));
         await adb.setAnimationState(true);
@@ -523,12 +525,18 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setGeoLocation', function () {
-      const location = {longitude: '50.5',
-                        latitude: '50.1'};
+      const location = {
+        longitude: '50.5',
+        latitude: '50.1'
+      };
       it('should call shell with correct args for real device', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['am', 'startservice', '-e', 'longitude', location.longitude,
-                                 '-e', 'latitude', location.latitude, `io.appium.settings/.LocationService`])
+          .once().withExactArgs([
+            'am', 'startservice',
+            '-e', 'longitude', location.longitude,
+            '-e', 'latitude', location.latitude,
+            `io.appium.settings/.LocationService`
+          ])
           .returns("");
         await adb.setGeoLocation(location);
       });
@@ -880,118 +888,138 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     it('should properly list requested permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getReqPermissions('io.appium.android');
-      for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.INTERNET',
-                        'android.permission.READ_CONTACTS',
-                        'android.permission.RECORD_AUDIO',
-                        'android.permission.VIBRATE',
-                        'android.permission.CAMERA',
-                        'android.permission.FLASHLIGHT',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.MODIFY_AUDIO_SETTINGS',
-                        'android.permission.BLUETOOTH',
-                        'android.permission.WAKE_LOCK',
-                        'android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.RECEIVE_BOOT_COMPLETED']) {
+      for (let perm of [
+        'android.permission.ACCESS_NETWORK_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.INTERNET',
+        'android.permission.READ_CONTACTS',
+        'android.permission.RECORD_AUDIO',
+        'android.permission.VIBRATE',
+        'android.permission.CAMERA',
+        'android.permission.FLASHLIGHT',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+        'android.permission.BLUETOOTH',
+        'android.permission.WAKE_LOCK',
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.RECEIVE_BOOT_COMPLETED'
+      ]) {
         result.should.include(perm);
       }
     });
     it('should properly list requested permissions for output without install permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
       const result = await adb.getReqPermissions('io.appium.android');
-      for (let perm of ['android.permission.ACCESS_NETWORK_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.INTERNET',
-                        'android.permission.READ_CONTACTS',
-                        'android.permission.RECORD_AUDIO',
-                        'android.permission.VIBRATE',
-                        'android.permission.CAMERA',
-                        'android.permission.FLASHLIGHT',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.MODIFY_AUDIO_SETTINGS',
-                        'android.permission.BLUETOOTH',
-                        'android.permission.WAKE_LOCK',
-                        'android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.RECEIVE_BOOT_COMPLETED']) {
+      for (let perm of [
+        'android.permission.ACCESS_NETWORK_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.INTERNET',
+        'android.permission.READ_CONTACTS',
+        'android.permission.RECORD_AUDIO',
+        'android.permission.VIBRATE',
+        'android.permission.CAMERA',
+        'android.permission.FLASHLIGHT',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+        'android.permission.BLUETOOTH',
+        'android.permission.WAKE_LOCK',
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.RECEIVE_BOOT_COMPLETED'
+      ]) {
         result.should.include(perm);
       }
     });
     it('should properly list granted permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getGrantedPermissions('io.appium.android');
-      for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
-                        'android.permission.RECEIVE_BOOT_COMPLETED',
-                        'android.permission.BLUETOOTH',
-                        'android.permission.INTERNET',
-                        'android.permission.FLASHLIGHT',
-                        'android.permission.ACCESS_NETWORK_STATE',
-                        'android.permission.VIBRATE',
-                        'android.permission.WAKE_LOCK',
-                        'android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.RECORD_AUDIO']) {
+      for (let perm of [
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+        'android.permission.RECEIVE_BOOT_COMPLETED',
+        'android.permission.BLUETOOTH',
+        'android.permission.INTERNET',
+        'android.permission.FLASHLIGHT',
+        'android.permission.ACCESS_NETWORK_STATE',
+        'android.permission.VIBRATE',
+        'android.permission.WAKE_LOCK',
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.RECORD_AUDIO'
+      ]) {
         result.should.include(perm);
       }
-      for (let perm of ['android.permission.READ_CONTACTS',
-                        'android.permission.CAMERA']) {
+      for (let perm of [
+        'android.permission.READ_CONTACTS',
+        'android.permission.CAMERA',
+      ]) {
         result.should.not.include(perm);
       }
     });
     it('should properly list granted permissions for output without install permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
       const result = await adb.getGrantedPermissions('io.appium.android');
-      for (let perm of ['android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.RECORD_AUDIO']) {
+      for (let perm of [
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.RECORD_AUDIO'
+      ]) {
         result.should.include(perm);
       }
-      for (let perm of ['android.permission.READ_CONTACTS',
-                        'android.permission.CAMERA']) {
+      for (let perm of [
+        'android.permission.READ_CONTACTS',
+        'android.permission.CAMERA'
+      ]) {
         result.should.not.include(perm);
       }
     });
     it('should properly list denied permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedOutput);
       const result = await adb.getDeniedPermissions('io.appium.android');
-      for (let perm of ['android.permission.MODIFY_AUDIO_SETTINGS',
-                        'android.permission.RECEIVE_BOOT_COMPLETED',
-                        'android.permission.BLUETOOTH',
-                        'android.permission.INTERNET',
-                        'android.permission.FLASHLIGHT',
-                        'android.permission.ACCESS_NETWORK_STATE',
-                        'android.permission.VIBRATE',
-                        'android.permission.WAKE_LOCK',
-                        'android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.RECORD_AUDIO']) {
+      for (let perm of [
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+        'android.permission.RECEIVE_BOOT_COMPLETED',
+        'android.permission.BLUETOOTH',
+        'android.permission.INTERNET',
+        'android.permission.FLASHLIGHT',
+        'android.permission.ACCESS_NETWORK_STATE',
+        'android.permission.VIBRATE',
+        'android.permission.WAKE_LOCK',
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.RECORD_AUDIO',
+      ]) {
         result.should.not.include(perm);
       }
-      for (let perm of ['android.permission.READ_CONTACTS',
-                        'android.permission.CAMERA']) {
+      for (let perm of [
+        'android.permission.READ_CONTACTS',
+        'android.permission.CAMERA',
+      ]) {
         result.should.include(perm);
       }
     });
     it('should properly list denied permissions for output without install permissions', async function () {
       mocks.adb.expects("shell").once().returns(dumpedLimitedOutput);
       const result = await adb.getDeniedPermissions('io.appium.android');
-      for (let perm of ['android.permission.ACCESS_FINE_LOCATION',
-                        'android.permission.READ_EXTERNAL_STORAGE',
-                        'android.permission.READ_PHONE_STATE',
-                        'android.permission.WRITE_EXTERNAL_STORAGE',
-                        'android.permission.RECORD_AUDIO']) {
+      for (let perm of [
+        'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.READ_PHONE_STATE',
+        'android.permission.WRITE_EXTERNAL_STORAGE',
+        'android.permission.RECORD_AUDIO'
+      ]) {
         result.should.not.include(perm);
       }
-      for (let perm of ['android.permission.READ_CONTACTS',
-                        'android.permission.CAMERA']) {
+      for (let perm of [
+        'android.permission.READ_CONTACTS',
+        'android.permission.CAMERA'
+      ]) {
         result.should.include(perm);
       }
     });
