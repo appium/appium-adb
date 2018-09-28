@@ -79,42 +79,42 @@ describe('helpers', withMocks({fs}, function (mocks) {
 
     it('should parse optionalIntentArguments with single key', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
-      cmd[cmd.length-2].should.eql('-d');
-      cmd[cmd.length-1].should.eql('key');
+      cmd[cmd.length - 2].should.eql('-d');
+      cmd[cmd.length - 1].should.eql('key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value'}, startOptions), 20);
-      cmd[cmd.length-3].should.eql('-d');
-      cmd[cmd.length-2].should.eql('key');
-      cmd[cmd.length-1].should.eql('value');
+      cmd[cmd.length - 3].should.eql('-d');
+      cmd[cmd.length - 2].should.eql('key');
+      cmd[cmd.length - 1].should.eql('value');
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value value2'}, startOptions), 20);
-      cmd[cmd.length-3].should.eql('-d');
-      cmd[cmd.length-2].should.eql('key');
-      cmd[cmd.length-1].should.eql('value value2');
+      cmd[cmd.length - 3].should.eql('-d');
+      cmd[cmd.length - 2].should.eql('key');
+      cmd[cmd.length - 1].should.eql('value value2');
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions), 20);
-      cmd[cmd.length-4].should.eql('-d');
-      cmd[cmd.length-3].should.eql('key1');
-      cmd[cmd.length-2].should.eql('-e');
-      cmd[cmd.length-1].should.eql('key2');
+      cmd[cmd.length - 4].should.eql('-d');
+      cmd[cmd.length - 3].should.eql('key1');
+      cmd[cmd.length - 2].should.eql('-e');
+      cmd[cmd.length - 1].should.eql('key2');
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions), 20);
-      cmd[cmd.length-6].should.eql('-d');
-      cmd[cmd.length-5].should.eql('key1');
-      cmd[cmd.length-4].should.eql('value1');
-      cmd[cmd.length-3].should.eql('-e');
-      cmd[cmd.length-2].should.eql('key2');
-      cmd[cmd.length-1].should.eql('value2');
+      cmd[cmd.length - 6].should.eql('-d');
+      cmd[cmd.length - 5].should.eql('key1');
+      cmd[cmd.length - 4].should.eql('value1');
+      cmd[cmd.length - 3].should.eql('-e');
+      cmd[cmd.length - 2].should.eql('key2');
+      cmd[cmd.length - 1].should.eql('value2');
     });
     it('should parse optionalIntentArguments with hyphens', function () {
       let arg = 'http://some-url-with-hyphens.com/';
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: `-d ${arg}`}, startOptions), 20);
-      cmd[cmd.length-2].should.eql('-d');
-      cmd[cmd.length-1].should.eql(arg);
+      cmd[cmd.length - 2].should.eql('-d');
+      cmd[cmd.length - 1].should.eql(arg);
     });
     it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
       let arg1 = 'http://some-url-with-hyphens.com/';
@@ -122,19 +122,19 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let cmd = buildStartCmd(_.defaults({
         optionalIntentArguments: `-d ${arg1} -e key ${arg2}`
       }, startOptions), 20);
-      cmd[cmd.length-5].should.eql('-d');
-      cmd[cmd.length-4].should.eql(arg1);
-      cmd[cmd.length-3].should.eql('-e');
-      cmd[cmd.length-2].should.eql('key');
-      cmd[cmd.length-1].should.eql(arg2);
+      cmd[cmd.length - 5].should.eql('-d');
+      cmd[cmd.length - 4].should.eql(arg1);
+      cmd[cmd.length - 3].should.eql('-e');
+      cmd[cmd.length - 2].should.eql('key');
+      cmd[cmd.length - 1].should.eql(arg2);
     });
-    it('should have -S option when stopApp is set', async function () {
+    it('should have -S option when stopApp is set', function () {
       let cmd = buildStartCmd(_.defaults({stopApp: true}, startOptions), 20);
-      cmd[cmd.length-1].should.eql('-S');
+      cmd[cmd.length - 1].should.eql('-S');
     });
-    it('should not have -S option when stopApp is not set', async function () {
+    it('should not have -S option when stopApp is not set', function () {
       let cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
-      cmd[cmd.length-1].should.not.eql('-S');
+      cmd[cmd.length - 1].should.not.eql('-S');
     });
   });
 

@@ -20,7 +20,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   it('getConnectedDevices should get all connected devices', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"List of devices attached \n emulator-5554	device"});
+      .returns({stdout: "List of devices attached \n emulator-5554	device"});
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
   });
@@ -31,7 +31,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
                       "emulator-5554	device";
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:stdoutValue});
+      .returns({stdout: stdoutValue});
 
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
@@ -39,7 +39,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   it('getConnectedDevices should fail when adb devices returns unexpected output', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"foobar"});
+      .returns({stdout: "foobar"});
     await adb.getConnectedDevices().should.eventually.be
                                    .rejectedWith("Unexpected output while trying to get devices");
   });
@@ -47,7 +47,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
     this.timeout(20000);
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"List of devices attached"});
+      .returns({stdout: "List of devices attached"});
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
     await adb.getDevicesWithRetry(1000).should.eventually.be
@@ -56,7 +56,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   it('getDevicesWithRetry should fail when adb devices returns unexpected output', async function () {
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"foobar"});
+      .returns({stdout: "foobar"});
     mocks.teen_process.expects("exec")
       .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
     await adb.getDevicesWithRetry(1000).should.eventually.be
@@ -65,17 +65,17 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   it('getDevicesWithRetry should get all connected devices', async function () {
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"List of devices attached \n emulator-5554	device"});
+      .returns({stdout: "List of devices attached \n emulator-5554	device"});
     let devices = await adb.getDevicesWithRetry(1000);
     devices.should.have.length.above(0);
   });
   it('getDevicesWithRetry should get all connected devices second time', async function () {
     mocks.teen_process.expects("exec")
       .onCall(0)
-      .returns({stdout:"Foobar"});
+      .returns({stdout: "Foobar"});
     mocks.teen_process.expects("exec")
       .withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
-      .returns({stdout:"List of devices attached \n emulator-5554	device"});
+      .returns({stdout: "List of devices attached \n emulator-5554	device"});
     mocks.teen_process.expects("exec")
       .once().withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
     let devices = await adb.getDevicesWithRetry(2000);
@@ -110,7 +110,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   });
 }));
 
-describe('System calls',  withMocks({adb, B, teen_process}, function (mocks) {
+describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
   afterEach(function () {
     mocks.verify();
   });

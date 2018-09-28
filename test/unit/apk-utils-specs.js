@@ -824,9 +824,10 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       locales: '--_--'
       densities: '120' '160' '240' '320'`});
       const result = await adb.getApkInfo('/some/folder/path.apk');
-      for (let [name, value] of [['name', 'io.appium.settings'],
-                                 ['versionCode', 2],
-                                 ['versionName', '1.1']]) {
+      for (let [name, value] of [
+        ['name', 'io.appium.settings'],
+        ['versionCode', 2],
+        ['versionName', '1.1']]) {
         result.should.have.property(name, value);
       }
     });
@@ -860,9 +861,10 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         User 0: ceDataInode=474317 installed=true hidden=false suspended=false stopped=true notLaunched=true enabled=0
           runtime permissions:`);
       const result = await adb.getPackageInfo('com.example.testapp.first');
-      for (let [name, value] of [['name', 'com.example.testapp.first'],
-                                 ['versionCode', 1],
-                                 ['versionName', '1.0']]) {
+      for (let [name, value] of [
+        ['name', 'com.example.testapp.first'],
+        ['versionCode', 1],
+        ['versionName', '1.0']]) {
         result.should.have.property(name, value);
       }
     });

@@ -34,7 +34,7 @@ describe('logcat', function () {
     }
   });
   describe('clearDeviceLogsOnStart = false', function () {
-    before(async function () {
+    before(function () {
       logcat = new Logcat({
         adb: adb.executable,
         debug: false,
@@ -56,7 +56,7 @@ describe('logcat', function () {
     });
   });
   describe('clearDeviceLogsOnStart = true', function () {
-    before(async function () {
+    before(function () {
       logcat = new Logcat({
         adb: adb.executable,
         debug: false,

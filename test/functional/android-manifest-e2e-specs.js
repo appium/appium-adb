@@ -16,7 +16,7 @@ const serverPath = path.resolve(rootDir, 'test', 'fixtures', 'selendroid', 'sele
 
 chai.use(chaiAsPromised);
 
-describe('Android-manifest', async function () {
+describe('Android-manifest', function () {
   let adb;
   before(async function () {
     adb = await ADB.createADB();
