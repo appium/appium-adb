@@ -54,8 +54,8 @@ describe('adb commands', function () {
     await adb.enabledIMEs();
   });
   it('processExists should be able to find ui process', async function () {
-    if (await adb.getApiLevel() > 21 && process.env.TRAVIS) {
-      // This test is not stable on Travis
+    if (process.env.TRAVIS) {
+      // This test is unstable on Travis
       return this.skip();
     }
     (await adb.processExists('com.android.systemui')).should.be.true;
