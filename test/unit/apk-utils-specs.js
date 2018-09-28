@@ -12,12 +12,26 @@ const should = chai.should(),
       pkg = 'com.example.android.contactmanager',
       uri = 'content://contacts/people/1',
       act = '.ContactManager',
-      startAppOptions = {stopApp: true, action: 'action', category: 'cat',
-                         flags: 'flags', pkg: 'pkg', activity: 'act',
-                         optionalIntentArguments: '-x options -y option argument -z option arg with spaces'},
-      cmd = ['am', 'start', '-W', '-n', 'pkg/act', '-S', '-a', 'action', '-c', 'cat',
-             '-f', 'flags', '-x', 'options', '-y', 'option', 'argument',
-             '-z', 'option', 'arg with spaces'],
+      startAppOptions = {
+        stopApp: true,
+        action: 'action',
+        category: 'cat',
+        flags: 'flags',
+        pkg: 'pkg',
+        activity: 'act',
+        optionalIntentArguments: '-x options -y option argument -z option arg with spaces',
+      },
+      cmd = [
+        'am', 'start', '-W', '-n', 'pkg/act', '-S',
+        '-a', 'action',
+        '-c', 'cat',
+        '-f', 'flags',
+        '-x', 'options',
+        '-y', 'option',
+        'argument',
+        '-z', 'option',
+        'arg with spaces',
+      ],
       language = 'en',
       country = 'US',
       locale = 'en-US';
@@ -490,7 +504,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().withExactArgs()
         .returns(17);
       mocks.adb.expects('shell')
-        .once().withExactArgs(cmd)
+        .once().withArgs(cmd)
         .returns('');
       (await adb.startApp(startAppOptions));
     });
@@ -513,7 +527,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().withExactArgs()
         .returns(17);
       mocks.adb.expects('shell')
-        .once().withExactArgs(cmdWithInnerClass)
+        .once().withArgs(cmdWithInnerClass)
         .returns('');
       (await adb.startApp(startAppOptionsWithInnerClass));
     });

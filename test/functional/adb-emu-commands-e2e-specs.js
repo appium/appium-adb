@@ -22,7 +22,7 @@ describe('adb emu commands', function () {
     // the test here only works if we have API level 23 or above
     // it will also fail on emulators
     if (await adb.getApiLevel() < 23 || !process.env.REAL_DEVICE) {
-      this.skip();
+      return this.skip();
     }
   });
   it('fingerprint should open the secret activity on emitted valid finger touch event', async function () {

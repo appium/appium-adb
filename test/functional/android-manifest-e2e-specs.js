@@ -8,15 +8,11 @@ import { rootDir } from '../../lib/helpers.js';
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
-const contactManagerPath = path.resolve(rootDir, 'test',
-                                        'fixtures', 'ContactManager.apk'),
-      contactMangerSelendroidPath = path.resolve(rootDir, 'test',
-                                                 'fixtures', 'ContactManager-selendroid.apk'),
-      tmpDir = path.resolve(rootDir, 'test', 'temp'),
-      srcManifest = path.resolve(rootDir, 'test', 'fixtures',
-                                 'selendroid', 'AndroidManifest.xml'),
-      serverPath = path.resolve(rootDir, 'test', 'fixtures',
-                                'selendroid', 'selendroid.apk');
+const contactManagerPath = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
+const contactMangerSelendroidPath = path.resolve(rootDir, 'test',  'fixtures', 'ContactManager-selendroid.apk');
+const tmpDir = path.resolve(rootDir, 'test', 'temp');
+const srcManifest = path.resolve(rootDir, 'test', 'fixtures', 'selendroid', 'AndroidManifest.xml');
+const serverPath = path.resolve(rootDir, 'test', 'fixtures', 'selendroid', 'selendroid.apk');
 
 chai.use(chaiAsPromised);
 
@@ -28,7 +24,7 @@ describe('Android-manifest', async function () {
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
     apkPackage.should.equal('com.example.android.contactmanager');
-    apkActivity.should.equal('com.example.android.contactmanager.ContactManager');
+    apkActivity.endsWith('.ContactManager').should.be.true;
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
     let flag = await adb.hasInternetPermissionFromManifest(contactMangerSelendroidPath);

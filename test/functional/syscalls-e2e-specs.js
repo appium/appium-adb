@@ -54,6 +54,10 @@ describe('System calls', function () {
     await adb.waitForDevice(2);
   });
   it('reboot should reboot the device', async function () {
+    if (process.env.TRAVIS) {
+      // The test is very slow on CI
+      return this.skip();
+    }
     this.timeout(MOCHA_LONG_TIMEOUT);
     await adb.reboot(process.env.TRAVIS ? 200 : undefined);
     await adb.ping();

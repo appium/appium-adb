@@ -6,6 +6,8 @@ import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
 import { MOCHA_TIMEOUT } from './setup';
 
+const waitDuration = 60000;
+
 chai.should();
 chai.use(chaiAsPromised);
 
@@ -62,90 +64,115 @@ describe('apk utils', function () {
   describe('startApp', async function () {
     it('should be able to start', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager'});
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitDuration: 60000,
+      });
       await assertPackageAndActivity();
 
     });
     it('should throw error for wrong activity', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManage'}).should.eventually
-                                                     .be.rejectedWith('Activity');
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManage'
+      }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager',
-                          waitActivity: 'foo',
-                          waitDuration: 1000}).should.eventually
-                                              .be.rejectedWith('foo');
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: 'foo',
+        waitDuration: 1000,
+      }).should.eventually.be.rejectedWith('foo');
     });
     it('should start activity with wait activity', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager',
-                          waitActivity: '.ContactManager'});
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: '.ContactManager',
+        waitDuration,
+      });
       await assertPackageAndActivity();
     });
     it('should start activity when wait activity is a wildcard', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager',
-                          waitActivity: '*'});
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: '*',
+        waitDuration,
+      });
       await assertPackageAndActivity();
     });
     it('should start activity when wait activity contains a wildcard', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager',
-                          waitActivity: '*.ContactManager'});
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: '*.ContactManager',
+        waitDuration,
+      });
       await assertPackageAndActivity();
     });
     it('should throw error for wrong activity when wait activity contains a wildcard', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'SuperManager',
-                          waitActivity: '*.ContactManager'}).should.eventually
-                                                            .be.rejectedWith('Activity');
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'SuperManager',
+        waitActivity: '*.ContactManager'
+      }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
-                          activity: 'ContactManager',
-                          waitActivity: '*.SuperManager'}).should.eventually
-                                                          .be.rejectedWith('SuperManager');
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        activity: 'ContactManager',
+        waitActivity: '*.SuperManager'
+      }).should.eventually.be.rejectedWith('SuperManager');
     });
     it('should start activity with comma separated wait packages list', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
         waitPkg: 'com.android.settings, com.example.android.contactmanager',
         activity: 'ContactManager',
-        waitActivity: '.ContactManager'});
+        waitActivity: '.ContactManager',
+        waitDuration,
+      });
       await assertPackageAndActivity();
     });
     it('should throw error for wrong activity when packages provided as comma separated list', async function () {
       await adb.install(contactManagerPath);
-      await adb.startApp({pkg: 'com.example.android.contactmanager',
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
         waitPkg: 'com.android.settings, com.example.somethingelse',
         activity: 'SuperManager',
-        waitActivity: '*.ContactManager'}).should.eventually
-        .be.rejectedWith('Activity');
+        waitActivity: '*.ContactManager',
+      }).should.eventually.be.rejectedWith('Activity');
     });
   });
   it('should start activity when start activity is an inner class', async function () {
     await adb.install(contactManagerPath);
-    await adb.startApp({pkg: 'com.android.settings',
-      activity: '.Settings$NotificationAppListActivity'});
-
+    await adb.startApp({
+      pkg: 'com.android.settings',
+      activity: '.Settings$NotificationAppListActivity',
+      waitDuration,
+    });
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
     appPackage.should.equal('com.android.settings');
     appActivity.should.equal('.Settings$NotificationAppListActivity');
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
     await adb.install(contactManagerPath);
-    await adb.startApp({pkg: 'com.example.android.contactmanager',
-                        activity: 'ContactManager'});
+    await adb.startApp({
+      pkg: 'com.example.android.contactmanager',
+      activity: 'ContactManager',
+      waitDuration,
+    });
     await assertPackageAndActivity();
   });
   it('extractStringsFromApk should get strings for default language', async function () {
