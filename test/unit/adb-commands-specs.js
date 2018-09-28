@@ -200,7 +200,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('availableIMEs', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['ime', 'list', '-a'])
+          .once().withArgs(['ime', 'list', '-a'])
           .returns(imeList);
         (await adb.availableIMEs()).should.have.length.above(0);
       });
@@ -208,7 +208,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('enabledIMEs', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['ime', 'list'])
+          .once().withArgs(['ime', 'list'])
           .returns(imeList);
         (await adb.enabledIMEs()).should.have.length.above(0);
       });
@@ -671,6 +671,13 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
 
       it('should throw an error if a process with given ID does not exist', async function () {
         mocks.adb.expects("shell")
+          .once().withExactArgs(['whoami'])
+          .returns('root');
+        mocks.adb.expects("root")
+          .never();
+        mocks.adb.expects("unroot")
+          .never();
+        mocks.adb.expects("shell")
           .once().withExactArgs(['kill', '-0', pid])
           .throws();
         adb.killProcessByPID(pid).should.eventually.be.rejected;
@@ -1132,7 +1139,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
   describe('getSetting', function () {
     it('should call shell settings get', async function () {
       mocks.adb.expects('shell').once()
-        .withExactArgs(['settings', 'get', 'namespace', 'setting'])
+        .withArgs(['settings', 'get', 'namespace', 'setting'])
         .returns('value');
       (await adb.getSetting('namespace', 'setting')).should.be.equal('value');
     });

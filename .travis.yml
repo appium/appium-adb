@@ -1,26 +1,20 @@
 language: android
-dist: precise
+sudo: required
+jdk: oraclejdk8
+dist: trusty
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-4.9
+      - g++-6
+# https://docs.travis-ci.com/user/languages/android/
 android:
   components:
-    # use the latest revision of Android SDK Tools
-    - platform-tools
     - tools
-
-    # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - addon-google_apis-google-19
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-22
+    - platform-tools
+    # https://developer.android.com/studio/releases/build-tools
+    - build-tools
 env:
   global:
     - _FORCE_LOGS=1
@@ -28,33 +22,83 @@ env:
     - MOCHA_TIMEOUT=360000
     - RECURSIVE=
     - START_EMU=1
+    - ANDROID_API=21
     - ANDROID_EMU_NAME=test
-    - ANDROID_EMU_TARGET=android-21
     - ANDROID_EMU_ABI=armeabi-v7a
+    - ANDROID_EMU_TAG=default
     - ANDROID_AVD=test
     - PLATFORM_VERSION=5.0.2
-    - CC=gcc-4.9 CXX=g++-4.9
+    - CC=gcc-6 CXX=g++-6
+    - QEMU_AUDIO_DRV=none
   matrix:
     - TEST=unit START_EMU=0
-    - TEST=functional RECURSIVE=--recursive
-before_script:
+    - TEST=functional RECURSIVE=--recursive ANDROID_EMU_TARGET=android-21
+    # API24@armeabi-v7a is the newest available default image
+    # which does not require hardware acceleration:
+    # https://github.com/travis-ci/travis-ci/issues/1419
+    - TEST=functional RECURSIVE=--recursive ANDROID_API=24 PLATFORM_VERSION=7.0 ANDROID_EMU_TARGET=android-24
+before_install:
+  - echo $ANDROID_HOME
+  - |
+    if [ ${START_EMU} = "1" ]; then
+      cat /proc/sys/net/ipv6/conf/all/disable_ipv6
+      cat /etc/sysctl.conf
+      echo y | android update sdk --no-ui -t tools
+      echo yes | sdkmanager tools > /dev/null
+      # Free up some space
+      for apiVersion in 15 16 17 18 19; do
+        sdkmanager --uninstall "system-images;android-${apiVersion};default;armeabi-v7a" > /dev/null
+        sdkmanager --uninstall "platforms;android-${apiVersion}" > /dev/null
+      done
+      echo yes | sdkmanager --update > /dev/null
+      echo yes | sdkmanager "platforms;${ANDROID_EMU_TARGET}" > /dev/null
+      echo yes | sdkmanager "extras;android;m2repository" > /dev/null
+      # echo yes | sdkmanager "extras;google;m2repository" > /dev/null
+      export ANDROID_EMU_IMAGE="system-images;${ANDROID_EMU_TARGET};${ANDROID_EMU_TAG};${ANDROID_EMU_ABI}"
+      for retry in 1 2 3; do
+        echo yes | sdkmanager "${ANDROID_EMU_IMAGE}" > /dev/null && break
+        echo "sdkmanager was not able to download the ${ANDROID_EMU_IMAGE} image (retry ${retry})"
+        sleep 5
+      done
+      sdkmanager --list
+      export TOOLS=${ANDROID_HOME}/tools
+      export PATH=${ANDROID_HOME}:${ANDROID_HOME}/emulator:${TOOLS}:${TOOLS}/bin:${ANDROID_HOME}/platform-tools:${PATH}
+      echo no | avdmanager create avd -k "${ANDROID_EMU_IMAGE}" -n "${ANDROID_EMU_NAME}" -f --abi "${ANDROID_EMU_ABI}" --tag "${ANDROID_EMU_TAG}" || exit 1
+      emulator -avd "${ANDROID_EMU_NAME}" -no-window -camera-back none -camera-front none &
+    fi
+install:
   # node stuff
   - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
-  - nvm install 6
+  - nvm install 8
   - node --version
   - npm --version
-  - npm install appium-test-support # get the travis emu scripts
-
-  # android stuff
-  - echo $ANDROID_HOME
-  - android list targets
-  - $(npm bin)/android-emu-travis-pre
 
   # npm stuff
   - npm install
-
-  # make sure emulator started
-  - $(npm bin)/android-emu-travis-post
+before_script:
+  - |
+    if [ ${START_EMU} = "1" ]; then
+      # Fail fast if emulator process cannot start
+      pgrep -nf avd || exit 1
+      # make sure the emulator is ready
+      adb wait-for-device get-serialno
+      secondsStarted=`date +%s`
+      TIMEOUT=360
+      while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
+        processList=`adb shell ps`
+        if [[ "$processList" =~ "com.android.systemui" ]]; then
+          echo "System UI process is running. Checking IME services availability"
+          adb shell ime list && break
+        fi
+        sleep 5
+        secondsElapsed=$(( `date +%s` - $secondsStarted ))
+        secondsLeft=$(( $TIMEOUT - $secondsElapsed ))
+        echo "Waiting until emulator finishes services startup; ${secondsElapsed}s elapsed; ${secondsLeft}s left"
+      done
+      bootDuration=$(( `date +%s` - $secondsStarted ))
+      echo "Emulator booting took ${bootDuration}s"
+      adb shell input keyevent 82
+    fi
 script:
   - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST -ig @skip-ci
 after_success:
