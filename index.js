@@ -1,7 +1,9 @@
 // transpile:main
 
-import {default as ADB, DEFAULT_ADB_PORT } from './lib/adb';
+import * as adb from './lib/adb';
 
+
+const { ADB, DEFAULT_ADB_PORT } = adb;
 
 export default ADB;
 export { DEFAULT_ADB_PORT, ADB };
