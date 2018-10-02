@@ -9,14 +9,14 @@ import { rootDir } from '../../lib/helpers.js';
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
 const contactManagerPath = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
-const contactMangerSelendroidPath = path.resolve(rootDir, 'test',  'fixtures', 'ContactManager-selendroid.apk');
+const contactMangerSelendroidPath = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager-selendroid.apk');
 const tmpDir = path.resolve(rootDir, 'test', 'temp');
 const srcManifest = path.resolve(rootDir, 'test', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(rootDir, 'test', 'fixtures', 'selendroid', 'selendroid.apk');
 
 chai.use(chaiAsPromised);
 
-describe('Android-manifest', async function () {
+describe('Android-manifest', function () {
   let adb;
   before(async function () {
     adb = await ADB.createADB();

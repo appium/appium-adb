@@ -14,8 +14,10 @@ let expect = chai.expect;
 
 // change according to CI
 const IME = 'com.example.android.softkeyboard/.SoftKeyboard',
-      defaultIMEs = ['com.android.inputmethod.latin/.LatinIME',
-                     'io.appium.android.ime/.UnicodeIME'],
+      defaultIMEs = [
+        'com.android.inputmethod.latin/.LatinIME',
+        'io.appium.android.ime/.UnicodeIME',
+      ],
       contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
       pkg = 'com.example.android.contactmanager',
@@ -172,7 +174,7 @@ describe('adb commands', function () {
     await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
     (await adb.getDeviceSysLocale()).should.equal('en-US');
   });
-  describe('app permissions', async function () {
+  describe('app permissions', function () {
     before(async function () {
       let deviceApiLevel = await adb.getApiLevel();
       if (deviceApiLevel < 23) {

@@ -490,7 +490,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('isAnimationOn', function () {
-      const mockSetting = async function (duration_scale, transition_scale, window_scale) {
+      const mockSetting = function (duration_scale, transition_scale, window_scale) {
         mocks.adb.expects("getSetting").once().withExactArgs('global', 'animator_duration_scale')
           .returns(duration_scale);
         mocks.adb.expects("getSetting").once().withExactArgs('global', 'transition_animation_scale')
@@ -499,19 +499,19 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .returns(window_scale);
       };
       it('should return false if all animation settings are equal to zero', async function () {
-        await mockSetting("0.0", "0.0", "0.0");
+        mockSetting("0.0", "0.0", "0.0");
         (await adb.isAnimationOn()).should.be.false;
       });
       it('should return true if animator_duration_scale setting is NOT equal to zero', async function () {
-        await mockSetting("0.5", "0.0", "0.0");
+        mockSetting("0.5", "0.0", "0.0");
         (await adb.isAnimationOn()).should.be.true;
       });
       it('should return true if transition_animation_scale setting is NOT equal to zero', async function () {
-        await mockSetting("0.0", "0.5", "0.0");
+        mockSetting("0.0", "0.5", "0.0");
         (await adb.isAnimationOn()).should.be.true;
       });
       it('should return true if window_animation_scale setting is NOT equal to zero', async function () {
-        await mockSetting("0.0", "0.0", "0.5");
+        mockSetting("0.0", "0.0", "0.5");
         (await adb.isAnimationOn()).should.be.true;
       });
     });
@@ -680,7 +680,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         mocks.adb.expects("shell")
           .once().withExactArgs(['kill', '-0', pid])
           .throws();
-        adb.killProcessByPID(pid).should.eventually.be.rejected;
+        await adb.killProcessByPID(pid).should.eventually.be.rejected;
       });
     });
     describe('broadcastProcessEnd', function () {

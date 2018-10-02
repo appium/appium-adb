@@ -43,7 +43,7 @@ describe('apk utils', function () {
     await adb.push(contactManagerPath, deviceTempPath);
     await adb.installFromDevicePath(deviceTempPath + 'ContactManager.apk');
   });
-  describe('startUri', async function () {
+  describe('startUri', function () {
     it('should be able to start a uri', async function () {
       await adb.goToHome();
       let res = await adb.getFocusedPackageAndActivity();
@@ -61,7 +61,7 @@ describe('apk utils', function () {
       await adb.goToHome();
     });
   });
-  describe('startApp', async function () {
+  describe('startApp', function () {
     it('should be able to start', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
@@ -76,7 +76,7 @@ describe('apk utils', function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
-        activity: 'ContactManage'
+        activity: 'ContactManage',
       }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity', async function () {
@@ -123,7 +123,7 @@ describe('apk utils', function () {
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'SuperManager',
-        waitActivity: '*.ContactManager'
+        waitActivity: '*.ContactManager',
       }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
@@ -131,7 +131,7 @@ describe('apk utils', function () {
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
-        waitActivity: '*.SuperManager'
+        waitActivity: '*.SuperManager',
       }).should.eventually.be.rejectedWith('SuperManager');
     });
     it('should start activity with comma separated wait packages list', async function () {

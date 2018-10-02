@@ -24,8 +24,7 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
         .once().withExactArgs()
               .returns('');
       mocks.teen_process.expects("exec")
-        .once().withExactArgs('dummy_aapt', ['dump', 'xmltree', localApk,
-                              'AndroidManifest.xml'])
+        .once().withExactArgs('dummy_aapt', ['dump', 'xmltree', localApk, 'AndroidManifest.xml'])
         .returns({stdout: ` E: application (line=234)
                           A: android:process(0x01010011)="${dummyProcess}"`});
       (await adb.processFromManifest(localApk)).should.equal(dummyProcess);

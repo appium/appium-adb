@@ -19,9 +19,9 @@ const selendroidTestApp = path.resolve(rootDir, 'test',
 
 chai.use(chaiAsPromised);
 
-describe('Apk-signing', async function () {
-  let adb,
-      unsignApk = async (apk) => { await exec('java', ['-jar', unsignJar, apk]); };
+describe('Apk-signing', function () {
+  let adb;
+  let unsignApk = async (apk) => { await exec('java', ['-jar', unsignJar, apk]); };
 
   before(async function () {
     adb = await ADB.createADB();
