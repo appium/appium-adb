@@ -139,7 +139,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
       });
     });
     describe("sendSMS", function () {
-      it("should not throw exception on invalid phoneNumber", async function () {
+      it("should convert valid number from an invalid phoneNumbe", async function () {
         mocks.adb.expects("isEmulatorConnected")
           .once().withExactArgs()
           .returns(true);
