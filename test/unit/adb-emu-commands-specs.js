@@ -138,18 +138,18 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
         await adb.powerOFF();
       });
     });
-    describe("sendSMS", function () {
-      it("should convert valid number from an invalid phoneNumbe", async function () {
-        mocks.adb.expects("isEmulatorConnected")
+    describe('sendSMS', function () {
+      it('should convert valid number from an invalid phoneNumbe', async function () {
+        mocks.adb.expects('isEmulatorConnected')
           .once().withExactArgs()
           .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
+        mocks.adb.expects('resetTelnetAuthToken')
           .once().withExactArgs()
           .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "sms", "send", "00549341312345678", "Hello Appium"])
+        mocks.adb.expects('adbExec')
+          .once().withExactArgs(['emu', 'sms', 'send', '00549341312345678', 'Hello Appium'])
           .returns();
-        await adb.sendSMS("00549341a31234 5678", 'Hello Appium');
+        await adb.sendSMS('00549341a31234 5678', 'Hello Appium');
       });
       it("should call adbExec with the correct args", async function () {
         let phoneNumber = 4509;
@@ -184,16 +184,16 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
         await adb.gsmSignal(signalStrength);
       });
     });
-    describe("gsm call methods", function () {
-      it("should convert valid number from an invalid phoneNumber", async function () {
-        mocks.adb.expects("isEmulatorConnected")
+    describe('gsm call methods', function () {
+      it('should convert valid number from an invalid phoneNumber', async function () {
+        mocks.adb.expects('isEmulatorConnected')
           .once().withExactArgs()
           .returns(true);
-        mocks.adb.expects("resetTelnetAuthToken")
+        mocks.adb.expects('resetTelnetAuthToken')
           .once().withExactArgs()
           .returns();
-        mocks.adb.expects("adbExec")
-          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_CALL, "549341312345678"])
+        mocks.adb.expects('adbExec')
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, '549341312345678'])
           .returns();
         await adb.gsmCall("+5493413a1234 5678", "call");
       });
