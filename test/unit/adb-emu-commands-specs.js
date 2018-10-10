@@ -139,11 +139,17 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
       });
     });
     describe("sendSMS", function () {
-      it("should throw exception on invalid message", async function () {
-        await adb.sendSMS("+549341312345678").should.eventually.be.rejectedWith("Sending an SMS requires a message");
-      });
-      it("should throw exception on invalid phoneNumber", async function () {
-        await adb.sendSMS("00549341a312345678", 'Hello Appium').should.eventually.be.rejectedWith("Invalid sendSMS phoneNumber");
+      it("should not throw exception on invalid phoneNumber", async function () {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "sms", "send", "00549341312345678", "Hello Appium"])
+          .returns();
+        await adb.sendSMS("00549341a31234 5678", 'Hello Appium');
       });
       it("should call adbExec with the correct args", async function () {
         let phoneNumber = 4509;
@@ -179,11 +185,17 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
       });
     });
     describe("gsm call methods", function () {
-      it("should throw exception on invalid action", async function () {
-        await adb.gsmCall("+549341312345678").should.eventually.be.rejectedWith("Invalid gsm action");
-      });
-      it("should throw exception on invalid phoneNumber", async function () {
-        await adb.gsmCall("+5493413a12345678", "call").should.eventually.be.rejectedWith("Invalid gsmCall phoneNumber");
+      it("should convert valid number from an invalid phoneNumber", async function () {
+        mocks.adb.expects("isEmulatorConnected")
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects("resetTelnetAuthToken")
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects("adbExec")
+          .once().withExactArgs(["emu", "gsm", adb.GSM_CALL_ACTIONS.GSM_CALL, "549341312345678"])
+          .returns();
+        await adb.gsmCall("+5493413a1234 5678", "call");
       });
       it("should set the correct method for making gsm call", async function () {
         let phoneNumber = 4509;
