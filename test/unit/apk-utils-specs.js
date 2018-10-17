@@ -460,12 +460,16 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   });
   describe('install', function () {
     it('should call forceStop and adbExec with correct arguments', async function () {
+      mocks.adb.expects('getApiLevel')
+        .once().returns(23);
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
         .returns('');
       await adb.install('foo');
     });
     it('should call forceStop and adbExec with correct arguments when not replacing', async function () {
+      mocks.adb.expects('getApiLevel')
+        .once().returns(23);
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', 'foo'], {timeout: 60000})
         .returns('');
