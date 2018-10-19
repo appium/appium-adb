@@ -455,21 +455,31 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
-      (await adb.installFromDevicePath('foo'));
+      await adb.installFromDevicePath('foo');
     });
   });
   describe('install', function () {
     it('should call forceStop and adbExec with correct arguments', async function () {
+      mocks.adb.expects('getApiLevel')
+        .once().returns(23);
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
         .returns('');
-      (await adb.install('foo'));
+      await adb.install('foo');
     });
     it('should call forceStop and adbExec with correct arguments when not replacing', async function () {
+      mocks.adb.expects('getApiLevel')
+        .once().returns(23);
       mocks.adb.expects('adbExec')
         .once().withExactArgs(['install', 'foo'], {timeout: 60000})
         .returns('');
-      (await adb.install('foo', {replace: false}));
+      await adb.install('foo', {replace: false});
+    });
+    it('should call apks install if the path points to it', async function () {
+      mocks.adb.expects('installApks')
+        .once().withArgs('foo.apks')
+        .returns('');
+      await adb.install('foo.apks');
     });
   });
   describe('startUri', function () {
@@ -782,48 +792,63 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('getApkInfo', function () {
+    const APK_INFO = `package: name='io.appium.settings' versionCode='2' versionName='1.1' platformBuildVersionName='6.0-2166767'
+    sdkVersion:'17'
+    targetSdkVersion:'23'
+    uses-permission: name='android.permission.INTERNET'
+    uses-permission: name='android.permission.CHANGE_NETWORK_STATE'
+    uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+    uses-permission: name='android.permission.READ_PHONE_STATE'
+    uses-permission: name='android.permission.WRITE_SETTINGS'
+    uses-permission: name='android.permission.CHANGE_WIFI_STATE'
+    uses-permission: name='android.permission.ACCESS_WIFI_STATE'
+    uses-permission: name='android.permission.ACCESS_FINE_LOCATION'
+    uses-permission: name='android.permission.ACCESS_COARSE_LOCATION'
+    uses-permission: name='android.permission.ACCESS_MOCK_LOCATION'
+    application-label:'Appium Settings'
+    application-icon-120:'res/drawable-ldpi-v4/ic_launcher.png'
+    application-icon-160:'res/drawable-mdpi-v4/ic_launcher.png'
+    application-icon-240:'res/drawable-hdpi-v4/ic_launcher.png'
+    application-icon-320:'res/drawable-xhdpi-v4/ic_launcher.png'
+    application: label='Appium Settings' icon='res/drawable-mdpi-v4/ic_launcher.png'
+    application-debuggable
+    launchable-activity: name='io.appium.settings.Settings'  label='Appium Settings' icon=''
+    feature-group: label=''
+      uses-feature: name='android.hardware.wifi'
+      uses-feature: name='android.hardware.location'
+      uses-implied-feature: name='android.hardware.location' reason='requested android.permission.ACCESS_COARSE_LOCATION permission, requested android.permission.ACCESS_FINE_LOCATION permission, and requested android.permission.ACCESS_MOCK_LOCATION permission'
+      uses-feature: name='android.hardware.location.gps'
+      uses-implied-feature: name='android.hardware.location.gps' reason='requested android.permission.ACCESS_FINE_LOCATION permission'
+      uses-feature: name='android.hardware.location.network'
+      uses-implied-feature: name='android.hardware.location.network' reason='requested android.permission.ACCESS_COARSE_LOCATION permission'
+      uses-feature: name='android.hardware.touchscreen'
+      uses-implied-feature: name='android.hardware.touchscreen' reason='default feature for all apps'
+    main
+    other-receivers
+    other-services
+    supports-screens: 'small' 'normal' 'large' 'xlarge'
+    supports-any-density: 'true'
+    locales: '--_--'
+    densities: '120' '160' '240' '320'`;
+
     it('should properly parse apk info', async function () {
       mocks.fs.expects('exists').once().returns(true);
       mocks.adb.expects('initAapt').once().returns(true);
-      mocks.teen_process.expects('exec').once().returns({stdout: `package: name='io.appium.settings' versionCode='2' versionName='1.1' platformBuildVersionName='6.0-2166767'
-      sdkVersion:'17'
-      targetSdkVersion:'23'
-      uses-permission: name='android.permission.INTERNET'
-      uses-permission: name='android.permission.CHANGE_NETWORK_STATE'
-      uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
-      uses-permission: name='android.permission.READ_PHONE_STATE'
-      uses-permission: name='android.permission.WRITE_SETTINGS'
-      uses-permission: name='android.permission.CHANGE_WIFI_STATE'
-      uses-permission: name='android.permission.ACCESS_WIFI_STATE'
-      uses-permission: name='android.permission.ACCESS_FINE_LOCATION'
-      uses-permission: name='android.permission.ACCESS_COARSE_LOCATION'
-      uses-permission: name='android.permission.ACCESS_MOCK_LOCATION'
-      application-label:'Appium Settings'
-      application-icon-120:'res/drawable-ldpi-v4/ic_launcher.png'
-      application-icon-160:'res/drawable-mdpi-v4/ic_launcher.png'
-      application-icon-240:'res/drawable-hdpi-v4/ic_launcher.png'
-      application-icon-320:'res/drawable-xhdpi-v4/ic_launcher.png'
-      application: label='Appium Settings' icon='res/drawable-mdpi-v4/ic_launcher.png'
-      application-debuggable
-      launchable-activity: name='io.appium.settings.Settings'  label='Appium Settings' icon=''
-      feature-group: label=''
-        uses-feature: name='android.hardware.wifi'
-        uses-feature: name='android.hardware.location'
-        uses-implied-feature: name='android.hardware.location' reason='requested android.permission.ACCESS_COARSE_LOCATION permission, requested android.permission.ACCESS_FINE_LOCATION permission, and requested android.permission.ACCESS_MOCK_LOCATION permission'
-        uses-feature: name='android.hardware.location.gps'
-        uses-implied-feature: name='android.hardware.location.gps' reason='requested android.permission.ACCESS_FINE_LOCATION permission'
-        uses-feature: name='android.hardware.location.network'
-        uses-implied-feature: name='android.hardware.location.network' reason='requested android.permission.ACCESS_COARSE_LOCATION permission'
-        uses-feature: name='android.hardware.touchscreen'
-        uses-implied-feature: name='android.hardware.touchscreen' reason='default feature for all apps'
-      main
-      other-receivers
-      other-services
-      supports-screens: 'small' 'normal' 'large' 'xlarge'
-      supports-any-density: 'true'
-      locales: '--_--'
-      densities: '120' '160' '240' '320'`});
+      mocks.teen_process.expects('exec').once().returns({stdout: APK_INFO});
       const result = await adb.getApkInfo('/some/folder/path.apk');
+      for (let [name, value] of [
+        ['name', 'io.appium.settings'],
+        ['versionCode', 2],
+        ['versionName', '1.1']]) {
+        result.should.have.property(name, value);
+      }
+    });
+    it('should extract base apk first in order to retrieve apks info', async function () {
+      mocks.adb.expects('extractBaseApk').once().returns('/some/otherfolder/path.apk');
+      mocks.fs.expects('exists').once().returns(true);
+      mocks.adb.expects('initAapt').once().returns(true);
+      mocks.teen_process.expects('exec').once().returns({stdout: APK_INFO});
+      const result = await adb.getApkInfo('/some/folder/path.apks');
       for (let [name, value] of [
         ['name', 'io.appium.settings'],
         ['versionCode', 2],
