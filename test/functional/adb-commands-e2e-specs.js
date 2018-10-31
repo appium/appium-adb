@@ -171,6 +171,9 @@ describe('adb commands', function () {
     await adb.setDeviceSysLocaleViaSettingApp('fr', 'fr');
     (await adb.getDeviceSysLocale()).should.equal('fr-FR');
 
+    await adb.setDeviceSysLocaleViaSettingApp('zh', 'CN', 'Hans');
+    (await adb.getDeviceSysLocale()).should.equal('zh-Hans-CN');
+
     await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
     (await adb.getDeviceSysLocale()).should.equal('en-US');
   });
