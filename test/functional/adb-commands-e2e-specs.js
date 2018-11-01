@@ -16,6 +16,7 @@ let expect = chai.expect;
 const IME = 'com.example.android.softkeyboard/.SoftKeyboard',
       defaultIMEs = [
         'com.android.inputmethod.latin/.LatinIME',
+        'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
         'io.appium.android.ime/.UnicodeIME',
       ],
       contactManagerPath = path.resolve(rootDir, 'test',
@@ -105,6 +106,7 @@ describe('adb commands', function () {
   it('should get device locale', async function () {
     if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
 
+    await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
     ['us', 'en', 'ca_en', 'en-US'].should.contain(await adb.getDeviceLocale());
   });
   it('should forward the port', async function () {
@@ -156,10 +158,14 @@ describe('adb commands', function () {
     (await adb.isWifiOn()).should.be.false;
   });
   it('should be able to turn off animation @skip-ci', async function () {
+    await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
+
     await adb.setAnimationState(false);
     (await adb.isAnimationOn()).should.be.false;
   });
   it('should be able to turn on animation @skip-ci', async function () {
+    await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
+
     await adb.setAnimationState(true);
     (await adb.isAnimationOn()).should.be.true;
   });

@@ -10,7 +10,7 @@
     "watch": "gulp watch",
     "build": "gulp transpile",
     "mocha": "mocha",
-    "e2e-test": "gulp e2e-test",
+    "e2e-test": "gulp transpile && mocha --timeout 600000 build/test/functional/",
     "coverage": "gulp coveralls",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "precommit-test": "REPORTER=dot gulp once",

@@ -1,10 +1,11 @@
 "use strict";
 
-let gulp = require('gulp'),
-    boilerplate = require('appium-gulp-plugins').boilerplate.use(gulp);
+const gulp = require('gulp');
+const boilerplate = require('appium-gulp-plugins').boilerplate.use(gulp);
 
 boilerplate({
   build: 'appium-adb',
-  jscs: false,
-  e2eTest: { android: true }
+  testTimeout: 120000,
+  e2eTest: { android: true },
+  eslint: true,
 });
