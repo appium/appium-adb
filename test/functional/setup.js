@@ -14,8 +14,8 @@ const API_LEVEL_MAP = {
   '9.0': '28',
 };
 
-const avdName = process.env.ANDROID_AVD || 'Nexus 5X API 27';
-const platformVersion = process.env.PLATFORM_VERSION || '8.1';
+const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
+const platformVersion = process.env.PLATFORM_VERSION || '4.3';
 
 let apiLevel = process.env.API_LEVEL ||
                API_LEVEL_MAP[parseFloat(platformVersion).toString()];
