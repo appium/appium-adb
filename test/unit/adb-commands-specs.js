@@ -35,7 +35,7 @@ u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.conta
       manufacturer = `unknown`,
       screenSize = `768x1280`;
 
-const adb = new ADB();
+const adb = new ADB({ adbExecTimeout: 60000 });
 const logcat = new Logcat({
   adb: adb.executable,
   debug: false,

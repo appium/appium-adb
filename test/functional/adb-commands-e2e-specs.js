@@ -28,7 +28,7 @@ describe('adb commands', function () {
 
   let adb;
   before(async function () {
-    adb = await ADB.createADB();
+    adb = await ADB.createADB({ adbExecTimeout: 60000 });
   });
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
