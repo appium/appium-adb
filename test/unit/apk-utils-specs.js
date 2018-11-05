@@ -36,7 +36,7 @@ const should = chai.should(),
       country = 'US',
       locale = 'en-US';
 
-const adb = new ADB();
+const adb = new ADB({ adbExecTimeout: 60000 });
 
 describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   afterEach(function () {
