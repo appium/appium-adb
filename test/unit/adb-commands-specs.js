@@ -516,12 +516,21 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setDeviceSysLocaleViaSettingApp', function () {
-      const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.locale',
-        '-n', 'io.appium.settings/.receivers.LocaleSettingReceiver',
-        '--es', 'lang', 'en', '--es', 'country', 'US'];
-      it('should call shell with locale settings', async function () {
+      it('should call shell with locale settings without script', async function () {
+        const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.locale',
+          '-n', 'io.appium.settings/.receivers.LocaleSettingReceiver',
+          '--es', 'lang', 'en', '--es', 'country', 'US'];
+
         mocks.adb.expects("shell").once().withExactArgs(adbArgs);
         await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
+      });
+
+      it('should call shell with locale settings with script', async function () {
+        const adbArgs = ['am', 'broadcast', '-a', 'io.appium.settings.locale',
+          '-n', 'io.appium.settings/.receivers.LocaleSettingReceiver',
+          '--es', 'lang', 'zh', '--es', 'country', 'CN', '--es', 'script', 'Hans'];
+        mocks.adb.expects("shell").once().withExactArgs(adbArgs);
+        await adb.setDeviceSysLocaleViaSettingApp('zh', 'CN', 'Hans');
       });
     });
     describe('setGeoLocation', function () {

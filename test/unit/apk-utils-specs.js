@@ -670,6 +670,16 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("");
       (await adb.ensureCurrentLocale('en', 'us')).should.be.false;
     });
+    it('should return true when API 23 with script', async function () {
+      mocks.adb.expects("getApiLevel").withExactArgs().once().returns(23);
+      mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("zh-Hans-CN");
+      (await adb.ensureCurrentLocale('zh', 'CN', 'Hans')).should.be.true;
+    });
+    it('should return false when API 23 with script', async function () {
+      mocks.adb.expects("getApiLevel").withExactArgs().once().returns(23);
+      mocks.adb.expects("getDeviceLocale").withExactArgs().once().returns("");
+      (await adb.ensureCurrentLocale('zh', 'CN', 'Hans')).should.be.false;
+    });
   });
   describe('setDeviceLocale', function () {
     it('should not call setDeviceLanguageCountry because of empty', async function () {
@@ -758,10 +768,20 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
           .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
           .once().returns('fr-FR');
-      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").withExactArgs(language, country)
+      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").withExactArgs(language, country, null)
           .once().returns("");
       mocks.adb.expects('reboot').never();
       await adb.setDeviceLanguageCountry(language, country);
+    });
+    it('should call set locale with script via setting app when API 24+', async function () {
+      mocks.adb.expects("getApiLevel").withExactArgs()
+          .once().returns(24);
+      mocks.adb.expects("getDeviceLocale").withExactArgs()
+          .once().returns('fr-FR');
+      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").withExactArgs('zh', 'CN', 'Hans')
+          .once().returns("");
+      mocks.adb.expects('reboot').never();
+      await adb.setDeviceLanguageCountry('zh', 'CN', 'Hans');
     });
     it('should not set language and country if it does not change when API 24+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
