@@ -583,7 +583,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects("getApiLevel")
         .once().returns(21);
       mocks.adb.expects("shell")
-        .once().withExactArgs(['setprop', 'persist.sys.language', language])
+        .once().withExactArgs(['setprop', 'persist.sys.language', language], {
+          privileged: true
+        })
         .returns("");
       await adb.setDeviceLanguage(language);
     });
@@ -610,7 +612,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects("getApiLevel")
         .once().returns(21);
       mocks.adb.expects("shell")
-        .once().withExactArgs(['setprop', 'persist.sys.country', country])
+        .once().withExactArgs(['setprop', 'persist.sys.country', country], {
+          privileged: true
+        })
         .returns("");
       await adb.setDeviceCountry(country);
     });
