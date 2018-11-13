@@ -75,7 +75,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('setDeviceSysLanguage', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.language', language])
+          .once().withExactArgs(['setprop', 'persist.sys.language', language], {
+            privileged: true
+          })
           .returns("");
         await adb.setDeviceSysLanguage(language);
       });
@@ -130,7 +132,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('setDeviceSysCountry', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.country', country])
+          .once().withExactArgs(['setprop', 'persist.sys.country', country], {
+            privileged: true
+          })
           .returns("");
         await adb.setDeviceSysCountry(country);
       });
@@ -146,7 +150,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('setDeviceSysLocale', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.locale', locale])
+          .once().withExactArgs(['setprop', 'persist.sys.locale', locale], {
+            privileged: true
+          })
           .returns("");
         await adb.setDeviceSysLocale(locale);
       });
@@ -176,24 +182,12 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setDeviceProperty', function () {
-      it('should call setprop with correct args without root', async function () {
-        mocks.adb.expects("getApiLevel")
-          .once().returns(21);
+      it('should call setprop with correct args', async function () {
         mocks.adb.expects("shell")
-          .withExactArgs(['setprop', 'persist.sys.locale', locale])
+          .withExactArgs(['setprop', 'persist.sys.locale', locale], {
+            privileged: true
+          })
           .returns("");
-        await adb.setDeviceProperty('persist.sys.locale', locale);
-      });
-      it('should call setprop with correct args with root', async function () {
-        mocks.adb.expects("getApiLevel")
-          .once().returns(26);
-        mocks.adb.expects("root")
-          .once().returns("");
-        mocks.adb.expects("shell")
-          .withExactArgs(['setprop', 'persist.sys.locale', locale])
-          .returns("");
-        mocks.adb.expects("unroot")
-          .once().returns("");
         await adb.setDeviceProperty('persist.sys.locale', locale);
       });
     });
@@ -375,14 +369,11 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiState(true);
       });
       it('should call shell with correct args for emulator', async function () {
-        mocks.adb.expects("root")
-          .once()
-          .returns(true);
         mocks.adb.expects("shell")
-          .once().withExactArgs(['svc', 'wifi', 'disable'])
+          .once().withExactArgs(['svc', 'wifi', 'disable'], {
+            privileged: true
+          })
           .returns("");
-        mocks.adb.expects("unroot")
-          .once();
         await adb.setWifiState(false, true);
       });
     });
@@ -410,14 +401,11 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setDataState(false);
       });
       it('should call shell with correct args for emulator', async function () {
-        mocks.adb.expects("root")
-          .once()
-          .returns(true);
         mocks.adb.expects("shell")
-          .once().withExactArgs(['svc', 'data', 'enable'])
+          .once().withExactArgs(['svc', 'data', 'enable'], {
+            privileged: true
+          })
           .returns("");
-        mocks.adb.expects("unroot")
-          .once();
         await adb.setDataState(true, true);
       });
     });
@@ -431,25 +419,19 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiAndData({wifi: true});
       });
       it('should call shell with correct args when turning only wifi off for emulator', async function () {
-        mocks.adb.expects("root")
-          .once()
-          .returns(true);
         mocks.adb.expects("shell")
-          .once().withExactArgs(['svc', 'wifi', 'disable'])
+          .once().withExactArgs(['svc', 'wifi', 'disable'], {
+            privileged: true
+          })
           .returns("");
-        mocks.adb.expects("unroot")
-          .once();
         await adb.setWifiAndData({wifi: false}, true);
       });
       it('should call shell with correct args when turning only data on for emulator', async function () {
-        mocks.adb.expects("root")
-          .once()
-          .returns(true);
         mocks.adb.expects("shell")
-          .once().withExactArgs(['svc', 'data', 'enable'])
+          .once().withExactArgs(['svc', 'data', 'enable'], {
+            privileged: true
+          })
           .returns("");
-        mocks.adb.expects("unroot")
-          .once();
         await adb.setWifiAndData({data: true}, true);
       });
       it('should call shell with correct args when turning only data off for real device', async function () {
@@ -465,12 +447,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiAndData({wifi: true, data: true});
       });
       it('should call shell with correct args when turning both wifi and data off for emulator', async function () {
-        mocks.adb.expects("root")
-          .atLeast(1)
-          .returns(true);
         mocks.adb.expects("shell").twice().returns("");
-        mocks.adb.expects("unroot")
-          .atLeast(1);
         await adb.setWifiAndData({wifi: false, data: false}, true);
       });
     });
