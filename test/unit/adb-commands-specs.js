@@ -873,6 +873,11 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
       await adb.grantPermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
     });
+    it('should grant requested multiple permissions', async function () {
+      mocks.adb.expects("shell")
+          .once().withArgs('"pm grant io.appium.settings android.permission.READ_EXTERNAL_STORAGE ; pm grant io.appium.settings android.permission.CHANGE_CONFIGURATION ;"');
+      await adb.grantMultiplePermissions('io.appium.settings', ['android.permission.READ_EXTERNAL_STORAGE', 'android.permission.CHANGE_CONFIGURATION']);
+    });
     it('should revoke requested permission', async function () {
       mocks.adb.expects("shell")
           .once().withArgs(['pm', 'revoke', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
