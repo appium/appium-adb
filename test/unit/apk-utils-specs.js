@@ -714,25 +714,28 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('getDeviceLanguage').never();
       mocks.adb.expects('getDeviceCountry').never();
       mocks.adb.expects('getDeviceLocale').never();
-      mocks.adb.expects('setDeviceLanguage').never();
-      mocks.adb.expects('setDeviceCountry').never();
-      mocks.adb.expects('setDeviceLocale').never();
+      mocks.adb.expects('setDeviceSysLocaleViaSettingApp').never();
       mocks.adb.expects('reboot').never();
       await adb.setDeviceLanguageCountry();
     });
+    it('should return if language or country are not passed', async function () {
+      mocks.adb.expects('getDeviceLanguage').never();
+      mocks.adb.expects('getDeviceCountry').never();
+      mocks.adb.expects('getDeviceLocale').never();
+      mocks.adb.expects('setDeviceSysLocaleViaSettingApp').never();
+      mocks.adb.expects('reboot').never();
+      await adb.setDeviceLanguageCountry('us');
+    });
     it('should set language, country and reboot the device when API < 23', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
-          .once().returns(22);
+        .once().returns(22);
       mocks.adb.expects("getDeviceLanguage").withExactArgs()
-          .once().returns("fr");
+        .once().returns("fr");
       mocks.adb.expects("getDeviceCountry").withExactArgs()
-          .once().returns("");
-      mocks.adb.expects("setDeviceLanguage").withExactArgs(language)
-          .once().returns("");
-      mocks.adb.expects("setDeviceCountry").withExactArgs(country)
-          .once().returns("");
-      mocks.adb.expects("reboot")
-          .once().returns("");
+        .once().returns("");
+      mocks.adb.expects("setDeviceSysLocaleViaSettingApp").withExactArgs(language, country)
+        .once().returns("");
+      mocks.adb.expects('reboot').never();
       await adb.setDeviceLanguageCountry(language, country);
     });
     it('should not set language and country if it does not change when API < 23', async function () {
@@ -741,35 +744,13 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('getDeviceLanguage').once().returns('en');
       mocks.adb.expects('getDeviceCountry').once().returns('US');
       mocks.adb.expects('getDeviceLocale').never();
-      mocks.adb.expects('setDeviceLanguage').never();
-      mocks.adb.expects('setDeviceCountry').never();
-      mocks.adb.expects('setDeviceLocale').never();
+      mocks.adb.expects('setDeviceSysLocaleViaSettingApp').never();
       mocks.adb.expects('reboot').never();
       await adb.setDeviceLanguageCountry(language.toLowerCase(), country.toLowerCase());
     });
-    it('should set locale when API is 23', async function () {
+    it('should call set locale via setting app when API 23+', async function () {
       mocks.adb.expects("getApiLevel").withExactArgs()
           .once().returns(23);
-      mocks.adb.expects("getDeviceLocale").withExactArgs()
-          .once().returns('fr-FR');
-      mocks.adb.expects("setDeviceSysLocale").withExactArgs(locale)
-          .once().returns('fr-FR');
-      mocks.adb.expects("reboot")
-          .once().returns("");
-      await adb.setDeviceLanguageCountry(language, country);
-    });
-    it('should not set language and country if it does not change when API is 23', async function () {
-      mocks.adb.expects("getApiLevel").withExactArgs()
-          .once().returns(23);
-      mocks.adb.expects("getDeviceLocale").withExactArgs()
-          .once().returns(locale);
-      mocks.adb.expects('setDeviceSysLocale').never();
-      mocks.adb.expects('reboot').never();
-      await adb.setDeviceLanguageCountry(language, country);
-    });
-    it('should call set locale via setting app when API 24+', async function () {
-      mocks.adb.expects("getApiLevel").withExactArgs()
-          .once().returns(24);
       mocks.adb.expects("getDeviceLocale").withExactArgs()
           .once().returns('fr-FR');
       mocks.adb.expects("setDeviceSysLocaleViaSettingApp").withExactArgs(language, country, null)
