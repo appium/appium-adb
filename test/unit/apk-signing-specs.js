@@ -40,7 +40,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects("getApksignerForOs")
         .returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
-        .once().withExactArgs(path.basename(apksignerDummyPath), ['sign',
+        .once().withExactArgs(apksignerDummyPath, ['sign',
           '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
           {cwd: path.dirname(apksignerDummyPath)})
         .returns({});
@@ -52,7 +52,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects("getApksignerForOs")
         .returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
-        .once().withExactArgs(path.basename(apksignerDummyPath), ['sign',
+        .once().withExactArgs(apksignerDummyPath, ['sign',
           '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
           {cwd: path.dirname(apksignerDummyPath)})
         .throws();
@@ -77,7 +77,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects("getApksignerForOs")
         .returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
-        .withExactArgs(path.basename(apksignerDummyPath), ['sign',
+        .withExactArgs(apksignerDummyPath, ['sign',
           '--ks', keystorePath,
           '--ks-key-alias', keyAlias,
           '--ks-pass', `pass:${password}`,
@@ -169,7 +169,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects("getApksignerForOs")
         .twice().returns(apksignerDummyPath);
       mocks.teen_process.expects("exec")
-        .once().withExactArgs(path.basename(apksignerDummyPath),
+        .once().withExactArgs(apksignerDummyPath,
           ['verify', '--print-certs', selendroidTestApp],
           {cwd: path.dirname(apksignerDummyPath)})
         .returns({
