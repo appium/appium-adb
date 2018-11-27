@@ -1,7 +1,5 @@
 language: android
-sudo: required
 jdk: oraclejdk8
-dist: trusty
 addons:
   apt:
     sources:
