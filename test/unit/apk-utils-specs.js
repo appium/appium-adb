@@ -953,8 +953,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
-    it('should not throw an error if pkg id cannot be read', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({});
+    it('should execute install if pkg id cannot be read', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({});
+      mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if older package version is installed', async function () {
