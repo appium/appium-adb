@@ -922,7 +922,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.installOrUpgrade(apkPath, pkgId);
     });
     it('should return if newer package version is already installed', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 1
       });
@@ -932,31 +932,34 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
-    it('should not throw an error if apk version code cannot be read', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+    it('should execute install if apk version code cannot be read', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId
       });
       mocks.adb.expects('getPackageInfo').once().returns({
         versionCode: 2
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
-    it('should not throw an error if pkg version code cannot be read', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+    it('should execute install if pkg version code cannot be read', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 1
       });
       mocks.adb.expects('getPackageInfo').once().returns({});
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
-    it('should not throw an error if pkg id cannot be read', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({});
+    it('should execute install if pkg id cannot be read', async function () {
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({});
+      mocks.adb.expects('install').withArgs(apkPath).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if older package version is installed', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 2
       });
@@ -968,7 +971,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if older package version is installed, but version codes are not maintained', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 1,
         versionName: '2.0.0',
@@ -982,7 +985,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if the same version is installed, but version codes are different', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 2,
         versionName: '2.0.0',
@@ -996,7 +999,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.installOrUpgrade(apkPath);
     });
     it('should uninstall and re-install if older package version is installed and upgrade fails', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 2
       });
@@ -1010,7 +1013,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.installOrUpgrade(apkPath);
     });
     it('should throw an exception if upgrade and reinstall fail', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 2
       });
@@ -1029,7 +1032,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       isExceptionThrown.should.be.true;
     });
     it('should throw an exception if upgrade and uninstall fail', async function () {
-      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).once().returns({
+      mocks.adb.expects('getApkInfo').withExactArgs(apkPath).atLeast(1).returns({
         name: pkgId,
         versionCode: 2
       });
