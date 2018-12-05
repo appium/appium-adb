@@ -1108,11 +1108,18 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       let proxyHost = "http://localhost";
       let proxyPort = 4723;
       mocks.adb.expects('setSetting').once().withExactArgs('global', 'http_proxy', `${proxyHost}:${proxyPort}`);
-      mocks.adb.expects('setSetting').once().withExactArgs('secure', 'http_proxy', `${proxyHost}:${proxyPort}`);
-      mocks.adb.expects('setSetting').once().withExactArgs('system', 'http_proxy', `${proxyHost}:${proxyPort}`);
-      mocks.adb.expects('setSetting').once().withExactArgs('system', 'global_http_proxy_host', proxyHost);
-      mocks.adb.expects('setSetting').once().withExactArgs('system', 'global_http_proxy_port', proxyPort);
+      mocks.adb.expects('setSetting').once().withExactArgs('global', 'global_http_proxy_host', proxyHost);
+      mocks.adb.expects('setSetting').once().withExactArgs('global', 'global_http_proxy_port', proxyPort);
       await adb.setHttpProxy(proxyHost, proxyPort);
+    });
+  });
+  describe('deleteHttpProxy', function () {
+    it('should call setSetting method with correct args', async function () {
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'delete', 'global', 'http_proxy']);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_host']);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_port']);
+      mocks.adb.expects('shell').once().withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_exclusion_list']);
+      await adb.deleteHttpProxy();
     });
   });
   describe('setSetting', function () {
