@@ -578,18 +578,6 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       (await adb.getDeviceLanguage()).should.equal(language);
     });
   });
-  describe('setDeviceLanguage', function () {
-    it('should call shell one time with correct args when API < 23', async function () {
-      mocks.adb.expects("getApiLevel")
-        .once().returns(21);
-      mocks.adb.expects("shell")
-        .once().withExactArgs(['setprop', 'persist.sys.language', language], {
-          privileged: true
-        })
-        .returns("");
-      await adb.setDeviceLanguage(language);
-    });
-  });
   describe('getDeviceCountry', function () {
     it('should call shell one time with correct args and return country', async function () {
       mocks.adb.expects("shell")
@@ -605,18 +593,6 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().withExactArgs(['getprop', 'ro.product.locale.region'])
         .returns(country);
       (await adb.getDeviceCountry()).should.equal(country);
-    });
-  });
-  describe('setDeviceCountry', function () {
-    it('should call shell one time with correct args', async function () {
-      mocks.adb.expects("getApiLevel")
-        .once().returns(21);
-      mocks.adb.expects("shell")
-        .once().withExactArgs(['setprop', 'persist.sys.country', country], {
-          privileged: true
-        })
-        .returns("");
-      await adb.setDeviceCountry(country);
     });
   });
   describe('getDeviceLocale', function () {
