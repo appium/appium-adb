@@ -72,16 +72,6 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         (await adb.getDeviceSysLanguage()).should.equal(language);
       });
     });
-    describe('setDeviceSysLanguage', function () {
-      it('should call shell with correct args', async function () {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.language', language], {
-            privileged: true
-          })
-          .returns("");
-        await adb.setDeviceSysLanguage(language);
-      });
-    });
     describe('getDeviceSysCountry', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
@@ -129,32 +119,12 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.toggleGPSLocationProvider(false);
       });
     });
-    describe('setDeviceSysCountry', function () {
-      it('should call shell with correct args', async function () {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.country', country], {
-            privileged: true
-          })
-          .returns("");
-        await adb.setDeviceSysCountry(country);
-      });
-    });
     describe('getDeviceSysLocale', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects("shell")
           .once().withExactArgs(['getprop', 'persist.sys.locale'])
           .returns(locale);
         (await adb.getDeviceSysLocale()).should.equal(locale);
-      });
-    });
-    describe('setDeviceSysLocale', function () {
-      it('should call shell with correct args', async function () {
-        mocks.adb.expects("shell")
-          .once().withExactArgs(['setprop', 'persist.sys.locale', locale], {
-            privileged: true
-          })
-          .returns("");
-        await adb.setDeviceSysLocale(locale);
       });
     });
     describe('getDeviceProductLanguage', function () {

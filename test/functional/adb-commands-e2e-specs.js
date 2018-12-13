@@ -90,19 +90,6 @@ describe('adb commands', function () {
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
-  it('should set device language and country', async function () {
-    if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
-
-    await adb.setDeviceSysLanguage('fr');
-    await adb.setDeviceSysCountry('fr');
-    await adb.reboot();
-    await adb.getDeviceSysLanguage().should.eventually.equal('fr');
-    await adb.getDeviceSysCountry().should.eventually.equal('FR');
-    // cleanup
-    await adb.setDeviceSysLanguage('en');
-    await adb.setDeviceSysCountry('us');
-  });
   it('should get device locale', async function () {
     if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
 
