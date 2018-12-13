@@ -18,5 +18,4 @@ node_modules
 coverage
 coverage-e2e
 package-lock.json*
-
 .DS_Store
