@@ -579,9 +579,17 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('getPIDsByName', function () {
       it('should call shell and parse pids correctly', async function () {
         mocks.adb.expects("shell")
-          .once().withExactArgs(['ps'])
-          .returns(psOutput);
+          .once().withExactArgs(['pidof', contactManagerPackage])
+          .returns('5078\n');
         (await adb.getPIDsByName(contactManagerPackage))[0].should.equal(5078);
+      });
+      it('should call shell and return an empty list if no processes are running', async function () {
+        const err = new Error();
+        err.code = 1;
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['pidof', contactManagerPackage])
+          .throws(err);
+        (await adb.getPIDsByName(contactManagerPackage)).length.should.eql(0);
       });
     });
     describe('killProcessesByName', function () {
