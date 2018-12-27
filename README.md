@@ -53,7 +53,7 @@ example:
 import ADB from 'appium-adb';
 
 const adb = await ADB.createADB();
-console.log(await adb.getPIDsByName('m.android.phone'));
+console.log(await adb.getPIDsByName('com.android.phone'));
 ```
 
 ### List of methods:

@@ -67,7 +67,7 @@ describe('adb commands', function () {
     (await adb.ping()).should.be.true;
   });
   it('getPIDsByName should return pids', async function () {
-    (await adb.getPIDsByName('m.android.phone')).should.have.length.above(0);
+    (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
     await adb.install(contactManagerPath);
