@@ -5,6 +5,8 @@ const boilerplate = require('appium-gulp-plugins').boilerplate.use(gulp);
 
 boilerplate({
   build: 'appium-adb',
-  e2eTest: { android: true },
+  e2eTest: {
+    android: true,
+  },
   eslint: true,
 });
