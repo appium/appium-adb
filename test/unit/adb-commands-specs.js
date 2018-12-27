@@ -28,8 +28,6 @@ const apiLevel = 21,
       enabled=true exported=true processName=com.android.inputmethod.latin
       permission=android.permission.BIND_INPUT_METHOD
       flags=0x0`,
-      psOutput = `USER     PID   PPID  VSIZE  RSS     WCHAN    PC   NAME
-u0_a101   5078  3129  487404 37044 ffffffff b76ce565 S com.example.android.contactmanager`,
       contactManagerPackage = 'com.example.android.contactmanager',
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
@@ -511,15 +509,15 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('processExists', function () {
       it('should call shell with correct args and should find process', async function () {
-        mocks.adb.expects("shell")
-          .once().withExactArgs("ps")
-          .returns(psOutput);
+        mocks.adb.expects("getPIDsByName")
+          .once().withExactArgs(contactManagerPackage)
+          .returns([123]);
         (await adb.processExists(contactManagerPackage)).should.be.true;
       });
       it('should call shell with correct args and should not find process', async function () {
-        mocks.adb.expects("shell")
-          .once().withExactArgs("ps")
-          .returns("foo");
+        mocks.adb.expects("getPIDsByName")
+          .once().withExactArgs(contactManagerPackage)
+          .returns([]);
         (await adb.processExists(contactManagerPackage)).should.be.false;
       });
     });
@@ -578,10 +576,20 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('getPIDsByName', function () {
       it('should call shell and parse pids correctly', async function () {
+        adb._isPidofAvailable = true;
         mocks.adb.expects("shell")
-          .once().withExactArgs(['ps'])
-          .returns(psOutput);
+          .once().withExactArgs(['pidof', contactManagerPackage])
+          .returns('5078\n');
         (await adb.getPIDsByName(contactManagerPackage))[0].should.equal(5078);
+      });
+      it('should call shell and return an empty list if no processes are running', async function () {
+        adb._isPidofAvailable = true;
+        const err = new Error();
+        err.code = 1;
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['pidof', contactManagerPackage])
+          .throws(err);
+        (await adb.getPIDsByName(contactManagerPackage)).length.should.eql(0);
       });
     });
     describe('killProcessesByName', function () {
