@@ -575,6 +575,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('getPIDsByName', function () {
+      afterEach(function () {
+        adb._isPidofAvailable = undefined;
+      });
       it('should call shell and parse pids correctly', async function () {
         adb._isPidofAvailable = true;
         mocks.adb.expects("shell")
@@ -590,6 +593,59 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .once().withExactArgs(['pidof', contactManagerPackage])
           .throws(err);
         (await adb.getPIDsByName(contactManagerPackage)).length.should.eql(0);
+      });
+      it('should fall back to ps if pidof is not available', async function () {
+        adb._isPidofAvailable = false;
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ps'])
+          .returns(`
+          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
+          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
+          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
+          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
+          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
+          u0_a1     1349  69    1206724 26164 ffffffff b6db0920 S com.android.providers.calendar
+          u0_a17    1431  69    1217460 26616 ffffffff b6db0920 S com.android.calendar
+          u0_a21    1454  69    1203712 26244 ffffffff b6db0920 S com.android.deskclock
+          u0_a27    1490  69    1206480 24748 ffffffff b6db0920 S com.android.exchange
+          u0_a4     1574  69    1205460 22984 ffffffff b6db0920 S com.android.dialer
+          u0_a2     1590  69    1207456 29340 ffffffff b6db0920 S android.process.acore
+          u0_a11    1608  69    1199320 22448 ffffffff b6db0920 S com.android.sharedstoragebackup
+          u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
+          u0_a5     1646  69    1202716 27004 ffffffff b6db0920 S android.process.media
+          root      1676  2     0      0     c00d0d8c 00000000 S flush-31:1
+          root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
+          root      1681  60    10672  996   00000000 b6f33508 R ps
+          `);
+        (await adb.getPIDsByName('com.android.phone')).should.eql([929, 930]);
+      });
+      it('should fall back to ps and return empty list if no processes were found', async function () {
+        adb._isPidofAvailable = false;
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ps'])
+          .returns(`
+          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
+          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
+          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
+          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
+          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
+          `);
+        (await adb.getPIDsByName('com.android.phoner')).length.should.eql(0);
+      });
+      it('should properly parse different ps output formats', async function () {
+        adb._isPidofAvailable = false;
+        mocks.adb.expects("shell")
+          .once().withExactArgs(['ps'])
+          .returns(`
+          USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
+          shell        21989 32761    4952   2532 sigsuspend   b2f1d778 S sh
+          shell        21992 21989    5568   3016 0            b4396448 R ps
+          `);
+        (await adb.getPIDsByName('sh')).should.eql([21989]);
       });
     });
     describe('killProcessesByName', function () {
