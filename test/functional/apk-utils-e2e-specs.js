@@ -27,7 +27,9 @@ describe('apk utils', function () {
   };
 
   before(async function () {
-    adb = await ADB.createADB();
+    adb = await ADB.createADB({
+      adbExecTimeout: process.env.TRAVIS ? 60000 : 40000,
+    });
   });
   it('should be able to check status of third party app', async function () {
     (await adb.isAppInstalled('com.android.phone')).should.be.true;
