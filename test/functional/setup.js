@@ -21,7 +21,7 @@ let apiLevel = process.env.API_LEVEL ||
                API_LEVEL_MAP[parseFloat(platformVersion).toString()];
 apiLevel = parseInt(apiLevel, 10);
 
-let MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
-let MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
+const MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
+const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
 export { apiLevel, platformVersion, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT };
