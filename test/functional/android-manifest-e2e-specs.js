@@ -49,7 +49,7 @@ describe('Android-manifest', function () {
     }
     await fs.mkdir(tmpDir);
     await fs.mkdir(dstDir);
-    await fs.writeFile(dstManifest, await fs.readFile(srcManifest, "utf8"), "utf8");
+    await fs.writeFile(dstManifest, await fs.readFile(srcManifest, 'utf8'), 'utf8');
     await adb.compileManifest(dstManifest, newPackage, appPackage);
     (await util.fileExists(dstManifest)).should.be.true;
     await adb.insertManifest(dstManifest, serverPath, newServerPath);

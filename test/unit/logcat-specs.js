@@ -20,7 +20,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
     it('should correctly call subprocess and should resolve promise', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      mocks.teen_process.expects("SubProcess")
+      mocks.teen_process.expects('SubProcess')
         .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
@@ -33,7 +33,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
     it('should correctly call subprocess and should reject promise', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      mocks.teen_process.expects("SubProcess")
+      mocks.teen_process.expects('SubProcess')
         .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
@@ -44,7 +44,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
     it('should correctly call subprocess and should resolve promise if it fails on startup', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      mocks.teen_process.expects("SubProcess")
+      mocks.teen_process.expects('SubProcess')
         .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
         .returns(conn);
       setTimeout(function () {
