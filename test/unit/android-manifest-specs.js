@@ -20,10 +20,10 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK',
             dummyProcess = 'dummyProcess';
-      mocks.adb.expects("initAapt")
+      mocks.adb.expects('initAapt')
         .once().withExactArgs()
               .returns('');
-      mocks.teen_process.expects("exec")
+      mocks.teen_process.expects('exec')
         .once().withExactArgs('dummy_aapt', ['dump', 'xmltree', localApk, 'AndroidManifest.xml'])
         .returns({stdout: ` E: application (line=234)
                           A: android:process(0x01010011)="${dummyProcess}"`});
@@ -33,11 +33,11 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
   describe('packageAndLaunchActivityFromManifest', function () {
     it('should correctly parse package and activity from manifest with apkanalyzer tool', async function () {
       const apkanalyzerDummyPath = 'apkanalyzer';
-      mocks.helpers.expects("getApkanalyzerForOs").returns(apkanalyzerDummyPath);
+      mocks.helpers.expects('getApkanalyzerForOs').returns(apkanalyzerDummyPath);
       const localApk = 'dummyAPK';
       const dummyPackageName = 'io.appium.android';
       const dummyActivityName = 'io.appium.mainactivity.MainTabActivity';
-      mocks.teen_process.expects("exec")
+      mocks.teen_process.expects('exec')
         .once().withArgs(apkanalyzerDummyPath)
         .returns({stdout: `
         <?xml version="1.0" encoding="utf-8"?>
@@ -221,11 +221,11 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
       const localApk = 'dummyAPK';
       const dummyPackageName = 'package';
       const dummyActivityName = 'activity';
-      mocks.helpers.expects("getApkanalyzerForOs").throws();
-      mocks.adb.expects("initAapt")
+      mocks.helpers.expects('getApkanalyzerForOs').throws();
+      mocks.adb.expects('initAapt')
         .once().withExactArgs()
         .returns('');
-      mocks.teen_process.expects("exec")
+      mocks.teen_process.expects('exec')
         .once().withExactArgs('dummy_aapt', ['dump', 'badging', localApk])
         .returns({stdout: ` package: name='${dummyPackageName}'
                           launchable-activity: name='${dummyActivityName}'`});
@@ -238,10 +238,10 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
     it('should correctly parse internet permission from manifest', async function () {
       adb.binaries.aapt = 'dummy_aapt';
       const localApk = 'dummyAPK';
-      mocks.adb.expects("initAapt")
+      mocks.adb.expects('initAapt')
         .once().withExactArgs()
               .returns('');
-      mocks.teen_process.expects("exec")
+      mocks.teen_process.expects('exec')
         .once().withExactArgs('dummy_aapt', ['dump', 'badging', localApk])
         .returns({stdout: ` uses-permission:.*'android.permission.INTERNET'`});
       (await adb.hasInternetPermissionFromManifest(localApk)).should.be.true;

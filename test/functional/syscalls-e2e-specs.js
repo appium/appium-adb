@@ -26,7 +26,7 @@ describe('System calls', function () {
     devices.should.have.length.above(0);
   });
   it('adbExec should get devices when with devices', async function () {
-    (await adb.adbExec("devices")).should.contain("List of devices attached");
+    (await adb.adbExec('devices')).should.contain('List of devices attached');
   });
   it('isDeviceConnected should be true', async function () {
     (await adb.isDeviceConnected()).should.be.true;
