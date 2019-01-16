@@ -6,6 +6,7 @@ import events from 'events';
 import Logcat from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from 'appium-test-support';
+import _ from 'lodash';
 
 
 chai.use(chaiAsPromised);
@@ -577,16 +578,27 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('getPIDsByName', function () {
       afterEach(function () {
         adb._isPidofAvailable = undefined;
+        adb._isPgrepAvailable = undefined;
       });
-      it('should call shell and parse pids correctly', async function () {
+      it('should call shell and parse pids with pidof correctly', async function () {
         adb._isPidofAvailable = true;
+        adb._isPgrepAvailable = false;
         mocks.adb.expects('shell')
           .once().withExactArgs(['pidof', contactManagerPackage])
-          .returns('5078\n');
-        (await adb.getPIDsByName(contactManagerPackage))[0].should.equal(5078);
+          .returns('5078 5079\n');
+        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
+      });
+      it('should call shell and parse pids with pgrep correctly', async function () {
+        adb._isPidofAvailable = false;
+        adb._isPgrepAvailable = true;
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['pgrep', '-f', `^${_.escapeRegExp(contactManagerPackage)}$`])
+          .returns('5078\n5079\n');
+        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
       });
       it('should call shell and return an empty list if no processes are running', async function () {
         adb._isPidofAvailable = true;
+        adb._isPgrepAvailable = false;
         const err = new Error();
         err.code = 1;
         mocks.adb.expects('shell')
@@ -596,6 +608,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
       it('should fall back to ps if pidof is not available', async function () {
         adb._isPidofAvailable = false;
+        adb._isPgrepAvailable = false;
         mocks.adb.expects('shell')
           .once().withExactArgs(['ps'])
           .returns(`
@@ -623,6 +636,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
       it('should fall back to ps and return empty list if no processes were found', async function () {
         adb._isPidofAvailable = false;
+        adb._isPgrepAvailable = false;
         mocks.adb.expects('shell')
           .once().withExactArgs(['ps'])
           .returns(`
@@ -638,6 +652,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
       it('should properly parse different ps output formats', async function () {
         adb._isPidofAvailable = false;
+        adb._isPgrepAvailable = false;
         mocks.adb.expects('shell')
           .once().withExactArgs(['ps'])
           .returns(`
