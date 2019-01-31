@@ -76,7 +76,7 @@
     "gulp": "^4.0.0",
     "mocha": "^5.1.1",
     "pre-commit": "^1.1.3",
-    "sinon": "^6.0.0",
+    "sinon": "^7.2.3",
     "temp": "^0.9.0"
   },
   "greenkeeper": {
