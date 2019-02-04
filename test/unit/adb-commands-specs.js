@@ -541,7 +541,23 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         mocks.adb.expects('adbExec')
             .once().withExactArgs(['forward', `--remove`, `tcp:${sysPort}`])
             .returns('');
-        await adb.removePortForward(sysPort, devicePort);
+        await adb.removePortForward(sysPort);
+      });
+    });
+    describe('reversePort', function () {
+      const sysPort = 12345,
+            devicePort = 54321;
+      it('reversePort should call shell with correct args', async function () {
+        mocks.adb.expects('adbExec')
+          .once().withExactArgs(['reverse', `tcp:${devicePort}`, `tcp:${sysPort}`])
+          .returns('');
+        await adb.reversePort(devicePort, sysPort);
+      });
+      it('removePortReverse should call shell with correct args', async function () {
+        mocks.adb.expects('adbExec')
+            .once().withExactArgs(['reverse', `--remove`, `tcp:${devicePort}`])
+            .returns('');
+        await adb.removePortReverse(devicePort);
       });
     });
     describe('ping', function () {

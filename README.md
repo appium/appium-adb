@@ -99,6 +99,7 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 - `pull`
 - `processExists`
 - `forwardPort`
+- `reversePort` (ApiLevel >=21)
 - `forwardAbstractPort`
 - `ping`
 - `restart`

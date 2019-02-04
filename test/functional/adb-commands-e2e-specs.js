@@ -106,6 +106,16 @@ describe('adb commands', function () {
     (await adb.adbExec([`forward`, `--list`])).should.not.contain('tcp:8200');
 
   });
+  it('should reverse forward the port', async function () {
+    await adb.reversePort(4724, 4724);
+  });
+  it('should remove reverse forwarded port', async function () {
+    await adb.reversePort(6790, 8200);
+    (await adb.adbExec([`reverse`, `--list`])).should.contain('tcp:6790');
+    await adb.removePortReverse(6790);
+    (await adb.adbExec([`reverse`, `--list`])).should.not.contain('tcp:6790');
+
+  });
   it('should start logcat from adb', async function () {
     await adb.startLogcat();
     let logs = adb.logcat.getLogs();
