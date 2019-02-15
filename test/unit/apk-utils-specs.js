@@ -463,7 +463,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
       mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000})
+        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
         .returns('');
       await adb.install('foo');
     });
@@ -471,7 +471,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
       mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', 'foo'], {timeout: 60000})
+        .once().withExactArgs(['install', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
         .returns('');
       await adb.install('foo', {replace: false});
     });
