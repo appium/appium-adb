@@ -28,7 +28,7 @@ describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  let androidInstallTimeout = 90000;
+  const androidInstallTimeout = 90000;
   before(async function () {
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
   });
