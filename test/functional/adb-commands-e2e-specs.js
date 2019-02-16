@@ -28,6 +28,7 @@ describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
+  const androidInstallTimeout = 90000;
   before(async function () {
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
   });
@@ -70,13 +71,13 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(contactManagerPath);
+    await adb.install(contactManagerPath, {timeout: androidInstallTimeout});
     await adb.startApp({pkg, activity});
     await adb.killProcessesByName(pkg);
     (await adb.getPIDsByName(pkg)).should.have.length(0);
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(contactManagerPath);
+    await adb.install(contactManagerPath, {timeout: androidInstallTimeout});
     await adb.startApp({pkg, activity});
     let pids = await adb.getPIDsByName(pkg);
     pids.should.have.length.above(0);
@@ -195,7 +196,7 @@ describe('adb commands', function () {
     it('should install and grant all permission', async function () {
       let apiDemos = path.resolve(rootDir, 'test',
           'fixtures', 'ApiDemos-debug.apk');
-      await adb.install(apiDemos);
+      await adb.install(apiDemos, {timeout: androidInstallTimeout});
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
       await adb.grantAllPermissions('io.appium.android.apis');
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
