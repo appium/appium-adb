@@ -98,6 +98,6 @@ before_script:
       adb shell input keyevent 82
     fi
 script:
-  - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST -ig @skip-ci
+  - npm run lint && npm run mocha -- -t 900000 -R spec $RECURSIVE build/test/$TEST -i -g @skip-ci
 after_success:
   - npm run coverage
