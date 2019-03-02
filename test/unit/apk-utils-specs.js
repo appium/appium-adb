@@ -435,7 +435,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().withExactArgs(pkg)
         .returns('');
       mocks.adb.expects('adbExec')
-        .once().withExactArgs(['uninstall', pkg], {timeout: 20000})
+        .once().withExactArgs(['uninstall', pkg], {timeout: undefined})
         .returns('Success');
       (await adb.uninstallApk(pkg)).should.be.true;
     });
