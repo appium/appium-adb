@@ -5,7 +5,8 @@ import { fs } from 'appium-support';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
 import path from 'path';
-
+import _ from 'lodash';
+import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
@@ -456,6 +457,25 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
       await adb.installFromDevicePath('foo');
+    });
+  });
+  describe('cacheApk', function () {
+    it('should remove extra apks from the cache', async function () {
+      const apkPath = '/dummy/foo.apk';
+      mocks.adb.expects('ls')
+        .once()
+        .returns(_.range(adb.remoteAppsCacheLimit + 2).map((x) => `${x}.apk`));
+      mocks.fs.expects('hash')
+        .withExactArgs(apkPath)
+        .returns('1');
+      mocks.adb.expects('shell')
+        .once()
+        .withExactArgs([
+          'rm', '-f',
+          `${REMOTE_CACHE_ROOT}/${adb.remoteAppsCacheLimit}.apk`,
+          `${REMOTE_CACHE_ROOT}/${adb.remoteAppsCacheLimit + 1}.apk`,
+        ]);
+      await adb.cacheApk(apkPath);
     });
   });
   describe('install', function () {
