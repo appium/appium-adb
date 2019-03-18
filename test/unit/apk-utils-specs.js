@@ -464,9 +464,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().returns(23);
       mocks.adb.expects('cacheApk')
         .once().withExactArgs('foo', {
-          replace: true,
           timeout: 60000,
-          timeoutCapName: 'androidInstallTimeout'
         })
         .returns('bar');
       mocks.adb.expects('shell')
@@ -482,9 +480,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once().returns(23);
       mocks.adb.expects('cacheApk')
         .once().withExactArgs('foo', {
-          replace: false,
           timeout: 60000,
-          timeoutCapName: 'androidInstallTimeout'
         })
         .returns('bar');
       mocks.adb.expects('shell')
