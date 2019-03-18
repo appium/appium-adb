@@ -451,7 +451,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('installFromDevicePath', function () {
-    it('should call forceStop and adbExec with correct arguments', async function () {
+    it('should call shell with correct arguments', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
@@ -459,19 +459,39 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('install', function () {
-    it('should call forceStop and adbExec with correct arguments', async function () {
+    it('should call shell with correct arguments', async function () {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
-      mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
+      mocks.adb.expects('cacheApk')
+        .once().withExactArgs('foo', {
+          replace: true,
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
+        .returns('bar');
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['pm', 'install', '-r', 'bar'], {
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
         .returns('');
       await adb.install('foo');
     });
-    it('should call forceStop and adbExec with correct arguments when not replacing', async function () {
+    it('should call shell with correct arguments when not replacing', async function () {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
-      mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
+      mocks.adb.expects('cacheApk')
+        .once().withExactArgs('foo', {
+          replace: false,
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
+        .returns('bar');
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['pm', 'install', 'bar'], {
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
         .returns('');
       await adb.install('foo', {replace: false});
     });
