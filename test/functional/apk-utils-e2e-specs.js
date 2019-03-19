@@ -174,6 +174,9 @@ describe('apk utils', function () {
     appActivity.should.equal('.Settings$NotificationAppListActivity');
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
+    // The test sometimes fails due to Emulator slowness on Travis
+    this.retries(2);
+
     await adb.install(contactManagerPath);
     await adb.startApp({
       pkg: 'com.example.android.contactmanager',
