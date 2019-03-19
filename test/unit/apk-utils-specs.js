@@ -5,7 +5,8 @@ import { fs } from 'appium-support';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
 import path from 'path';
-
+import _ from 'lodash';
+import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
@@ -451,27 +452,85 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('installFromDevicePath', function () {
-    it('should call forceStop and adbExec with correct arguments', async function () {
+    it('should call shell with correct arguments', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'install', '-r', 'foo'], {})
         .returns('');
       await adb.installFromDevicePath('foo');
     });
   });
+  describe('cacheApk', function () {
+    it('should remove extra apks from the cache', async function () {
+      const apkPath = '/dummy/foo.apk';
+      mocks.adb.expects('ls')
+        .once()
+        .returns(_.range(adb.remoteAppsCacheLimit + 2).map((x) => `${x}.apk`));
+      mocks.fs.expects('hash')
+        .withExactArgs(apkPath)
+        .returns('1');
+      mocks.adb.expects('shell')
+        .once()
+        .withExactArgs([
+          'rm', '-f',
+          `${REMOTE_CACHE_ROOT}/${adb.remoteAppsCacheLimit}.apk`,
+          `${REMOTE_CACHE_ROOT}/${adb.remoteAppsCacheLimit + 1}.apk`,
+        ]);
+      await adb.cacheApk(apkPath);
+    });
+    it('should add apk into the cache if it is not there yet', async function () {
+      const apkPath = '/dummy/foo.apk';
+      const hash = '12345';
+      mocks.adb.expects('ls')
+        .once()
+        .returns([]);
+      mocks.fs.expects('hash')
+        .withExactArgs(apkPath)
+        .returns(hash);
+      mocks.adb.expects('shell')
+        .once()
+        .withExactArgs(['mkdir', '-p', REMOTE_CACHE_ROOT])
+        .returns();
+      mocks.adb.expects('push')
+        .once()
+        .withArgs(apkPath, `${REMOTE_CACHE_ROOT}/${hash}.apk`)
+        .returns();
+      mocks.fs.expects('stat')
+        .once()
+        .withExactArgs(apkPath)
+        .returns({size: 1});
+      await adb.cacheApk(apkPath);
+    });
+  });
   describe('install', function () {
-    it('should call forceStop and adbExec with correct arguments', async function () {
+    it('should call shell with correct arguments', async function () {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
-      mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', '-r', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
+      mocks.adb.expects('cacheApk')
+        .once().withExactArgs('foo', {
+          timeout: 60000,
+        })
+        .returns('bar');
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['pm', 'install', '-r', 'bar'], {
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
         .returns('');
       await adb.install('foo');
     });
-    it('should call forceStop and adbExec with correct arguments when not replacing', async function () {
+    it('should call shell with correct arguments when not replacing', async function () {
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
-      mocks.adb.expects('adbExec')
-        .once().withExactArgs(['install', 'foo'], {timeout: 60000, timeoutCapName: 'androidInstallTimeout'})
+      mocks.adb.expects('cacheApk')
+        .once().withExactArgs('foo', {
+          timeout: 60000,
+        })
+        .returns('bar');
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['pm', 'install', 'bar'], {
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
         .returns('');
       await adb.install('foo', {replace: false});
     });
