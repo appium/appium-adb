@@ -477,6 +477,29 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         ]);
       await adb.cacheApk(apkPath);
     });
+    it('should add apk into the cache if it is not there yet', async function () {
+      const apkPath = '/dummy/foo.apk';
+      const hash = '12345';
+      mocks.adb.expects('ls')
+        .once()
+        .returns([]);
+      mocks.fs.expects('hash')
+        .withExactArgs(apkPath)
+        .returns(hash);
+      mocks.adb.expects('shell')
+        .once()
+        .withExactArgs(['mkdir', '-p', REMOTE_CACHE_ROOT])
+        .returns();
+      mocks.adb.expects('push')
+        .once()
+        .withArgs(apkPath, `${REMOTE_CACHE_ROOT}/${hash}.apk`)
+        .returns();
+      mocks.fs.expects('stat')
+        .once()
+        .withExactArgs(apkPath)
+        .returns({size: 1});
+      await adb.cacheApk(apkPath);
+    });
   });
   describe('install', function () {
     it('should call shell with correct arguments', async function () {
