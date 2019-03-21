@@ -462,9 +462,14 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   describe('cacheApk', function () {
     it('should remove extra apks from the cache', async function () {
       const apkPath = '/dummy/foo.apk';
-      mocks.adb.expects('ls')
+      adb._areExtendedLsOptionsSupported = true;
+      mocks.adb.expects('shell')
         .once()
-        .returns(_.range(adb.remoteAppsCacheLimit + 2).map((x) => `${x}.apk`));
+        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo _ERROR_`])
+        .returns(_.range(adb.remoteAppsCacheLimit + 2)
+          .map((x) => `${x}.apk`)
+          .join('\r\n')
+        );
       mocks.fs.expects('hash')
         .withExactArgs(apkPath)
         .returns('1');
@@ -480,9 +485,11 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should add apk into the cache if it is not there yet', async function () {
       const apkPath = '/dummy/foo.apk';
       const hash = '12345';
+      adb._areExtendedLsOptionsSupported = true;
       mocks.adb.expects('ls')
         .once()
-        .returns([]);
+        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo _ERROR_`])
+        .returns('');
       mocks.fs.expects('hash')
         .withExactArgs(apkPath)
         .returns(hash);
