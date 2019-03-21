@@ -465,7 +465,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       adb._areExtendedLsOptionsSupported = true;
       mocks.adb.expects('shell')
         .once()
-        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} || echo _ERROR_`])
+        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo _ERROR_`])
         .returns(_.range(adb.remoteAppsCacheLimit + 2)
           .map((x) => `${x}.apk`)
           .join('\r\n')
@@ -488,7 +488,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       adb._areExtendedLsOptionsSupported = true;
       mocks.adb.expects('ls')
         .once()
-        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} || echo _ERROR_`])
+        .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo _ERROR_`])
         .returns('');
       mocks.fs.expects('hash')
         .withExactArgs(apkPath)
