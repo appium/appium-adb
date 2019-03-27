@@ -50,7 +50,7 @@
     "bluebird": "^3.4.7",
     "lodash": "^4.0.0",
     "lru-cache": "^5.0.0",
-    "semver": "^5.5.0",
+    "semver": "^6.0.0",
     "shell-quote": "^1.6.1",
     "source-map-support": "^0.5.5",
     "teen_process": "^1.11.0",
