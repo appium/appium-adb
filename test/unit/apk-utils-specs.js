@@ -1008,7 +1008,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('getPackageInfo').once().returns({
         versionCode: 1
       });
-      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).atLeast(1).returns(true);
+      mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
