@@ -1009,7 +1009,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if older package version is installed, but version codes are not maintained', async function () {
@@ -1023,7 +1023,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionName: '1.0.0',
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should perform upgrade if the same version is installed, but version codes are different', async function () {
@@ -1037,7 +1037,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionName: '2.0.0',
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should uninstall and re-install if older package version is installed and upgrade fails', async function () {
@@ -1049,9 +1049,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1
       });
       mocks.adb.expects('isAppInstalled').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, {replace: true, timeout: 60000}).once().throws();
+      mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().throws();
       mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
-      mocks.adb.expects('install').withArgs(apkPath, {replace: false, timeout: 60000}).once().returns(true);
+      mocks.adb.expects('install').withArgs(apkPath, {replace: false}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
     it('should throw an exception if upgrade and reinstall fail', async function () {
