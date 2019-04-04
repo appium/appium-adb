@@ -5,14 +5,17 @@ jobs:
     parameters:
       script: npx mocha --timeout 6000000 --reporter mocha-junit-reporter --recursive build/test/functional/ -g @skip-ci -i --exit
       name: sdk28_e2e_tests
+      PLATFORM_VERSION: 9.0
       ANDROID_SDK_VERSION: 28
   - template: templates/android-e2e-template.yml
     parameters:
       script: npx mocha --timeout 6000000 --reporter mocha-junit-reporter --recursive build/test/functional/ -g @skip-ci -i --exit
       name: sdk25_e2e_tests
+      PLATFORM_VERSION: 7.1
       ANDROID_SDK_VERSION: 25
   - template: templates/android-e2e-template.yml
     parameters:
       script: npx mocha --timeout 6000000 --reporter mocha-junit-reporter --recursive build/test/functional/ -g @skip-ci -i --exit
       name: sdk22_e2e_tests
+      PLATFORM_VERSION: 6.0
       ANDROID_SDK_VERSION: 23
