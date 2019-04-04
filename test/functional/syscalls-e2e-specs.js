@@ -40,7 +40,7 @@ describe('System calls', function () {
   it('getRunningAVD should get all connected avd', async function () {
     (await adb.getRunningAVD(avdName)).should.not.be.null;
   });
-  it('getRunningAVDWithRetry should get all connected avds', async function () {
+  it.only('getRunningAVDWithRetry should get all connected avds', async function () {
     (await adb.getRunningAVDWithRetry(avdName)).should.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI
