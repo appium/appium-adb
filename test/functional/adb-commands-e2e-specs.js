@@ -143,7 +143,7 @@ describe('adb commands', function () {
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
   });
-  it.only('should be able to toggle airplane mode', async function () {
+  it('should be able to toggle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
