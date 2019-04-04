@@ -15,4 +15,4 @@ jobs:
     parameters:
       script: npx mocha --timeout 6000000 --reporter mocha-junit-reporter --recursive build/test/functional/ -g @skip-ci -i --exit
       name: sdk22_e2e_tests
-      ANDROID_SDK_VERSION: 22
+      ANDROID_SDK_VERSION: 23

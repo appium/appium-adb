@@ -20,6 +20,8 @@ jobs:
     - task: NodeTool@0
       inputs:
         versionSpec: ${{ parameters.NODE_VERSION }}
+    - script: npm install
+      displayName: Install Node dependencies
     - script: npm test
       displayName: NPM Test
     - script: bash ci-jobs/scripts/start-emulator.sh
