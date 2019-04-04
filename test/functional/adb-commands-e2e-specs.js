@@ -141,13 +141,13 @@ describe('adb commands', function () {
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
   });
-  it('should be able to toogle airplane mode', async function () {
+  it.only('should be able to toggle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
     (await adb.isAirplaneModeOn()).should.be.false;
   });
-  it('should be able to toogle wifi @skip-ci', async function () {
+  it('should be able to toggle wifi @skip-ci', async function () {
     this.retries(3);
 
     await adb.setWifiState(true);
@@ -253,7 +253,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS) {
+      if (process.env.TRAVIS || process.env.CI) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
