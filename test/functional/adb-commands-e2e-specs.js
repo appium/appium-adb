@@ -34,8 +34,10 @@ describe('adb commands', function () {
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
   });
-  it('getPlatformVersion should get correct platform version', async function () {
-    (await adb.getPlatformVersion()).should.include(platformVersion);
+  it.only('getPlatformVersion should get correct platform version', async function () {
+    const detectedPlatformVersion = await adb.getPlatformVersion();
+    const expectedPlatformVersion = platformVersion;
+    parseFloat(detectedPlatformVersion).should.equal(parseFloat(expectedPlatformVersion));
   });
   it('availableIMEs should get list of available IMEs', async function () {
     (await adb.availableIMEs()).should.have.length.above(0);
