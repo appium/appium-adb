@@ -247,9 +247,7 @@ describe('adb commands', function () {
       remoteData.toString().should.equal(stringData);
     });
     it('should throw error if it cannot write to the remote file', async function () {
-      let remoteFile = '/foo/bar/remote.txt';
-
-      await adb.push(localFile, remoteFile).should.be.rejectedWith(/\/foo\/bar\/remote.txt/);
+      await adb.push(localFile, '/foo/bar/remote.txt').should.be.rejectedWith(/\/foo/);
     });
   });
 
