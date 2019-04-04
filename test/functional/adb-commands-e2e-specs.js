@@ -34,7 +34,7 @@ describe('adb commands', function () {
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
   });
-  it.only('getPlatformVersion should get correct platform version', async function () {
+  it('getPlatformVersion should get correct platform version', async function () {
     const detectedPlatformVersion = await adb.getPlatformVersion();
     const expectedPlatformVersion = platformVersion;
     parseFloat(detectedPlatformVersion).should.equal(parseFloat(expectedPlatformVersion));
