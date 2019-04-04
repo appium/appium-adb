@@ -16,6 +16,7 @@ jobs:
       TERM: dumb
       MOCHA_FILE: ${{ parameters.MOCHA_FILE }}
       ANDROID_SDK_VERSION: ${{ parameters.ANDROID_SDK_VERSION }}
+      PLATFORM_VERSION: ${{ parameters.ANDROID_SDK_VERSION }}
     steps:
     - task: NodeTool@0
       inputs:
