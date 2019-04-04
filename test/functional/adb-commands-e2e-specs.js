@@ -58,7 +58,7 @@ describe('adb commands', function () {
     await adb.enabledIMEs();
   });
   it('processExists should be able to find ui process', async function () {
-    if (process.env.TRAVIS) {
+    if (process.env.TRAVIS || process.env.CI) {
       // This test is unstable on Travis
       return this.skip();
     }
@@ -86,7 +86,9 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
+    if (process.env.TRAVIS || process.env.CI) {
+      return this.skip();
+    }
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
