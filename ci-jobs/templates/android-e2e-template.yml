@@ -18,7 +18,6 @@ jobs:
       MOCHA_FILE: ${{ parameters.MOCHA_FILE }}
       ANDROID_SDK_VERSION: ${{ parameters.ANDROID_SDK_VERSION }}
       PLATFORM_VERSION: ${{ parameters.PLATFORM_VERSION }}
-      API_LEVEL: ${{ parameters.PLATFORM_VERSION }}
     steps:
     - task: NodeTool@0
       inputs:
