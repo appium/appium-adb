@@ -54,7 +54,7 @@ describe('apk utils', function () {
       await adb.install(contactManagerPath);
       await adb.startUri('content://contacts/people', 'com.android.contacts');
       await retryInterval(10, 500, async () => {
-        res = await adb.shell(['dumpsys', 'window', 'windows']);
+        res = await adb.dumpsys();
         // depending on apilevel, app might show up as active in one of these
         // two dumpsys output formats
         let focusRe1 = '(mCurrentFocus.+\\.PeopleActivity)';

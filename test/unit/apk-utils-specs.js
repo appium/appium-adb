@@ -48,7 +48,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should parse correctly and return true', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'package', pkg])
+        .twice().withExactArgs(['dumpsys', 'package', pkg])
         .returns(`Packages:
           Package [${pkg}] (2469669):
             userId=2000`);
@@ -196,8 +196,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
 
   describe('getFocusedPackageAndActivity', function () {
     it('should parse correctly and return package and activity', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/${act} t181}}}\n` +
                  `mCurrentFocus=Window{4330b6c0 com.android.settings/com.android.settings.SubSettings paused=false}`);
@@ -207,8 +207,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appActivity.should.equal(act);
     });
     it('should parse correctly and return package and activity when a comma is present', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{20fe217e token=Token{21878739 ` +
                  `ActivityRecord{16425300 u0 ${pkg}/${act}, isShadow:false t10}}}`);
 
@@ -217,8 +217,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appActivity.should.equal(act);
     });
     it('should parse correctly and return package and activity of only mCurrentFocus is set', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=null\n  mCurrentFocus=Window{4330b6c0 u0 ${pkg}/${act} paused=false}`);
 
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
@@ -226,16 +226,16 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appActivity.should.equal(act);
     });
     it('should return null if mFocusedApp=null', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns('mFocusedApp=null');
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       should.not.exist(appPackage);
       should.not.exist(appActivity);
     });
     it('should return null if mCurrentFocus=null', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns('mCurrentFocus=null');
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       should.not.exist(appPackage);
@@ -244,60 +244,59 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   });
   describe('waitForActivityOrNot', function () {
     it('should call shell once and should return', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/${act} t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, act, false);
     });
     it('should call shell multiple times and return', async function () {
-      mocks.adb.expects('shell').onCall(0)
+      mocks.adb.expects('dumpsys')
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
                  'ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
-      mocks.adb.expects('shell')
+      mocks.adb.expects('dumpsys')
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
                  'ActivityRecord{2c7c4318 u0 com.example.android.contactmanager/.ContactManager t181}}}');
 
       await adb.waitForActivityOrNot(pkg, act, false);
     });
     it('should call shell once return for not', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
                  'ActivityRecord{c 0 foo/bar t181}}}');
 
       await adb.waitForActivityOrNot(pkg, act, true);
     });
     it('should call shell multiple times and return for not', async function () {
-      mocks.adb.expects('shell').onCall(0)
+      mocks.adb.expects('dumpsys')
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/${act} t181}}}`);
-      mocks.adb.expects('shell')
+      mocks.adb.expects('dumpsys')
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
                  'ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
       await adb.waitForActivityOrNot(pkg, act, true);
     });
     it('should be able to get first of a comma-separated list of activities', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, '.ContactManager, .OtherManager', false);
     });
     it('should be able to get second of a comma-separated list of activities', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.OtherManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, '.ContactManager, .OtherManager', false);
     });
     it('should fail if no activity in a comma-separated list is available', async function () {
-      mocks.adb.expects('shell')
+      mocks.adb.expects('dumpsys')
         .atLeast(1)
-        .withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/${act} t181}}}`);
 
@@ -305,56 +304,56 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .should.eventually.be.rejected;
     });
     it('should be able to match activities if waitActivity is a wildcard', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `*`, false);
     });
     it('should be able to match activities if waitActivity is shortened and contains a whildcard', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `.*Manager`, false);
     });
     it('should be able to match activities if waitActivity contains a wildcard alternative to activity', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `${pkg}.*`, false);
     });
     it('should be able to match activities if waitActivity contains a wildcard on head', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `*.contactmanager.ContactManager`, false);
     });
     it('should be able to match activities if waitActivity contains a wildcard across a pkg name and an activity name', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `com.*Manager`, false);
     });
     it('should be able to match activities if waitActivity contains wildcards in both a pkg name and an activity name', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u ${pkg}/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, `com.*.contactmanager.*Manager`, false);
     });
     it('should fail if activity not to match from regexp activities', async function () {
-      mocks.adb.expects('shell')
-        .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .atLeast(1)
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
                  `ActivityRecord{2 u com.example.android.supermanager/.SuperManager t181}}}`);
 
@@ -362,48 +361,48 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .should.eventually.be.rejected;
     });
     it('should be able to get an activity that is an inner class', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u ${pkg}/.Settings$AppDrawOverlaySettingsActivity t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, '.Settings$AppDrawOverlaySettingsActivity', false);
     });
     it('should be able to get first activity from first package in a comma-separated list of packages + activities', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.android.settings/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get first activity from second package in a comma-separated list of packages + activities', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.example.android.supermanager/.ContactManager t181}}}`);
 
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get second activity from first package in a comma-separated list of packages + activities', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.android.settings/.OtherManager t181}}}`);
 
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get second activity from second package in a comma-separated list of packages', async function () {
-      mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.example.android.supermanager/.OtherManager t181}}}`);
 
       await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should fail to get activity when focused activity matches none of the provided list of packages', async function () {
-      mocks.adb.expects('shell')
-        .atLeast(1).withExactArgs(['dumpsys', 'window', 'windows'])
+      mocks.adb.expects('dumpsys')
+        .atLeast(1)
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.otherpackage/.ContactManager t181}}}`);
 
@@ -1091,6 +1090,20 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         isExceptionThrown = true;
       }
       isExceptionThrown.should.be.true;
+    });
+  });
+  describe('dumpsys', function () {
+    it('should call shell with dumpsys args for sdk < 29', async function () {
+      mocks.adb.expects('getApiLevel').returns(28);
+      mocks.adb.expects('shell').withArgs(['getprop', 'ro.build.version.sdk']).onCall(0);
+      mocks.adb.expects('shell').withArgs(['dumpsys', 'window', 'windows']).onCall(1);
+      await adb.dumpsys();
+    });
+    it('should call `dumpsys window displays` for sdk >= 29', async function () {
+      mocks.adb.expects('getApiLevel').returns(29);
+      mocks.adb.expects('shell').withArgs(['getprop', 'ro.build.version.sdk']).onCall(0);
+      mocks.adb.expects('shell').withArgs(['dumpsys', 'window', 'displays']).onCall(1);
+      await adb.dumpsys();
     });
   });
 }));
