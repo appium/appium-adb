@@ -51,7 +51,7 @@ describe('logcat', function () {
       let logs = logcat.getAllLogs();
       logs.should.have.length.above(0);
     });
-    it('should not affect device logs', async function () {
+    it('should not affect device logs @skip-ci', async function () {
       await runClearDeviceLogTest(adb, logcat, false);
     });
   });
