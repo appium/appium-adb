@@ -13,7 +13,7 @@ chai.use(chaiAsPromised);
 let expect = chai.expect;
 
 
-const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' : 
+const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' :
   'com.example.android.softkeyboard/.SoftKeyboard';
 const defaultIMEs = [
         'com.android.inputmethod.latin/.LatinIME',
