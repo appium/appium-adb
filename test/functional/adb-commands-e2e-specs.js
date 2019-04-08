@@ -12,16 +12,18 @@ chai.should();
 chai.use(chaiAsPromised);
 let expect = chai.expect;
 
-// change according to CI
+
+const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' :
+  'com.example.android.softkeyboard/.SoftKeyboard';
 const defaultIMEs = [
-  'com.android.inputmethod.latin/.LatinIME',
-  'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
-  'io.appium.android.ime/.UnicodeIME',
-];
-const contactManagerPath = path.resolve(rootDir, 'test',
-                                  'fixtures', 'ContactManager.apk');
-const pkg = 'com.example.android.contactmanager';
-const activity = 'ContactManager';
+        'com.android.inputmethod.latin/.LatinIME',
+        'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+        'io.appium.android.ime/.UnicodeIME',
+      ],
+      contactManagerPath = path.resolve(rootDir, 'test',
+                                        'fixtures', 'ContactManager.apk'),
+      pkg = 'com.example.android.contactmanager',
+      activity = 'ContactManager';
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -35,7 +37,8 @@ describe('adb commands', function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
   });
   it('getPlatformVersion should get correct platform version', async function () {
-    (await adb.getPlatformVersion()).should.include(platformVersion);
+    const actualPlatformVersion = await adb.getPlatformVersion();
+    parseFloat(platformVersion).should.equal(parseFloat(actualPlatformVersion));
   });
   it('availableIMEs should get list of available IMEs', async function () {
     (await adb.availableIMEs()).should.have.length.above(0);
@@ -49,8 +52,7 @@ describe('adb commands', function () {
       defaultIMEs.should.include(defaultIME);
     }
   });
-  it('enableIME and disableIME should enable and disble IME', async function () {
-    const IME = 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME';
+  it('enableIME and disableIME should enable and disable IME', async function () {
     await adb.disableIME(IME);
     (await adb.enabledIMEs()).should.not.include(IME);
     await adb.enableIME(IME);
@@ -86,7 +88,7 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
+    if (process.env.TRAVIS || process.env.CI) return this.skip(); // eslint-disable-line curly
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
@@ -253,7 +255,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS) {
+      if (process.env.TRAVIS || process.env.CI) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
