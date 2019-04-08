@@ -254,7 +254,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS) {
+      if (process.env.TRAVIS || process.env.CI) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
