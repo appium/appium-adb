@@ -27,7 +27,9 @@ jobs:
     - script: npm test
       displayName: NPM Test
     - script: bash ci-jobs/scripts/start-emulator.sh
-      displayName: Create and run Emulator
+      displayName: Create and run Emulator 
+    - script: npm run build
+      displayName: Build
     - script: ${{ parameters.script }}
       displayName: Run tests
     - task: PublishTestResults@2
