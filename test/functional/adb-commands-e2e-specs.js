@@ -12,16 +12,18 @@ chai.should();
 chai.use(chaiAsPromised);
 let expect = chai.expect;
 
-// change according to CI
+
+const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' : 
+  'com.example.android.softkeyboard/.SoftKeyboard';
 const defaultIMEs = [
-  'com.android.inputmethod.latin/.LatinIME',
-  'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
-  'io.appium.android.ime/.UnicodeIME',
-];
-const contactManagerPath = path.resolve(rootDir, 'test',
-                                  'fixtures', 'ContactManager.apk');
-const pkg = 'com.example.android.contactmanager';
-const activity = 'ContactManager';
+        'com.android.inputmethod.latin/.LatinIME',
+        'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+        'io.appium.android.ime/.UnicodeIME',
+      ],
+      contactManagerPath = path.resolve(rootDir, 'test',
+                                        'fixtures', 'ContactManager.apk'),
+      pkg = 'com.example.android.contactmanager',
+      activity = 'ContactManager';
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -35,9 +37,7 @@ describe('adb commands', function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
   });
   it('getPlatformVersion should get correct platform version', async function () {
-    const detectedPlatformVersion = await adb.getPlatformVersion();
-    const expectedPlatformVersion = platformVersion;
-    parseFloat(detectedPlatformVersion).should.equal(parseFloat(expectedPlatformVersion));
+    (await adb.getPlatformVersion()).should.include(platformVersion);
   });
   it('availableIMEs should get list of available IMEs', async function () {
     (await adb.availableIMEs()).should.have.length.above(0);
@@ -51,8 +51,7 @@ describe('adb commands', function () {
       defaultIMEs.should.include(defaultIME);
     }
   });
-  it('enableIME and disableIME should enable and disble IME', async function () {
-    const IME = 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME';
+  it('enableIME and disableIME should enable and disable IME', async function () {
     await adb.disableIME(IME);
     (await adb.enabledIMEs()).should.not.include(IME);
     await adb.enableIME(IME);
@@ -60,7 +59,7 @@ describe('adb commands', function () {
     await adb.enabledIMEs();
   });
   it('processExists should be able to find ui process', async function () {
-    if (process.env.TRAVIS || process.env.CI) {
+    if (process.env.TRAVIS) {
       // This test is unstable on Travis
       return this.skip();
     }
@@ -88,9 +87,7 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS || process.env.CI) {
-      return this.skip();
-    }
+    if (process.env.TRAVIS) return this.skip(); // eslint-disable-line curly
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
@@ -145,13 +142,13 @@ describe('adb commands', function () {
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
   });
-  it('should be able to toggle airplane mode', async function () {
+  it('should be able to toogle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
     (await adb.isAirplaneModeOn()).should.be.false;
   });
-  it('should be able to toggle wifi @skip-ci', async function () {
+  it('should be able to toogle wifi @skip-ci', async function () {
     this.retries(3);
 
     await adb.setWifiState(true);
@@ -257,7 +254,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS || process.env.CI) {
+      if (process.env.TRAVIS) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
