@@ -13,16 +13,15 @@ chai.use(chaiAsPromised);
 let expect = chai.expect;
 
 // change according to CI
-const IME = 'com.example.android.softkeyboard/.SoftKeyboard',
-      defaultIMEs = [
-        'com.android.inputmethod.latin/.LatinIME',
-        'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
-        'io.appium.android.ime/.UnicodeIME',
-      ],
-      contactManagerPath = path.resolve(rootDir, 'test',
-                                        'fixtures', 'ContactManager.apk'),
-      pkg = 'com.example.android.contactmanager',
-      activity = 'ContactManager';
+const defaultIMEs = [
+  'com.android.inputmethod.latin/.LatinIME',
+  'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+  'io.appium.android.ime/.UnicodeIME',
+];
+const contactManagerPath = path.resolve(rootDir, 'test',
+                                  'fixtures', 'ContactManager.apk');
+const pkg = 'com.example.android.contactmanager';
+const activity = 'ContactManager';
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -51,6 +50,7 @@ describe('adb commands', function () {
     }
   });
   it('enableIME and disableIME should enable and disble IME', async function () {
+    const IME = 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME';
     await adb.disableIME(IME);
     (await adb.enabledIMEs()).should.not.include(IME);
     await adb.enableIME(IME);
