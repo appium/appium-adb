@@ -51,7 +51,8 @@ describe('adb commands', function () {
       defaultIMEs.should.include(defaultIME);
     }
   });
-  it('enableIME and disableIME should enable and disable IME', async function () {
+  it('enableIME and disableIME should enable and disble IME', async function () {
+    const IME = 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME';
     await adb.disableIME(IME);
     (await adb.enabledIMEs()).should.not.include(IME);
     await adb.enableIME(IME);
