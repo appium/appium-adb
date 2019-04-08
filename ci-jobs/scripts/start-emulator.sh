@@ -29,6 +29,8 @@ while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
   echo "Waiting until emulator finishes services startup; ${secondsElapsed}s elapsed; ${secondsLeft}s left"
 done
 
-$ANDROID_HOME/platform-tools/adb devices
+bootDuration=$(( `date +%s` - $secondsStarted ))
+echo "Emulator booting took ${bootDuration}s"
+adb shell input keyevent 82
 
-echo "Emulator started"
+$ANDROID_HOME/platform-tools/adb devices
