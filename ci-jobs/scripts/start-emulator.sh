@@ -17,6 +17,10 @@ echo "Starting emulator"
 # Start emulator in background
 nohup $ANDROID_HOME/emulator/emulator -avd $ANDROID_AVD -no-snapshot > /dev/null 2>&1 &
 #$ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+
+$ANDROID_HOME/platform-tools/adb wait-for-device get-serialno
+secondsStarted=`date +%s`
+TIMEOUT=360
 while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
   processList=`adb shell ps`
   if [[ "$processList" =~ "com.android.systemui" ]]; then
