@@ -15,6 +15,4 @@ jobs:
       displayName: NPM Test
     - script: npm run build
       displayName: Build
-    - script: npm test
-      displayName: Run Unit Tests
   
