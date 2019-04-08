@@ -16,7 +16,18 @@ echo "Starting emulator"
 
 # Start emulator in background
 nohup $ANDROID_HOME/emulator/emulator -avd $ANDROID_AVD -no-snapshot > /dev/null 2>&1 &
-$ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+#$ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
+  processList=`adb shell ps`
+  if [[ "$processList" =~ "com.android.systemui" ]]; then
+    echo "System UI process is running. Checking IME services availability"
+    $ANDROID_HOME/platform-tools/adb shell ime list && break
+  fi
+  sleep 5
+  secondsElapsed=$(( `date +%s` - $secondsStarted ))
+  secondsLeft=$(( $TIMEOUT - $secondsElapsed ))
+  echo "Waiting until emulator finishes services startup; ${secondsElapsed}s elapsed; ${secondsLeft}s left"
+done
 
 $ANDROID_HOME/platform-tools/adb devices
 
