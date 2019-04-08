@@ -4,7 +4,7 @@ import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
-import { MOCHA_TIMEOUT } from './setup';
+import { MOCHA_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = 10000;
@@ -48,6 +48,9 @@ describe('apk utils', function () {
   });
   describe('startUri', function () {
     it('should be able to start a uri', async function () {
+      if (apiLevel < 23) {
+        return this.skip();
+      }
       await adb.goToHome();
       let res = await adb.getFocusedPackageAndActivity();
       res.appPackage.should.not.equal('com.android.contacts');
