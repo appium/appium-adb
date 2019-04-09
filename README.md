@@ -120,7 +120,6 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 - `insertManifest`
 - `hasInternetPermissionFromManifest`
 - `getSdkBinaryPath`
-- `getCommandForOS`
 - `getBinaryFromSdkRoot`
 - `getBinaryFromPath`
 - `getConnectedDevices`
