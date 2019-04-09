@@ -28,12 +28,9 @@ jobs:
       displayName: NPM Test
     - script: bash ci-jobs/scripts/start-emulator.sh
       displayName: Create and run Emulator
-    - script: npm run build
-      displayName: Build
     - script: ${{ parameters.script }}
       displayName: Run tests
     - task: PublishTestResults@2
       condition: always()
       inputs:
         testResultsFiles: ${{ parameters.MOCHA_FILE }}
-  

@@ -24,4 +24,11 @@ apiLevel = parseInt(apiLevel, 10);
 const MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
 const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
+beforeEach(function () {
+  if (process.env.CI) {
+    // small log line to distinguish in logs
+    console.log(`\n\nTest: '${this.currentTest.title}'`); // eslint-disable-line
+  }
+});
+
 export { apiLevel, platformVersion, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT };
