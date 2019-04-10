@@ -24,8 +24,6 @@ jobs:
         versionSpec: ${{ parameters.NODE_VERSION }}
     - script: npm install
       displayName: Install Node dependencies
-    - script: npm test
-      displayName: NPM Test
     - script: adb logcat > logcat.txt &
       displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
@@ -41,6 +39,6 @@ jobs:
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: ${{ parameters.name }}-logcat
-        target: logcat.txt
+        targetPath: logcat.txt
 
   
