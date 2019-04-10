@@ -34,12 +34,12 @@ jobs:
       displayName: Run tests
     - task: PublishTestResults@2
       condition: always()
-      name: Publish Test Results
+      displayName: Publish Test Results
       inputs:
         testResultsFiles: ${{ parameters.MOCHA_FILE }}
     - task: PublishPipelineArtifact@0
       condition: always()
-      name: Publish Logcat to Artifacts
+      displayName: Publish Logcat to Artifacts
       inputs:
         artifactName: ${{ parameters.name }}-logcat
         targetPath: logcat.txt
