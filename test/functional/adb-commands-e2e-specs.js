@@ -88,7 +88,7 @@ describe('adb commands', function () {
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS || process.env.CI) return this.skip(); // eslint-disable-line curly
+    if (process.env.TRAVIS /*|| process.env.CI*/) return this.skip(); // eslint-disable-line curly
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
@@ -255,7 +255,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS || process.env.CI) {
+      if (process.env.TRAVIS /*|| process.env.CI*/) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
