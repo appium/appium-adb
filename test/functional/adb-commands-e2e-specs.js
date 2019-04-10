@@ -48,7 +48,7 @@ describe('adb commands', function () {
   });
   it('defaultIME should get default IME', async function () {
     const defaultIME = await adb.defaultIME();
-    if (defaultIME) {
+    if (defaultIME && defaultIME !== 'null') {
       defaultIMEs.should.include(defaultIME);
     }
   });
