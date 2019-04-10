@@ -26,7 +26,7 @@ jobs:
       displayName: Install Node dependencies
     - script: npm test
       displayName: NPM Test
-    - script: adb logcat -d > logcat.txt
+    - script: adb logcat > logcat.txt &
       displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
       displayName: Create and run Emulator 
