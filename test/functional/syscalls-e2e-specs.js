@@ -54,7 +54,7 @@ describe('System calls', function () {
     await adb.waitForDevice(2);
   });
   it('reboot should reboot the device', async function () {
-    if (process.env.TRAVIS /*|| process.env.CI*/) {
+    if (process.env.TRAVIS || process.env.CI) {
       // The test is very slow on CI
       return this.skip();
     }
