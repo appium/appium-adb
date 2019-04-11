@@ -235,14 +235,4 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       .returns([]);
     chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
   });
-  it('restartAdbIfDevicesOffline should call restartAdb if no connected devices', async function () {
-    mocks.adb.expects('getConnectedDevices').once().withExactArgs().returns([]);
-    mocks.adb.expects('restartAdb').once();
-    await adb.restartAdbIfDevicesOffline();
-  });
-  it('restartAdbIfDevicesOffline should not call restartAdb if connected devices', async function () {
-    mocks.adb.expects('getConnectedDevices').once().withExactArgs().returns(['singleton device']);
-    mocks.adb.expects('restartAdb').never();
-    await adb.restartAdbIfDevicesOffline();
-  });
 }));
