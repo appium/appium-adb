@@ -53,7 +53,7 @@ describe('System calls', function () {
   it('waitForDevice should get all connected avds', async function () {
     await adb.waitForDevice(2);
   });
-  it.only('reboot should reboot the device', async function () {
+  it('reboot should reboot the device', async function () {
     if (process.env.TRAVIS) {
       // The test is very slow on CI
       return this.skip();
