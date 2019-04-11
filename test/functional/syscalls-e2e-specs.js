@@ -53,7 +53,7 @@ describe('System calls', function () {
   it('waitForDevice should get all connected avds', async function () {
     await adb.waitForDevice(2);
   });
-  it('reboot should reboot the device', async function () {
+  it.only('reboot should reboot the device', async function () {
     if (process.env.TRAVIS) {
       // The test is very slow on CI
       return this.skip();
@@ -63,7 +63,7 @@ describe('System calls', function () {
       await adb.reboot();
       await adb.ping();
     } catch (e) {
-      e.message.should.include('requires root access');
+      e.message.should.include('must be root');
     }
   });
   it('fileExists should detect when files do and do not exist', async function () {
