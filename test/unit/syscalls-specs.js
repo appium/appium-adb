@@ -235,4 +235,51 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       .returns([]);
     chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
   });
+  describe('root', function () {
+    it('should restart adb if root throws err and stderr contains "closed" in message', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .withExactArgs(adb.executable.path, ['root'])
+        .throws({
+          stdout: '',
+          stderr: 'adb: unable to connect for root: closed\n',
+          code: 1
+        });
+      mocks.adb.expects('restartAdb').once();
+      await adb.root().should.eventually.eql({isRooted: false, wasAlreadyRooted: false});
+    });
+    it('should not restart adb if root throws err but stderr does not contain "closed" in message', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .withExactArgs(adb.executable.path, ['root'])
+        .throws({
+          stdout: '',
+          stderr: 'some error that does not close device',
+          code: 1
+        });
+      mocks.adb.expects('restartAdb').never();
+      await adb.root().should.eventually.eql({isRooted: false, wasAlreadyRooted: false});
+    });
+    it('should call "unroot" if unroot parameter is set to true', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .withExactArgs(adb.executable.path, ['unroot'])
+        .returns({stdout: 'Hello World'});
+      await adb.root(true).should.eventually.eql({isRooted: false, wasAlreadyRooted: false});
+    });
+    it('should call "root" if unroot parameter is falsey', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .withExactArgs(adb.executable.path, ['root'])
+        .returns({stdout: 'Hello World'});
+      await adb.root().should.eventually.eql({isRooted: true, wasAlreadyRooted: false});
+    });
+    it('should tell us if "wasAlreadyRooted"', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .withExactArgs(adb.executable.path, ['root'])
+        .returns({stdout: 'Something something already running as root something something'});
+      await adb.root().should.eventually.eql({isRooted: true, wasAlreadyRooted: true});
+    });
+  });
 }));
