@@ -10,7 +10,7 @@ const DEFAULT_CERTIFICATE = path.resolve(rootDir, 'keys', 'testkey.x509.pem');
 
 chai.use(chaiAsPromised);
 
-describe.only('System calls', function () {
+describe('System calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
