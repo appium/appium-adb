@@ -59,8 +59,12 @@ describe('System calls', function () {
       return this.skip();
     }
     this.timeout(MOCHA_LONG_TIMEOUT);
-    await adb.reboot();
-    await adb.ping();
+    try {
+      await adb.reboot();
+      await adb.ping();
+    } catch (e) {
+      e.message.should.include('requires root access');
+    }
   });
   it('fileExists should detect when files do and do not exist', async function () {
     (await adb.fileExists('/foo/bar/baz.zip')).should.be.false;
