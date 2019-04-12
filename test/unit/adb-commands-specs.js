@@ -154,10 +154,10 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       it('should call setprop with correct args', async function () {
         mocks.adb.expects('shell')
           .withExactArgs(['setprop', 'persist.sys.locale', locale], {
-            privileged: false
+            privileged: true
           })
           .returns('');
-        await adb.setDeviceProperty('persist.sys.locale', locale, {privileged: false});
+        await adb.setDeviceProperty('persist.sys.locale', locale);
       });
     });
     describe('availableIMEs', function () {
