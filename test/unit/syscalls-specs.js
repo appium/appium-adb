@@ -294,5 +294,10 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       mocks.teen_process.expects('exec').never();
       await adb.root().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
     });
+    it('should return unsuccessful if "adbd cannot run as root" in stdout', async function () {
+      mocks.adb.expects('isRoot').once().returns(true);
+      mocks.teen_process.expects('exec').once().returns('something something adbd cannot run as root something smoething');
+      await adb.root().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
+    });
   });
 }));
