@@ -200,6 +200,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     await adb.reboot().should.eventually.not.be.rejected;
   });
   it('reboot should error with helpful message if cause of error is no root access', async function () {
+    mocks.adb.expects('isRoot').once().returns(false);
     mocks.adb.expects('root').once().returns({wasAlreadyRooted: false});
     mocks.adb.expects('shell')
       .once().throws(new Error('something something ==must be root== something something'));
@@ -275,6 +276,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       await adb.root().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
     });
     it('should call "unroot" on shell if call .unroot', async function () {
+      mocks.adb.expects('isRoot').once().returns(false);
       mocks.teen_process.expects('exec')
         .once()
         .withExactArgs(adb.executable.path, ['unroot'])
@@ -294,10 +296,16 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       mocks.teen_process.expects('exec').never();
       await adb.root().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
     });
+    it('should not call unroot if isRoot returns false', async function () {
+      mocks.adb.expects('isRoot').once().returns(false);
+      mocks.teen_process.expects('exec').never();
+      await adb.unroot().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: false});
+    });
     it('should return unsuccessful if "adbd cannot run as root" in stdout', async function () {
+      mocks.adb.expects('isRoot').once().returns(false);
       mocks.teen_process.expects('exec').once()
         .returns({stdout: 'something something adbd cannot run as root something smoething'});
-      await adb.changeUserPrivileges().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
+      await adb.root().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
     });
   });
 }));
