@@ -54,13 +54,17 @@ describe('System calls', function () {
     await adb.waitForDevice(2);
   });
   it('reboot should reboot the device', async function () {
-    if (process.env.TRAVIS || process.env.CI) {
+    if (process.env.TRAVIS) {
       // The test is very slow on CI
       return this.skip();
     }
     this.timeout(MOCHA_LONG_TIMEOUT);
-    await adb.reboot();
-    await adb.ping();
+    try {
+      await adb.reboot();
+      await adb.ping();
+    } catch (e) {
+      e.message.should.include('must be root');
+    }
   });
   it('fileExists should detect when files do and do not exist', async function () {
     (await adb.fileExists('/foo/bar/baz.zip')).should.be.false;

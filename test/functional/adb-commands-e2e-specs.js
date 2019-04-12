@@ -255,10 +255,12 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS || process.env.CI) {
+      if (process.env.TRAVIS) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
+      const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+      this.timeout(BUG_REPORT_TIMEOUT);
       (await adb.bugreport()).should.be.a('string');
     });
   });

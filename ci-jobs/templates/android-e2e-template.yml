@@ -24,13 +24,24 @@ jobs:
         versionSpec: ${{ parameters.NODE_VERSION }}
     - script: npm install
       displayName: Install Node dependencies
-    - script: npm test
-      displayName: NPM Test
+    - script: adb logcat > logcat.txt &
+      displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
-      displayName: Create and run Emulator
+      displayName: Create and run Emulator 
+    - script: npm run build
+      displayName: Build
     - script: ${{ parameters.script }}
       displayName: Run tests
     - task: PublishTestResults@2
       condition: always()
+      displayName: Publish Test Results
       inputs:
         testResultsFiles: ${{ parameters.MOCHA_FILE }}
+    - task: PublishPipelineArtifact@0
+      condition: always()
+      displayName: Publish Logcat to Artifacts
+      inputs:
+        artifactName: ${{ parameters.name }}-logcat
+        targetPath: logcat.txt
+
+  
