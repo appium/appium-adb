@@ -37,7 +37,7 @@ describe('apk utils', function () {
   });
   it('should be able to install/remove app and detect its status', async function () {
     (await adb.isAppInstalled('foo')).should.be.false;
-    await adb.install(contactManagerPath);
+    await adb.install(contactManagerPath, {grantPermissions: true});
     (await adb.isAppInstalled('com.example.android.contactmanager')).should.be.true;
     (await adb.uninstallApk('com.example.android.contactmanager')).should.be.true;
     (await adb.isAppInstalled('com.example.android.contactmanager')).should.be.false;
@@ -54,7 +54,7 @@ describe('apk utils', function () {
       await adb.goToHome();
       let res = await adb.getFocusedPackageAndActivity();
       res.appPackage.should.not.equal('com.android.contacts');
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startUri('content://contacts/people', 'com.android.contacts');
       await retryInterval(10, 500, async () => {
         res = await adb.dumpWindows();
@@ -69,7 +69,7 @@ describe('apk utils', function () {
   });
   describe('startApp', function () {
     it('should be able to start', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true}, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -79,7 +79,7 @@ describe('apk utils', function () {
 
     });
     it('should throw error for wrong activity', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true}, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManage',
@@ -87,7 +87,7 @@ describe('apk utils', function () {
       }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true}, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -96,7 +96,7 @@ describe('apk utils', function () {
       }).should.eventually.be.rejectedWith('foo');
     });
     it('should start activity with wait activity', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true}, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -106,7 +106,7 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
     });
     it('should start activity when wait activity is a wildcard', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -116,7 +116,7 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
     });
     it('should start activity when wait activity contains a wildcard', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -126,7 +126,7 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
     });
     it('should throw error for wrong activity when wait activity contains a wildcard', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'SuperManager',
@@ -135,7 +135,7 @@ describe('apk utils', function () {
       }).should.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         activity: 'ContactManager',
@@ -144,7 +144,7 @@ describe('apk utils', function () {
       }).should.eventually.be.rejectedWith('SuperManager');
     });
     it('should start activity with comma separated wait packages list', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         waitPkg: 'com.android.settings, com.example.android.contactmanager',
@@ -155,7 +155,7 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
     });
     it('should throw error for wrong activity when packages provided as comma separated list', async function () {
-      await adb.install(contactManagerPath);
+      await adb.install(contactManagerPath, {grantPermissions: true});
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
         waitPkg: 'com.android.settings, com.example.somethingelse',
@@ -166,7 +166,7 @@ describe('apk utils', function () {
     });
   });
   it('should start activity when start activity is an inner class', async function () {
-    await adb.install(contactManagerPath);
+    await adb.install(contactManagerPath, {grantPermissions: true});
     await adb.startApp({
       pkg: 'com.android.settings',
       activity: '.Settings$NotificationAppListActivity',
@@ -180,7 +180,7 @@ describe('apk utils', function () {
     // The test sometimes fails due to Emulator slowness on Travis
     this.retries(2);
 
-    await adb.install(contactManagerPath);
+    await adb.install(contactManagerPath, {grantPermissions: true});
     await adb.startApp({
       pkg: 'com.example.android.contactmanager',
       activity: 'ContactManager',

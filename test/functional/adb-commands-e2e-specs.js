@@ -32,6 +32,10 @@ describe('adb commands', function () {
   const androidInstallTimeout = 90000;
   before(async function () {
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    await adb.install(path.resolve('node_modules', 'io.appium.settings', 'apks', 'settings_apk-debug.apk'));
+  });
+  after(async function () {
+    await adb.uninstallApk(path.resolve('node_modules', 'io.appium.settings', 'apks', 'settings_apk-debug.apk'));
   });
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
@@ -79,7 +83,7 @@ describe('adb commands', function () {
     (await adb.getPIDsByName(pkg)).should.have.length(0);
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(contactManagerPath, {timeout: androidInstallTimeout});
+    await adb.install(contactManagerPath, {timeout: androidInstallTimeout, grantPermissions: true});
     await adb.startApp({pkg, activity});
     let pids = await adb.getPIDsByName(pkg);
     pids.should.have.length.above(0);

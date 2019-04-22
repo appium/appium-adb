@@ -32,6 +32,8 @@ describe('System calls', function () {
     (await adb.isDeviceConnected()).should.be.true;
   });
   it('shell should execute command in adb shell ', async function () {
+    // TODO: This fails in Q beta due to emulator not reporting correct apiLevel (28 when it should be 29)
+    // If this problem stops, remove this comment
     (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
   it('getConnectedEmulators should get all connected emulators', async function () {
