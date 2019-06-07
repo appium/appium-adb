@@ -252,7 +252,7 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
       let oldAndroidHome = process.env.ANDROID_HOME;
       delete process.env.ANDROID_HOME;
 
-      await adb.compileManifest().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
+      await adb.compileManifest().should.eventually.be.rejectedWith(/environment/);
 
       process.env.ANDROID_HOME = oldAndroidHome;
     });
