@@ -11,7 +11,7 @@ describe('Helpers', function () {
     delete process.env.ANDROID_HOME;
 
     try {
-      await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/ANDROID_HOME environment variable was not exported/);
+      await getAndroidPlatformAndPath().should.eventually.be.rejectedWith(/environment/);
     } finally {
       // resetting ANDROID_HOME
       process.env.ANDROID_HOME = android_home;
