@@ -75,7 +75,7 @@ before_install:
     fi
 install:
   # node stuff
-  - nvm install 10
+  - nvm install 10.15
 
   # npm stuff
   - npm install
