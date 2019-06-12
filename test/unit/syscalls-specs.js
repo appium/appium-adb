@@ -248,12 +248,13 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       .returns([]);
     chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
   });
+
   describe('root', function () {
     it('should restart adb if root throws err and stderr contains "closed" in message', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec')
+      mocks.adb.expects('adbExec')
         .once()
-        .withExactArgs(adb.executable.path, ['root'])
+        .withExactArgs(['root'])
         .throws({
           stdout: '',
           stderr: 'adb: unable to connect for root: closed\n',
@@ -264,9 +265,9 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     });
     it('should not restart adb if root throws err but stderr does not contain "closed" in message', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec')
+      mocks.adb.expects('adbExec')
         .once()
-        .withExactArgs(adb.executable.path, ['root'])
+        .withExactArgs(['root'])
         .throws({
           stdout: '',
           stderr: 'some error that does not close device',
@@ -277,33 +278,33 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     });
     it('should call "unroot" on shell if call .unroot', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec')
+      mocks.adb.expects('adbExec')
         .once()
-        .withExactArgs(adb.executable.path, ['unroot'])
+        .withExactArgs(['unroot'])
         .returns({stdout: 'Hello World'});
       await adb.unroot().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: false});
     });
     it('should tell us if "wasAlreadyRooted"', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec')
+      mocks.adb.expects('adbExec')
         .once()
-        .withExactArgs(adb.executable.path, ['root'])
+        .withExactArgs(['root'])
         .returns({stdout: 'Something something already running as root something something'});
       await adb.root().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
     });
     it('should not call root if isRoot returns true', async function () {
       mocks.adb.expects('isRoot').once().returns(true);
-      mocks.teen_process.expects('exec').never();
+      mocks.adb.expects('adbExec').never();
       await adb.root().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
     });
     it('should not call unroot if isRoot returns false', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec').never();
+      mocks.adb.expects('adbExec').never();
       await adb.unroot().should.eventually.eql({isSuccessful: true, wasAlreadyRooted: false});
     });
     it('should return unsuccessful if "adbd cannot run as root" in stdout', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
-      mocks.teen_process.expects('exec').once()
+      mocks.adb.expects('adbExec').once()
         .returns({stdout: 'something something adbd cannot run as root something smoething'});
       await adb.root().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
     });
