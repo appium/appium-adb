@@ -21,9 +21,6 @@ let apiLevel = process.env.API_LEVEL ||
                API_LEVEL_MAP[parseFloat(platformVersion)];
 apiLevel = parseInt(apiLevel, 10);
 
-// eslint-disable-next-line no-console
-console.log('apiLevel vruno', apiLevel);
-
 const MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
 const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
