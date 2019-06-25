@@ -346,5 +346,25 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
         await adb.gsmVoice('on');
       });
     });
+    describe('sensorSet method', function () {
+      it('should throw exception on missing sensor name', async function () {
+        await adb.sensorSet('sensor').should.eventually.be.rejectedWith('Unsupported sensor sent');
+      });
+      it('should throw exception on missing sensor name', async function () {
+        await adb.sensorSet('light').should.eventually.be.rejectedWith('Missing sensor value argument');
+      });
+      it('should call adb emu sensor set with the correct values', async function () {
+        mocks.adb.expects('isEmulatorConnected')
+          .once().withExactArgs()
+          .returns(true);
+        mocks.adb.expects('resetTelnetAuthToken')
+          .once().withExactArgs()
+          .returns();
+        mocks.adb.expects('adbExec')
+          .once().withExactArgs(['emu', 'sensor', 'set', 'humidity', 100])
+          .returns();
+        await adb.sensorSet('humidity', 100);
+      });
+    });
   });
 }));
