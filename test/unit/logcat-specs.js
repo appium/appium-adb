@@ -21,7 +21,8 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects('SubProcess')
-        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .onFirstCall()
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stdout', ['- beginning of system\r']);
@@ -34,7 +35,8 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects('SubProcess')
-        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .onFirstCall()
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stderr', ['execvp()']);
@@ -45,7 +47,8 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects('SubProcess')
-        .once().withExactArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .onFirstCall()
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stderr', ['something']);

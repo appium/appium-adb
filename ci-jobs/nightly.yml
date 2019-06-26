@@ -17,5 +17,5 @@ jobs:
     parameters:
       script: npx mocha --timeout 6000000 --reporter mocha-multi-reporters --reporter-options configFile=./ci-jobs/mocha-config.json --recursive build/test/functional/ -g @skip-ci -i --exit
       name: sdk22_e2e_tests
-      PLATFORM_VERSION: 7.1
+      PLATFORM_VERSION: 5.1
       ANDROID_SDK_VERSION: 22
