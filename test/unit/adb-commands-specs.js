@@ -1208,11 +1208,11 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       mocks.adb.expects('shell')
         .once().withExactArgs(['getprop', 'persist.sys.timezone'])
         .returns(`Asia/Tokyo${EOL}`);
-      (await adb.getCurrentTimeZone()).should.equal('Asia/Tokyo');
+      (await adb.getTimeZone()).should.equal('Asia/Tokyo');
     });
     it('should raise an error', async function () {
-      mocks.adb.expects('shell').throws(new Error());
-      await adb.getCurrentTimeZone().should.eventually.be.rejected;
+      mocks.adb.expects('shell').throws();
+      await adb.getTimeZone().should.eventually.be.rejected;
     });
   });
 }));
