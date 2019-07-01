@@ -250,11 +250,15 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
   describe('compileManifest', function () {
     it('should throw an error if no ANDROID_HOME set', async function () {
       let oldAndroidHome = process.env.ANDROID_HOME;
+      let oldAndroidSdkRoot = process.env.ANDROID_SDK_ROOT;
+
       delete process.env.ANDROID_HOME;
+      delete process.env.ANDROID_SDK_ROOT;
 
       await adb.compileManifest().should.eventually.be.rejectedWith(/environment/);
 
       process.env.ANDROID_HOME = oldAndroidHome;
+      process.env.ANDROID_SDK_ROOT = oldAndroidSdkRoot;
     });
   });
 }));

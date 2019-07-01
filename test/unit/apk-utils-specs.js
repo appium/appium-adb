@@ -7,6 +7,7 @@ import { withMocks } from 'appium-test-support';
 import path from 'path';
 import _ from 'lodash';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
+import apksUtilsMethods from '../../lib/tools/apks-utils';
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
@@ -1104,6 +1105,15 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('shell').withArgs(['getprop', 'ro.build.version.sdk']).onCall(0);
       mocks.adb.expects('shell').withArgs(['dumpsys', 'window', 'displays']).onCall(1);
       await adb.dumpWindows();
+    });
+  });
+  describe('isTestPackageOnly', function () {
+    it('should return true on INSTALL_FAILED_TEST_ONLY meesage found in adb install output', function () {
+      apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_TEST_ONLY]').should.equal(true);
+      apksUtilsMethods.isTestPackageOnlyError(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
+    });
+    it('should return false on INSTALL_FAILED_TEST_ONLY meesage not found in adb install output', function () {
+      apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
     });
   });
 }));
