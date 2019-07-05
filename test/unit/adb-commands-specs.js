@@ -7,6 +7,7 @@ import Logcat from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from 'appium-test-support';
 import _ from 'lodash';
+import { EOL } from 'os';
 
 
 chai.use(chaiAsPromised);
@@ -1200,6 +1201,18 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         .withArgs(['settings', 'get', 'namespace', 'setting'])
         .returns('value');
       (await adb.getSetting('namespace', 'setting')).should.be.equal('value');
+    });
+  });
+  describe('getCurrentTimeZone', function () {
+    it('should call shell with correct args', async function () {
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['getprop', 'persist.sys.timezone'])
+        .returns(`Asia/Tokyo${EOL}`);
+      (await adb.getTimeZone()).should.equal('Asia/Tokyo');
+    });
+    it('should raise an error', async function () {
+      mocks.adb.expects('shell').throws();
+      await adb.getTimeZone().should.eventually.be.rejected;
     });
   });
 }));
