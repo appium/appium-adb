@@ -779,7 +779,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .concat(['shell', 'am', 'instrument', '-e', 'coverage', 'true', '-w'])
           .concat([instrumentClass]);
         mocks.teen_process.expects('SubProcess')
-          .once().withExactArgs('dummy_adb_path', args)
+          .withArgs('dummy_adb_path', args)
+          .onFirstCall()
           .returns(conn);
         mocks.adb.expects('waitForActivity')
           .once().withExactArgs(waitPkg, waitActivity)
