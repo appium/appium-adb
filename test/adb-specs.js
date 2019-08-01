@@ -6,7 +6,6 @@ chai.use(chaiAsPromised);
 
 describe.skip('ADB To be implemented methods', function () {
 
-  // it('processFromManifest', async () => { });
   // it('packageAndLaunchActivityFromManifest', async () => { });
   // it('processExists', async () => { });
   // it('compileManifest', async () => { });
