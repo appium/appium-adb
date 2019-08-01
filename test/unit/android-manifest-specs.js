@@ -15,21 +15,6 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
     mocks.verify();
   });
 
-  describe('processFromManifest', function () {
-    it('should correctly parse process from manifest', async function () {
-      adb.binaries.aapt = 'dummy_aapt';
-      const localApk = 'dummyAPK',
-            dummyProcess = 'dummyProcess';
-      mocks.adb.expects('initAapt')
-        .once().withExactArgs()
-              .returns('');
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs('dummy_aapt', ['dump', 'xmltree', localApk, 'AndroidManifest.xml'])
-        .returns({stdout: ` E: application (line=234)
-                          A: android:process(0x01010011)="${dummyProcess}"`});
-      (await adb.processFromManifest(localApk)).should.equal(dummyProcess);
-    });
-  });
   describe('packageAndLaunchActivityFromManifest', function () {
     it('should correctly parse package and activity from manifest with apkanalyzer tool', async function () {
       const apkanalyzerDummyPath = 'apkanalyzer';

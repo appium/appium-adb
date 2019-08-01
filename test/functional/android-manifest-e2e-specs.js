@@ -62,7 +62,3 @@ describe('Android-manifest', function () {
     }
   });
 });
-
-describe.skip('Android-manifest To be implemented methods', function () {
-  it('should return correct processFromManifest', async function () { });
-});
