@@ -15,19 +15,6 @@ describe('android-manifest', withMocks({adb, teen_process, helpers}, function (m
     mocks.verify();
   });
 
-  describe('hasInternetPermissionFromManifest', function () {
-    it('should correctly parse internet permission from manifest', async function () {
-      adb.binaries.aapt = 'dummy_aapt';
-      const localApk = 'dummyAPK';
-      mocks.adb.expects('initAapt')
-        .once().withExactArgs()
-              .returns('');
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs('dummy_aapt', ['dump', 'badging', localApk])
-        .returns({stdout: ` uses-permission:.*'android.permission.INTERNET'`});
-      (await adb.hasInternetPermissionFromManifest(localApk)).should.be.true;
-    });
-  });
   describe('compileManifest', function () {
     it('should throw an error if no ANDROID_HOME set', async function () {
       let oldAndroidHome = process.env.ANDROID_HOME;
