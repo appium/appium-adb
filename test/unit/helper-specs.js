@@ -157,172 +157,69 @@ describe('helpers', withMocks({fs}, function (mocks) {
   });
 
   describe('parseManifest', function () {
-    const manifestXml = `<?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="697"
-    android:versionName="3.27.697"
-    package="com.example"
-    platformBuildVersionCode="697"
-    platformBuildVersionName="3.27.697">
-
-    <uses-sdk
-        android:minSdkVersion="17"
-        android:targetSdkVersion="27" />
-
-    <uses-permission
-        android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <uses-permission
-        android:name="android.permission.INTERNET" />
-
-    <uses-permission
-        android:name="android.permission.READ_CONTACTS" />
-
-    <uses-permission
-        android:name="android.permission.RECORD_AUDIO" />
-
-    <uses-permission
-        android:name="android.permission.VIBRATE" />
-
-    <uses-permission
-        android:name="android.permission.CAMERA" />
-
-    <uses-permission
-        android:name="android.permission.FLASHLIGHT" />
-
-    <uses-permission
-        android:name="android.permission.READ_PHONE_STATE" />
-
-    <uses-permission
-        android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
-    <uses-permission
-        android:name="android.permission.BLUETOOTH" />
-
-    <uses-permission
-        android:name="android.permission.WAKE_LOCK" />
-
-    <uses-permission
-        android:name="com.google.android.c2dm.permission.RECEIVE" />
-
-    <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-permission
-        android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false" />
-
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false" />
-
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-feature
-        android:glEsVersion="0x20000"
-        android:required="true" />
-
-    <application
-        android:theme="@ref/0x7f100148"
-        android:label="Example"
-        android:icon="@ref/0x7f0800cd"
-        android:name="com.example.Application"
-        android:allowBackup="false"
-        android:vmSafeMode="false"
-        android:hardwareAccelerated="true"
-        android:supportsRtl="true">
-
-        <activity
-            android:theme="@ref/0x7f100148"
-            android:name="com.example.Application.MainActivity"
-            android:launchMode="2"
-            android:configChanges="0x4a0"
-            android:windowSoftInputMode="0x12"
-            android:hardwareAccelerated="true">
-
-            <intent-filter>
-
-                <data
-                    android:scheme="example"
-                    android:host="password-reset-successful" />
-
-                <action
-                    android:name="android.intent.action.VIEW" />
-
-                <category
-                    android:name="android.intent.category.DEFAULT" />
-
-                <category
-                    android:name="android.intent.category.BROWSABLE" />
-
-                <category
-                    android:name="android.intent.category.VIEW" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:theme="@ref/0x7f100148"
-            android:label="@ref/0x7f0f004c"
-            android:name="com.example.LaunchActivity"
-            android:launchMode="2"
-            android:noHistory="true">
-
-            <intent-filter>
-
-                <action
-                    android:name="android.intent.action.MAIN" />
-
-                <category
-                    android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:theme="@ref/0x7f10013d"
-            android:name="com.example.CallingActivity"
-            android:launchMode="2"
-            android:screenOrientation="1"
-            android:windowSoftInputMode="0x2"
-            android:hardwareAccelerated="true"
-            android:showOnLockScreen="true" />
-
-        <activity
-            android:theme="@ref/0x7f100141"
-            android:label="@ref/0x7f0f01bc"
-            android:name="com.example.PreferencesActivity"
-            android:launchMode="2"
-            android:hardwareAccelerated="true" />
-
-        <activity
-            android:theme="@ref/0x7f10014c"
-            android:name="com.example.PopupActivity"
-            android:taskAffinity="@string/0x25"
-            android:excludeFromRecents="true"
-            android:launchMode="1"
-            android:screenOrientation="-1"
-            android:windowSoftInputMode="0x4"
-            android:hardwareAccelerated="true" />
-    </application>
-</manifest>`;
+    const manifest = {
+      versionCode: 1,
+      versionName: '1.0',
+      package: 'com.example.hello.helloapp.app',
+      usesPermissions: [],
+      permissions: [],
+      permissionTrees: [],
+      permissionGroups: [],
+      instrumentation: null,
+      usesSdk: { minSdkVersion: 7, targetSdkVersion: 19 },
+      usesConfiguration: null,
+      usesFeatures: [],
+      supportsScreens: null,
+      compatibleScreens: [],
+      supportsGlTextures: [],
+      application: {
+        theme: 'resourceId:0x7f0b0000',
+        label: 'resourceId:0x7f0a000e',
+        icon: 'resourceId:0x7f020057',
+        debuggable: true,
+        allowBackup: true,
+        activities: [{
+          label: 'resourceId:0x7f0a000e',
+          name: 'com.example.hello.helloapp.app.MainActivity',
+          intentFilters: [{
+            actions: [{
+              name: 'android.intent.action.MAIN'
+            }],
+            categories: [{
+              name: 'android.intent.category.LAUNCHER'
+            }],
+            data: []
+          }],
+          metaData: []
+        }],
+        activityAliases: [],
+        launcherActivities: [{
+          label: 'resourceId:0x7f0a000e',
+          name: 'com.example.hello.helloapp.app.MainActivity',
+          intentFilters: [{
+            actions: [{
+              name: 'android.intent.action.MAIN'
+            }],
+            categories: [{
+              name: 'android.intent.category.LAUNCHER'
+            }],
+            data: []
+          }],
+          metaData: []
+        }],
+        services: [],
+        receivers: [],
+        providers: [],
+        usesLibraries: []
+      }
+    };
 
     it('should parse manifest', function () {
-      const {pkg, activity, versionCode, versionName} = parseManifest(manifestXml);
-      pkg.should.eql('com.example');
-      activity.should.eql('com.example.LaunchActivity');
-      versionCode.should.eql(697);
-      versionName.should.eql('3.27.697');
+      const {pkg, activity, versionCode, versionName} = parseManifest(manifest);
+      pkg.should.eql('com.example.hello.helloapp.app');
+      activity.should.eql('com.example.hello.helloapp.app.MainActivity');
+      versionCode.should.eql(1);
+      versionName.should.eql('1.0');
     });
   });
 
