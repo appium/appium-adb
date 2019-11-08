@@ -593,6 +593,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('getPIDsByName', function () {
+      beforeEach(function () {
+        mocks.adb.expects('getApiLevel').once().returns(23);
+      });
       afterEach(function () {
         adb._isPidofAvailable = undefined;
         adb._isPgrepAvailable = undefined;
