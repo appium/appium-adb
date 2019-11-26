@@ -82,8 +82,7 @@ describe('apk utils', function () {
     it('should be able to start with an intent and no activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
-        pkg: 'com.example.android.contactmanager',
-        category: 'android.intent.category.DEFAULT',
+        pkg: 'com.android.contacts',
         action: 'android.intent.action.VIEW',
         optionalIntentArguments: '-d content://com.android.contacts/contacts',
         waitDuration: START_APP_WAIT_DURATION,
