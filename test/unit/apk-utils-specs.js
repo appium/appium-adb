@@ -464,6 +464,23 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns('');
       (await adb.startApp(startAppOptions));
     });
+    it('should call getApiLevel and shell with correct arguments when activity is intent', async function () {
+      const startAppOptionsWithIntent = {
+        pkg: 'pkg',
+        action: 'android.intent.action.VIEW',
+        category: 'android.intent.category.DEFAULT',
+        optionalIntentArguments: '-d scheme://127.0.0.1'
+      };
+      const cmdWithIntent = ['am', 'start', '-W', '-S', '-a', 'android.intent.action.VIEW', '-c', 'android.intent.category.DEFAULT', '-d', 'scheme://127.0.0.1'];
+
+      mocks.adb.expects('getApiLevel')
+        .once().withExactArgs()
+        .returns(17);
+      mocks.adb.expects('shell')
+        .once().withArgs(cmdWithIntent)
+        .returns('');
+      (await adb.startApp(startAppOptionsWithIntent));
+    });
     it('should call getApiLevel and shell with correct arguments when activity is inner class', async function () {
       const startAppOptionsWithInnerClass = { pkg: 'pkg', activity: 'act$InnerAct'},
             cmdWithInnerClass = ['am', 'start', '-W', '-n', 'pkg/act\\$InnerAct', '-S'];

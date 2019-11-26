@@ -68,7 +68,7 @@ describe('apk utils', function () {
     });
   });
   describe('startApp', function () {
-    it('should be able to start', async function () {
+    it('should be able to start with normal package and activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
@@ -78,6 +78,21 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
 
     });
+
+    it('should be able to start with an intent and no activity', async function () {
+      await adb.install(contactManagerPath);
+      await adb.startApp({
+        pkg: 'com.example.android.contactmanager',
+        category: 'android.intent.category.DEFAULT',
+        action: 'android.intent.action.VIEW',
+        optionalIntentArguments: '-d content://com.android.contacts/contacts',
+        waitDuration: START_APP_WAIT_DURATION,
+      });
+      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal('com.android.contacts');
+      appActivity.should.equal('.activities.PeopleActivity');
+    });
+
     it('should throw error for wrong activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
