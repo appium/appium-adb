@@ -36,6 +36,7 @@ env:
     - PLATFORM_VERSION=5.0.2
     - CC=gcc-6 CXX=g++-6
     - QEMU_AUDIO_DRV=none
+    - NODE_VERSION=10
   matrix:
     # API24@armeabi-v7a is the newest available default image
     # which does not require hardware acceleration:
@@ -46,20 +47,15 @@ env:
 before_install:
   - echo $ANDROID_HOME
   - |
-    if [ ${START_EMU} = "1" ]; then
+    if [[ "${START_EMU}" == "1" ]]; then
       echo 'count=0' > /home/travis/.android/repositories.cfg
-      echo y | android update sdk --no-ui -t tools
-      echo y | sdkmanager "platform-tools" >/dev/null
-      echo y | sdkmanager tools > /dev/null
-      # Free up some space
-      for apiVersion in 18 19; do
-        sdkmanager --uninstall "platforms;android-${apiVersion}" > /dev/null
-      done
-      echo y | sdkmanager "build-tools;${SDK_VERSION}" >/dev/null
+      export TOOLS=${ANDROID_HOME}/tools
+      curl -o "${HOME}/sdk.zip" https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+      rm -rf "${TOOLS}"
+      unzip -o "${HOME}/sdk.zip" -d "$ANDROID_HOME" > /dev/null
+      rm -f "${HOME}/sdk.zip"
       echo y | sdkmanager --update > /dev/null
-      echo y | sdkmanager "platforms;${EMU_TARGET}" > /dev/null
-      echo y | sdkmanager "platforms;android-${API_VERSION}" >/dev/null
-      echo y | sdkmanager "extras;android;m2repository" > /dev/null
+      echo y | sdkmanager "platform-tools" "build-tools;${SDK_VERSION}" "platforms;${EMU_TARGET}" "platforms;android-${API_VERSION}" "extras;android;m2repository" > /dev/null
       echo y | sdkmanager --channel=3 "emulator" >/dev/null
       export EMU_IMAGE="system-images;${EMU_TARGET};${EMU_TAG};${EMU_ABI}"
       for retry in 1 2 3; do
@@ -68,40 +64,21 @@ before_install:
         sleep 5
       done
       sdkmanager --list
-      export TOOLS=${ANDROID_HOME}/tools
       export PATH=${ANDROID_HOME}:${ANDROID_HOME}/emulator:${TOOLS}:${TOOLS}/bin:${ANDROID_HOME}/platform-tools:${PATH}
       echo no | avdmanager create avd -k "${EMU_IMAGE}" -n "${EMU_NAME}" -f --abi "${EMU_ABI}" --tag "${EMU_TAG}" || exit 1
-      emulator -avd "${EMU_NAME}" -no-accel -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
+      emulator -avd "${EMU_NAME}" -gpu swiftshader_indirect -no-accel -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
     fi
 install:
   # node stuff
-  - nvm install 10.15
+  - nvm install $NODE_VERSION
 
   # npm stuff
   - npm install
+  - npm install appium-test-support
 before_script:
   - |
-    if [ ${START_EMU} = "1" ]; then
-      # Fail fast if emulator process cannot start
-      pgrep -nf avd || exit 1
-      # make sure the emulator is ready
-      adb wait-for-device get-serialno
-      secondsStarted=`date +%s`
-      TIMEOUT=360
-      while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
-        processList=`adb shell ps`
-        if [[ "$processList" =~ "com.android.systemui" ]]; then
-          echo "System UI process is running. Checking IME services availability"
-          adb shell ime list && break
-        fi
-        sleep 5
-        secondsElapsed=$(( `date +%s` - $secondsStarted ))
-        secondsLeft=$(( $TIMEOUT - $secondsElapsed ))
-        echo "Waiting until emulator finishes services startup; ${secondsElapsed}s elapsed; ${secondsLeft}s left"
-      done
-      bootDuration=$(( `date +%s` - $secondsStarted ))
-      echo "Emulator booting took ${bootDuration}s"
-      adb shell input keyevent 82
+    if [[ "${START_EMU}" == "1" ]]; then
+      $(npm bin)/android-emu-travis-post
     fi
 script:
   - npm run lint && npm run mocha -- -t $MOCHA_TIMEOUT -R spec $RECURSIVE build/test/$TEST -i -g @skip-ci
