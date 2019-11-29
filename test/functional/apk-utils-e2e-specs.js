@@ -81,13 +81,12 @@ describe('apk utils', function () {
     it('should be able to start with an intent and no activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
-        action: 'android.intent.action.DIAL',
-        optionalIntentArguments: '-d tel:555-5555',
+        action: 'android.intent.action.WEB_SEARCH',
         waitDuration: START_APP_WAIT_DURATION
       });
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.equal('com.android.dialer');
-      appActivity.should.equal('.main.impl.MainActivity');
+      appPackage.should.equal('com.google.android.googlequicksearchbox');
+      appActivity.should.equal('com.google.android.apps.gsa.searchnow.SearchNowActivity');
     });
     it('should throw an error for unknown activity for intent', async function () {
       await adb.install(contactManagerPath);
