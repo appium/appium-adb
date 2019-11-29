@@ -82,18 +82,19 @@ describe('apk utils', function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         action: 'android.intent.action.WEB_SEARCH',
-        waitDuration: START_APP_WAIT_DURATION
+        waitDuration: START_APP_WAIT_DURATION,
+        stopApp: false
       });
-      let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      let {appPackage} = await adb.getFocusedPackageAndActivity();
       appPackage.should.equal('com.google.android.googlequicksearchbox');
-      appActivity.should.equal('com.google.android.apps.gsa.searchnow.SearchNowActivity');
     });
     it('should throw an error for unknown activity for intent', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         action: 'android.intent.action.DEFAULT',
         optionalIntentArguments: '-d tel:555-5555',
-        waitDuration: START_APP_WAIT_DURATION
+        waitDuration: START_APP_WAIT_DURATION,
+        stopApp: false
       }).should.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
     it('should throw error for wrong activity', async function () {
