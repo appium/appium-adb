@@ -78,19 +78,25 @@ describe('apk utils', function () {
       await assertPackageAndActivity();
 
     });
-
     it('should be able to start with an intent and no activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
-        action: 'android.intent.action.VIEW',
-        optionalIntentArguments: '-d content://com.android.contacts/contacts',
-        waitDuration: START_APP_WAIT_DURATION,
+        action: 'android.intent.action.DIAL',
+        optionalIntentArguments: '-d tel:555-5555',
+        waitDuration: START_APP_WAIT_DURATION
       });
       let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.equal('com.android.contacts');
-      appActivity.should.equal('.activities.PeopleActivity');
+      appPackage.should.equal('com.android.dialer');
+      appActivity.should.equal('.main.impl.MainActivity');
     });
-
+    it('should throw an error for unknown activity for intent', async function () {
+      await adb.install(contactManagerPath);
+      await adb.startApp({
+        action: 'android.intent.action.DEFAULT',
+        optionalIntentArguments: '-d tel:555-5555',
+        waitDuration: START_APP_WAIT_DURATION
+      }).should.eventually.be.rejectedWith(/Cannot start the .* application/);
+    });
     it('should throw error for wrong activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
