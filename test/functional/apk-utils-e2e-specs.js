@@ -4,7 +4,7 @@ import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
-import { MOCHA_TIMEOUT, apiLevel } from './setup';
+import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = 10000;
@@ -79,6 +79,7 @@ describe('apk utils', function () {
 
     });
     it('should be able to start with an intent and no activity', async function () {
+      this.timeout(MOCHA_LONG_TIMEOUT);
       await adb.install(contactManagerPath);
       await adb.startApp({
         action: 'android.intent.action.WEB_SEARCH',
@@ -89,6 +90,7 @@ describe('apk utils', function () {
       appPackage.should.equal('com.google.android.googlequicksearchbox');
     });
     it('should throw an error for unknown activity for intent', async function () {
+      this.timeout(MOCHA_LONG_TIMEOUT);
       await adb.install(contactManagerPath);
       await adb.startApp({
         action: 'android.intent.action.DEFAULT',
