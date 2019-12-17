@@ -5,6 +5,7 @@ import { fs } from 'appium-support';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
 import _ from 'lodash';
+import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 import apksUtilsMethods from '../../lib/tools/apks-utils';
 
@@ -339,6 +340,10 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
           .map((x) => `${x}.apk`)
           .join('\r\n')
         );
+      mocks.adb.expects('shell')
+        .once()
+        .withExactArgs(['touch', '-am', '/data/local/tmp/appium_cache/1.apk'])
+        .returns(B.resolve());
       mocks.fs.expects('hash')
         .withExactArgs(apkPath)
         .returns('1');
