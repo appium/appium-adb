@@ -83,7 +83,8 @@ describe('apk utils', function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         action: 'android.intent.action.WEB_SEARCH',
-        waitDuration: START_APP_WAIT_DURATION,
+        pkg: 'com.google.android.googlequicksearchbox',
+        waitDuration: MOCHA_LONG_TIMEOUT,
         stopApp: false
       });
       let {appPackage} = await adb.getFocusedPackageAndActivity();
@@ -95,7 +96,7 @@ describe('apk utils', function () {
       await adb.startApp({
         action: 'android.intent.action.DEFAULT',
         optionalIntentArguments: '-d tel:555-5555',
-        waitDuration: START_APP_WAIT_DURATION,
+        waitDuration: MOCHA_LONG_TIMEOUT,
         stopApp: false
       }).should.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
