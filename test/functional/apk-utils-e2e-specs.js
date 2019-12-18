@@ -89,7 +89,12 @@ describe('apk utils', function () {
         stopApp: false
       });
       let {appPackage} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.equal('com.google.android.googlequicksearchbox');
+      const expectedPkgPossibilities = [
+        'com.android.browser',
+        'org.chromium.webview_shell',
+        'com.google.android.googlequicksearchbox'
+      ];
+      expectedPkgPossibilities.should.include(appPackage);
     });
     it('should throw an error for unknown activity for intent', async function () {
       this.timeout(MOCHA_LONG_TIMEOUT);
