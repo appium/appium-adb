@@ -84,7 +84,8 @@ describe('apk utils', function () {
       await adb.startApp({
         action: 'android.intent.action.WEB_SEARCH',
         pkg: 'com.google.android.googlequicksearchbox',
-        waitDuration: MOCHA_LONG_TIMEOUT,
+        optionalIntentArguments: '-e query foo',
+        waitDuration: START_APP_WAIT_DURATION,
         stopApp: false
       });
       let {appPackage} = await adb.getFocusedPackageAndActivity();
@@ -97,7 +98,7 @@ describe('apk utils', function () {
         action: 'android.intent.action.DEFAULT',
         pkg: 'com.google.android.telephony',
         optionalIntentArguments: '-d tel:555-5555',
-        waitDuration: MOCHA_LONG_TIMEOUT,
+        waitDuration: START_APP_WAIT_DURATION,
         stopApp: false
       }).should.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
