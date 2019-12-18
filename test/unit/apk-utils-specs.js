@@ -481,6 +481,27 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns('');
       (await adb.startApp(startAppOptionsWithIntent));
     });
+    it('should throw error when action provided, but pkg not provided', async function () {
+      const startAppOptionsWithoutPkg = {
+        action: 'android.intent.action.VIEW'
+      };
+      await adb.startApp(startAppOptionsWithoutPkg).should.eventually.be.rejectedWith(
+        `pkg, and activity or intent action, are required to start an application`);
+    });
+    it('should throw error when activity provided, but pkg not provided', async function () {
+      const startAppOptionsWithoutPkg = {
+        activity: '.MainActivity'
+      };
+      await adb.startApp(startAppOptionsWithoutPkg).should.eventually.be.rejectedWith(
+        `pkg, and activity or intent action, are required to start an application`);
+    });
+    it('should throw error when neither action nor activity provided', async function () {
+      const startAppOptionsWithoutActivityOrAction = {
+        pkg: 'pkg'
+      };
+      await adb.startApp(startAppOptionsWithoutActivityOrAction).should.eventually.be.rejectedWith(
+        `pkg, and activity or intent action, are required to start an application`);
+    });
     it('should call getApiLevel and shell with correct arguments when activity is inner class', async function () {
       const startAppOptionsWithInnerClass = { pkg: 'pkg', activity: 'act$InnerAct'},
             cmdWithInnerClass = ['am', 'start', '-W', '-n', 'pkg/act\\$InnerAct', '-S'];
