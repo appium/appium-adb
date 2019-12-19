@@ -29,7 +29,7 @@ describe('apk utils', function () {
 
   before(async function () {
     adb = await ADB.createADB({
-      adbExecTimeout: (process.env.TRAVIS || process.env.CI) ? MOCHA_LONG_TIMEOUT : 40000,
+      adbExecTimeout: (process.env.TRAVIS || process.env.CI) ? 60000 : 40000,
     });
   });
   it('should be able to check status of third party app', async function () {
