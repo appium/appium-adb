@@ -4,7 +4,7 @@ import ADB from '../..';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
-import { MOCHA_TIMEOUT, apiLevel } from './setup';
+import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = 10000;
@@ -68,7 +68,7 @@ describe('apk utils', function () {
     });
   });
   describe('startApp', function () {
-    it('should be able to start', async function () {
+    it('should be able to start with normal package and activity', async function () {
       await adb.install(contactManagerPath);
       await adb.startApp({
         pkg: 'com.example.android.contactmanager',
@@ -77,6 +77,35 @@ describe('apk utils', function () {
       });
       await assertPackageAndActivity();
 
+    });
+    it('should be able to start with an intent and no activity', async function () {
+      this.timeout(MOCHA_LONG_TIMEOUT);
+      await adb.install(contactManagerPath);
+      await adb.startApp({
+        action: 'android.intent.action.WEB_SEARCH',
+        pkg: 'com.google.android.googlequicksearchbox',
+        optionalIntentArguments: '-e query foo',
+        waitDuration: START_APP_WAIT_DURATION,
+        stopApp: false
+      });
+      let {appPackage} = await adb.getFocusedPackageAndActivity();
+      const expectedPkgPossibilities = [
+        'com.android.browser',
+        'org.chromium.webview_shell',
+        'com.google.android.googlequicksearchbox'
+      ];
+      expectedPkgPossibilities.should.include(appPackage);
+    });
+    it('should throw an error for unknown activity for intent', async function () {
+      this.timeout(MOCHA_LONG_TIMEOUT);
+      await adb.install(contactManagerPath);
+      await adb.startApp({
+        action: 'android.intent.action.DEFAULT',
+        pkg: 'com.google.android.telephony',
+        optionalIntentArguments: '-d tel:555-5555',
+        waitDuration: START_APP_WAIT_DURATION,
+        stopApp: false
+      }).should.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
     it('should throw error for wrong activity', async function () {
       await adb.install(contactManagerPath);
