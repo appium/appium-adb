@@ -612,7 +612,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         adb._isPidofAvailable = false;
         adb._isPgrepAvailable = true;
         mocks.adb.expects('shell')
-          .once().withExactArgs(['pgrep', `^${_.escapeRegExp(contactManagerPackage.slice(-15))}$`])
+          .once()
+          .withExactArgs([`pgrep ^${_.escapeRegExp(contactManagerPackage.slice(-15))}$ || pgrep ^${_.escapeRegExp(contactManagerPackage.slice(0, 15))}$`])
           .returns('5078\n5079\n');
         (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
       });
