@@ -2,11 +2,15 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseManifest, parseAaptStrings, parseAapt2Strings,
+  parseJsonData,
 } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
 import path from 'path';
 import _ from 'lodash';
+import chai from 'chai';
+
+const should = chai.should();
 
 
 describe('helpers', withMocks({fs}, function (mocks) {
@@ -390,6 +394,32 @@ describe('helpers', withMocks({fs}, function (mocks) {
         'Eine Kontaktanfrage',
         '%1$s Kontaktanfragen\\n\\n"blabla"',
       ]);
+    });
+  });
+
+  describe('parseJsonData', function () {
+    it('should parse JSON received from broadcast output', function () {
+      const broadcastOutput = `
+      Broadcasting: Intent { act=io.appium.settings.sms.read flg=0x400000 (has extras) }
+      Broadcast completed: result=-1, data="{"items":[{"id":"2","address":"+123456789","date":"1581936422203","read":"0","status":"-1","type":"1","body":"\\"text message2\\""},{"id":"1","address":"+123456789","date":"1581936382740","read":"0","status":"-1","type":"1","body":"\\"text message\\""}],"total":2}"
+      `;
+      const {items, total} = parseJsonData(broadcastOutput, '');
+      items.length.should.eql(2);
+      total.should.eql(2);
+    });
+    it('should throw an error if json retrieval fails', function () {
+      const broadcastOutput = `
+      Broadcasting: Intent { act=io.appium.settings.sms.read flg=0x400000 (has extras) }
+      Broadcast completed: result=0, data="{"items":[{"id":"2","address":"+123456789","date":"1581936422203","read":"0","status":"-1","type":"1","body":"\\"text message2\\""},{"id":"1","address":"+123456789","date":"1581936382740","read":"0","status":"-1","type":"1","body":"\\"text message\\""}],"total":2}"
+      `;
+      should.throw(() => parseJsonData(broadcastOutput, ''));
+    });
+    it('should throw an error if json parsing fails', function () {
+      const broadcastOutput = `
+      Broadcasting: Intent { act=io.appium.settings.sms.read flg=0x400000 (has extras) }
+      Broadcast completed: result=-1, data="{24324"
+      `;
+      should.throw(() => parseJsonData(broadcastOutput, ''));
     });
   });
 }));
