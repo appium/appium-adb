@@ -54,7 +54,8 @@
     "semver": "^7.0.0",
     "shell-quote": "^1.6.1",
     "source-map-support": "^0.5.5",
-    "teen_process": "^1.11.0"
+    "teen_process": "^1.11.0",
+    "utf7": "^1.0.2"
   },
   "pre-commit": [
     "precommit-msg",
