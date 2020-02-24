@@ -55,6 +55,26 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .returns(`${apiLevel}`);
         (await adb.getApiLevel()).should.equal(apiLevel);
       });
+      it('should call shell with correct args with Q preview device', async function () {
+        adb._apiLevel = null;
+        mocks.adb.expects('getDeviceProperty')
+          .once().withExactArgs('ro.build.version.sdk')
+          .returns('28');
+        mocks.adb.expects('getDeviceProperty')
+          .once().withExactArgs('ro.build.version.release')
+          .returns('q');
+        (await adb.getApiLevel()).should.equal(29);
+      });
+      it('should call shell with correct args with R preview device', async function () {
+        adb._apiLevel = null;
+        mocks.adb.expects('getDeviceProperty')
+          .once().withExactArgs('ro.build.version.sdk')
+          .returns('29');
+        mocks.adb.expects('getDeviceProperty')
+          .once().withExactArgs('ro.build.version.release')
+          .returns('R');
+        (await adb.getApiLevel()).should.equal(30);
+      });
     });
     describe('getPlatformVersion', function () {
       it('should call shell with correct args', async function () {
