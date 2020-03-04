@@ -265,4 +265,16 @@ describe('adb commands', function () {
     });
   });
 
+  describe('features', function () {
+    it('should return the features as a list', async function () {
+      _.isArray(await adb.listFeatures()).should.be.true;
+    });
+  });
+
+  describe('isStreamedInstallSupported', function () {
+    it('should return boolean value', async function () {
+      _.isBoolean(await adb.isStreamedInstallSupported()).should.be.true;
+    });
+  });
+
 });
