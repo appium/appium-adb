@@ -6,6 +6,7 @@ import { rootDir } from '../../lib/helpers.js';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
+import _ from 'lodash';
 
 
 chai.should();
