@@ -384,6 +384,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   });
   describe('install', function () {
     it('should call shell with correct arguments', async function () {
+      mocks.adb.expects('isStreamedInstallSupported')
+        .once().returns(false);
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
       mocks.adb.expects('cacheApk')
@@ -399,7 +401,24 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns('');
       await adb.install('foo');
     });
+    it('should not cache apk if streamed install is supported', async function () {
+      mocks.adb.expects('isStreamedInstallSupported')
+        .once().returns(true);
+      mocks.adb.expects('getApiLevel')
+        .once().returns(23);
+      mocks.adb.expects('cacheApk')
+        .never();
+      mocks.adb.expects('adbExec')
+        .once().withExactArgs(['install', '-r', 'foo'], {
+          timeout: 60000,
+          timeoutCapName: 'androidInstallTimeout'
+        })
+        .returns('');
+      await adb.install('foo');
+    });
     it('should call shell with correct arguments when not replacing', async function () {
+      mocks.adb.expects('isStreamedInstallSupported')
+        .once().returns(false);
       mocks.adb.expects('getApiLevel')
         .once().returns(23);
       mocks.adb.expects('cacheApk')

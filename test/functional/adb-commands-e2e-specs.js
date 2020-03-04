@@ -6,6 +6,7 @@ import { rootDir } from '../../lib/helpers.js';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
+import _ from 'lodash';
 
 
 chai.should();
@@ -262,6 +263,18 @@ describe('adb commands', function () {
       const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
       this.timeout(BUG_REPORT_TIMEOUT);
       (await adb.bugreport()).should.be.a('string');
+    });
+  });
+
+  describe('features', function () {
+    it('should return the features as a list', async function () {
+      _.isArray(await adb.listFeatures()).should.be.true;
+    });
+  });
+
+  describe('isStreamedInstallSupported', function () {
+    it('should return boolean value', async function () {
+      _.isBoolean(await adb.isStreamedInstallSupported()).should.be.true;
     });
   });
 
