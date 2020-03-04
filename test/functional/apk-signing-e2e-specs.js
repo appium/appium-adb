@@ -2,26 +2,21 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../../lib/adb.js';
 import path from 'path';
-import { exec } from 'teen_process';
-import { system } from 'appium-support';
-import { rootDir } from '../../lib/helpers.js';
+import os from 'os';
+import { rootDir, unsignApk } from '../../lib/helpers.js';
 
 
-const selendroidTestApp = path.resolve(rootDir, 'test',
-                                       'fixtures', 'selendroid-test-app.apk'),
-      contactManagerPath = path.resolve(rootDir, 'test',
-                                        'fixtures', 'ContactManager.apk'),
-      unsignJar = path.resolve(rootDir, 'jars', 'unsign.jar'),
-      tmp = system.isWindows() ? 'C:\\Windows\\Temp' : '/tmp',
-      keystorePath = path.resolve(rootDir, 'test',
-                                  'fixtures', 'appiumtest.keystore'),
-      keyAlias = 'appiumtest';
+const fixturesRoot = path.resolve(rootDir, 'test', 'fixtures');
+const selendroidTestApp = path.resolve(fixturesRoot, 'selendroid-test-app.apk');
+const contactManagerPath = path.resolve(fixturesRoot, 'ContactManager.apk');
+const tmp = os.tmpdir();
+const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
+const keyAlias = 'appiumtest';
 
 chai.use(chaiAsPromised);
 
 describe('Apk-signing', function () {
   let adb;
-  let unsignApk = async (apk) => { await exec('java', ['-jar', unsignJar, apk]); };
 
   before(async function () {
     adb = await ADB.createADB();
