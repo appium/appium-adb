@@ -108,9 +108,9 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         .returns(javaHome);
       mocks.helpers.expects('getJavaForOs')
         .returns(javaDummyPath);
-      mocks.teen_process.expects('exec')
-        .withExactArgs(javaDummyPath, ['-jar', path.resolve(helperJarPath, 'unsign.jar'), selendroidTestApp])
-        .returns({});
+      mocks.helpers.expects('unsignApk')
+        .withExactArgs(selendroidTestApp)
+        .returns(true);
       mocks.teen_process.expects('exec')
         .withExactArgs(jarsigner, ['-sigalg', 'MD5withRSA', '-digestalg', 'SHA1',
           '-keystore', keystorePath, '-storepass', password,
