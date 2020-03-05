@@ -755,18 +755,17 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.killProcessByPID(pid);
       });
 
-      it('should throw an error if a process with given ID does not exist', async function () {
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['whoami'])
-          .returns('root');
+      it('should not throw an error if a process with given ID does not exist', async function () {
         mocks.adb.expects('root')
           .never();
         mocks.adb.expects('unroot')
           .never();
+        const error = new Error('yolo');
+        error.stderr = 'No such process';
         mocks.adb.expects('shell')
           .once().withExactArgs(['kill', '-0', pid])
-          .throws();
-        await adb.killProcessByPID(pid).should.eventually.be.rejected;
+          .throws(error);
+        await adb.killProcessByPID(pid);
       });
     });
     describe('broadcastProcessEnd', function () {
