@@ -40,7 +40,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
-        .once().withArgs(['sign',
+        .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath, selendroidTestApp])
         .returns({});
@@ -52,7 +52,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
-        .once().withArgs(['sign',
+        .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath, selendroidTestApp])
         .throws();
