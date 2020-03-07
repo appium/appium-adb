@@ -42,8 +42,9 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
-          '--cert', defaultCertPath, selendroidTestApp])
-        .returns('');
+          '--cert', defaultCertPath,
+          selendroidTestApp
+        ]).returns('');
       await adb.signWithDefaultCert(selendroidTestApp);
     });
 
@@ -54,8 +55,9 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
-          '--cert', defaultCertPath, selendroidTestApp])
-        .throws();
+          '--cert', defaultCertPath,
+          selendroidTestApp
+        ]).throws();
       mocks.helpers.expects('getJavaForOs')
         .once().returns(javaDummyPath);
       mocks.teen_process.expects('exec')
