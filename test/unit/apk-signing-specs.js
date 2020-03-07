@@ -13,8 +13,6 @@ chai.use(chaiAsPromised);
 const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures', 'selendroid-test-app.apk'),
       helperJarPath = path.resolve(helpers.rootDir, 'jars'),
       keystorePath = path.resolve(helpers.rootDir, 'test', 'fixtures', 'appiumtest.keystore'),
-      defaultKeyPath = path.resolve(helpers.rootDir, 'keys', 'testkey.pk8'),
-      defaultCertPath = path.resolve(helpers.rootDir, 'keys', 'testkey.x509.pem'),
       keyAlias = 'appiumtest',
       password = 'android',
       selendroidTestAppPackage = 'io.selendroid.testapp',
@@ -39,25 +37,23 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should call exec with correct args', async function () {
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
+      mocks.helpers.expects('getJavaForOs')
+        .once().returns(javaDummyPath);
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(apksignerDummyPath, ['sign',
-          '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
-          {cwd: path.dirname(apksignerDummyPath)})
+        .once().withArgs(javaDummyPath)
         .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
     });
 
     it('should fallback to sign.jar if apksigner fails', async function () {
-      let signPath = path.resolve(helperJarPath, 'sign.jar');
+      const signPath = path.resolve(helperJarPath, 'sign.jar');
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(apksignerDummyPath, ['sign',
-          '--key', defaultKeyPath, '--cert', defaultCertPath, selendroidTestApp],
-          {cwd: path.dirname(apksignerDummyPath)})
+        .once().withArgs(javaDummyPath)
         .throws();
       mocks.helpers.expects('getJavaForOs')
-        .returns(javaDummyPath);
+        .atLeast(1).returns(javaDummyPath);
       mocks.teen_process.expects('exec')
         .once().withExactArgs(javaDummyPath, ['-jar', signPath, selendroidTestApp, '--override'])
         .returns({});
@@ -76,46 +72,31 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
 
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
+      mocks.helpers.expects('getJavaForOs')
+        .once().returns(javaDummyPath);
       mocks.teen_process.expects('exec')
-        .withExactArgs(apksignerDummyPath, ['sign',
-          '--ks', keystorePath,
-          '--ks-key-alias', keyAlias,
-          '--ks-pass', `pass:${password}`,
-          '--key-pass', `pass:${password}`,
-          selendroidTestApp], {cwd: path.dirname(apksignerDummyPath)})
+        .withArgs(javaDummyPath)
         .returns({});
       await adb.signWithCustomCert(selendroidTestApp);
     });
 
     it('should fallback to jarsigner if apksigner fails', async function () {
-      let jarsigner = path.resolve(javaHome, 'bin', 'jarsigner');
-      if (appiumSupport.system.isWindows()) {
-        jarsigner = jarsigner + '.exe';
-      }
       adb.useKeystore = true;
 
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
+      mocks.helpers.expects('getJavaForOs')
+        .atLeast(1).returns(javaDummyPath);
       mocks.teen_process.expects('exec')
-        .withExactArgs(apksignerDummyPath, ['sign',
-          '--ks', keystorePath,
-          '--ks-key-alias', keyAlias,
-          '--ks-pass', `pass:${password}`,
-          '--key-pass', `pass:${password}`,
-          selendroidTestApp], {cwd: path.dirname(apksignerDummyPath)})
-        .throws();
+        .twice()
+        .withArgs(javaDummyPath)
+        .onCall(0).throws()
+        .onCall(1).returns({});
       mocks.helpers.expects('getJavaHome')
         .returns(javaHome);
-      mocks.helpers.expects('getJavaForOs')
-        .returns(javaDummyPath);
       mocks.helpers.expects('unsignApk')
         .withExactArgs(selendroidTestApp)
         .returns(true);
-      mocks.teen_process.expects('exec')
-        .withExactArgs(jarsigner, ['-sigalg', 'MD5withRSA', '-digestalg', 'SHA1',
-          '-keystore', keystorePath, '-storepass', password,
-          '-keypass', password, selendroidTestApp, keyAlias])
-        .returns({});
       await adb.signWithCustomCert(selendroidTestApp);
     });
   });
@@ -167,17 +148,16 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       adb.useKeystore = false;
 
       mocks.helpers.expects('getApksignerForOs')
-        .twice().returns(apksignerDummyPath);
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs(apksignerDummyPath,
-          ['verify', '--print-certs', selendroidTestApp],
-          {cwd: path.dirname(apksignerDummyPath)})
-        .returns({
-          stdout: `Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
-                   Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
-                   Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
-                   Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`,
-        });
+        .once().returns(apksignerDummyPath);
+      mocks.helpers.expects('getJavaForOs')
+        .once().returns(javaDummyPath);
+      mocks.adb.expects('executeApksigner')
+        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .returns(`
+          Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
+          Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
+          Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`);
       (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
     });
 
