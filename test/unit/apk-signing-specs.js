@@ -90,17 +90,31 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     });
 
     it('should fallback to jarsigner if apksigner fails', async function () {
+      let jarsigner = path.resolve(javaHome, 'bin', 'jarsigner');
+      if (appiumSupport.system.isWindows()) {
+        jarsigner = jarsigner + '.exe';
+      }
       adb.useKeystore = true;
 
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs')
-        .atLeast(1).returns(javaDummyPath);
+      mocks.adb.expects('executeApksigner')
+        .once().withExactArgs(['sign',
+          '--ks', keystorePath,
+          '--ks-key-alias', keyAlias,
+          '--ks-pass', `pass:${password}`,
+          '--key-pass', `pass:${password}`,
+          selendroidTestApp
+        ]).throws();
       mocks.teen_process.expects('exec')
-        .twice()
-        .withArgs(javaDummyPath)
-        .onCall(0).throws()
-        .onCall(1).returns({});
+        .once().withExactArgs(jarsigner, [
+          '-sigalg', 'MD5withRSA',
+          '-digestalg', 'SHA1',
+          '-keystore', keystorePath,
+          '-storepass', password,
+          '-keypass', password,
+          selendroidTestApp, keyAlias])
+        .returns({});
       mocks.helpers.expects('getJavaHome')
         .returns(javaHome);
       mocks.helpers.expects('unsignApk')
