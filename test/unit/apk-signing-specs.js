@@ -43,7 +43,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath, selendroidTestApp])
-        .returns({});
+        .returns('');
       await adb.signWithDefaultCert(selendroidTestApp);
     });
 
@@ -85,7 +85,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
           selendroidTestApp
-        ]).returns({});
+        ]).returns('');
       await adb.signWithCustomCert(selendroidTestApp);
     });
 
