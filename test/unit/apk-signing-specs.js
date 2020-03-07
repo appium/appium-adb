@@ -13,6 +13,8 @@ chai.use(chaiAsPromised);
 const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures', 'selendroid-test-app.apk'),
       helperJarPath = path.resolve(helpers.rootDir, 'jars'),
       keystorePath = path.resolve(helpers.rootDir, 'test', 'fixtures', 'appiumtest.keystore'),
+      defaultKeyPath = path.resolve(helpers.rootDir, 'keys', 'testkey.pk8'),
+      defaultCertPath = path.resolve(helpers.rootDir, 'keys', 'testkey.x509.pem'),
       keyAlias = 'appiumtest',
       password = 'android',
       selendroidTestAppPackage = 'io.selendroid.testapp',
@@ -37,10 +39,10 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should call exec with correct args', async function () {
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs')
-        .once().returns(javaDummyPath);
-      mocks.teen_process.expects('exec')
-        .once().withArgs(javaDummyPath)
+      mocks.adb.expects('executeApksigner')
+        .once().withArgs(['sign',
+          '--key', defaultKeyPath,
+          '--cert', defaultCertPath, selendroidTestApp])
         .returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
     });
@@ -49,14 +51,18 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       const signPath = path.resolve(helperJarPath, 'sign.jar');
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.teen_process.expects('exec')
-        .once().withArgs(javaDummyPath)
+      mocks.adb.expects('executeApksigner')
+        .once().withArgs(['sign',
+          '--key', defaultKeyPath,
+          '--cert', defaultCertPath, selendroidTestApp])
         .throws();
       mocks.helpers.expects('getJavaForOs')
-        .atLeast(1).returns(javaDummyPath);
+        .once().returns(javaDummyPath);
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(javaDummyPath, ['-jar', signPath, selendroidTestApp, '--override'])
-        .returns({});
+        .once().withExactArgs(javaDummyPath, [
+          '-jar', signPath,
+          selendroidTestApp, '--override'
+        ]).returns({});
       await adb.signWithDefaultCert(selendroidTestApp);
     });
 
@@ -72,11 +78,14 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
 
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs')
-        .once().returns(javaDummyPath);
-      mocks.teen_process.expects('exec')
-        .withArgs(javaDummyPath)
-        .returns({});
+      mocks.adb.expects('executeApksigner')
+        .withExactArgs(['sign',
+          '--ks', keystorePath,
+          '--ks-key-alias', keyAlias,
+          '--ks-pass', `pass:${password}`,
+          '--key-pass', `pass:${password}`,
+          selendroidTestApp
+        ]).returns({});
       await adb.signWithCustomCert(selendroidTestApp);
     });
 
@@ -144,13 +153,11 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       (await adb.checkApkCert('dummyPath', 'dummyPackage')).should.be.false;
     });
 
-    it('should call exec when not using keystore', async function () {
+    it('should check default signature when not using keystore', async function () {
       adb.useKeystore = false;
 
       mocks.helpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs')
-        .once().returns(javaDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
         .returns(`
@@ -159,6 +166,23 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`);
       (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
+    });
+
+    it('should check non default signature when not using keystore', async function () {
+      adb.useKeystore = false;
+
+      mocks.helpers.expects('getApksignerForOs')
+        .once().returns(apksignerDummyPath);
+      mocks.adb.expects('executeApksigner')
+        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .returns(`
+          Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
+          Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
+          Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
+      (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage, {
+        requireDefaultCert: false,
+      })).should.be.true;
     });
 
     it('should fallback to verify.jar if apksigner is not found', async function () {
