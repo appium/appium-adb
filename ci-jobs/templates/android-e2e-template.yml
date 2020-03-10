@@ -2,7 +2,7 @@
 parameters:
   script: echo "NO TEST SCRIPT WAS PROVIDED" && exit 1
   name: 'android_e2e_tests'
-  vmImage: 'macOS-10.13'
+  vmImage: 'macOS-10.15'
   MOCHA_FILE: 'sdk-$(ANDROID_SDK_VERSION)-test-results.xml'
   NODE_VERSION: 10.x
   PLATFORM_VERSION: 9.0
@@ -27,7 +27,7 @@ jobs:
     - script: adb logcat > logcat.txt &
       displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
-      displayName: Create and run Emulator 
+      displayName: Create and run Emulator
     - script: npm run build
       displayName: Build
     - script: ${{ parameters.script }}
@@ -43,5 +43,3 @@ jobs:
       inputs:
         artifactName: ${{ parameters.name }}-logcat
         targetPath: logcat.txt
-
-  
