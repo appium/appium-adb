@@ -1249,4 +1249,22 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       await adb.getTimeZone().should.eventually.be.rejected;
     });
   });
+  describe('setHiddenApiPolicy', function () {
+    it('should call setSetting method with correct args for set hidden api policy', async function () {
+      mocks.adb.expects('shell').once().withExactArgs(
+        'settings put global hidden_api_policy_pre_p_apps 1;' +
+        'settings put global hidden_api_policy_p_apps 1;' +
+        'settings put global hidden_api_policy 1');
+      await adb.setHiddenApiPolicy(1);
+    });
+  });
+  describe('setDefaultHiddenApiPolicy', function () {
+    it('should call setSetting method with correct args for set hidden api policy', async function () {
+      mocks.adb.expects('shell').once().withExactArgs(
+        'settings delete global hidden_api_policy_pre_p_apps;' +
+        'settings delete global hidden_api_policy_p_apps;' +
+        'settings delete global hidden_api_policy');
+      await adb.setDefaultHiddenApiPolicy();
+    });
+  });
 }));
