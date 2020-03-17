@@ -433,36 +433,22 @@ describe('helpers', withMocks({fs}, function (mocks) {
     installPermissionsFixed=true installStatus=1
     pkgFlags=[ SYSTEM DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
     requested permissions:
-      android.permission.INTERNET
-      android.permission.ACCESS_NETWORK_STATE
+      android.xx.INTERNET
+      com.google.android.c2dm.permission.RECEIVE
       android.permission.ACCESS_WIFI_STATE
-      android.permission.BLUETOOTH
-      android.permission.BLUETOOTH_ADMIN
-      android.permission.ACCESS_COARSE_LOCATION
-      android.permission.ACCESS_FINE_LOCATION
-      android.car.permission.CAR_VENDOR_EXTENSION
-      android.car.permission.CAR_CABIN
+      android.xxx.permission.CAR_VENDOR_EXTENSION
+      android.123.permission.CAR_CABIN
       android.car.permission.CAR_CHARGE
-      android.car.permission.CAR_MILEAGE
-      android.car.permission.CAR_HVAC
-      android.car.permission.CAR_CONTROL_AUDIO_VOLUME
-      android.car.permission.CAR_CONTROL_AUDIO_SETTINGS
       android.permission.WAKE_LOCK
       android.permission.WRITE_EXTERNAL_STORAGE
       android.permission.READ_EXTERNAL_STORAGE
     install permissions:
       android.car.permission.CAR_VENDOR_EXTENSION: granted=true
-      android.car.permission.CAR_CONTROL_AUDIO_VOLUME: granted=true
-      android.permission.BLUETOOTH: granted=true
-      android.permission.INTERNET: granted=true
+      android.123.permission.CAR_CONTROL_AUDIO_VOLUME: granted=true
+      android.xxx.BLUETOOTH: granted=true
+      com.google.android.c2dm.permission.RECEIVE: granted=true
       android.permission.BLUETOOTH_ADMIN: granted=true
-      android.car.permission.CAR_CABIN: granted=true
-      android.car.permission.CAR_CHARGE: granted=true
-      android.permission.ACCESS_NETWORK_STATE: granted=true
-      android.permission.ACCESS_WIFI_STATE: granted=true
-      android.car.permission.CAR_CONTROL_AUDIO_SETTINGS: granted=true
-      android.permission.WAKE_LOCK: granted=true
-      android.car.permission.CAR_HVAC: granted=true
+      android.car.123.CAR_CONTROL_AUDIO_SETTINGS: granted=true
     User 0: ceDataInode=32838 installed=true hidden=false suspended=false stopped=false notLaunched=false enabled=0 instant=false virtual=false
       gids=[3002, 3003, 3001]
       runtime permissions:
@@ -470,7 +456,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
         `;
     it('test install permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], true);
-      per.length.should.eql(12);
+      per.length.should.eql(4);
     });
     it('test install permission with granted false', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], false);
