@@ -2,7 +2,7 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseManifest, parseAaptStrings, parseAapt2Strings,
-  parseJsonData,
+  parseJsonData, extractMatchingPermissions,
 } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
 import { fs } from 'appium-support';
@@ -420,6 +420,55 @@ describe('helpers', withMocks({fs}, function (mocks) {
       Broadcast completed: result=-1, data="{24324"
       `;
       should.throw(() => parseJsonData(broadcastOutput, ''));
+    });
+  });
+
+  describe('parsePermissions', function () {
+    const dumpsysOutput = `
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2020-03-16 20:11:46
+    firstInstallTime=2020-03-16 20:11:46
+    lastUpdateTime=2020-03-16 20:11:46
+    signatures=PackageSignatures{2cb80c0 [a2b14acf]}
+    installPermissionsFixed=true installStatus=1
+    pkgFlags=[ SYSTEM DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    requested permissions:
+      android.xx.INTERNET
+      com.google.android.c2dm.permission.RECEIVE
+      android.permission.ACCESS_WIFI_STATE
+      android.xxx.permission.CAR_VENDOR_EXTENSION
+      android.123.permission.CAR_CABIN
+      android.car.permission.CAR_CHARGE
+      android.permission.WAKE_LOCK
+      android.permission.WRITE_EXTERNAL_STORAGE
+      android.permission.READ_EXTERNAL_STORAGE
+    install permissions:
+      android.car.permission.CAR_VENDOR_EXTENSION: granted=true
+      android.123.permission.CAR_CONTROL_AUDIO_VOLUME: granted=true
+      android.xxx.BLUETOOTH: granted=true
+      com.google.android.c2dm.permission.RECEIVE: granted=true
+      android.permission.BLUETOOTH_ADMIN: granted=true
+      android.car.123.CAR_CONTROL_AUDIO_SETTINGS: granted=true
+    User 0: ceDataInode=32838 installed=true hidden=false suspended=false stopped=false notLaunched=false enabled=0 instant=false virtual=false
+      gids=[3002, 3003, 3001]
+      runtime permissions:
+        android.car.permission.CAR_MILEAGE: granted=true, flags=[ GRANTED_BY_DEFAULT ]
+        `;
+    it('test install permission', function () {
+      const per = extractMatchingPermissions(dumpsysOutput, ['install'], true);
+      per.length.should.eql(4);
+    });
+    it('test install permission with granted false', function () {
+      const per = extractMatchingPermissions(dumpsysOutput, ['install'], false);
+      per.length.should.eql(0);
+    });
+    it('test requested permission', function () {
+      const per = extractMatchingPermissions(dumpsysOutput, ['requested'], true);
+      per.length.should.eql(0);
+    });
+    it('test runtime permission', function () {
+      const per = extractMatchingPermissions(dumpsysOutput, ['runtime'], true);
+      per.length.should.eql(1);
     });
   });
 }));
