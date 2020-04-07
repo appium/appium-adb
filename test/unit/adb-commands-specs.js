@@ -622,6 +622,46 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.getLogcatLogs();
       });
     });
+    describe('getNameByPid', function () {
+      it('should get package name from valid ps output', async function () {
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['ps'])
+          .returns(`
+          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
+          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
+          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
+          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
+          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
+          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
+          u0_a1     1349  69    1206724 26164 ffffffff b6db0920 S com.android.providers.calendar
+          u0_a17    1431  69    1217460 26616 ffffffff b6db0920 S com.android.calendar
+          u0_a21    1454  69    1203712 26244 ffffffff b6db0920 S com.android.deskclock
+          u0_a27    1490  69    1206480 24748 ffffffff b6db0920 S com.android.exchange
+          u0_a4     1574  69    1205460 22984 ffffffff b6db0920 S com.android.dialer
+          u0_a2     1590  69    1207456 29340 ffffffff b6db0920 S android.process.acore
+          u0_a11    1608  69    1199320 22448 ffffffff b6db0920 S com.android.sharedstoragebackup
+          u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
+          u0_a5     1646  69    1202716 27004 ffffffff b6db0920 S android.process.media
+          root      1676  2     0      0     c00d0d8c 00000000 S flush-31:1
+          root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
+          root      1681  60    10672  996   00000000 b6f33508 R ps
+          `);
+        (await adb.getNameByPid('1627')).should.eql('com.android.browser');
+      });
+      it('should fail if no PID could be found in the name', async function () {
+        await adb.getNameByPid('bla').should.eventually.be.rejectedWith(/valid number/);
+      });
+      it('should fail if no PID could be found in ps output', async function () {
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['ps'])
+          .returns(`
+          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
+          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
+          `);
+        await adb.getNameByPid(115).should.eventually.be.rejectedWith(/process name/);
+      });
+    });
     describe('getPIDsByName', function () {
       beforeEach(function () {
         mocks.adb.expects('getApiLevel').once().returns(23);
