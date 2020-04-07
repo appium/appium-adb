@@ -659,7 +659,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
           u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
           `);
-        await adb.getNameByPid(115).should.eventually.be.rejectedWith(/package name/);
+        await adb.getNameByPid(115).should.eventually.be.rejectedWith(/process name/);
       });
     });
     describe('getPIDsByName', function () {
