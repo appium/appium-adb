@@ -42,4 +42,16 @@ describe('adb emu commands', function () {
     app = await adb.getFocusedPackageAndActivity();
     app.appActivity.should.equal(secretActivity);
   });
+
+  describe('execEmuConsoleCommand', function () {
+    it('should print name', async function () {
+      const name = await adb.execEmuConsoleCommand(['avd', 'name']);
+      name.should.not.be.empty;
+    });
+
+    it('should fail if the command is unknown', async function () {
+      await adb.execEmuConsoleCommand(['avd', 'namer']).should.eventually
+        .be.rejected;
+    });
+  });
 });
