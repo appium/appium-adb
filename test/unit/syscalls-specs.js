@@ -144,7 +144,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     await adb.getAdbVersion();
     await adb.getAdbVersion();
   });
-  it('fileExists should return true for if file/dir exists', async function () {
+  it('fileExists should return true if file/dir exists', async function () {
     mocks.adb.expects('shell')
       .once().withExactArgs([`[ -e 'foo' ] && echo __PASS__`])
       .returns('__PASS__');
