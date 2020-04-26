@@ -144,10 +144,10 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     await adb.getAdbVersion();
     await adb.getAdbVersion();
   });
-  it('fileExists should return true for if ls returns', async function () {
-    mocks.adb.expects('ls')
-      .once().withExactArgs('foo')
-      .returns(['bar']);
+  it('fileExists should return true for if file/dir exists', async function () {
+    mocks.adb.expects('shell')
+      .once().withExactArgs([`[ -e 'foo' ] && echo __PASS__`])
+      .returns('__PASS__');
     await adb.fileExists('foo').should.eventually.equal(true);
   });
   it('ls should return list', async function () {
