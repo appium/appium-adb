@@ -17,13 +17,14 @@ let expect = chai.expect;
 const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' :
   'com.example.android.softkeyboard/.SoftKeyboard';
 const defaultIMEs = [
+        'com.google.android.googlequicksearchbox/com.google.android.voicesearch.ime.VoiceInputMethodService',
         'com.android.inputmethod.latin/.LatinIME',
         'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
         'io.appium.android.ime/.UnicodeIME',
       ],
       contactManagerPath = path.resolve(rootDir, 'test',
                                         'fixtures', 'ContactManager.apk'),
-      pkg = 'com.example.android.contactmanager',
+      pkg = 'com.saucelabs.ContactManager',
       activity = 'ContactManager';
 
 describe('adb commands', function () {

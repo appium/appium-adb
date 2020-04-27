@@ -26,7 +26,7 @@ describe('Apk-signing', function () {
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.false;
   });
   it('checkApkCert should return true for signed apk', async function () {
-    (await adb.checkApkCert(contactManagerPath, 'com.example.android.contactmanager')).should.be.true;
+    (await adb.checkApkCert(contactManagerPath, 'com.saucelabs.ContactManager')).should.be.true;
   });
   it('signWithDefaultCert should sign apk', async function () {
     await unsignApk(selendroidTestApp);
