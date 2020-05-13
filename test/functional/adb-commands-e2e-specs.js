@@ -11,20 +11,17 @@ import _ from 'lodash';
 
 chai.should();
 chai.use(chaiAsPromised);
-let expect = chai.expect;
+const expect = chai.expect;
 
+const DEFAULT_IMES = [
+  'com.android.inputmethod.latin/.LatinIME',
+  'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+  'io.appium.android.ime/.UnicodeIME',
+];
+const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
+const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
 
-const IME = apiLevel >= 28 ? 'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME' :
-  'com.example.android.softkeyboard/.SoftKeyboard';
-const defaultIMEs = [
-        'com.android.inputmethod.latin/.LatinIME',
-        'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
-        'io.appium.android.ime/.UnicodeIME',
-      ],
-      contactManagerPath = path.resolve(rootDir, 'test',
-                                        'fixtures', 'ContactManager.apk'),
-      pkg = 'com.example.android.contactmanager',
-      activity = 'ContactManager';
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -50,15 +47,20 @@ describe('adb commands', function () {
   it('defaultIME should get default IME', async function () {
     const defaultIME = await adb.defaultIME();
     if (defaultIME) {
-      defaultIMEs.should.include(defaultIME);
+      DEFAULT_IMES.should.include(defaultIME);
     }
   });
   it('enableIME and disableIME should enable and disable IME', async function () {
-    await adb.disableIME(IME);
-    (await adb.enabledIMEs()).should.not.include(IME);
-    await adb.enableIME(IME);
-    (await adb.enabledIMEs()).should.include(IME);
-    await adb.enabledIMEs();
+    const imes = await adb.availableIMEs();
+    if (imes.length < 2) {
+      return this.skip();
+    }
+
+    const ime = _.last(imes);
+    await adb.disableIME(ime);
+    (await adb.enabledIMEs()).should.not.include(ime);
+    await adb.enableIME(ime);
+    (await adb.enabledIMEs()).should.include(ime);
   });
   it('processExists should be able to find ui process', async function () {
     if (process.env.TRAVIS) {
@@ -74,18 +76,18 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(contactManagerPath, {timeout: androidInstallTimeout});
-    await adb.startApp({pkg, activity});
-    await adb.killProcessesByName(pkg);
-    (await adb.getPIDsByName(pkg)).should.have.length(0);
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.killProcessesByName(CONTACT_MANAGER_PKG);
+    (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).should.have.length(0);
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(contactManagerPath, {timeout: androidInstallTimeout});
-    await adb.startApp({pkg, activity});
-    let pids = await adb.getPIDsByName(pkg);
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
     await adb.killProcessByPID(pids[0]);
-    (await adb.getPIDsByName(pkg)).length.should.equal(0);
+    (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length.should.equal(0);
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
