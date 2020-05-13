@@ -4,7 +4,7 @@
 # with some changes
 
 # Install AVD files
-declare -r emulator="system-images;android-$ANDROID_SDK_VERSION;google_apis;x86"
+declare -r emulator="system-images;android-$ANDROID_SDK_VERSION;default;x86"
 echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "$emulator"
 
 # Create emulator
@@ -22,6 +22,9 @@ $ANDROID_HOME/platform-tools/adb wait-for-device get-serialno
 secondsStarted=`date +%s`
 TIMEOUT=360
 while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
+  # Fail fast if Emulator process crashed
+  pgrep -nf avd || exit 1
+
   processList=`adb shell ps`
   if [[ "$processList" =~ "com.android.systemui" ]]; then
     echo "System UI process is running. Checking IME services availability"
@@ -34,6 +37,10 @@ while [[ $(( `date +%s` - $secondsStarted )) -lt $TIMEOUT ]]; do
 done
 
 bootDuration=$(( `date +%s` - $secondsStarted ))
+if [[ $bootDuration -ge $TIMEOUT ]]; then
+  echo "Emulator has failed to fully start within ${TIMEOUT}s"
+  exit 1
+fi
 echo "Emulator booting took ${bootDuration}s"
 adb shell input keyevent 82
 
