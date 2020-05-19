@@ -72,7 +72,8 @@ describe('System calls', function () {
   });
   it('ls should list files', async function () {
     (await adb.ls('/foo/bar')).should.eql([]);
-    (await adb.ls('/data/local/')).should.contain('tmp');
+    await adb.shell(['touch', '/data/local/tmp/test']);
+    (await adb.ls('/data/local/tmp')).should.contain('test');
   });
   it('should check if the given certificate is already installed', async function () {
     const certBuffer = await fs.readFile(DEFAULT_CERTIFICATE);
