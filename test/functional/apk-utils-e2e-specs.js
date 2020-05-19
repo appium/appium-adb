@@ -7,7 +7,7 @@ import { retryInterval } from 'asyncbox';
 import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
-const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 30000 : 10000;
+const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 
 chai.should();
 chai.use(chaiAsPromised);
