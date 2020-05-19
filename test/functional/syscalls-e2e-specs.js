@@ -54,8 +54,8 @@ describe('System calls', function () {
     await adb.waitForDevice(2);
   });
   it('reboot should reboot the device', async function () {
-    if (process.env.TRAVIS) {
-      // The test is very slow on CI
+    if (process.env.CI) {
+      // The test makes CI unstable
       return this.skip();
     }
     this.timeout(MOCHA_LONG_TIMEOUT);
@@ -68,11 +68,11 @@ describe('System calls', function () {
   });
   it('fileExists should detect when files do and do not exist', async function () {
     (await adb.fileExists('/foo/bar/baz.zip')).should.be.false;
-    (await adb.fileExists('/system/')).should.be.true;
+    (await adb.fileExists('/data/local/tmp')).should.be.true;
   });
   it('ls should list files', async function () {
     (await adb.ls('/foo/bar')).should.eql([]);
-    (await adb.ls('/system/')).should.contain('etc');
+    (await adb.ls('/data/local/')).should.contain('tmp');
   });
   it('should check if the given certificate is already installed', async function () {
     const certBuffer = await fs.readFile(DEFAULT_CERTIFICATE);
