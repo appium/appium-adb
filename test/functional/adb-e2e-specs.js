@@ -15,7 +15,7 @@ describe('ADB', function () {
   });
   it('should throw when ANDROID_HOME is ivalid', async function () {
     let opts = {sdkRoot: '/aasdasdds'};
-    await ADB.createADB(opts).should.eventually.be.fulfilled;
+    await ADB.createADB(opts).should.eventually.be.rejected;
   });
   it.skip('should error out if binary not persent', async function () {
     // TODO write a negative test
