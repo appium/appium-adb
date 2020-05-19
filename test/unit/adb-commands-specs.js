@@ -770,41 +770,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
 
       it('should call kill process correctly', async function () {
         mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', '-0', pid])
+          .once().withExactArgs(['kill', pid])
           .returns('');
-        mocks.adb.expects('shell')
-          .withExactArgs(['kill', pid])
-          .twice()
-          .onCall(0)
-          .returns('')
-          .onCall(1)
-          .throws();
-        await adb.killProcessByPID(pid);
-      });
-
-      it('should force kill process if normal kill fails', async function () {
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', '-0', pid])
-          .returns('');
-        mocks.adb.expects('shell')
-          .atLeast(2).withExactArgs(['kill', pid])
-          .returns('');
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', '-9', pid])
-          .returns('');
-        await adb.killProcessByPID(pid);
-      });
-
-      it('should not throw an error if a process with given ID does not exist', async function () {
-        mocks.adb.expects('root')
-          .never();
-        mocks.adb.expects('unroot')
-          .never();
-        const error = new Error('yolo');
-        error.stderr = 'No such process';
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', '-0', pid])
-          .throws(error);
         await adb.killProcessByPID(pid);
       });
     });
