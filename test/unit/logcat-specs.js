@@ -1,23 +1,29 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import * as teen_process from 'teen_process';
 import events from 'events';
 import Logcat from '../../lib/logcat';
+import { withMocks } from 'appium-test-support';
 
 
 chai.use(chaiAsPromised);
 
-describe('logcat', function () {
+describe('logcat', withMocks({teen_process}, function (mocks) {
   const adb = {path: 'dummyPath', defaultArgs: []};
   const logcat = new Logcat({adb, debug: false, debugTrace: false});
+
+  afterEach(function () {
+    mocks.verify();
+  });
 
   describe('startCapture', function () {
     it('should correctly call subprocess and should resolve promise', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      adb.createSubProcess = (args) => {
-        args.should.eql(['logcat', '-v', 'brief', 'yolo2:d', '*:v']);
-        return conn;
-      };
+      mocks.teen_process.expects('SubProcess')
+        .withArgs('dummyPath', ['logcat', '-v', 'brief', 'yolo2:d', '*:v'])
+        .onFirstCall()
+        .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stdout', ['- beginning of system\r']);
       }, 0);
@@ -31,10 +37,10 @@ describe('logcat', function () {
     it('should correctly call subprocess and should reject promise', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      adb.createSubProcess = (args) => {
-        args.should.eql(['logcat', '-v', 'threadtime']);
-        return conn;
-      };
+      mocks.teen_process.expects('SubProcess')
+        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .onFirstCall()
+        .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stderr', ['execvp()']);
       }, 0);
@@ -43,10 +49,10 @@ describe('logcat', function () {
     it('should correctly call subprocess and should resolve promise if it fails on startup', async function () {
       let conn = new events.EventEmitter();
       conn.start = () => { };
-      adb.createSubProcess = (args) => {
-        args.should.eql(['logcat', '-v', 'threadtime']);
-        return conn;
-      };
+      mocks.teen_process.expects('SubProcess')
+        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .onFirstCall()
+        .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stderr', ['something']);
       }, 0);
@@ -56,16 +62,15 @@ describe('logcat', function () {
 
   describe('clear', function () {
     it('should call logcat clear', async function () {
-      adb.adbExec = (args) => {
-        args.should.eql(['logcat', '-c']);
-      };
+      mocks.teen_process.expects('exec')
+        .once().withExactArgs(adb.path, adb.defaultArgs.concat(['logcat', '-c']));
       await logcat.clear();
     });
     it('should not fail if logcat clear fails', async function () {
-      adb.adbExec = () => {
-        throw new Error('Failed to clear');
-      };
+      mocks.teen_process.expects('exec')
+        .once().withExactArgs(adb.path, adb.defaultArgs.concat(['logcat', '-c']))
+        .throws('Failed to clear');
       await logcat.clear().should.eventually.not.be.rejected;
     });
   });
-});
+}));
