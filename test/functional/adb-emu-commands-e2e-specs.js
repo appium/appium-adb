@@ -54,4 +54,12 @@ describe('adb emu commands', function () {
         .be.rejected;
     });
   });
+
+  describe('getEmuVersionInfo', function () {
+    it('should get version info', async function () {
+      const {revision, buildId} = await adb.getEmuVersionInfo();
+      revision.should.not.be.empty;
+      (buildId > 0).should.be.true;
+    });
+  });
 });

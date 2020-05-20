@@ -19,21 +19,13 @@ describe('helpers', withMocks({fs}, function (mocks) {
   });
 
   describe('getAndroidPlatformAndPath', function () {
-    let oldAndroidHome;
-    before(function () {
-      oldAndroidHome = process.env.ANDROID_HOME;
-    });
-    after(function () {
-      process.env.ANDROID_HOME = oldAndroidHome;
-    });
-
     it('should get the latest available API', async function () {
-      process.env.ANDROID_HOME = '/path/to/android/home';
+      const ANDROID_HOME = '/path/to/android/home';
 
       mocks.fs.expects('glob').returns([
-        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-17', 'build.prop'),
-        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-25', 'build.prop'),
-        path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-22', 'build.prop'),
+        path.resolve(ANDROID_HOME, 'platforms', 'android-17', 'build.prop'),
+        path.resolve(ANDROID_HOME, 'platforms', 'android-25', 'build.prop'),
+        path.resolve(ANDROID_HOME, 'platforms', 'android-22', 'build.prop'),
       ]);
       mocks.fs.expects('readFile')
         .exactly(3)
@@ -52,10 +44,10 @@ describe('helpers', withMocks({fs}, function (mocks) {
           ro.build.version.sdk=22
           ro.build.version.codename=REL
           ro.build.version.release=5.1`);
-      let platformAndPath = await getAndroidPlatformAndPath();
+      let platformAndPath = await getAndroidPlatformAndPath(ANDROID_HOME);
       platformAndPath.platform.should.equal('android-25');
       platformAndPath.platformPath.should
-        .equal(path.resolve(process.env.ANDROID_HOME, 'platforms', 'android-25'));
+        .equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
     });
   });
 
