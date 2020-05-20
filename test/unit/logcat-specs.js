@@ -9,8 +9,8 @@ import { withMocks } from 'appium-test-support';
 chai.use(chaiAsPromised);
 
 describe('logcat', withMocks({teen_process}, function (mocks) {
-  let adb = {path: 'dummyPath', defaultArgs: []};
-  let logcat = new Logcat({adb, debug: false, debugTrace: false});
+  const adb = {path: 'dummyPath', defaultArgs: []};
+  const logcat = new Logcat({adb, debug: false, debugTrace: false});
 
   afterEach(function () {
     mocks.verify();
@@ -21,13 +21,16 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
       let conn = new events.EventEmitter();
       conn.start = () => { };
       mocks.teen_process.expects('SubProcess')
-        .withArgs('dummyPath', ['logcat', '-v', 'threadtime'])
+        .withArgs('dummyPath', ['logcat', '-v', 'brief', 'yolo2:d', '*:v'])
         .onFirstCall()
         .returns(conn);
       setTimeout(function () {
         conn.emit('lines-stdout', ['- beginning of system\r']);
       }, 0);
-      await logcat.startCapture();
+      await logcat.startCapture({
+        format: 'brief',
+        filterSpecs: ['yolo2:d', ':k', '-asd:e'],
+      });
       let logs = logcat.getLogs();
       logs.should.have.length.above(0);
     });
