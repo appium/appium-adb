@@ -272,7 +272,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
           stderr: 'adb: unable to connect for root: closed\n',
           code: 1
         });
-      mocks.adb.expects('restartAdb').once();
+      mocks.adb.expects('reconnect').once();
       await adb.root().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
     });
     it('should not restart adb if root throws err but stderr does not contain "closed" in message', async function () {
@@ -285,7 +285,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
           stderr: 'some error that does not close device',
           code: 1
         });
-      mocks.adb.expects('restartAdb').never();
+      mocks.adb.expects('reconnect').never();
       await adb.root().should.eventually.eql({isSuccessful: false, wasAlreadyRooted: false});
     });
     it('should call "unroot" on shell if call .unroot', async function () {
