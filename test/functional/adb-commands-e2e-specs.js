@@ -7,6 +7,7 @@ import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from 'appium-support';
 import temp from 'temp';
 import _ from 'lodash';
+import { waitForCondition } from 'asyncbox';
 
 
 chai.should();
@@ -79,7 +80,10 @@ describe('adb commands', function () {
     await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
-    (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).should.have.length(0);
+    await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
+      waitMs: 5000,
+      intervalMs: 500,
+    });
   });
   it('killProcessByPID should kill process', async function () {
     await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
@@ -87,7 +91,10 @@ describe('adb commands', function () {
     let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
     await adb.killProcessByPID(pids[0]);
-    (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length.should.equal(0);
+    await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
+      waitMs: 5000,
+      intervalMs: 500,
+    });
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
