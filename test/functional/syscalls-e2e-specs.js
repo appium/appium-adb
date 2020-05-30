@@ -5,6 +5,7 @@ import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
 import { fs } from 'appium-support';
+import _ from 'lodash';
 
 const DEFAULT_CERTIFICATE = path.resolve(rootDir, 'keys', 'testkey.x509.pem');
 
@@ -78,5 +79,13 @@ describe('System calls', function () {
   it('should check if the given certificate is already installed', async function () {
     const certBuffer = await fs.readFile(DEFAULT_CERTIFICATE);
     (await adb.isMitmCertificateInstalled(certBuffer)).should.be.false;
+  });
+  it('should return version', async function () {
+    const {binary, bridge} = await adb.getVersion();
+    if (binary) {
+      _.has(binary, 'version').should.be.true;
+      _.has(binary, 'build').should.be.true;
+    }
+    _.has(bridge, 'version').should.be.true;
   });
 });

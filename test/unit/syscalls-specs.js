@@ -4,7 +4,6 @@ import ADB from '../..';
 import * as teen_process from 'teen_process';
 import { withMocks } from 'appium-test-support';
 import B from 'bluebird';
-import _ from 'lodash';
 
 
 chai.use(chaiAsPromised);
@@ -123,27 +122,6 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     mocks.verify();
   });
 
-  it('should return adb version', async function () {
-    mocks.adb.expects('adbExec')
-      .once()
-      .withExactArgs('version')
-      .returns('Android Debug Bridge version 1.0.39\nRevision 5943271ace17-android');
-    let adbVersion = await adb.getAdbVersion();
-    adbVersion.versionString.should.equal('1.0.39');
-    adbVersion.versionFloat.should.be.within(1.0, 1.0);
-    adbVersion.major.should.equal(1);
-    adbVersion.minor.should.equal(0);
-    adbVersion.patch.should.equal(39);
-  });
-  it('should cache adb results', async function () {
-    adb.getAdbVersion.cache = new _.memoize.Cache();
-    mocks.adb.expects('adbExec')
-      .once()
-      .withExactArgs('version')
-      .returns('Android Debug Bridge version 1.0.39\nRevision 5943271ace17-android');
-    await adb.getAdbVersion();
-    await adb.getAdbVersion();
-  });
   it('fileExists should return true if file/dir exists', async function () {
     mocks.adb.expects('shell')
       .once().withExactArgs([`[ -e 'foo' ] && echo __PASS__`])
