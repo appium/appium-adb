@@ -287,4 +287,9 @@ describe('adb commands', function () {
     });
   });
 
+  describe('isIncrementalInstallSupported', function () {
+    it('should return boolean value', async function () {
+      _.isBoolean(await adb.isIncrementalInstallSupported()).should.be.true;
+    });
+  });
 });
