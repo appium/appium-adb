@@ -210,8 +210,8 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
         .returns([emulator]);
       mocks.adb.expects('setEmulatorPort')
         .once().withExactArgs(port);
-      mocks.adb.expects('sendTelnetCommand')
-        .once().withExactArgs('avd name')
+      mocks.adb.expects('execEmuConsoleCommand')
+        .once()
         .returns(avdName);
       mocks.adb.expects('setDeviceId')
         .once().withExactArgs(udid);
@@ -226,8 +226,8 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
         .returns([emulator]);
       mocks.adb.expects('setEmulatorPort')
         .once().withExactArgs(port);
-      mocks.adb.expects('sendTelnetCommand')
-        .once().withExactArgs('avd name')
+      mocks.adb.expects('execEmuConsoleCommand')
+        .once()
         .returns('OTHER_AVD');
       chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
     });
