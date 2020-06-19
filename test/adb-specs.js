@@ -73,7 +73,6 @@ describe.skip('ADB To be implemented methods', function () {
   // it('keyevent', async () => { });
   // it('isScreenLocked', async () => { });
   // it('isSoftKeyboardPresent', async () => { });
-  // it('sendTelnetCommand', async () => { });
   // it('isEmulator', async () => { });
   // it('isAirplaneModeOn', async () => { });
   // it('setAirplaneMode', async () => { });
