@@ -47,7 +47,7 @@
     "adbkit-apkreader": "^3.1.2",
     "appium-support": "^2.42.0",
     "async-lock": "^1.0.0",
-    "asyncbox": "^2.3.1",
+    "asyncbox": "^2.6.0",
     "bluebird": "^3.4.7",
     "lodash": "^4.0.0",
     "lru-cache": "^5.0.0",
