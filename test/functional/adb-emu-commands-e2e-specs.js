@@ -8,7 +8,13 @@ chai.should();
 describe('adb emu commands', function () {
   let adb;
   before(async function () {
+    if (process.env.REAL_DEVICE) {
+      return this.skip();
+    }
+
     adb = await ADB.createADB();
+    const devices = await adb.getConnectedEmulators();
+    adb.setDevice(devices[0]);
   });
 
   describe('execEmuConsoleCommand', function () {
