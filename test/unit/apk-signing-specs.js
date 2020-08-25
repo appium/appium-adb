@@ -11,7 +11,6 @@ import { withMocks } from 'appium-test-support';
 chai.use(chaiAsPromised);
 
 const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures', 'selendroid-test-app.apk'),
-      helperJarPath = path.resolve(helpers.rootDir, 'jars'),
       keystorePath = path.resolve(helpers.rootDir, 'test', 'fixtures', 'appiumtest.keystore'),
       defaultKeyPath = path.resolve(helpers.rootDir, 'keys', 'testkey.pk8'),
       defaultCertPath = path.resolve(helpers.rootDir, 'keys', 'testkey.x509.pem'),
@@ -48,8 +47,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       await adb.signWithDefaultCert(selendroidTestApp);
     });
 
-    it('should fallback to sign.jar if apksigner fails', async function () {
-      const signPath = path.resolve(helperJarPath, 'sign.jar');
+    it('should fail if apksigner fails', async function () {
       mocks.helpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
@@ -60,12 +58,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         ]).throws();
       mocks.helpers.expects('getJavaForOs')
         .once().returns(javaDummyPath);
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs(javaDummyPath, [
-          '-jar', signPath,
-          selendroidTestApp, '--override'
-        ]).returns({});
-      await adb.signWithDefaultCert(selendroidTestApp);
+      await adb.signWithDefaultCert(selendroidTestApp).should.eventually.be.rejected;
     });
 
     it('should throw error for invalid file path', async function () {
@@ -201,17 +194,15 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       })).should.be.true;
     });
 
-    it('should fallback to verify.jar if apksigner is not found', async function () {
+    it('should fail if apksigner is not found', async function () {
       adb.useKeystore = false;
 
       mocks.helpers.expects('getApksignerForOs')
         .throws();
       mocks.helpers.expects('getJavaForOs')
         .returns(javaDummyPath);
-      mocks.teen_process.expects('exec')
-        .withExactArgs(javaDummyPath, ['-jar', path.resolve(helperJarPath, 'verify.jar'), selendroidTestApp])
-        .returns({});
-      (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
+      await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)
+        .should.eventually.be.rejected;
     });
 
     it('should call checkCustomApkCert when using keystore', async function () {
