@@ -119,21 +119,6 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     });
   });
 
-  describe('getKeystoreMd5', function () {
-    it('should call exec with correct args', async function () {
-      let h = 'a-fA-F0-9';
-      let keytool = path.resolve(javaHome, 'bin', 'keytool');
-      let md5Str = ['.*MD5.*((?:[', h, ']{2}:){15}[', h, ']{2})'].join('');
-      let md5 = new RegExp(md5Str, 'mi');
-      adb.useKeystore = true;
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs(keytool, ['-v', '-list', '-alias', keyAlias,
-          '-keystore', keystorePath, '-storepass', password])
-        .returns({});
-      (await adb.getKeystoreMd5(keytool, md5));
-    });
-  });
-
   // Skipping as unable to mock mkdirp, this case is covered in e2e tests for now.
   // TODO: find ways to mock mkdirp
   describe.skip('zipAlignApk', function () {

@@ -15,9 +15,7 @@ describe.skip('ADB To be implemented methods', function () {
   // it('sign', async () => { });
   // it('zipAlignApk', async () => { });
   // it('checkApkCert', async () => { });
-  // it('checkCustomApkCert', async () => { });
-  // it('getKeystoreMd5', async () => { });
-  // it('checkApkKeystoreMatch', async () => { });
+  // it('getKeystoreHash', async () => { });
   // it('getDevicesWithRetry', async () => { });
   // it('getApiLevel', async () => { });
   // it('getEmulatorPort', async () => { });

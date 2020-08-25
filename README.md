@@ -142,8 +142,7 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 - `zipAlignApk`
 - `checkApkCert`
 - `checkCustomApkCert`
-- `getKeystoreMd5`
-- `checkApkKeystoreMatch`
+- `getKeystoreHash`
 - `isAppInstalled`
 - `startApp`
 - `startUri`
