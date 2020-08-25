@@ -58,7 +58,6 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 ### List of methods:
 
 - `createADB`
-- `initJars`
 - `getAdbWithCorrectAdbPath`
 - `initAapt`
 - `initZipAlign`
@@ -143,8 +142,7 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 - `zipAlignApk`
 - `checkApkCert`
 - `checkCustomApkCert`
-- `getKeystoreMd5`
-- `checkApkKeystoreMatch`
+- `getKeystoreHash`
 - `isAppInstalled`
 - `startApp`
 - `startUri`

@@ -42,6 +42,6 @@ describe('Apk-signing', function () {
     adb.keyPassword = 'android';
     adb.tmpDir = tmp;
     (await adb.signWithCustomCert(selendroidTestApp));
-    (await adb.checkCustomApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.true;
+    (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.true;
   });
 });
