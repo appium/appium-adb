@@ -190,13 +190,25 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         .should.eventually.be.rejected;
     });
 
-    it('should call checkCustomApkCert when using keystore', async function () {
+    it('should call getKeystoreHash when using keystore', async function () {
       adb.useKeystore = true;
 
-      mocks.adb.expects('checkCustomApkCert')
-           .once().withExactArgs(selendroidTestApp, selendroidTestAppPackage)
-           .returns('');
-      await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage);
+      mocks.adb.expects('getKeystoreHash')
+        .once().returns({
+          'md5': 'e89b158e4bcf988ebd09eb83f53ccccc',
+          'sha1': '61ed377e85d386a8dfee6b864bdcccccfaa5af81',
+          'sha256': 'a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc',
+        });
+      mocks.helpers.expects('getApksignerForOs')
+        .once().returns(apksignerDummyPath);
+      mocks.adb.expects('executeApksigner')
+        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .returns(`
+          Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
+          Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
+          Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
+      await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage).should.eventually.be.true;
     });
   });
 }));
