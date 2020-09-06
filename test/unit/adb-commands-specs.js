@@ -624,9 +624,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('getNameByPid', function () {
       it('should get package name from valid ps output', async function () {
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['ps'])
-          .returns(`
+        mocks.adb.expects('listProcessStatus')
+          .once().returns(`
           USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
           radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
           radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
@@ -653,9 +652,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.getNameByPid('bla').should.eventually.be.rejectedWith(/valid number/);
       });
       it('should fail if no PID could be found in ps output', async function () {
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['ps'])
-          .returns(`
+        mocks.adb.expects('listProcessStatus')
+          .once().returns(`
           USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
           u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
           `);
@@ -700,9 +698,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       it('should fall back to ps if pidof is not available', async function () {
         adb._isPidofAvailable = false;
         adb._isPgrepAvailable = false;
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['ps'])
-          .returns(`
+        mocks.adb.expects('listProcessStatus')
+          .once().returns(`
           USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
           radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
           radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
@@ -728,9 +725,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       it('should fall back to ps and return empty list if no processes were found', async function () {
         adb._isPidofAvailable = false;
         adb._isPgrepAvailable = false;
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['ps'])
-          .returns(`
+        mocks.adb.expects('listProcessStatus')
+          .once().returns(`
           USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
           radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
           radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
@@ -744,9 +740,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       it('should properly parse different ps output formats', async function () {
         adb._isPidofAvailable = false;
         adb._isPgrepAvailable = false;
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['ps'])
-          .returns(`
+        mocks.adb.expects('listProcessStatus')
+          .once().returns(`
           USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
           shell        21989 32761    4952   2532 sigsuspend   b2f1d778 S sh
           shell        21992 21989    5568   3016 0            b4396448 R ps
