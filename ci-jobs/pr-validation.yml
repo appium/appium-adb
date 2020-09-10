@@ -2,7 +2,7 @@
 jobs:
   - template: templates/android-e2e-template.yml
     parameters:
-      name: sdk29_e2e_tests
+      name: sdk30_e2e_tests
       PLATFORM_VERSION: 11.0
       ANDROID_SDK_VERSION: 30
   - template: templates/android-e2e-template.yml
