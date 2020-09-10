@@ -25,6 +25,8 @@ jobs:
       displayName: Install Node dependencies
     - script: adb logcat > logcat.txt &
       displayName: Capture Logcat
+    - script: $ANDROID_HOME/tools/bin/sdkmanager --list
+      displayName: List system images
     - script: bash ci-jobs/scripts/start-emulator.sh
       displayName: Create and run Emulator
     - script: npm run build

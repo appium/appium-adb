@@ -12,6 +12,8 @@ const API_LEVEL_MAP = {
   8.0: '26',
   8.1: '27',
   9: '28',
+  10: '29',
+  11: '30',
 };
 
 const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
