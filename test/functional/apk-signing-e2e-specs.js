@@ -21,7 +21,7 @@ describe('Apk-signing', function () {
   before(async function () {
     adb = await ADB.createADB();
   });
-  it('checkApkCert should return false for unsigned apk', async function () {
+  it.only('checkApkCert should return false for unsigned apk', async function () {
     await unsignApk(selendroidTestApp);
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.false;
   });

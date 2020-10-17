@@ -20,3 +20,4 @@ coverage-e2e
 package-lock.json*
 .DS_Store
 bugreport-*
+test-results.xml

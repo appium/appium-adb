@@ -5,7 +5,8 @@ parameters:
   MOCHA_FILE: 'sdk-$(ANDROID_SDK_VERSION)-test-results.xml'
   NODE_VERSION: 10.x
   PLATFORM_VERSION: 9.0
-
+  ANDROID_ARCH: x86
+  ANDROID_DISTRO: google_apis
 jobs:
   - job: ${{ parameters.name }}
     pool:
@@ -17,6 +18,7 @@ jobs:
       MOCHA_FILE: ${{ parameters.MOCHA_FILE }}
       ANDROID_SDK_VERSION: ${{ parameters.ANDROID_SDK_VERSION }}
       PLATFORM_VERSION: ${{ parameters.PLATFORM_VERSION }}
+      ANDROID_ARCH: ${{ parameters.ANDROID_ARCH }}
     steps:
     - task: NodeTool@0
       inputs:

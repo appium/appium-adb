@@ -17,6 +17,7 @@ const expect = chai.expect;
 const DEFAULT_IMES = [
   'com.android.inputmethod.latin/.LatinIME',
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+  'com.google.android.googlequicksearchbox/com.google.android.voicesearch.ime.VoiceInputMethodService',
   'io.appium.android.ime/.UnicodeIME',
 ];
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
@@ -77,7 +78,7 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, grantPermission: true});
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
     await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
@@ -86,7 +87,7 @@ describe('adb commands', function () {
     });
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, grantPermission: true});
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
@@ -208,7 +209,7 @@ describe('adb commands', function () {
     it('should install and grant all permission', async function () {
       let apiDemos = path.resolve(rootDir, 'test',
           'fixtures', 'ApiDemos-debug.apk');
-      await adb.install(apiDemos, {timeout: androidInstallTimeout});
+      await adb.install(apiDemos, {timeout: androidInstallTimeout, grantPermission: true});
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
       await adb.grantAllPermissions('io.appium.android.apis');
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
