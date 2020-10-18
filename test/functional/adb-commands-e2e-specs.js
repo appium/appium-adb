@@ -23,6 +23,7 @@ const DEFAULT_IMES = [
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
+const START_APP_WAIT_DURATION = 60000;
 
 
 describe('adb commands', function () {
@@ -77,9 +78,13 @@ describe('adb commands', function () {
   it('getPIDsByName should return pids', async function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
-  it.only('killProcessesByName should kill process', async function () {
+  it('killProcessesByName should kill process', async function () {
     await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.startApp({
+      pkg: CONTACT_MANAGER_PKG,
+      activity: CONTACT_MANAGER_ACTIVITY,
+      waitDuration: START_APP_WAIT_DURATION
+    });
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
     await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
       waitMs: 5000,
@@ -88,7 +93,11 @@ describe('adb commands', function () {
   });
   it('killProcessByPID should kill process', async function () {
     await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.startApp({
+      pkg: CONTACT_MANAGER_PKG,
+      activity: CONTACT_MANAGER_ACTIVITY,
+      waitDuration: START_APP_WAIT_DURATION
+    });
     let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
     await adb.killProcessByPID(pids[0]);
