@@ -11,7 +11,7 @@ import apksUtilsMethods from '../../lib/tools/apks-utils';
 
 chai.use(chaiAsPromised);
 const should = chai.should(),
-      pkg = 'com.example.android.contactmanager',
+      pkg = 'com.saucelabs.ContactManager',
       uri = 'content://contacts/people/1',
       act = '.ContactManager',
       startAppOptions = {
@@ -128,7 +128,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
                  'ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
       mocks.adb.expects('dumpWindows')
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
-                 'ActivityRecord{2c7c4318 u0 com.example.android.contactmanager/.ContactManager t181}}}');
+                 'ActivityRecord{2c7c4318 u0 com.saucelabs.ContactManager/.ContactManager t181}}}');
 
       await adb.waitForActivityOrNot(pkg, act, false);
     });
@@ -226,9 +226,9 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       mocks.adb.expects('dumpWindows')
         .atLeast(1)
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
-                 `ActivityRecord{2 u com.example.android.supermanager/.SuperManager t181}}}`);
+                 `ActivityRecord{2 u com.saucelabs.supermanager/.SuperManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.example.android.supermanager', `${pkg}.*`, false, 1000)
+      await adb.waitForActivityOrNot('com.saucelabs.supermanager', `${pkg}.*`, false, 1000)
         .should.eventually.be.rejected;
     });
     it('should be able to get an activity that is an inner class', async function () {
@@ -245,15 +245,15 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.android.settings/.ContactManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      await adb.waitForActivityOrNot('com.android.settings,com.saucelabs.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get first activity from second package in a comma-separated list of packages + activities', async function () {
       mocks.adb.expects('dumpWindows')
         .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
-          `ActivityRecord{2 u com.example.android.supermanager/.ContactManager t181}}}`);
+          `ActivityRecord{2 u com.saucelabs.supermanager/.ContactManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      await adb.waitForActivityOrNot('com.android.settings,com.saucelabs.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get second activity from first package in a comma-separated list of packages + activities', async function () {
       mocks.adb.expects('dumpWindows')
@@ -261,15 +261,15 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.android.settings/.OtherManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      await adb.waitForActivityOrNot('com.android.settings,com.saucelabs.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should be able to get second activity from second package in a comma-separated list of packages', async function () {
       mocks.adb.expects('dumpWindows')
         .once()
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
-          `ActivityRecord{2 u com.example.android.supermanager/.OtherManager t181}}}`);
+          `ActivityRecord{2 u com.saucelabs.supermanager/.OtherManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager,.OtherManager', false);
+      await adb.waitForActivityOrNot('com.android.settings,com.saucelabs.supermanager', '.ContactManager,.OtherManager', false);
     });
     it('should fail to get activity when focused activity matches none of the provided list of packages', async function () {
       mocks.adb.expects('dumpWindows')
@@ -277,7 +277,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` +
           `ActivityRecord{2 u com.otherpackage/.ContactManager t181}}}`);
 
-      await adb.waitForActivityOrNot('com.android.settings,com.example.android.supermanager', '.ContactManager, .OtherManager', false, 1000)
+      await adb.waitForActivityOrNot('com.android.settings,com.saucelabs.supermanager', '.ContactManager, .OtherManager', false, 1000)
         .should.eventually.be.rejected;
     });
   });
