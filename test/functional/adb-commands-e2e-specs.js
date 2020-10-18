@@ -77,7 +77,7 @@ describe('adb commands', function () {
   it('getPIDsByName should return pids', async function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
-  it('killProcessesByName should kill process', async function () {
+  it.only('killProcessesByName should kill process', async function () {
     await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, grantPermission: true});
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
