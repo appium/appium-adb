@@ -270,9 +270,9 @@ describe('adb commands', function () {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
-      const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+      const BUG_REPORT_TIMEOUT = 4 * 60 * 1000; // 4 minutes
       this.timeout(BUG_REPORT_TIMEOUT);
-      (await adb.bugreport()).should.be.a('string');
+      (await adb.bugreport(BUG_REPORT_TIMEOUT)).should.be.a('string');
     });
   });
 
