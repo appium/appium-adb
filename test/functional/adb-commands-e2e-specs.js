@@ -23,14 +23,14 @@ const DEFAULT_IMES = [
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
-const START_APP_WAIT_DURATION = 120000;
+const START_APP_WAIT_DURATION = 240000;
 
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  const androidInstallTimeout = 270000;
+  const androidInstallTimeout = 540000;
   before(async function () {
     adb = await ADB.createADB({ adbExecTimeout: 120000 });
   });
