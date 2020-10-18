@@ -23,7 +23,7 @@ const DEFAULT_IMES = [
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
-const START_APP_WAIT_DURATION = 60000;
+const START_APP_WAIT_DURATION = 120000;
 
 
 describe('adb commands', function () {
