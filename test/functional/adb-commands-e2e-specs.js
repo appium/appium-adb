@@ -17,20 +17,22 @@ const expect = chai.expect;
 const DEFAULT_IMES = [
   'com.android.inputmethod.latin/.LatinIME',
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
+  'com.google.android.googlequicksearchbox/com.google.android.voicesearch.ime.VoiceInputMethodService',
   'io.appium.android.ime/.UnicodeIME',
 ];
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
+const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
+const START_APP_WAIT_DURATION = 240000;
 
 
 describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  const androidInstallTimeout = 90000;
+  const androidInstallTimeout = 540000;
   before(async function () {
-    adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    adb = await ADB.createADB({ adbExecTimeout: 120000 });
   });
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
@@ -77,8 +79,12 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
+    await adb.startApp({
+      pkg: CONTACT_MANAGER_PKG,
+      activity: CONTACT_MANAGER_ACTIVITY,
+      waitDuration: START_APP_WAIT_DURATION
+    });
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
     await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
       waitMs: 5000,
@@ -86,8 +92,12 @@ describe('adb commands', function () {
     });
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
+    await adb.startApp({
+      pkg: CONTACT_MANAGER_PKG,
+      activity: CONTACT_MANAGER_ACTIVITY,
+      waitDuration: START_APP_WAIT_DURATION
+    });
     let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
     await adb.killProcessByPID(pids[0]);
@@ -208,7 +218,7 @@ describe('adb commands', function () {
     it('should install and grant all permission', async function () {
       let apiDemos = path.resolve(rootDir, 'test',
           'fixtures', 'ApiDemos-debug.apk');
-      await adb.install(apiDemos, {timeout: androidInstallTimeout});
+      await adb.install(apiDemos, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
       await adb.grantAllPermissions('io.appium.android.apis');
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
@@ -269,9 +279,9 @@ describe('adb commands', function () {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }
-      const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+      const BUG_REPORT_TIMEOUT = 4 * 60 * 1000; // 4 minutes
       this.timeout(BUG_REPORT_TIMEOUT);
-      (await adb.bugreport()).should.be.a('string');
+      (await adb.bugreport(BUG_REPORT_TIMEOUT)).should.be.a('string');
     });
   });
 

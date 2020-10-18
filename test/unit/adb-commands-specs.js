@@ -30,7 +30,7 @@ const apiLevel = 21,
       enabled=true exported=true processName=com.android.inputmethod.latin
       permission=android.permission.BIND_INPUT_METHOD
       flags=0x0`,
-      contactManagerPackage = 'com.example.android.contactmanager',
+      contactManagerPackage = 'com.saucelabs.ContactManager',
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
       screenSize = `768x1280`;
