@@ -15,7 +15,7 @@ const keyAlias = 'appiumtest';
 
 chai.use(chaiAsPromised);
 
-describe('Apk-signing', function () {
+describe.only('Apk-signing', function () {
   let adb;
 
   before(async function () {
