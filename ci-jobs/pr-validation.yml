@@ -19,6 +19,7 @@ jobs:
       name: sdk28_e2e_tests
       PLATFORM_VERSION: 9.0
       ANDROID_SDK_VERSION: 28
+      ANDROID_ARCH: x86_64
   - template: templates/android-e2e-template.yml
     parameters:
       name: sdk25_e2e_tests
