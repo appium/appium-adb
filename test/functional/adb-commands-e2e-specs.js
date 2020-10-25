@@ -292,4 +292,14 @@ describe('adb commands', function () {
       _.isBoolean(await adb.isIncrementalInstallSupported()).should.be.true;
     });
   });
+
+  describe('addToDeviceIdleWhitelist', function () {
+    it('should add package to the whitelist', async function () {
+      await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+      if (await adb.addToDeviceIdleWhitelist(CONTACT_MANAGER_PKG)) {
+        const pkgList = await adb.getDeviceIdleWhitelist();
+        pkgList.some((item) => item.includes(CONTACT_MANAGER_PKG)).should.be.true;
+      }
+    });
+  });
 });
