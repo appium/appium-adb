@@ -21,7 +21,7 @@ const DEFAULT_IMES = [
   'io.appium.android.ime/.UnicodeIME',
 ];
 const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
 const START_APP_WAIT_DURATION = 240000;
 
@@ -79,7 +79,7 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, grantPermissions: true});
     await adb.startApp({
       pkg: CONTACT_MANAGER_PKG,
       activity: CONTACT_MANAGER_ACTIVITY,
@@ -92,7 +92,7 @@ describe('adb commands', function () {
     });
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, allowTestPackages: true, grantPermissions: true});
+    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout, grantPermissions: true});
     await adb.startApp({
       pkg: CONTACT_MANAGER_PKG,
       activity: CONTACT_MANAGER_ACTIVITY,

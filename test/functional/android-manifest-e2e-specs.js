@@ -23,7 +23,7 @@ describe('Android-manifest', function () {
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
-    apkPackage.should.equal('com.saucelabs.ContactManager');
+    apkPackage.should.equal('com.example.android.contactmanager');
     apkActivity.endsWith('.ContactManager').should.be.true;
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
@@ -36,9 +36,9 @@ describe('Android-manifest', function () {
   });
   // TODO fix this test
   it.skip('should compile and insert manifest', async function () {
-    let appPackage = 'com.saucelabs.ContactManager',
+    let appPackage = 'com.example.android.contactmanager',
         newServerPath = path.resolve(tmpDir, `selendroid.${appPackage}.apk`),
-        newPackage = 'com.saucelabs.ContactManager.selendroid',
+        newPackage = 'com.example.android.contactmanager.selendroid',
         dstDir = path.resolve(tmpDir, appPackage),
         dstManifest = path.resolve(dstDir, 'AndroidManifest.xml');
     // deleting temp directory if present
