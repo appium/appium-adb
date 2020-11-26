@@ -1,22 +1,51 @@
-# https://docs.microsoft.com/azure/devops/pipelines/languages/android
-jobs:
-  - template: templates/android-e2e-template.yml
-    parameters:
-      name: sdk29_e2e_tests
-      PLATFORM_VERSION: 9.0
-      ANDROID_SDK_VERSION: 28
-  - template: templates/android-e2e-template.yml
-    parameters:
-      name: sdk28_e2e_tests
-      PLATFORM_VERSION: 9.0
-      ANDROID_SDK_VERSION: 28
-  - template: templates/android-e2e-template.yml
-    parameters:
-      name: sdk25_e2e_tests
-      PLATFORM_VERSION: 7.1
-      ANDROID_SDK_VERSION: 25
-  - template: templates/android-e2e-template.yml
-    parameters:
-      name: sdk22_e2e_tests
-      PLATFORM_VERSION: 5.1
-      ANDROID_SDK_VERSION: 22
+variables:
+  NODE_VERSION: 12.x
+  _FORCE_LOGS: 1
+  CI: true
+
+
+parameters:
+- name: integrationJobs
+  type: object
+  default:
+  - name: sdk30_e2e_tests
+    platformVersion: 10.0
+    sdkVersion: 30
+  - name: sdk28_e2e_tests
+    platformVersion: 9.0
+    sdkVersion: 28
+  - name: sdk25_e2e_tests
+    platformVersion: 7.1
+    sdkVersion: 25
+  - name: sdk22_e2e_tests
+    platformVersion: 5.1
+    sdkVersion: 22
+
+
+stages:
+- stage: Unit_Tests_And_Linters
+  jobs:
+  - job: Unit_Tests
+    pool:
+      vmImage: ubuntu-20.04
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: $(NODE_VERSION)
+    - script: npm install
+      displayName: Install Node dependencies
+    - script: npm run lint
+      displayName: Linter
+    - script: npx mocha --recursive build/test/unit/ -g @skip-ci -i --exit
+      env:
+        JAVA_HOME: $(JAVA_HOME_11_X64)
+        PATH: $(JAVA_HOME_11_X64)/bin:$(PATH)
+      displayName: Tests
+- stage: Integration_Tests
+  jobs:
+  - ${{ each job in parameters.integrationJobs }}:
+    - template: templates/android-e2e-template.yml
+      parameters:
+        name: ${{ job.name }}
+        platformVersion: ${{ job.platformVersion }}
+        sdkVersion: ${{ job.sdkVersion }}

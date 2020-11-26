@@ -17,9 +17,9 @@ const API_LEVEL_MAP = {
 const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
 const platformVersion = process.env.PLATFORM_VERSION || 4.3;
 
-let apiLevel = process.env.API_LEVEL ||
-               API_LEVEL_MAP[parseFloat(platformVersion)];
-apiLevel = parseInt(apiLevel, 10);
+const apiLevel = parseInt(process.env.ANDROID_SDK_VERSION
+  || process.env.API_LEVEL
+  || API_LEVEL_MAP[platformVersion], 10);
 
 const MOCHA_TIMEOUT = process.env.TRAVIS ? 240000 : 60000;
 const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
