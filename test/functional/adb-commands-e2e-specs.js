@@ -77,7 +77,10 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.install(CONTACT_MANAGER_PATH, {
+      timeout: androidInstallTimeout,
+      grantPermissions: true,
+    });
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     await adb.killProcessesByName(CONTACT_MANAGER_PKG);
     await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
@@ -86,7 +89,10 @@ describe('adb commands', function () {
     });
   });
   it('killProcessByPID should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+    await adb.install(CONTACT_MANAGER_PATH, {
+      timeout: androidInstallTimeout,
+      grantPermissions: true,
+    });
     await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
     let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
     pids.should.have.length.above(0);
@@ -265,7 +271,7 @@ describe('adb commands', function () {
 
   describe('bugreport', function () {
     it('should return the report as a raw string', async function () {
-      if (process.env.TRAVIS) {
+      if (process.env.CI) {
         // skip the test on CI, since it takes a lot of time
         return this.skip;
       }

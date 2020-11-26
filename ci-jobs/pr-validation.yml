@@ -9,7 +9,7 @@ parameters:
   type: object
   default:
   - name: sdk30_e2e_tests
-    platformVersion: 10.0
+    platformVersion: 11.0
     sdkVersion: 30
     emuTag: google_apis
   - name: sdk28_e2e_tests
