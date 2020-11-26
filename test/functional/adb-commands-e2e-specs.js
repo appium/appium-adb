@@ -64,10 +64,6 @@ describe('adb commands', function () {
     (await adb.enabledIMEs()).should.include(ime);
   });
   it('processExists should be able to find ui process', async function () {
-    if (process.env.TRAVIS) {
-      // This test is unstable on Travis
-      return this.skip();
-    }
     (await adb.processExists('com.android.systemui')).should.be.true;
   });
   it('ping should return true', async function () {
@@ -77,6 +73,10 @@ describe('adb commands', function () {
     (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
   });
   it('killProcessesByName should kill process', async function () {
+    if (process.env.CI) {
+      this.retries(2);
+    }
+
     await adb.install(CONTACT_MANAGER_PATH, {
       timeout: androidInstallTimeout,
       grantPermissions: true,
@@ -103,8 +103,9 @@ describe('adb commands', function () {
     });
   });
   it('should get device language and country', async function () {
-    if (parseInt(apiLevel, 10) >= 23) return this.skip(); // eslint-disable-line curly
-    if (process.env.TRAVIS || process.env.CI) return this.skip(); // eslint-disable-line curly
+    if (parseInt(apiLevel, 10) >= 23 || process.env.CI) {
+      return this.skip();
+    }
 
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
