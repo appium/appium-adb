@@ -2,31 +2,31 @@
 parameters:
   name: 'android_e2e_tests'
   vmImage: 'macOS-10.15'
-  MOCHA_FILE: 'sdk-$(ANDROID_SDK_VERSION)-test-results.xml'
-  NODE_VERSION: 10.x
-  PLATFORM_VERSION: 9.0
+  sdkVersion: 28
+  platformVersion: 9.0
+  emuTag: default
 
 jobs:
   - job: ${{ parameters.name }}
     pool:
       vmImage: ${{ parameters.vmImage }}
     variables:
-      CI: true
       TERM: dumb
       ANDROID_AVD: testemulator
-      MOCHA_FILE: ${{ parameters.MOCHA_FILE }}
-      ANDROID_SDK_VERSION: ${{ parameters.ANDROID_SDK_VERSION }}
-      PLATFORM_VERSION: ${{ parameters.PLATFORM_VERSION }}
+      MOCHA_FILE: "sdk-${{ parameters.sdkVersion }}-test-results.xml"
+      ANDROID_SDK_VERSION: ${{ parameters.sdkVersion }}
+      PLATFORM_VERSION: ${{ parameters.platformVersion }}
+      EMU_TAG: ${{ parameters.emuTag }}
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: ${{ parameters.NODE_VERSION }}
+        versionSpec: $(NODE_VERSION)
     - script: npm install
       displayName: Install Node dependencies
-    - script: adb logcat > logcat.txt &
-      displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
       displayName: Create and run Emulator
+    - script: nohup adb logcat > logcat.txt &
+      displayName: Capture Logcat
     - script: npm run build
       displayName: Build
     - script: npx mocha --timeout 6000000 --reporter mocha-multi-reporters --reporter-options configFile=./ci-jobs/mocha-config.json --recursive build/test/functional/ -g @skip-ci -i --exit
@@ -38,7 +38,7 @@ jobs:
       condition: always()
       displayName: Publish Test Results
       inputs:
-        testResultsFiles: ${{ parameters.MOCHA_FILE }}
+        testResultsFiles: $(MOCHA_FILE)
     - task: PublishPipelineArtifact@0
       condition: always()
       displayName: Publish Logcat to Artifacts
