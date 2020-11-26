@@ -50,7 +50,7 @@ describe('apk utils', function () {
   });
   describe('startUri', function () {
     it('should be able to start a uri', async function () {
-      if (apiLevel < 23) {
+      if (apiLevel < 23 || apiLevel > 28) {
         return this.skip();
       }
       await adb.goToHome();

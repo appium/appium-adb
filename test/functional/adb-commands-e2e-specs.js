@@ -110,7 +110,9 @@ describe('adb commands', function () {
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
   it('should get device locale', async function () {
-    if (parseInt(apiLevel, 10) < 23) return this.skip(); // eslint-disable-line curly
+    if (parseInt(apiLevel, 10) < 23 || parseInt(apiLevel, 10) > 28) {
+      return this.skip();
+    }
 
     await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
     ['us', 'en', 'ca_en', 'en-US'].should.contain(await adb.getDeviceLocale());
