@@ -11,15 +11,19 @@ parameters:
   - name: sdk30_e2e_tests
     platformVersion: 10.0
     sdkVersion: 30
+    emuTag: google_apis
   - name: sdk28_e2e_tests
     platformVersion: 9.0
     sdkVersion: 28
+    emuTag: default
   - name: sdk25_e2e_tests
     platformVersion: 7.1
     sdkVersion: 25
+    emuTag: default
   - name: sdk22_e2e_tests
     platformVersion: 5.1
     sdkVersion: 22
+    emuTag: default
 
 
 stages:
@@ -49,3 +53,4 @@ stages:
         name: ${{ job.name }}
         platformVersion: ${{ job.platformVersion }}
         sdkVersion: ${{ job.sdkVersion }}
+        emuTag: ${{ job.emuTag }}

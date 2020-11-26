@@ -4,6 +4,7 @@ parameters:
   vmImage: 'macOS-10.15'
   sdkVersion: 28
   platformVersion: 9.0
+  emuTag: default
 
 jobs:
   - job: ${{ parameters.name }}
@@ -15,16 +16,17 @@ jobs:
       MOCHA_FILE: "sdk-${{ parameters.sdkVersion }}-test-results.xml"
       ANDROID_SDK_VERSION: ${{ parameters.sdkVersion }}
       PLATFORM_VERSION: ${{ parameters.platformVersion }}
+      EMU_TAG: ${{ parameters.emuTag }}
     steps:
     - task: NodeTool@0
       inputs:
         versionSpec: $(NODE_VERSION)
     - script: npm install
       displayName: Install Node dependencies
-    - script: adb logcat > logcat.txt &
-      displayName: Capture Logcat
     - script: bash ci-jobs/scripts/start-emulator.sh
       displayName: Create and run Emulator
+    - script: nohup adb logcat > logcat.txt &
+      displayName: Capture Logcat
     - script: npm run build
       displayName: Build
     - script: npx mocha --timeout 6000000 --reporter mocha-multi-reporters --reporter-options configFile=./ci-jobs/mocha-config.json --recursive build/test/functional/ -g @skip-ci -i --exit
