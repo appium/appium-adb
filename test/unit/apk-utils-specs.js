@@ -1023,10 +1023,5 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         partialInstall: true
       });
     });
-
-    it('should raise an error if no valid apks', async function () {
-      mocks.adb.expects('getApiLevel').once().returns(28);
-      await adb.installMultipleApks([], {}).should.eventually.be.rejected;
-    });
   });
 }));
