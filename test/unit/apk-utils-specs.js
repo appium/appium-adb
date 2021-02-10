@@ -1006,12 +1006,21 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should call adbExec with an apk and options', async function () {
       mocks.adb.expects('getApiLevel').once().returns(28);
       mocks.adb.expects('adbExec').withArgs([
-        'install-multiple', '-r', '/dummy/apk.apk'
+        'install-multiple',
+        '-r', '-t', '-s', '-g', '-p',
+        '/dummy/apk.apk'
       ], {
-        timeout: 60, timeoutCapName: 'androidInstallTimeout'
+        timeout: 60,
+        timeoutCapName: 'androidInstallTimeout',
       }).once();
       await adb.installMultipleApks(['/dummy/apk.apk'], {
-        timeout: 60, timeoutCapName: 'androidInstallTimeout'
+        timeout: 60,
+        timeoutCapName: 'androidInstallTimeout',
+        grantPermissions: true,
+        useSdcard: true,
+        allowTestPackages: true,
+        replace: true,
+        partialInstall: true
       });
     });
 
