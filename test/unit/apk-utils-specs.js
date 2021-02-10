@@ -982,4 +982,46 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
     });
   });
+  describe('installMultipleApks', function () {
+    it('should call adbExec with an apk', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(28);
+      mocks.adb.expects('adbExec').withArgs([
+        'install-multiple', '-r', '/dummy/apk.apk'
+      ], {
+        timeout: undefined, timeoutCapName: undefined
+      }).once();
+      await adb.installMultipleApks(['/dummy/apk.apk'], {});
+    });
+
+    it('should call adbExec with two apks', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(28);
+      mocks.adb.expects('adbExec').withArgs([
+        'install-multiple', '-r', '/dummy/apk.apk', '/dummy/apk2.apk'
+      ], {
+        timeout: undefined, timeoutCapName: undefined
+      }).once();
+      await adb.installMultipleApks(['/dummy/apk.apk', '/dummy/apk2.apk'], {});
+    });
+
+    it('should call adbExec with an apk and options', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(28);
+      mocks.adb.expects('adbExec').withArgs([
+        'install-multiple',
+        '-r', '-t', '-s', '-g', '-p',
+        '/dummy/apk.apk'
+      ], {
+        timeout: 60,
+        timeoutCapName: 'androidInstallTimeout',
+      }).once();
+      await adb.installMultipleApks(['/dummy/apk.apk'], {
+        timeout: 60,
+        timeoutCapName: 'androidInstallTimeout',
+        grantPermissions: true,
+        useSdcard: true,
+        allowTestPackages: true,
+        replace: true,
+        partialInstall: true
+      });
+    });
+  });
 }));
