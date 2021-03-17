@@ -60,12 +60,28 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
+    it('should assume that screen is locked if NotificationShade is active', async function () {
+      let dumpsys = 'mCurrentFocus=Window{4bdb8b5 u0 NotificationShade}';
+      (await isShowingLockscreen(dumpsys)).should.be.true;
+    });
+    it('should assume that screen is locked if StatusBar is active', async function () {
+      let dumpsys = 'mCurrentFocus=Window{4bdb8b5 u0 StatusBar}';
+      (await isShowingLockscreen(dumpsys)).should.be.true;
+    });
     it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
     it('should assume that screen is unlocked if can not determine lock state', async function () {
       let dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+    it('should assume that screen is unlocked if mCurrentFocus is another activity', async function () {
+      let dumpsys = 'mCurrentFocus=Window{8b4bb70 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}';
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+    it('should assume that screen is unlocked if mCurrentFocus is another activity', async function () {
+      let dumpsys = 'mCurrentFocus=Window{8b4bb70 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
   });
