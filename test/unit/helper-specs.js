@@ -60,12 +60,17 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
-    it('should assume that screen is locked if NotificationShade is active', async function () {
-      let dumpsys = 'mCurrentFocus=Window{4bdb8b5 u0 NotificationShade}';
-      (await isShowingLockscreen(dumpsys)).should.be.true;
-    });
-    it('should assume that screen is locked if StatusBar is active', async function () {
-      let dumpsys = 'mCurrentFocus=Window{4bdb8b5 u0 StatusBar}';
+    it('should assume that screen is locked if keyguard is unlocked', async function () {
+      let dumpsys = `
+      KeyguardServiceDelegate
+      ....
+        KeyguardStateMonitor
+          mIsShowing=false
+          mSimSecure=false
+          mInputRestricted=false
+          mCurrentUserId=0
+          ...
+      `;
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
     it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
@@ -77,11 +82,16 @@ describe('helpers', withMocks({fs}, function (mocks) {
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
     it('should assume that screen is unlocked if mCurrentFocus is another activity', async function () {
-      let dumpsys = 'mCurrentFocus=Window{8b4bb70 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}';
-      (await isShowingLockscreen(dumpsys)).should.be.false;
-    });
-    it('should assume that screen is unlocked if mCurrentFocus is another activity', async function () {
-      let dumpsys = 'mCurrentFocus=Window{8b4bb70 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}';
+      let dumpsys = `
+      KeyguardServiceDelegate
+      ....
+        KeyguardStateMonitor
+          mIsShowing=true
+          mSimSecure=false
+          mInputRestricted=true
+          mCurrentUserId=0
+          ...
+      `;
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
   });
