@@ -81,7 +81,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
-    it('should assume that screen is unlocked if mCurrentFocus is another activity', async function () {
+    it('should assume that screen is unlocked if mInputRestricted and mIsShowing were true', async function () {
       let dumpsys = `
       KeyguardServiceDelegate
       ....
@@ -89,6 +89,19 @@ describe('helpers', withMocks({fs}, function (mocks) {
           mIsShowing=true
           mSimSecure=false
           mInputRestricted=true
+          mCurrentUserId=0
+          ...
+      `;
+      (await isShowingLockscreen(dumpsys)).should.be.false;
+    });
+    it('should assume that screen is unlocked if mIsShowing was true', async function () {
+      let dumpsys = `
+      KeyguardServiceDelegate
+      ....
+        KeyguardStateMonitor
+          mIsShowing=true
+          mSimSecure=false
+          mInputRestricted=false
           mCurrentUserId=0
           ...
       `;
