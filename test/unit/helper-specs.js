@@ -60,12 +60,12 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.true;
     });
-    it('should assume that screen is locked if keyguard is unlocked', async function () {
+    it('should assume that screen is locked if keyguard is shown', async function () {
       let dumpsys = `
       KeyguardServiceDelegate
       ....
         KeyguardStateMonitor
-          mIsShowing=false
+          mIsShowing=true
           mSimSecure=false
           mInputRestricted=false
           mCurrentUserId=0
@@ -81,7 +81,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
       let dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
       (await isShowingLockscreen(dumpsys)).should.be.false;
     });
-    it('should assume that screen is unlocked if mInputRestricted and mIsShowing were true', async function () {
+    it('should assume that screen is locked if mInputRestricted and mIsShowing were true', async function () {
       let dumpsys = `
       KeyguardServiceDelegate
       ....
@@ -92,14 +92,14 @@ describe('helpers', withMocks({fs}, function (mocks) {
           mCurrentUserId=0
           ...
       `;
-      (await isShowingLockscreen(dumpsys)).should.be.false;
+      (await isShowingLockscreen(dumpsys)).should.be.true;
     });
-    it('should assume that screen is unlocked if mIsShowing was true', async function () {
+    it('should assume that screen is unlocked if mIsShowing was false', async function () {
       let dumpsys = `
       KeyguardServiceDelegate
       ....
         KeyguardStateMonitor
-          mIsShowing=true
+          mIsShowing=false
           mSimSecure=false
           mInputRestricted=false
           mCurrentUserId=0
