@@ -143,6 +143,11 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
   });
 
   describe('checkApkCert', function () {
+    beforeEach(function () {
+      mocks.fs.expects('hash')
+        .returns(Math.random().toString(36));
+    });
+
     it('should return false for apk not present', async function () {
       (await adb.checkApkCert('dummyPath', 'dummyPackage')).should.be.false;
     });
