@@ -151,6 +151,28 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     let size = await adb.fileSize(remotePath);
     size.should.eql(39571);
   });
+  describe('shell outputFormat option', function () {
+    beforeEach(function () {
+      mocks.teen_process.expects('exec')
+      .once()
+      .returns({stdout: 'a value', stderr: 'an error', code: 0});
+    });
+    it('should default to stdout', async function () {
+      mocks.teen_process.expects('exec')
+        .once()
+        .returns({stdout: 'a value', stderr: 'an error', code: 0});
+      let output = await adb.shell(['command']);
+      output.should.equal('a value');
+    });
+    it('should output only stdout when set', async function () {
+      let output = await adb.shell(['command'], {outputFormat: 'stdout'});
+      output.should.equal('a value');
+    });
+    it('should return full output when set', async function () {
+      let output = await adb.shell(['command'], {outputFormat: 'full'});
+      output.should.deep.equal({stdout: 'a value', stderr: 'an error', code: 0});
+    });
+  });
   describe('reboot', function () {
     it('should call stop and start using shell', async function () {
       mocks.adb.expects('shell')
