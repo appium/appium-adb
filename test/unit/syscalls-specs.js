@@ -158,9 +158,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       .returns({stdout: 'a value', stderr: 'an error', code: 0});
     });
     it('should default to stdout', async function () {
-      mocks.teen_process.expects('exec')
-        .once()
-        .returns({stdout: 'a value', stderr: 'an error', code: 0});
+
       let output = await adb.shell(['command']);
       output.should.equal('a value');
     });
