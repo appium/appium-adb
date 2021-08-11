@@ -167,7 +167,7 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
     });
     it('should return full output when set', async function () {
       let output = await adb.shell(['command'], {outputFormat: 'full'});
-      output.should.deep.equal({stdout: 'a value', stderr: 'an error', code: 0});
+      output.should.deep.equal({stdout: 'a value', stderr: 'an error'});
     });
   });
   describe('reboot', function () {
