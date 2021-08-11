@@ -35,13 +35,13 @@ describe('System calls', function () {
   it('shell should execute command in adb shell ', async function () {
     (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
-  it('shell should output stderr from adb shell with full output', async function () {
+  it('shell should return stderr from adb with full output', async function () {
     let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: 'full'});
+    let outputWithError = apiLevel <= 23 ? fullShellOutput.stdout : fullShellOutput.stderr;
     fullShellOutput.code.should.equal(0);
-    fullShellOutput.stderr.should.contain('Error while accessing provider');
-    fullShellOutput.stdout.should.equal('');
+    outputWithError.should.contain('Error while accessing provider');
   });
-  it('shell should output stdout from adb shell with full output', async function () {
+  it('shell should return stdout from adb shell with full output', async function () {
     let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: 'full'});
     fullShellOutput.code.should.equal(0);
     fullShellOutput.stderr.should.equal('');
