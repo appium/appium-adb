@@ -162,11 +162,11 @@ describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
       output.should.equal('a value');
     });
     it('should output only stdout when set', async function () {
-      let output = await adb.shell(['command'], {outputFormat: 'stdout'});
+      let output = await adb.shell(['command'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.STDOUT});
       output.should.equal('a value');
     });
     it('should return full output when set', async function () {
-      let output = await adb.shell(['command'], {outputFormat: 'full'});
+      let output = await adb.shell(['command'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
       output.should.deep.equal({stdout: 'a value', stderr: 'an error'});
     });
   });

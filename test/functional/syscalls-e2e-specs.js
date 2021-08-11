@@ -37,12 +37,12 @@ describe('System calls', function () {
   });
   it('shell should return stderr from adb with full output', async function () {
     const minStderrApiLevel = 24;
-    let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: 'full'});
+    let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
     let outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
     outputWithError.should.contain('Error while accessing provider');
   });
   it('shell should return stdout from adb shell with full output', async function () {
-    let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: 'full'});
+    let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
     fullShellOutput.stderr.should.equal('');
     fullShellOutput.stdout.should.equal(`${apiLevel}`);
   });
