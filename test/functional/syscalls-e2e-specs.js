@@ -35,6 +35,17 @@ describe('System calls', function () {
   it('shell should execute command in adb shell ', async function () {
     (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
+  it('shell should return stderr from adb with full output', async function () {
+    const minStderrApiLevel = 24;
+    let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
+    let outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
+    outputWithError.should.contain('Error while accessing provider');
+  });
+  it('shell should return stdout from adb shell with full output', async function () {
+    let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
+    fullShellOutput.stderr.should.equal('');
+    fullShellOutput.stdout.should.equal(`${apiLevel}`);
+  });
   it('getConnectedEmulators should get all connected emulators', async function () {
     (await adb.getConnectedEmulators()).length.should.be.above(0);
   });
