@@ -14,8 +14,8 @@ describe('Lock Management', function () {
     }
   });
   it('lock credential cleanup should work', async function () {
-    await adb.clearLockCredentials();
-    await adb.verifyLockCredentials().should.eventually.be.true;
+    await adb.clearLockCredential();
+    await adb.verifyLockCredential().should.eventually.be.true;
     await adb.isLockEnabled().should.eventually.be.false;
   });
 });
