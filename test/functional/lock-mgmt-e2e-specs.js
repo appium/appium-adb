@@ -1,7 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../../lib/adb.js';
-import { waitForCondition } from 'asyncbox';
 
 chai.use(chaiAsPromised);
 
@@ -22,7 +21,6 @@ describe('Lock Management', function () {
 
   describe('Lock and unlock life cycle', function () {
     const password = '1234';
-    const unlockTimeoutMs = 10 * 1000;
 
     before(function () {
       if (process.env.CI) {
@@ -40,20 +38,8 @@ describe('Lock Management', function () {
       await adb.isLockEnabled().should.eventually.be.true;
       await adb.isScreenLocked().should.eventually.be.true;
       await adb.clearLockCredential(password);
-
-      await waitForCondition(
-        async () => {
-          if (!await adb.isScreenLocked()) {
-            return true;
-          }
-
-          await adb.dismissKeyguard();
-          return !(await adb.isScreenLocked());
-        }, {
-          waitMs: unlockTimeoutMs,
-          intervalMs: 1000,
-        }
-      );
+      await adb.cycleWakeUp();
+      await adb.dismissKeyguard();
       await adb.isLockEnabled().should.eventually.be.false;
       await adb.isScreenLocked().should.eventually.be.false;
     });
