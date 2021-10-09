@@ -250,8 +250,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.inputText(text);
       });
       it('should call shell with correct args and select appropriate quotes', async function () {
-        const text = 'some text & with quotes"';
-        const expectedText = `'some%stext%s&%swith%squotes"'`;
+        const text = 'some text & with quote$"';
+        const expectedText = `'some%stext%s&%swith%squote\\$"'`;
         mocks.adb.expects('shell')
           .once().withExactArgs([`input text ${expectedText}`])
           .returns('');
