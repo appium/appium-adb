@@ -233,11 +233,27 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('inputText', function () {
-      it('should call shell with correct args', async function () {
-        let text = 'some text with spaces';
-        let expectedText = 'some%stext%swith%sspaces';
+      it('should call shell with correct args if spaces are present in the text', async function () {
+        const text = 'some text  with spaces';
+        const expectedText = '"some%stext%s%swith%sspaces"';
+        mocks.adb.expects('shell')
+          .once().withExactArgs([`input text ${expectedText}`])
+          .returns('');
+        await adb.inputText(text);
+      });
+      it('should call shell with correct args if special chars are not present in the text', async function () {
+        const text = 'something';
+        const expectedText = `something`;
         mocks.adb.expects('shell')
           .once().withExactArgs(['input', 'text', expectedText])
+          .returns('');
+        await adb.inputText(text);
+      });
+      it('should call shell with correct args and select appropriate quotes', async function () {
+        const text = 'some text & with quote$"';
+        const expectedText = `'some%stext%s&%swith%squote\\$"'`;
+        mocks.adb.expects('shell')
+          .once().withExactArgs([`input text ${expectedText}`])
           .returns('');
         await adb.inputText(text);
       });
