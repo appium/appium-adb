@@ -348,10 +348,10 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
     });
     describe('sensorSet method', function () {
       it('should throw exception on missing sensor name', async function () {
-        await adb.sensorSet('sensor').should.eventually.be.rejectedWith('Unsupported sensor sent');
+        await adb.sensorSet('sensor').should.eventually.be.rejected;
       });
-      it('should throw exception on missing sensor name', async function () {
-        await adb.sensorSet('light').should.eventually.be.rejectedWith('Missing sensor value argument');
+      it('should throw exception on missing sensor value', async function () {
+        await adb.sensorSet('light').should.eventually.be.rejected;
       });
       it('should call adb emu sensor set with the correct values', async function () {
         mocks.adb.expects('isEmulatorConnected')
