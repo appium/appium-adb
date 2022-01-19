@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as teen_process from 'teen_process';
-import { fs } from 'appium-support';
+import { fs } from '@appium/support';
 import ADB from '../..';
 import { withMocks } from 'appium-test-support';
 import _ from 'lodash';

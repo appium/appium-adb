@@ -5,7 +5,7 @@ import {
   parseJsonData, extractMatchingPermissions,
 } from '../../lib/helpers';
 import { withMocks } from 'appium-test-support';
-import { fs } from 'appium-support';
+import { fs } from '@appium/support';
 import path from 'path';
 import _ from 'lodash';
 import chai from 'chai';
