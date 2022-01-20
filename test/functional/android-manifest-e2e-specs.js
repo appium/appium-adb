@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
-import { fs, util } from 'appium-support';
+import { fs, util } from '@appium/support';
 import { rootDir } from '../../lib/helpers.js';
 
 

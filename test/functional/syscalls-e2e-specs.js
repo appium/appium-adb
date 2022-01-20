@@ -4,7 +4,7 @@ import ADB from '../..';
 import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
 import path from 'path';
 import { rootDir } from '../../lib/helpers.js';
-import { fs } from 'appium-support';
+import { fs } from '@appium/support';
 import _ from 'lodash';
 
 const DEFAULT_CERTIFICATE = path.resolve(rootDir, 'keys', 'testkey.x509.pem');

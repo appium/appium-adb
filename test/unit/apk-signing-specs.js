@@ -4,8 +4,8 @@ import ADB from '../..';
 import * as helpers from '../../lib/helpers.js';
 import path from 'path';
 import * as teen_process from 'teen_process';
-import * as appiumSupport from 'appium-support';
-import { withMocks } from 'appium-test-support';
+import * as appiumSupport from '@appium/support';
+import { withMocks } from '@appium/test-support';
 
 
 chai.use(chaiAsPromised);

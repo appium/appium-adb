@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import * as teen_process from 'teen_process';
 import events from 'events';
 import Logcat from '../../lib/logcat';
-import { withMocks } from 'appium-test-support';
+import { withMocks } from '@appium/test-support';
 
 
 chai.use(chaiAsPromised);

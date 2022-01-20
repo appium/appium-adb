@@ -5,7 +5,7 @@ import net from 'net';
 import events from 'events';
 import Logcat from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
-import { withMocks } from 'appium-test-support';
+import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 import { EOL } from 'os';
 

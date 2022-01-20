@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
-import { withMocks } from 'appium-test-support';
+import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 
 chai.use(chaiAsPromised);

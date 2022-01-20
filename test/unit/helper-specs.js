@@ -4,8 +4,8 @@ import {
   parseManifest, parseAaptStrings, parseAapt2Strings,
   parseJsonData, extractMatchingPermissions,
 } from '../../lib/helpers';
-import { withMocks } from 'appium-test-support';
-import { fs } from 'appium-support';
+import { withMocks } from '@appium/test-support';
+import { fs } from '@appium/support';
 import path from 'path';
 import _ from 'lodash';
 import chai from 'chai';
