@@ -3,8 +3,6 @@ appium-adb
 
 [![NPM version](http://img.shields.io/npm/v/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 [![Downloads](http://img.shields.io/npm/dm/appium-adb.svg)](https://npmjs.org/package/appium-adb)
-[![Dependency Status](https://david-dm.org/appium/appium-adb.svg)](https://david-dm.org/appium/appium-adb)
-[![devDependency Status](https://david-dm.org/appium/appium-adb/dev-status.svg)](https://david-dm.org/appium/appium-adb#info=devDependencies)
 
 [![Build Status](https://api.travis-ci.org/appium/appium-adb.png?branch=master)](https://travis-ci.org/appium/appium-adb)
 
