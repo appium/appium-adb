@@ -109,7 +109,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
           '-storepass', password,
           '-keypass', password,
           selendroidTestApp, keyAlias],
-          { shell: appiumSupport.system.isWindows() })
+          { windowsVerbatimArguments: appiumSupport.system.isWindows() })
         .returns({});
       mocks.helpers.expects('getJavaHome')
         .returns(javaHome);
