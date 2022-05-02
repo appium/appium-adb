@@ -71,7 +71,7 @@
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "gulp": "^4.0.0",
-    "mocha": "^9.0.0",
+    "mocha": "^10.0.0",
     "mocha-junit-reporter": "^2.0.0",
     "mocha-multi-reporters": "^1.1.7",
     "pre-commit": "^1.1.3",
