@@ -44,11 +44,11 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
       await adb.getConnectedDevices().should.eventually.be
                                      .rejectedWith('Unexpected output while trying to get devices');
     });
-    it('should get all connected devices with long output', async function () {
+    it('should get all connected devices with verbose output', async function () {
       mocks.teen_process.expects('exec')
         .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices', '-l'])
         .returns({stdout: 'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo'});
-      let devices = await adb.getConnectedDevices({long: true});
+      let devices = await adb.getConnectedDevices({verbose: true});
       devices.should.have.length.above(0);
       devices.should.deep.equal([
         {udid: 'emulator-5556', state: 'device', product: 'sdk_google_phone_x86_64', model: 'Android_SDK_built_for_x86_64', device: 'generic_x86_64'},
