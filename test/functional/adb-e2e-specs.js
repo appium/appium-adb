@@ -37,4 +37,11 @@ describe('ADB', function () {
     await adb.initZipAlign();
     adb.binaries.zipalign.should.contain('zipalign');
   });
+  it('should correctly initialize adb from parent', async function () {
+    let adb = await ADB.createADB();
+    should.exist(adb.executable.path);
+    let clone = adb.cloneADB();
+    should.exist(clone.executable.path);
+    should.be.equal(adb.executable.path, clone.executable.path);
+  });
 });
