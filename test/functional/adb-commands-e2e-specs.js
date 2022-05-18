@@ -290,6 +290,15 @@ describe('adb commands', function () {
     });
   });
 
+  describe('main activity', function () {
+    it('should resolve the name of the main activity', async function () {
+      if (await adb.getApiLevel() < 24) {
+        return this.skip();
+      }
+      (await adb.resolveMainActivity(CONTACT_MANAGER_PKG)).should.not.be.empty;
+    });
+  });
+
   describe('isStreamedInstallSupported', function () {
     it('should return boolean value', async function () {
       _.isBoolean(await adb.isStreamedInstallSupported()).should.be.true;
