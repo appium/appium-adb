@@ -2,7 +2,7 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseManifest, parseAaptStrings, parseAapt2Strings,
-  parseJsonData, extractMatchingPermissions,
+  parseJsonData, extractMatchingPermissions, parseLaunchableActivityName,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
@@ -500,6 +500,66 @@ describe('helpers', withMocks({fs}, function (mocks) {
     it('test runtime permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['runtime'], true);
       per.length.should.eql(1);
+    });
+  });
+
+
+  describe('parseLaunchableActivityName', function () {
+    it('test valid output parsing', function () {
+      const dumpsysOutput = `
+      Activity Resolver Table:
+        Schemes:
+            com.sunpower.elc2:
+              e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity filter a38e087
+                Action: "android.intent.action.VIEW"
+                Category: "android.intent.category.DEFAULT"
+                Category: "android.intent.category.BROWSABLE"
+                Scheme: "com.sunpower.elc2"
+            :
+              e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity filter e0aebb4
+                Action: "android.intent.action.VIEW"
+                Category: "android.intent.category.DEFAULT"
+                Category: "android.intent.category.BROWSABLE"
+                Scheme: " "
+                Authority: " ": -1
+                Path: "PatternMatcher{PREFIX: /}"
+
+        Non-Data Actions:
+            android.intent.action.MAIN:
+              e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity2 filter e9328c6
+                Action: "android.intent.action.MAIN"
+                Category: "android.intent.category.BROWSABLE"
+            android.intent.action.MAIN:
+              e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity filter e9328c6
+                Action: "android.intent.action.MAIN"
+                Category: "android.intent.category.LAUNCHER"
+
+      Domain verification status:
+      `;
+      const name = parseLaunchableActivityName(dumpsysOutput);
+      name.should.eql('com.sunpower.energylink.commissioning2/.MainActivity');
+    });
+    it('test valid output parsing (older Android versions)', function () {
+      const dumpsysOutput = `
+      Activity Resolver Table:
+        Non-Data Actions:
+             android.intent.action.MAIN:
+               376f0635 com.example.android.contactmanager/.ContactManager
+
+      Key Set Manager:
+        [com.example.android.contactmanager]
+             Signing KeySets: 2
+      `;
+      const name = parseLaunchableActivityName(dumpsysOutput);
+      name.should.eql('com.example.android.contactmanager/.ContactManager');
+    });
+    it('test error output parsing', function () {
+      const dumpsysOutput = `
+      Domain verification status:
+      Failure printing domain verification information
+      `;
+      const name = parseLaunchableActivityName(dumpsysOutput);
+      _.isNil(name).should.be.true;
     });
   });
 }));
