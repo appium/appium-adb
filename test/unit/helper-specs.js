@@ -535,6 +535,20 @@ describe('helpers', withMocks({fs}, function (mocks) {
       const name = parseLaunchableActivityName(dumpsysOutput);
       name.should.eql('com.sunpower.energylink.commissioning2/.MainActivity');
     });
+    it('test valid output parsing (older Android versions)', function () {
+      const dumpsysOutput = `
+      Activity Resolver Table:
+        Non-Data Actions:
+             android.intent.action.MAIN:
+               376f0635 com.example.android.contactmanager/.ContactManager
+
+      Key Set Manager:
+        [com.example.android.contactmanager]
+             Signing KeySets: 2
+      `;
+      const name = parseLaunchableActivityName(dumpsysOutput);
+      name.should.eql('com.example.android.contactmanager/.ContactManager');
+    });
     it('test error output parsing', function () {
       const dumpsysOutput = `
       Domain verification status:
