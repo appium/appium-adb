@@ -526,6 +526,10 @@ describe('helpers', withMocks({fs}, function (mocks) {
 
         Non-Data Actions:
             android.intent.action.MAIN:
+              e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity2 filter e9328c6
+                Action: "android.intent.action.MAIN"
+                Category: "android.intent.category.BROWSABLE"
+            android.intent.action.MAIN:
               e0a7ea1 com.sunpower.energylink.commissioning2/.MainActivity filter e9328c6
                 Action: "android.intent.action.MAIN"
                 Category: "android.intent.category.LAUNCHER"
