@@ -536,8 +536,8 @@ describe('helpers', withMocks({fs}, function (mocks) {
 
       Domain verification status:
       `;
-      const name = parseLaunchableActivityNames(dumpsysOutput);
-      name.should.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
+      const names = parseLaunchableActivityNames(dumpsysOutput);
+      names.should.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
     });
     it('test valid output parsing (older Android versions)', function () {
       const dumpsysOutput = `
@@ -552,8 +552,8 @@ describe('helpers', withMocks({fs}, function (mocks) {
         [com.example.android.contactmanager]
              Signing KeySets: 2
       `;
-      const name = parseLaunchableActivityNames(dumpsysOutput);
-      name.should.eql([
+      const names = parseLaunchableActivityNames(dumpsysOutput);
+      names.should.eql([
         'com.example.android.contactmanager/.ContactManager2',
         'com.example.android.contactmanager/.ContactManager3',
         'com.example.android.contactmanager/.ContactManager',
@@ -564,8 +564,8 @@ describe('helpers', withMocks({fs}, function (mocks) {
       Domain verification status:
       Failure printing domain verification information
       `;
-      const name = parseLaunchableActivityNames(dumpsysOutput);
-      name.should.be.eql([]);
+      const names = parseLaunchableActivityNames(dumpsysOutput);
+      names.should.be.eql([]);
     });
   });
 }));
