@@ -2,7 +2,7 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseManifest, parseAaptStrings, parseAapt2Strings,
-  parseJsonData, extractMatchingPermissions, parseLaunchableActivityName,
+  parseJsonData, extractMatchingPermissions, parseLaunchableActivityNames,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
@@ -504,7 +504,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
   });
 
 
-  describe('parseLaunchableActivityName', function () {
+  describe('parseLaunchableActivityNames', function () {
     it('test valid output parsing', function () {
       const dumpsysOutput = `
       Activity Resolver Table:
@@ -536,30 +536,36 @@ describe('helpers', withMocks({fs}, function (mocks) {
 
       Domain verification status:
       `;
-      const name = parseLaunchableActivityName(dumpsysOutput);
-      name.should.eql('com.sunpower.energylink.commissioning2/.MainActivity');
+      const name = parseLaunchableActivityNames(dumpsysOutput);
+      name.should.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
     });
     it('test valid output parsing (older Android versions)', function () {
       const dumpsysOutput = `
       Activity Resolver Table:
         Non-Data Actions:
              android.intent.action.MAIN:
-               376f0635 com.example.android.contactmanager/.ContactManager
+               376f0635 com.example.android.contactmanager/.ContactManager2
+               376f0636 com.example.android.contactmanager/.ContactManager3
+               376f0637 com.example.android.contactmanager/.ContactManager
 
       Key Set Manager:
         [com.example.android.contactmanager]
              Signing KeySets: 2
       `;
-      const name = parseLaunchableActivityName(dumpsysOutput);
-      name.should.eql('com.example.android.contactmanager/.ContactManager');
+      const name = parseLaunchableActivityNames(dumpsysOutput);
+      name.should.eql([
+        'com.example.android.contactmanager/.ContactManager2',
+        'com.example.android.contactmanager/.ContactManager3',
+        'com.example.android.contactmanager/.ContactManager',
+      ]);
     });
     it('test error output parsing', function () {
       const dumpsysOutput = `
       Domain verification status:
       Failure printing domain verification information
       `;
-      const name = parseLaunchableActivityName(dumpsysOutput);
-      _.isNil(name).should.be.true;
+      const name = parseLaunchableActivityNames(dumpsysOutput);
+      name.should.be.eql([]);
     });
   });
 }));
