@@ -531,7 +531,22 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         longitude: '50.5',
         latitude: '50.1'
       };
-      it('should call shell with correct args for real device', async function () {
+      it('should call shell with correct args for real device with Oreo preview device', async function () {
+        mocks.adb.expects('getApiLevel')
+          .once().returns(26);
+        mocks.adb.expects('shell')
+          .once().withExactArgs([
+            'am', 'start-foreground-service',
+            '-e', 'longitude', location.longitude,
+            '-e', 'latitude', location.latitude,
+            `io.appium.settings/.LocationService`
+          ])
+          .returns('');
+        await adb.setGeoLocation(location);
+      });
+      it('should call shell with correct args for real device with Nougat preview device', async function () {
+        mocks.adb.expects('getApiLevel')
+          .once().returns(25);
         mocks.adb.expects('shell')
           .once().withExactArgs([
             'am', 'startservice',
