@@ -82,7 +82,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .once()
         .returns(`mFocusedApp=ActivityRecord{14d88c3 u0 com.android.systemui/.subscreen.SubHomeActivity t9}
         mFocusedApp=ActivityRecord{d72327 u0 eu.niko.smart.universal/crc648a3abc16689e594e.MainActivity t409}
-        mCurrentFocus=Window{2785a60 u0 eu.niko.smart.universal/crc648a3abc16689e594e.MainActivity}`);
+        mCurrentFocus=Window{2785a60 u0 eu.niko.smart.universal/crc648a3abc16689e594e.MainActivity}
+        mCurrentFocus=null`);
       const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       appPackage.should.equal('eu.niko.smart.universal');
       appActivity.should.equal('crc648a3abc16689e594e.MainActivity');
