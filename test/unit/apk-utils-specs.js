@@ -77,6 +77,17 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appPackage.should.equal(pkg);
       appActivity.should.equal(act);
     });
+    it('should return package and activity if multiple apps are active', async function () {
+      mocks.adb.expects('dumpWindows')
+        .once()
+        .returns(`mFocusedApp=ActivityRecord{14d88c3 u0 com.android.systemui/.subscreen.SubHomeActivity t9}
+        mFocusedApp=ActivityRecord{d72327 u0 eu.niko.smart.universal/crc648a3abc16689e594e.MainActivity t409}
+        mCurrentFocus=Window{2785a60 u0 eu.niko.smart.universal/crc648a3abc16689e594e.MainActivity}
+        mCurrentFocus=null`);
+      const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal('eu.niko.smart.universal');
+      appActivity.should.equal('crc648a3abc16689e594e.MainActivity');
+    });
     it('should parse correctly and return package and activity when a comma is present', async function () {
       mocks.adb.expects('dumpWindows')
         .once()
