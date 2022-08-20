@@ -54,7 +54,7 @@
     "lru-cache": "^7.3.0",
     "semver": "^7.0.0",
     "source-map-support": "^0.x",
-    "teen_process": "^1.11.0",
+    "teen_process": "^2.0.0",
     "utf7": "^1.0.2"
   },
   "pre-commit": [
