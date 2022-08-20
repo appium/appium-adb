@@ -1,5 +1,5 @@
 variables:
-  NODE_VERSION: 12.x
+  NODE_VERSION: 16.x
   _FORCE_LOGS: 1
   CI: true
 
