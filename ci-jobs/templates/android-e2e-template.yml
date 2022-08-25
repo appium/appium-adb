@@ -1,7 +1,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/android
 parameters:
   name: 'android_e2e_tests'
-  vmImage: 'macOS-10.15'
+  vmImage: 'macOS-11'
   sdkVersion: 28
   platformVersion: 9.0
   emuTag: default
@@ -27,18 +27,11 @@ jobs:
       displayName: Create and run Emulator
     - script: nohup adb logcat > logcat.txt &
       displayName: Capture Logcat
-    - script: npm run build
-      displayName: Build
-    - script: npx mocha --timeout 6000000 --reporter mocha-multi-reporters --reporter-options configFile=./ci-jobs/mocha-config.json --recursive build/test/functional/ -g @skip-ci -i --exit
+    - script: npm run e2e-test
       env:
         JAVA_HOME: $(JAVA_HOME_11_X64)
         PATH: $(JAVA_HOME_11_X64)/bin:$(PATH)
       displayName: Run tests
-    - task: PublishTestResults@2
-      condition: always()
-      displayName: Publish Test Results
-      inputs:
-        testResultsFiles: $(MOCHA_FILE)
     - task: PublishPipelineArtifact@0
       condition: always()
       displayName: Publish Logcat to Artifacts

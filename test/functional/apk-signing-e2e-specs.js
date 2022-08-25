@@ -3,10 +3,10 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../../lib/adb.js';
 import path from 'path';
 import os from 'os';
-import { rootDir, unsignApk } from '../../lib/helpers.js';
+import { unsignApk } from '../../lib/helpers.js';
 
 
-const fixturesRoot = path.resolve(rootDir, 'test', 'fixtures');
+const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const selendroidTestApp = path.resolve(fixturesRoot, 'selendroid-test-app.apk');
 const contactManagerPath = path.resolve(fixturesRoot, 'ContactManager.apk');
 const tmp = os.tmpdir();

@@ -10,18 +10,18 @@ import { withMocks } from '@appium/test-support';
 
 chai.use(chaiAsPromised);
 
-const selendroidTestApp = path.resolve(helpers.rootDir, 'test', 'fixtures', 'selendroid-test-app.apk'),
-      keystorePath = path.resolve(helpers.rootDir, 'test', 'fixtures', 'appiumtest.keystore'),
-      defaultKeyPath = path.resolve(helpers.rootDir, 'keys', 'testkey.pk8'),
-      defaultCertPath = path.resolve(helpers.rootDir, 'keys', 'testkey.x509.pem'),
-      keyAlias = 'appiumtest',
-      password = 'android',
-      selendroidTestAppPackage = 'io.selendroid.testapp',
-      javaDummyPath = 'java_dummy_path',
-      javaHome = 'java_home',
-      apksignerDummyPath = '/path/to/apksigner',
-      tempDir = appiumSupport.tempDir,
-      fs = appiumSupport.fs;
+const selendroidTestApp = path.resolve(__dirname, '..', 'fixtures', 'selendroid-test-app.apk');
+const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
+const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8');
+const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
+const keyAlias = 'appiumtest';
+const password = 'android';
+const selendroidTestAppPackage = 'io.selendroid.testapp';
+const javaDummyPath = 'java_dummy_path';
+const javaHome = 'java_home';
+const apksignerDummyPath = '/path/to/apksigner';
+const tempDir = appiumSupport.tempDir;
+const fs = appiumSupport.fs;
 
 const adb = new ADB();
 adb.keystorePath = keystorePath;
