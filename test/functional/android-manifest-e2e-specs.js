@@ -9,7 +9,7 @@ import { fs, util } from '@appium/support';
 // that directory.
 const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const contactMangerSelendroidPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager-selendroid.apk');
-const tmpDir = path.resolve(__dirname, '..', 'test', 'temp');
+const tmpDir = path.resolve(__dirname, '..', 'temp');
 const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
 

@@ -167,7 +167,11 @@ describe('adb commands', function () {
     await adb.setAirplaneMode(false);
     (await adb.isAirplaneModeOn()).should.be.false;
   });
-  it('should be able to toogle wifi @skip-ci', async function () {
+  it('should be able to toogle wifi', async function () {
+    if (process.env.CI) {
+      return this.skip();
+    }
+
     this.retries(3);
 
     await adb.setWifiState(true);
@@ -175,19 +179,30 @@ describe('adb commands', function () {
     await adb.setWifiState(false);
     (await adb.isWifiOn()).should.be.false;
   });
-  it('should be able to turn off animation @skip-ci', async function () {
+  it('should be able to turn off animation', async function () {
+    if (process.env.CI) {
+      return this.skip();
+    }
     await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
 
     await adb.setAnimationState(false);
     (await adb.isAnimationOn()).should.be.false;
   });
-  it('should be able to turn on animation @skip-ci', async function () {
+  it('should be able to turn on animation', async function () {
+    if (process.env.CI) {
+      return this.skip();
+    }
+
     await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
 
     await adb.setAnimationState(true);
     (await adb.isAnimationOn()).should.be.true;
   });
-  it('should be able to set device locale via setting app @skip-ci', async function () {
+  it('should be able to set device locale via setting app', async function () {
+    if (process.env.CI) {
+      return this.skip();
+    }
+
     // Operation not allowed: java.lang.SecurityException: Package io.appium.settings has not requested permission android.permission.CHANGE_CONFIGURATION
     // is shown if the setting apk is not updated.
     await adb.grantPermission('io.appium.settings', 'android.permission.CHANGE_CONFIGURATION');
