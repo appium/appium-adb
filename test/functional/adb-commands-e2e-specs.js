@@ -2,7 +2,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
-import { rootDir } from '../../lib/helpers.js';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from '@appium/support';
 import temp from 'temp';
@@ -19,7 +18,7 @@ const DEFAULT_IMES = [
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
   'io.appium.android.ime/.UnicodeIME',
 ];
-const CONTACT_MANAGER_PATH = path.resolve(rootDir, 'test', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
 
@@ -215,8 +214,7 @@ describe('adb commands', function () {
       }
     });
     it('should install and grant all permission', async function () {
-      let apiDemos = path.resolve(rootDir, 'test',
-          'fixtures', 'ApiDemos-debug.apk');
+      let apiDemos = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
       await adb.install(apiDemos, {timeout: androidInstallTimeout});
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
       await adb.grantAllPermissions('io.appium.android.apis');

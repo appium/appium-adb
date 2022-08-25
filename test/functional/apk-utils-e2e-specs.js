@@ -2,7 +2,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import ADB from '../..';
 import path from 'path';
-import { rootDir } from '../../lib/helpers.js';
 import { retryInterval } from 'asyncbox';
 import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
@@ -16,10 +15,8 @@ describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  const contactManagerPath = path.resolve(rootDir, 'test',
-                                          'fixtures', 'ContactManager.apk');
-  const apiDemosPath = path.resolve(rootDir, 'test',
-                                    'fixtures', 'ApiDemos-debug.apk');
+  const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+  const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
