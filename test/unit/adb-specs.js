@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { ADB, DEFAULT_ADB_PORT } from '../..';
+import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
 
 
 chai.use(chaiAsPromised);
