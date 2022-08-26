@@ -16,8 +16,10 @@ jobs:
         node-version: 18.x
     - run: npm install --no-package-lock
       name: Install dev dependencies
+    - run: npm run build
+      name: Run build
     - run: npm run test
-      name: Run NPM Test
+      name: Run unit tests
     - run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
