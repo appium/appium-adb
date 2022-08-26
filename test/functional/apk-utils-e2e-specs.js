@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../..';
+import ADB from '../../lib/adb';
 import path from 'path';
 import { retryInterval } from 'asyncbox';
 import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';

@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../..';
+import ADB from '../../lib/adb';
 import net from 'net';
 import events from 'events';
 import Logcat from '../../lib/logcat.js';

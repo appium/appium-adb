@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../..';
+import ADB from '../../lib/adb';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import B from 'bluebird';
