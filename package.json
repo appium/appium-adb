@@ -4,7 +4,7 @@
   "description": "Android Debug Bridge interface",
   "main": "./build/index.js",
   "scripts": {
-    "build": "rm -rf build && babel --out-dir=build/lib lib && babel --out-dir=build index.js",
+    "build": "rimraf build && babel --out-dir=build/lib lib && babel --out-dir=build index.js",
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
@@ -58,6 +58,7 @@
     "ini": "^3.0.0",
     "lodash": "^4.0.0",
     "lru-cache": "^7.3.0",
+    "rimraf": "^3.0.2",
     "semver": "^7.0.0",
     "source-map-support": "^0.x",
     "teen_process": "^2.0.1",
