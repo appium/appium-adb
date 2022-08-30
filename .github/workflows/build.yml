@@ -1,0 +1,79 @@
+name: Build
+
+on: [pull_request, push]
+
+
+jobs:
+  unit_test:
+    matrix:
+      node: [14, 16, 18]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node }}
+    - run: npm install --no-package-lock
+      name: Install dev dependencies
+    - run: npm run build
+      name: Build
+    - run: npm run lint
+      name: Run linter
+    - run: npm run test
+      name: Run unit tests
+
+  e2e_test:
+    matrix:
+      include:
+      - name: sdk30_e2e_tests
+        platformVersion: 11.0
+        sdkVersion: 30
+        emuTag: google_apis
+      - name: sdk28_e2e_tests
+        platformVersion: 9.0
+        sdkVersion: 28
+        emuTag: default
+      - name: sdk25_e2e_tests
+        platformVersion: 7.1
+        sdkVersion: 25
+        emuTag: default
+      - name: sdk22_e2e_tests
+        platformVersion: 5.1
+        sdkVersion: 22
+        emuTag: default
+    # No hardware acceleration is available for emulators on Ubuntu:
+    # https://github.com/Malinskiy/action-android#requirements
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+        check-latest: true
+    - run: npm install --no-package-lock
+      name: Install dev dependencies
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    - uses: malinskiy/action-android/install-sdk@release/0.1.3
+    - run: sdkmanager platform-tools
+    - run: adb devices
+    - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
+      name: ${{ matrix.name }}
+      with:
+        cmd: |
+          export ANDROID_AVD=emulator
+          export ANDROID_SDK_VERSION=${{ matrix.sdkVersion }}
+          export PLATFORM_VERSION="${{ matrix.platformVersion }}"
+          export EMU_TAG="${{ matrix.emuTag }}"
+          npm run e2e-test
+        api: ${{ matrix.sdkVersion }}
+        tag: ${{ matrix.emuTag }}
+        abi: x86
+        cmdOptions: -no-snapshot
+    - name: Save logcat output
+      uses: actions/upload-artifact@master
+      with:
+        name: logcat
+        path: artifacts/logcat.log
