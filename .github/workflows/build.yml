@@ -5,8 +5,9 @@ on: [pull_request, push]
 
 jobs:
   unit_test:
-    matrix:
-      node: [14, 16, 18]
+    strategy:
+      matrix:
+        node: [14, 16, 18]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,24 +24,25 @@ jobs:
       name: Run unit tests
 
   e2e_test:
-    matrix:
-      include:
-      - name: sdk30_e2e_tests
-        platformVersion: 11.0
-        sdkVersion: 30
-        emuTag: google_apis
-      - name: sdk28_e2e_tests
-        platformVersion: 9.0
-        sdkVersion: 28
-        emuTag: default
-      - name: sdk25_e2e_tests
-        platformVersion: 7.1
-        sdkVersion: 25
-        emuTag: default
-      - name: sdk22_e2e_tests
-        platformVersion: 5.1
-        sdkVersion: 22
-        emuTag: default
+    strategy:
+      matrix:
+        include:
+        - name: sdk30_e2e_tests
+          platformVersion: 11.0
+          sdkVersion: 30
+          emuTag: google_apis
+        - name: sdk28_e2e_tests
+          platformVersion: 9.0
+          sdkVersion: 28
+          emuTag: default
+        - name: sdk25_e2e_tests
+          platformVersion: 7.1
+          sdkVersion: 25
+          emuTag: default
+        - name: sdk22_e2e_tests
+          platformVersion: 5.1
+          sdkVersion: 22
+          emuTag: default
     # No hardware acceleration is available for emulators on Ubuntu:
     # https://github.com/Malinskiy/action-android#requirements
     runs-on: macos-latest
