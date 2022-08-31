@@ -29,34 +29,26 @@ jobs:
     strategy:
       matrix:
         include:
-        - name: sdk30_e2e_tests
-          platformVersion: "11.0"
-          buildToolsVersion: "33.0.0"
-          sdkVersion: 30
+        - platformVersion: "11.0"
+          apiLevel: 30
           emuTag: google_apis
-        - name: sdk28_e2e_tests
-          platformVersion: "9.0"
-          buildToolsVersion: "33.0.0"
-          sdkVersion: 28
+        - platformVersion: "9.0"
+          apiLevel: 28
           emuTag: default
-        - name: sdk25_e2e_tests
-          platformVersion: "7.1"
-          buildToolsVersion: "33.0.0"
-          sdkVersion: 25
+        - platformVersion: "7.1"
+          apiLevel: 25
           emuTag: default
-        - name: sdk22_e2e_tests
-          platformVersion: "5.1"
-          buildToolsVersion: "33.0.0"
-          sdkVersion: 22
+        - platformVersion: "5.1"
+          apiLevel: 22
           emuTag: default
     env:
       CI: true
       ANDROID_AVD: emulator
-      ANDROID_SDK_VERSION: "${{ matrix.sdkVersion }}"
+      ANDROID_SDK_VERSION: "${{ matrix.apiLevel }}"
       PLATFORM_VERSION: "${{ matrix.platformVersion }}"
       EMU_TAG: "${{ matrix.emuTag }}"
     # No hardware acceleration is available for emulators on Ubuntu:
-    # https://github.com/Malinskiy/action-android#requirements
+    # https://github.com/marketplace/actions/android-emulator-runner#can-i-use-this-action-on-linux-vms
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
@@ -77,7 +69,7 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-${{ matrix.sdkVersion }}
+        key: avd-${{ matrix.apiLevel }}
     # https://github.com/marketplace/actions/android-emulator-runner
     - uses: reactivecircus/android-emulator-runner@v2
       if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -87,20 +79,20 @@ jobs:
         avd-name: $ANDROID_AVD
         force-avd-creation: false
         sdcard-path-or-size: 1500M
-        api-level: ${{ matrix.sdkVersion }}
+        api-level: ${{ matrix.apiLevel }}
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
     - run: nohup adb logcat > logcat.log &
       name: Capture Logcat
     - uses: reactivecircus/android-emulator-runner@v2
-      name: ${{ matrix.name }}
+      name: api${{ matrix.apiLevel }}_e2e
       with:
         script: npm run e2e-test
         avd-name: $ANDROID_AVD
         force-avd-creation: false
         sdcard-path-or-size: 1500M
-        api-level: ${{ matrix.sdkVersion }}
+        api-level: ${{ matrix.apiLevel }}
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
@@ -108,5 +100,5 @@ jobs:
       if: ${{ always() }}
       uses: actions/upload-artifact@master
       with:
-        name: logcat-sdk${{ matrix.sdkVersion }}
+        name: logcat-api${{ matrix.apiLevel }}
         path: logcat.log
