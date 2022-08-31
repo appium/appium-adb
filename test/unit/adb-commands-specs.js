@@ -249,6 +249,14 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .returns('');
         await adb.inputText(text);
       });
+      it('should call shell with correct args if special chars are present but spaces are not in the text', async function () {
+        const text = '&something';
+        const expectedText = `"&something"`;
+        mocks.adb.expects('shell')
+          .once().withExactArgs([`input text ${expectedText}`])
+          .returns('');
+        await adb.inputText(text);
+      });
       it('should call shell with correct args and select appropriate quotes', async function () {
         const text = 'some text & with quote$"';
         const expectedText = `'some%stext%s&%swith%squote\\$"'`;
