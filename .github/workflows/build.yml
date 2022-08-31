@@ -81,7 +81,7 @@ jobs:
     # https://github.com/marketplace/actions/android-emulator-runner
     - uses: reactivecircus/android-emulator-runner@v2
       if: steps.avd-cache.outputs.cache-hit != 'true'
-      name: ${{ matrix.name }}
+      name: Generate AVD snapshot for caching
       with:
         script: echo "Generated AVD snapshot for caching."
         avd-name: $ANDROID_AVD
@@ -91,7 +91,7 @@ jobs:
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-    - run: nohup adb logcat > artifacts/logcat.log &
+    - run: nohup adb logcat > logcat.log &
       name: Capture Logcat
     - uses: reactivecircus/android-emulator-runner@v2
       name: ${{ matrix.name }}
@@ -109,4 +109,4 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: logcat
-        path: artifacts/logcat.log
+        path: logcat.log
