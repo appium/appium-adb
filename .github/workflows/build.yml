@@ -14,6 +14,8 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node }}
+    - run: npm i -g npm
+      name: Update NPM
     - run: npm install --no-package-lock
       name: Install dev dependencies
     - run: npm run build
@@ -43,6 +45,11 @@ jobs:
           platformVersion: 5.1
           sdkVersion: 22
           emuTag: default
+    environment:
+      ANDROID_AVD: emulator
+      ANDROID_SDK_VERSION: ${{ matrix.sdkVersion }}
+      PLATFORM_VERSION: ${{ matrix.platformVersion }}
+      EMU_TAG: ${{ matrix.emuTag }}
     # No hardware acceleration is available for emulators on Ubuntu:
     # https://github.com/Malinskiy/action-android#requirements
     runs-on: macos-latest
@@ -64,17 +71,13 @@ jobs:
     - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
       name: ${{ matrix.name }}
       with:
-        cmd: |
-          export ANDROID_AVD=emulator
-          export ANDROID_SDK_VERSION=${{ matrix.sdkVersion }}
-          export PLATFORM_VERSION="${{ matrix.platformVersion }}"
-          export EMU_TAG="${{ matrix.emuTag }}"
-          npm run e2e-test
+        cmd: npm run e2e-test
         api: ${{ matrix.sdkVersion }}
         tag: ${{ matrix.emuTag }}
         abi: x86
         cmdOptions: -no-snapshot
     - name: Save logcat output
+      if: ${{ always() }}
       uses: actions/upload-artifact@master
       with:
         name: logcat
