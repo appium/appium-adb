@@ -30,26 +30,26 @@ jobs:
       matrix:
         include:
         - name: sdk30_e2e_tests
-          platformVersion: 11.0
+          platformVersion: "11.0"
           sdkVersion: 30
           emuTag: google_apis
         - name: sdk28_e2e_tests
-          platformVersion: 9.0
+          platformVersion: "9.0"
           sdkVersion: 28
           emuTag: default
         - name: sdk25_e2e_tests
-          platformVersion: 7.1
+          platformVersion: "7.1"
           sdkVersion: 25
           emuTag: default
         - name: sdk22_e2e_tests
-          platformVersion: 5.1
+          platformVersion: "5.1"
           sdkVersion: 22
           emuTag: default
     environment:
       ANDROID_AVD: emulator
-      ANDROID_SDK_VERSION: ${{ matrix.sdkVersion }}
-      PLATFORM_VERSION: ${{ matrix.platformVersion }}
-      EMU_TAG: ${{ matrix.emuTag }}
+      ANDROID_SDK_VERSION: "${{ matrix.sdkVersion }}"
+      PLATFORM_VERSION: "${{ matrix.platformVersion }}"
+      EMU_TAG: "${{ matrix.emuTag }}"
     # No hardware acceleration is available for emulators on Ubuntu:
     # https://github.com/Malinskiy/action-android#requirements
     runs-on: macos-latest
