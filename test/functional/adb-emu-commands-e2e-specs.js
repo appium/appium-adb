@@ -39,6 +39,10 @@ describe('adb emu commands', function () {
 
   describe('getEmuImageProperties', function () {
     it('should get emulator image properties', async function () {
+      if (process.env.CI) {
+        return this.skip();
+      }
+
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);
       const {target} = await adb.getEmuImageProperties(name);
       const apiMatch = /\d+/.exec(target);
