@@ -59,7 +59,7 @@ jobs:
     # https://github.com/Malinskiy/action-android#requirements
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
         node-version: lts/*
@@ -73,14 +73,40 @@ jobs:
     - uses: malinskiy/action-android/install-sdk@release/0.1.3
     - run: sdkmanager platform-tools "build-tools;${{ matrix.buildToolsVersion }}"
     - run: adb devices
-    - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
+    - name: AVD cache
+      uses: actions/cache@v3
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ matrix.api-level }}
+    # https://github.com/marketplace/actions/android-emulator-runner
+    - uses: reactivecircus/android-emulator-runner@v2
+      if: steps.avd-cache.outputs.cache-hit != 'true'
       name: ${{ matrix.name }}
       with:
-        cmd: npm run e2e-test
-        api: ${{ matrix.sdkVersion }}
-        tag: ${{ matrix.emuTag }}
-        abi: x86
-        cmdOptions: -no-snapshot
+        script: echo "Generated AVD snapshot for caching."
+        avd-name: $(ANDROID_AVD)
+        force-avd-creation: false
+        sdcard-path-or-size: 1500M
+        api-level: ${{ matrix.sdkVersion }}
+        disable-spellchecker: true
+        target: ${{ matrix.emuTag }}
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+    - run: nohup adb logcat > artifacts/logcat.log &
+      name: Capture Logcat
+    - uses: reactivecircus/android-emulator-runner@v2
+      name: ${{ matrix.name }}
+      with:
+        script: npm run e2e-test
+        avd-name: $(ANDROID_AVD)
+        force-avd-creation: false
+        sdcard-path-or-size: 1500M
+        api-level: ${{ matrix.sdkVersion }}
+        disable-spellchecker: true
+        target: ${{ matrix.emuTag }}
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
     - name: Save logcat output
       if: ${{ always() }}
       uses: actions/upload-artifact@master
