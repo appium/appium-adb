@@ -70,9 +70,6 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-    - uses: malinskiy/action-android/install-sdk@release/0.1.3
-    - run: sdkmanager platform-tools "build-tools;${{ matrix.buildToolsVersion }}"
-    - run: adb devices
     - name: AVD cache
       uses: actions/cache@v3
       id: avd-cache
@@ -87,7 +84,7 @@ jobs:
       name: ${{ matrix.name }}
       with:
         script: echo "Generated AVD snapshot for caching."
-        avd-name: $(ANDROID_AVD)
+        avd-name: $ANDROID_AVD
         force-avd-creation: false
         sdcard-path-or-size: 1500M
         api-level: ${{ matrix.sdkVersion }}
@@ -100,7 +97,7 @@ jobs:
       name: ${{ matrix.name }}
       with:
         script: npm run e2e-test
-        avd-name: $(ANDROID_AVD)
+        avd-name: $ANDROID_AVD
         force-avd-creation: false
         sdcard-path-or-size: 1500M
         api-level: ${{ matrix.sdkVersion }}
