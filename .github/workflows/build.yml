@@ -45,7 +45,7 @@ jobs:
           platformVersion: "5.1"
           sdkVersion: 22
           emuTag: default
-    environment:
+    env:
       ANDROID_AVD: emulator
       ANDROID_SDK_VERSION: "${{ matrix.sdkVersion }}"
       PLATFORM_VERSION: "${{ matrix.platformVersion }}"
