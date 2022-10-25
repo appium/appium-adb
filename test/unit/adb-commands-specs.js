@@ -375,6 +375,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('setWifiState', function () {
       it('should call shell with correct args for real device', async function () {
+        mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
             '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
@@ -409,6 +410,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('setDataState', function () {
       it('should call shell with correct args for real device', async function () {
+        mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
@@ -429,6 +431,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('setWifiAndData', function () {
       it('should call shell with correct args when turning only wifi on for real device', async function () {
+        mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
             '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
@@ -457,6 +460,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiAndData({data: true}, true);
       });
       it('should call shell with correct args when turning only data off for real device', async function () {
+        mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
@@ -465,6 +469,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiAndData({data: false});
       });
       it('should call shell with correct args when turning both wifi and data on for real device', async function () {
+        mocks.adb.expects('requireRunningSettingsApp').atLeast(1);
         mocks.adb.expects('shell').twice().returns('');
         await adb.setWifiAndData({wifi: true, data: true});
       });
