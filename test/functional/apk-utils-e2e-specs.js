@@ -269,12 +269,16 @@ describe('apk utils', function () {
         activity: 'ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
-      await adb.goToHome();
-      let {appPackage} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.not.eql(CONTACT_MANAGER_APP_ID);
-      await adb.activateApp(CONTACT_MANAGER_APP_ID);
-      ({appPackage} = await adb.getFocusedPackageAndActivity());
-      appPackage.should.eql(CONTACT_MANAGER_APP_ID);
+      await retryInterval(10, 500, async () => {
+        await adb.goToHome();
+        const {appPackage} = await adb.getFocusedPackageAndActivity();
+        appPackage.should.not.eql(CONTACT_MANAGER_APP_ID);
+      });
+      await retryInterval(10, 500, async () => {
+        await adb.activateApp(CONTACT_MANAGER_APP_ID);
+        const {appPackage} = await adb.getFocusedPackageAndActivity();
+        appPackage.should.eql(CONTACT_MANAGER_APP_ID);
+      });
     });
   });
 });
