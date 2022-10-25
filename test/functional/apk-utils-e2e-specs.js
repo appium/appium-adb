@@ -261,6 +261,10 @@ describe('apk utils', function () {
   });
   describe('activateApp', function () {
     it('should be able to activate with normal package and activity', async function () {
+      if (await this.getApiLevel() < 23) {
+        return this.skip();
+      }
+
       await adb.install(contactManagerPath, {
         grantPermissions: true
       });
