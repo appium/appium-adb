@@ -46,7 +46,8 @@
     "keys",
     "lib",
     "build/index.js",
-    "build/lib"
+    "build/lib",
+    "CHANGELOG.md"
   ],
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
