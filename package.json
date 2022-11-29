@@ -94,7 +94,7 @@
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "semantic-release": "^19.0.2",
-    "sinon": "^14.0.0",
+    "sinon": "^15.0.0",
     "temp": "^0.x"
   }
 }
