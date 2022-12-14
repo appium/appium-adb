@@ -1,6 +1,6 @@
 {
   "name": "appium-adb",
-  "version": "9.10.18",
+  "version": "9.10.19",
   "description": "Android Debug Bridge interface",
   "main": "./build/index.js",
   "scripts": {
