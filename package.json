@@ -51,7 +51,7 @@
   ],
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
-    "@appium/support": "^2.60.0",
+    "@appium/support": "^3.0.0",
     "@babel/runtime": "^7.0.0",
     "adbkit-apkreader": "^3.1.2",
     "async-lock": "^1.0.0",
