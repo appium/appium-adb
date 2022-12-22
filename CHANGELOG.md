@@ -1,3 +1,10 @@
+## [9.10.20](https://github.com/appium/appium-adb/compare/v9.10.19...v9.10.20) (2022-12-22)
+
+
+### Miscellaneous Chores
+
+* Bump @appium/test-support from 2.0.2 to 3.0.1 ([#630](https://github.com/appium/appium-adb/issues/630)) ([b5d96b4](https://github.com/appium/appium-adb/commit/b5d96b4a5e2599b64ca542772ed7453f6f682e81))
+
 ## [9.10.19](https://github.com/appium/appium-adb/compare/v9.10.18...v9.10.19) (2022-12-14)
 
 
