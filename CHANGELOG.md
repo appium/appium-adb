@@ -1,3 +1,10 @@
+## [9.10.21](https://github.com/appium/appium-adb/compare/v9.10.20...v9.10.21) (2022-12-23)
+
+
+### Miscellaneous Chores
+
+* Remove redundant debug calls ([#631](https://github.com/appium/appium-adb/issues/631)) ([69931b1](https://github.com/appium/appium-adb/commit/69931b15122f743edc65a1770080216310de05fc))
+
 ## [9.10.20](https://github.com/appium/appium-adb/compare/v9.10.19...v9.10.20) (2022-12-22)
 
 
