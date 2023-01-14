@@ -1,3 +1,10 @@
+## [9.10.23](https://github.com/appium/appium-adb/compare/v9.10.22...v9.10.23) (2023-01-14)
+
+
+### Miscellaneous Chores
+
+* Only fetch resource paths when they are requested ([#634](https://github.com/appium/appium-adb/issues/634)) ([64dabb1](https://github.com/appium/appium-adb/commit/64dabb18342cac388c50bbc43ed2c2514e7add68))
+
 ## [9.10.22](https://github.com/appium/appium-adb/compare/v9.10.21...v9.10.22) (2023-01-13)
 
 
