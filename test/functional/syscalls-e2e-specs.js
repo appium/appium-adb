@@ -3,11 +3,11 @@ import chaiAsPromised from 'chai-as-promised';
 import ADB from '../../lib/adb';
 import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
 import path from 'path';
-import { getModuleRoot } from '../../lib/helpers.js';
+import { getResourcePath } from '../../lib/helpers.js';
 import { fs } from '@appium/support';
 import _ from 'lodash';
 
-const DEFAULT_CERTIFICATE = path.resolve(getModuleRoot(), 'keys', 'testkey.x509.pem');
+const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
 
 chai.use(chaiAsPromised);
 
@@ -88,7 +88,7 @@ describe('System calls', function () {
     (await adb.ls('/data/local/tmp')).should.contain('test');
   });
   it('should check if the given certificate is already installed', async function () {
-    const certBuffer = await fs.readFile(DEFAULT_CERTIFICATE);
+    const certBuffer = await fs.readFile(await getResourcePath(DEFAULT_CERTIFICATE));
     (await adb.isMitmCertificateInstalled(certBuffer)).should.be.false;
   });
   it('should return version', async function () {
