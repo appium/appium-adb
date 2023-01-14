@@ -7,7 +7,7 @@ import { getResourcePath } from '../../lib/helpers.js';
 import { fs } from '@appium/support';
 import _ from 'lodash';
 
-const DEFAULT_CERTIFICATE = `key${path.sep}testkey.x509.pem`;
+const DEFAULT_CERTIFICATE = `keys${path.sep}testkey.x509.pem`;
 
 chai.use(chaiAsPromised);
 
