@@ -344,9 +344,17 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setAirplaneMode', function () {
-      it('should call shell with correct args', async function () {
+      it('should call shell with correct args API 29', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(29);
         mocks.adb.expects('setSetting')
           .once().withExactArgs('global', 'airplane_mode_on', 1)
+          .returns('');
+        await adb.setAirplaneMode(1);
+      });
+      it('should call shell with correct args API 30', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(30);
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['cmd', 'connectivity', 'airplane-mode', 'enable'])
           .returns('');
         await adb.setAirplaneMode(1);
       });
@@ -374,12 +382,20 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setWifiState', function () {
-      it('should call shell with correct args for real device', async function () {
+      it('should call shell with correct args for real device API 29', async function () {
         mocks.adb.expects('requireRunningSettingsApp').once();
+        mocks.adb.expects('getApiLevel').once().returns(29);
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
             '-n', 'io.appium.settings/.receivers.WiFiConnectionSettingReceiver',
             '--es', 'setstatus', 'enable'])
+          .returns('');
+        await adb.setWifiState(true);
+      });
+      it('should call shell with correct args for real device API 30', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(30);
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['cmd', '-w', 'wifi', 'set-wifi-enabled', 'enabled'])
           .returns('');
         await adb.setWifiState(true);
       });
@@ -409,12 +425,20 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('setDataState', function () {
-      it('should call shell with correct args for real device', async function () {
+      it('should call shell with correct args for real device API 29', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(29);
         mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
             '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
             '--es', 'setstatus', 'disable'])
+          .returns('');
+        await adb.setDataState(false);
+      });
+      it('should call shell with correct args for real device API 30', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(30);
+        mocks.adb.expects('shell')
+          .once().withExactArgs(['cmd', 'phone', 'data', 'disable'])
           .returns('');
         await adb.setDataState(false);
       });
@@ -431,6 +455,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('setWifiAndData', function () {
       it('should call shell with correct args when turning only wifi on for real device', async function () {
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(29);
         mocks.adb.expects('requireRunningSettingsApp').once();
         mocks.adb.expects('shell')
           .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.wifi',
@@ -441,7 +466,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
       it('should call shell with correct args when turning only wifi off for emulator', async function () {
         mocks.adb.expects('getApiLevel')
-          .once().returns(25);
+          .atLeast(1).returns(25);
         mocks.adb.expects('shell')
           .once().withExactArgs(['svc', 'wifi', 'disable'], {
             privileged: true
@@ -451,7 +476,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
       it('should call shell with correct args when turning only data on for emulator', async function () {
         mocks.adb.expects('getApiLevel')
-          .once().returns(25);
+          .atLeast(1).returns(25);
         mocks.adb.expects('shell')
           .once().withExactArgs(['svc', 'data', 'enable'], {
             privileged: true
@@ -460,23 +485,21 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.setWifiAndData({data: true}, true);
       });
       it('should call shell with correct args when turning only data off for real device', async function () {
-        mocks.adb.expects('requireRunningSettingsApp').once();
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(30);
         mocks.adb.expects('shell')
-          .once().withExactArgs(['am', 'broadcast', '-a', 'io.appium.settings.data_connection',
-            '-n', 'io.appium.settings/.receivers.DataConnectionSettingReceiver',
-            '--es', 'setstatus', 'disable'])
+          .once().withExactArgs(['cmd', 'phone', 'data', 'disable'])
           .returns('');
         await adb.setWifiAndData({data: false});
       });
       it('should call shell with correct args when turning both wifi and data on for real device', async function () {
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(29);
         mocks.adb.expects('requireRunningSettingsApp').atLeast(1);
-        mocks.adb.expects('shell').twice().returns('');
+        mocks.adb.expects('shell').atLeast(1).returns('');
         await adb.setWifiAndData({wifi: true, data: true});
       });
       it('should call shell with correct args when turning both wifi and data off for emulator', async function () {
-        mocks.adb.expects('getApiLevel')
-          .atLeast(1).returns(25);
-        mocks.adb.expects('shell').twice().returns('');
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(25);
+        mocks.adb.expects('shell').atLeast(1).returns('');
         await adb.setWifiAndData({wifi: false, data: false}, true);
       });
     });
