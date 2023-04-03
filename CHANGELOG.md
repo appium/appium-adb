@@ -1,3 +1,10 @@
+## [9.11.0](https://github.com/appium/appium-adb/compare/v9.10.24...v9.11.0) (2023-04-03)
+
+
+### Features
+
+* Add networking control commands supported on Android 11+ ([#641](https://github.com/appium/appium-adb/issues/641)) ([3dc4885](https://github.com/appium/appium-adb/commit/3dc48854cd554fabb2754e0de38f89f7e1dc3faf))
+
 ## [9.10.24](https://github.com/appium/appium-adb/compare/v9.10.23...v9.10.24) (2023-01-17)
 
 
