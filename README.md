@@ -4,8 +4,6 @@ appium-adb
 [![NPM version](http://img.shields.io/npm/v/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 [![Downloads](http://img.shields.io/npm/dm/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 
-[![Build Status](https://api.travis-ci.org/appium/appium-adb.png?branch=master)](https://travis-ci.org/appium/appium-adb)
-
 A wrapper over android-adb, implemented using ES6 and along with `async/await`. This package is mainly used by Appium to perform all adb operations on android device.
 
 *Note*: Issue tracking for this repo has been disabled. Please use the [main Appium issue tracker](https://github.com/appium/appium/issues) instead.
@@ -19,7 +17,7 @@ npm install appium-adb
 ## Watch
 
 ```bash
-npm run watch
+npm run dev
 ```
 
 ## Test
