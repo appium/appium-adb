@@ -1,3 +1,10 @@
+## [9.11.1](https://github.com/appium/appium-adb/compare/v9.11.0...v9.11.1) (2023-04-18)
+
+
+### Miscellaneous Chores
+
+* Bump rimraf from 4.4.1 to 5.0.0 ([#644](https://github.com/appium/appium-adb/issues/644)) ([c47ad4d](https://github.com/appium/appium-adb/commit/c47ad4de460e77a813e064344edf697143687af5))
+
 ## [9.11.0](https://github.com/appium/appium-adb/compare/v9.10.24...v9.11.0) (2023-04-03)
 
 
