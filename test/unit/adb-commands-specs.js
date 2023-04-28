@@ -146,7 +146,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         mocks.adb.expects('getApiLevel').atLeast(1).returns(30);
         mocks.adb.expects('shell')
           .withExactArgs(['cmd', 'location', 'set-location-enabled', 'true']);
-        mocks.adb.expects('setSetting')
+        mocks.adb.expects('shell')
           .withExactArgs(['cmd', 'location', 'set-location-enabled', 'false']);
         await adb.toggleGPSLocationProvider(true);
         await adb.toggleGPSLocationProvider(false);
