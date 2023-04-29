@@ -102,6 +102,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
     describe('getLocationProviders', function () {
       it('should call shell with correct args and return empty location_providers_allowed', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(27);
         mocks.adb.expects('getSetting')
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('');
@@ -110,6 +111,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         providers.length.should.equal(0);
       });
       it('should return one location_providers_allowed', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(27);
         mocks.adb.expects('getSetting')
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('gps');
@@ -119,6 +121,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         providers.should.include('gps');
       });
       it('should return both location_providers_allowed', async function () {
+        mocks.adb.expects('getApiLevel').once().returns(27);
         mocks.adb.expects('getSetting')
           .once().withExactArgs('secure', 'location_providers_allowed')
           .returns('gps ,wifi');
@@ -130,11 +133,21 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('toggleGPSLocationProvider', function () {
-      it('should call shell with correct args on gps enabled', async function () {
+      it('should call shell with correct args on gps enabled on API below 31', async function () {
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(27);
         mocks.adb.expects('setSetting')
           .withExactArgs('secure', 'location_providers_allowed', '+gps');
         mocks.adb.expects('setSetting')
           .withExactArgs('secure', 'location_providers_allowed', '-gps');
+        await adb.toggleGPSLocationProvider(true);
+        await adb.toggleGPSLocationProvider(false);
+      });
+      it('should call shell with correct args on gps enabled on API above 30', async function () {
+        mocks.adb.expects('getApiLevel').atLeast(1).returns(31);
+        mocks.adb.expects('shell')
+          .withExactArgs(['cmd', 'location', 'set-location-enabled', 'true']);
+        mocks.adb.expects('shell')
+          .withExactArgs(['cmd', 'location', 'set-location-enabled', 'false']);
         await adb.toggleGPSLocationProvider(true);
         await adb.toggleGPSLocationProvider(false);
       });
