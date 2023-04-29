@@ -1,3 +1,10 @@
+## [9.11.2](https://github.com/appium/appium-adb/compare/v9.11.1...v9.11.2) (2023-04-29)
+
+
+### Bug Fixes
+
+* Update GPS toggle logic since Android 11 ([#655](https://github.com/appium/appium-adb/issues/655)) ([6251cf0](https://github.com/appium/appium-adb/commit/6251cf0548b7e4baec81122dddbf6e2bce3d7364))
+
 ## [9.11.1](https://github.com/appium/appium-adb/compare/v9.11.0...v9.11.1) (2023-04-18)
 
 
