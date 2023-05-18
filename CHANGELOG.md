@@ -1,3 +1,10 @@
+## [9.11.3](https://github.com/appium/appium-adb/compare/v9.11.2...v9.11.3) (2023-05-18)
+
+
+### Miscellaneous Chores
+
+* Bump @appium/support from 3.1.11 to 4.0.0 ([#658](https://github.com/appium/appium-adb/issues/658)) ([1cc7515](https://github.com/appium/appium-adb/commit/1cc75158fa2771b6acadaaeaa34259f8da0dabb8))
+
 ## [9.11.2](https://github.com/appium/appium-adb/compare/v9.11.1...v9.11.2) (2023-04-29)
 
 
