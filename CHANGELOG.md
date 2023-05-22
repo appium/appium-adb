@@ -1,3 +1,10 @@
+## [9.11.4](https://github.com/appium/appium-adb/compare/v9.11.3...v9.11.4) (2023-05-22)
+
+
+### Miscellaneous Chores
+
+* Perform boot readiness validation via reboot_readiness service on API 31+ ([#659](https://github.com/appium/appium-adb/issues/659)) ([c98fbcd](https://github.com/appium/appium-adb/commit/c98fbcd4a713296ab5e3a99f75f5cfa2233157cb))
+
 ## [9.11.3](https://github.com/appium/appium-adb/compare/v9.11.2...v9.11.3) (2023-05-18)
 
 
