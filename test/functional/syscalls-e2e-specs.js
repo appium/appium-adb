@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../../lib/adb';
+import {ADB} from '../../lib/adb';
 import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
 import path from 'path';
 import { getResourcePath } from '../../lib/helpers.js';

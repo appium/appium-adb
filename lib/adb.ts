@@ -1,13 +1,12 @@
 import _ from 'lodash';
-import os from 'os';
-import methods, { getAndroidBinaryPath } from './tools/index.js';
-import {
-  DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv
-} from './helpers';
+import os from 'node:os';
+import methods, {getAndroidBinaryPath} from './tools/index.js';
+import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './helpers.js';
 import log from './logger.js';
+import {StringRecord} from '@appium/types';
 
 const DEFAULT_ADB_PORT = 5037;
-const DEFAULT_OPTS = {
+export const DEFAULT_OPTS: ADBOptions = {
   sdkRoot: getSdkRootFromEnv() || null,
   udid: null,
   appDeviceReadyTimeout: null,
@@ -34,8 +33,44 @@ const DEFAULT_OPTS = {
   allowDelayAdb: true,
 };
 
-class ADB {
-  constructor (opts = {}) {
+export interface ADBOptions {
+  sdkRoot?: string | null;
+  udid?: string | null;
+  appDeviceReadyTimeout?: null;
+  useKeystore?: string | null;
+  keystorePath?: string | null;
+  keystorePassword?: string | null;
+  keyAlias?: string | null;
+  keyPassword?: string | null;
+  executable: ADBExecutable;
+  tmpDir?: string;
+  curDeviceId?: string | null;
+  emulatorPort?: number | null;
+  logcat?: string | null;
+  binaries?: StringRecord;
+  instrumentProc?: string | null;
+  suppressKillServer?: string | null;
+  jars?: StringRecord;
+  adbPort?: number;
+  adbHost?: string | null;
+  adbExecTimeout?: number;
+  remoteAppsCacheLimit?: number;
+  buildToolsVersion?: string | null;
+  allowOfflineDevices?: boolean;
+  allowDelayAdb?: boolean;
+  remoteAdbHost?: string;
+  remoteAdbPort?: number;
+}
+
+export interface ADBExecutable {
+  path: string;
+  defaultArgs: string[];
+}
+
+export class ADB {
+  adbHost?: string;
+  adbPort?: number;
+  constructor(opts: Partial<ADBOptions> = {}) {
     Object.assign(this, opts);
     _.defaultsDeep(this, _.cloneDeep(DEFAULT_OPTS));
 
@@ -48,16 +83,16 @@ class ADB {
     if (opts.remoteAdbPort) {
       this.adbPort = opts.remoteAdbPort;
     }
-    this.executable.defaultArgs.push('-P', this.adbPort);
+    this.executable.defaultArgs.push('-P', String(this.adbPort));
   }
 
   /**
    * Create a new instance of `ADB` that inherits configuration from this `ADB` instance.
    * This avoids the need to call `ADB.createADB()` multiple times.
-   * @param {object} opts - Additional options mapping to pass to the `ADB` constructor.
-   * @returns {ADB} The resulting class instance.
+   * @param opts - Additional options mapping to pass to the `ADB` constructor.
+   * @returns The resulting class instance.
    */
-  clone (opts = {}) {
+  clone(opts: Partial<ADBOptions> = {}): ADB {
     const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
     const cloneOptions = _.defaultsDeep(opts, originalOptions);
 
@@ -73,24 +108,22 @@ class ADB {
 
     return new ADB(cloneOptions);
   }
-}
 
-ADB.createADB = async function createADB (opts) {
-  const adb = new ADB(opts);
-  adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
-  await adb.getAdbWithCorrectAdbPath();
-  try {
-    await adb.adbExec(['start-server']);
-  } catch (e) {
-    log.warn(e.stderr || e.message);
+  static async createADB(opts: Partial<ADBOptions>) {
+    const adb = new ADB(opts);
+    adb.sdkRoot = requireSdkRoot(adb.sdkRoot);
+    adb.getAdbWithCorrectAdbPath();
+    try {
+      await adb.adbExec(['start-server']);
+    } catch (e) {
+      const err = e as import('teen_process').ExecError;
+      log.warn(err.stderr || err.message);
+    }
+    return adb;
   }
-  return adb;
-};
+}
 
 // add all the methods to the ADB prototype
-for (const [fnName, fn] of _.toPairs(methods)) {
-  ADB.prototype[fnName] = fn;
-}
+Object.assign(ADB.prototype, methods);
 
-export default ADB;
-export { ADB, DEFAULT_ADB_PORT, getAndroidBinaryPath, getSdkRootFromEnv };
+export {DEFAULT_ADB_PORT, getAndroidBinaryPath, getSdkRootFromEnv};

@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as teen_process from 'teen_process';
 import { fs } from '@appium/support';
-import ADB from '../../lib/adb';
+import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 import B from 'bluebird';

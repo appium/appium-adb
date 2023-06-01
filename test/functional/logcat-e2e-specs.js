@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../../lib/adb';
+import {ADB} from '../../lib/adb';
 import Logcat from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
 

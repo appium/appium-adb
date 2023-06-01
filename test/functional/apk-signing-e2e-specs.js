@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../../lib/adb.js';
+import {ADB} from '../../lib/adb.js';
 import path from 'path';
 import os from 'os';
 import { unsignApk } from '../../lib/helpers.js';
