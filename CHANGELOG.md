@@ -1,3 +1,10 @@
+## [9.11.5](https://github.com/appium/appium-adb/compare/v9.11.4...v9.11.5) (2023-06-02)
+
+
+### Bug Fixes
+
+* Properly handle the situation where reboot_readiness check returns a non-zero exit code ([#660](https://github.com/appium/appium-adb/issues/660)) ([525a36b](https://github.com/appium/appium-adb/commit/525a36b34e212575b64a4181b702607045a43e22))
+
 ## [9.11.4](https://github.com/appium/appium-adb/compare/v9.11.3...v9.11.4) (2023-05-22)
 
 
