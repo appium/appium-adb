@@ -1,5 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+// eslint-disable-next-line import/no-unresolved
 import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
 
 

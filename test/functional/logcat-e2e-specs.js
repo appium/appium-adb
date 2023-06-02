@@ -1,5 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import Logcat from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
