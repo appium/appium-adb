@@ -20,7 +20,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   describe('getConnectedDevices', function () {
     it('should get all connected devices', async function () {
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'List of devices attached \n emulator-5554	device'});
       let devices = await adb.getConnectedDevices();
       devices.should.have.length.above(0);
@@ -32,7 +32,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
                         '* daemon started successfully *\n' +
                         'emulator-5554	device';
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: stdoutValue});
 
       let devices = await adb.getConnectedDevices();
@@ -40,14 +40,14 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
     });
     it('should fail when adb devices returns unexpected output', async function () {
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'foobar'});
       await adb.getConnectedDevices().should.eventually.be
                                      .rejectedWith('Unexpected output while trying to get devices');
     });
     it('should get all connected devices with verbose output', async function () {
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices', '-l'])
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'devices', '-l'])
         .returns({stdout: 'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo'});
       let devices = await adb.getConnectedDevices({verbose: true});
       devices.should.have.length.above(0);
@@ -61,25 +61,25 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
     it('should fail when there are no connected devices', async function () {
       this.timeout(20000);
       mocks.teen_process.expects('exec')
-        .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .atLeast(2).withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'List of devices attached'});
       mocks.teen_process.expects('exec')
-        .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
+        .atLeast(2).withExactArgs(adb.executable.path, ['-P', '5037', 'kill-server']);
       await adb.getDevicesWithRetry(1000)
         .should.eventually.be.rejectedWith(/Could not find a connected Android device/);
     });
     it('should fail when adb devices returns unexpected output', async function () {
       mocks.teen_process.expects('exec')
-        .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .atLeast(2).withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'foobar'});
       mocks.teen_process.expects('exec')
-        .atLeast(2).withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
+        .atLeast(2).withExactArgs(adb.executable.path, ['-P', '5037', 'kill-server']);
       await adb.getDevicesWithRetry(1000)
         .should.eventually.be.rejectedWith(/Could not find a connected Android device/);
     });
     it('should get all connected devices', async function () {
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'List of devices attached \n emulator-5554	device'});
       const devices = await adb.getDevicesWithRetry(1000);
       devices.should.have.length.above(0);
@@ -89,10 +89,10 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
         .onCall(0)
         .returns({stdout: 'Foobar'});
       mocks.teen_process.expects('exec')
-        .withExactArgs(adb.executable.path, ['-P', 5037, 'devices'])
+        .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .returns({stdout: 'List of devices attached \n emulator-5554	device'});
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.executable.path, ['-P', 5037, 'kill-server']);
+        .once().withExactArgs(adb.executable.path, ['-P', '5037', 'kill-server']);
       const devices = await adb.getDevicesWithRetry(2000);
       devices.should.have.length.above(0);
     });

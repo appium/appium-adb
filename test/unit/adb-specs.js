@@ -27,7 +27,7 @@ describe('ADB', function () {
       });
 
       clone.executable.path.should.equal(original.executable.path);
-      clone.executable.defaultArgs.should.deep.equal(['-a', '-H', 'example.com', '-P', DEFAULT_ADB_PORT]);
+      clone.executable.defaultArgs.should.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
       clone.remoteAdbHost.should.equal('example.com');
       clone.adbHost.should.not.equal(original.adbHost);
     });

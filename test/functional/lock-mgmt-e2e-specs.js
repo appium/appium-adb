@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
-import {ADB} from '../../lib/adb.js';
+import {ADB} from '../../lib/adb';
 
 chai.use(chaiAsPromised);
 

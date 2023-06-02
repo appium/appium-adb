@@ -111,7 +111,7 @@ export class ADB {
 
   static async createADB(opts: Partial<ADBOptions>) {
     const adb = new ADB(opts);
-    adb.sdkRoot = requireSdkRoot(adb.sdkRoot);
+    adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
     adb.getAdbWithCorrectAdbPath();
     try {
       await adb.adbExec(['start-server']);
