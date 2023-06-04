@@ -8,18 +8,26 @@ jobs:
     strategy:
       matrix:
         include:
+        - platformVersion: "12.0"
+          apiLevel: 32
+          emuTag: google_apis
+          arch: x86_64
         - platformVersion: "11.0"
           apiLevel: 30
           emuTag: google_apis
+          arch: x86
         - platformVersion: "9.0"
           apiLevel: 28
           emuTag: default
+          arch: x86
         - platformVersion: "7.1"
           apiLevel: 25
           emuTag: default
+          arch: x86
         - platformVersion: "5.1"
           apiLevel: 22
           emuTag: default
+          arch: x86
     env:
       CI: true
       ANDROID_AVD: emulator
@@ -62,6 +70,9 @@ jobs:
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        arch: ${{ matrix.arch }}
+        ram-size: 4096M
+        heap-size: 1024M
     - run: nohup adb logcat > logcat.log &
       name: Capture Logcat
     - uses: reactivecircus/android-emulator-runner@v2
@@ -75,6 +86,9 @@ jobs:
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        arch: ${{ matrix.arch }}
+        ram-size: 4096M
+        heap-size: 1024M
     - name: Save logcat output
       if: ${{ always() }}
       uses: actions/upload-artifact@master
