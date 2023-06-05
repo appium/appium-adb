@@ -8,8 +8,17 @@
 import {SystemCalls} from './tools/system-calls';
 import {ApkUtils} from './tools/apk-utils';
 import {ADBCommands} from './tools/adb-commands';
-
+import {SettingsClientCommands} from './tools/settings-client-commands';
+import {ADBEmuCommands} from './tools/adb-emu-commands';
+import {LockManagementCommands} from './tools/lockmgmt';
 declare module './adb' {
   // note that ADBOptions is the options object, but it's mixed directly in to the instance in the constructor.
-  interface ADB extends ADBCommands, ApkUtils, SystemCalls, ADBOptions {}
+  interface ADB
+    extends ADBCommands,
+      ApkUtils,
+      SystemCalls,
+      ADBOptions,
+      SettingsClientCommands,
+      ADBEmuCommands,
+      LockManagementCommands {}
 }

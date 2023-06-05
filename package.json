@@ -44,7 +44,7 @@
     "singleQuote": true
   },
   "files": [
-    "index.js",
+    "index.ts",
     "keys",
     "lib",
     "build/index.*",
