@@ -11,9 +11,6 @@ install();
 
 export * from './lib/adb';
 export type * from './lib/mixins';
-export type * from './lib/tools/adb-commands';
-export type * from './lib/tools/adb-emu-commands';
-export type * from './lib/tools/apk-utils';
-export type * from './lib/tools/settings-client-commands';
-export type * from './lib/tools/android-manifest';
+export type * from './lib/tools';
+
 export default ADB;
