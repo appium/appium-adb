@@ -15,4 +15,5 @@ export type * from './lib/tools/adb-commands';
 export type * from './lib/tools/adb-emu-commands';
 export type * from './lib/tools/apk-utils';
 export type * from './lib/tools/settings-client-commands';
+export type * from './lib/tools/android-manifest';
 export default ADB;

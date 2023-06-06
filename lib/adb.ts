@@ -6,60 +6,48 @@ import log from './logger.js';
 import {StringRecord} from '@appium/types';
 
 const DEFAULT_ADB_PORT = 5037;
-export const DEFAULT_OPTS: ADBOptions = {
-  sdkRoot: getSdkRootFromEnv() || null,
-  udid: null,
-  appDeviceReadyTimeout: null,
-  useKeystore: null,
-  keystorePath: null,
-  keystorePassword: null,
-  keyAlias: null,
-  keyPassword: null,
+export const DEFAULT_OPTS = {
+  sdkRoot: getSdkRootFromEnv(),
   executable: {path: 'adb', defaultArgs: []},
   tmpDir: os.tmpdir(),
-  curDeviceId: null,
-  emulatorPort: null,
-  logcat: null,
   binaries: {},
-  instrumentProc: null,
-  suppressKillServer: null,
   jars: {},
   adbPort: DEFAULT_ADB_PORT,
-  adbHost: null,
   adbExecTimeout: DEFAULT_ADB_EXEC_TIMEOUT,
   remoteAppsCacheLimit: 10,
-  buildToolsVersion: null,
   allowOfflineDevices: false,
   allowDelayAdb: true,
-};
+} as const;
 
 export interface ADBOptions {
-  sdkRoot?: string | null;
-  udid?: string | null;
-  appDeviceReadyTimeout?: null;
-  useKeystore?: string | null;
-  keystorePath?: string | null;
-  keystorePassword?: string | null;
-  keyAlias?: string | null;
-  keyPassword?: string | null;
+  sdkRoot?: string;
+  udid?: string;
+  appDeviceReadyTimeout?: number;
+  useKeystore?: boolean;
+  keystorePath?: string;
+  keystorePassword?: string;
+  keyAlias?: string;
+  keyPassword?: string;
   executable: ADBExecutable;
   tmpDir?: string;
-  curDeviceId?: string | null;
-  emulatorPort?: number | null;
-  logcat?: string | null;
+  curDeviceId?: string;
+  emulatorPort?: number;
+  logcat?: string;
   binaries?: StringRecord;
-  instrumentProc?: string | null;
-  suppressKillServer?: string | null;
+  instrumentProc?: string;
+  suppressKillServer?: boolean;
   jars?: StringRecord;
   adbPort?: number;
-  adbHost?: string | null;
+  adbHost?: string;
   adbExecTimeout?: number;
   remoteAppsCacheLimit?: number;
-  buildToolsVersion?: string | null;
+  buildToolsVersion?: string;
   allowOfflineDevices?: boolean;
   allowDelayAdb?: boolean;
   remoteAdbHost?: string;
   remoteAdbPort?: number;
+  clearDeviceLogsOnStart?: boolean;
+  emPort?: number;
 }
 
 export interface ADBExecutable {
@@ -70,18 +58,23 @@ export interface ADBExecutable {
 export class ADB {
   adbHost?: string;
   adbPort?: number;
-  constructor(opts: Partial<ADBOptions> = {}) {
-    Object.assign(this, opts);
-    _.defaultsDeep(this, _.cloneDeep(DEFAULT_OPTS));
 
-    if (opts.remoteAdbHost) {
-      this.executable.defaultArgs.push('-H', opts.remoteAdbHost);
-      this.adbHost = opts.remoteAdbHost;
+  executable: ADBExecutable;
+  constructor(opts: Partial<ADBOptions> = {}) {
+    const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
+    _.defaultsDeep(this, options);
+
+    // avoid TS error by explicitly assigning
+    this.executable = options.executable;
+
+    if (options.remoteAdbHost) {
+      this.executable.defaultArgs.push('-H', options.remoteAdbHost);
+      this.adbHost = options.remoteAdbHost;
     }
     // TODO figure out why we have this option as it does not appear to be
     // used anywhere. Probably deprecate in favor of simple opts.adbPort
-    if (opts.remoteAdbPort) {
-      this.adbPort = opts.remoteAdbPort;
+    if (options.remoteAdbPort) {
+      this.adbPort = options.remoteAdbPort;
     }
     this.executable.defaultArgs.push('-P', String(this.adbPort));
   }

@@ -11,6 +11,7 @@ import {ADBCommands} from './tools/adb-commands';
 import {SettingsClientCommands} from './tools/settings-client-commands';
 import {ADBEmuCommands} from './tools/adb-emu-commands';
 import {LockManagementCommands} from './tools/lockmgmt';
+import {ManifestMethods} from './tools/android-manifest';
 declare module './adb' {
   // note that ADBOptions is the options object, but it's mixed directly in to the instance in the constructor.
   interface ADB
@@ -20,5 +21,6 @@ declare module './adb' {
       ADBOptions,
       SettingsClientCommands,
       ADBEmuCommands,
-      LockManagementCommands {}
+      LockManagementCommands,
+      ManifestMethods {}
 }
