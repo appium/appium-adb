@@ -1,3 +1,10 @@
+## [9.11.6](https://github.com/appium/appium-adb/compare/v9.11.5...v9.11.6) (2023-06-07)
+
+
+### Miscellaneous Chores
+
+* Bump conventional-changelog-conventionalcommits ([#665](https://github.com/appium/appium-adb/issues/665)) ([dc89ea8](https://github.com/appium/appium-adb/commit/dc89ea82e777ae40fd7b0878f3bcdf2d10fcf642))
+
 ## [9.11.5](https://github.com/appium/appium-adb/compare/v9.11.4...v9.11.5) (2023-06-02)
 
 
