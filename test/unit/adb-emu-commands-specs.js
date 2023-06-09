@@ -155,7 +155,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'sms', 'send', phoneNumber, 'Hello Appium'])
+          .once().withExactArgs(['emu', 'sms', 'send', phoneNumber, message])
           .returns();
         await adb.sendSMS(phoneNumber, message);
       });
