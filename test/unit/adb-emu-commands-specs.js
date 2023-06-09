@@ -155,7 +155,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'sms', 'send', '4509', 'Hello Appium'])
+          .once().withExactArgs(['emu', 'sms', 'send', phoneNumber, 'Hello Appium'])
           .returns();
         await adb.sendSMS(phoneNumber, message);
       });
@@ -194,7 +194,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'call');
       });
@@ -207,7 +207,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'accept');
       });
@@ -220,7 +220,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'cancel');
       });
@@ -233,7 +233,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'hold');
       });
