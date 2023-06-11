@@ -1,3 +1,10 @@
+## [9.11.7](https://github.com/appium/appium-adb/compare/v9.11.6...v9.11.7) (2023-06-11)
+
+
+### Bug Fixes
+
+* Streamline parameters validation for emulator commands ([#666](https://github.com/appium/appium-adb/issues/666)) ([70bdf96](https://github.com/appium/appium-adb/commit/70bdf96a5557a27fb2b035a9cc23fdb7a30db547))
+
 ## [9.11.6](https://github.com/appium/appium-adb/compare/v9.11.5...v9.11.6) (2023-06-07)
 
 
