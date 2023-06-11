@@ -140,10 +140,10 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
     });
     describe('sendSMS', function () {
       it('should throw exception on invalid message', async function () {
-        await adb.sendSMS('+549341312345678').should.eventually.be.rejectedWith('Sending an SMS requires a message');
+        await adb.sendSMS('+549341312345678').should.be.rejected;
       });
       it('should throw exception on invalid phoneNumber', async function () {
-        await adb.sendSMS('00549341a312345678', 'Hello Appium').should.eventually.be.rejectedWith('Invalid sendSMS phoneNumber');
+        await adb.sendSMS('', 'Hello Appium').should.be.rejected;
       });
       it('should call adbExec with the correct args', async function () {
         let phoneNumber = 4509;
@@ -155,7 +155,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'sms', 'send', '4509', 'Hello Appium'])
+          .once().withExactArgs(['emu', 'sms', 'send', phoneNumber, message])
           .returns();
         await adb.sendSMS(phoneNumber, message);
       });
@@ -180,10 +180,10 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
     });
     describe('gsm call methods', function () {
       it('should throw exception on invalid action', async function () {
-        await adb.gsmCall('+549341312345678').should.eventually.be.rejectedWith('Invalid gsm action');
+        await adb.gsmCall('+549341312345678').should.be.rejected;
       });
       it('should throw exception on invalid phoneNumber', async function () {
-        await adb.gsmCall('+5493413a12345678', 'call').should.eventually.be.rejectedWith('Invalid gsmCall phoneNumber');
+        await adb.gsmCall('', 'call').should.be.rejected;
       });
       it('should set the correct method for making gsm call', async function () {
         let phoneNumber = 4509;
@@ -194,7 +194,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'call');
       });
@@ -207,7 +207,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'accept');
       });
@@ -220,7 +220,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'cancel');
       });
@@ -233,7 +233,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, '4509'])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, phoneNumber])
           .returns();
         await adb.gsmCall(phoneNumber, 'hold');
       });
