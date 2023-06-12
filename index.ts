@@ -12,5 +12,5 @@ install();
 export * from './lib/adb';
 export type * from './lib/mixins';
 export type * from './lib/tools';
-
+export type * from './lib/logcat';
 export default ADB;

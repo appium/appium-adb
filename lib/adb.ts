@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import os from 'node:os';
-import methods, {getAndroidBinaryPath} from './tools/index.js';
-import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './helpers.js';
-import log from './logger.js';
+import methods, {getAndroidBinaryPath} from './tools';
+import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './helpers';
+import log from './logger';
 import {StringRecord} from '@appium/types';
+import type Logcat from './logcat';
 
 const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -32,7 +33,7 @@ export interface ADBOptions {
   tmpDir?: string;
   curDeviceId?: string;
   emulatorPort?: number;
-  logcat?: string;
+  logcat?: Logcat;
   binaries?: StringRecord;
   instrumentProc?: string;
   suppressKillServer?: boolean;
