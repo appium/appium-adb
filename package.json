@@ -4,13 +4,15 @@
   "description": "Android Debug Bridge interface",
   "main": "./build/index.js",
   "scripts": {
-    "build": "rimraf build && babel --out-dir=build/lib lib && babel --out-dir=build index.js",
+    "build": "tsc -b",
+    "clean": "npm run build -- --clean",
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "precommit-lint": "lint-staged",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
-    "prepare": "npm run build",
+    "prepare": "npm run rebuild",
+    "rebuild": "npm run clean && npm run build",
     "test": "mocha --exit --timeout 1m \"./test/unit/**/*-specs.js\"",
     "e2e-test": "mocha --exit --timeout 5m \"./test/functional/**/*-specs.js\""
   },
@@ -42,17 +44,16 @@
     "singleQuote": true
   },
   "files": [
-    "index.js",
+    "index.ts",
     "keys",
     "lib",
-    "build/index.js",
+    "build/index.*",
     "build/lib",
     "CHANGELOG.md"
   ],
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
     "@appium/support": "^4.0.0",
-    "@babel/runtime": "^7.0.0",
     "adbkit-apkreader": "^3.1.2",
     "async-lock": "^1.0.0",
     "asyncbox": "^2.6.0",
@@ -72,15 +73,21 @@
   "devDependencies": {
     "@appium/eslint-config-appium": "^6.0.0",
     "@appium/test-support": "^3.0.1",
-    "@babel/cli": "^7.18.10",
-    "@babel/core": "^7.18.10",
-    "@babel/eslint-parser": "^7.18.9",
-    "@babel/plugin-transform-runtime": "^7.18.10",
-    "@babel/preset-env": "^7.18.10",
-    "@babel/register": "^7.18.9",
+    "@appium/types": "^0.11.1",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
-    "babel-plugin-source-map-support": "^2.2.0",
+    "@types/async-lock": "^1.4.0",
+    "@types/bluebird": "^3.5.38",
+    "@types/chai": "^4.3.5",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/ini": "^1.3.31",
+    "@types/lodash": "^4.14.195",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.2.5",
+    "@types/semver": "^7.5.0",
+    "@types/sinon": "^10.0.15",
+    "@types/source-map-support": "^0.5.6",
+    "@types/teen_process": "^2.0.0",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "conventional-changelog-conventionalcommits": "^6.0.0",
@@ -96,6 +103,9 @@
     "rimraf": "^5.0.0",
     "semantic-release": "^20.0.2",
     "sinon": "^15.0.0",
-    "temp": "^0.x"
-  }
+    "temp": "^0.x",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  },
+  "types": "./build/index.d.ts"
 }

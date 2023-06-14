@@ -1,6 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../../lib/adb';
+// eslint-disable-next-line import/no-unresolved
+import {ADB} from '../../lib/adb';
 import path from 'path';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, mkdirp } from '@appium/support';

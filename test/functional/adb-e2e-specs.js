@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import ADB from '../../lib/adb';
+// eslint-disable-next-line import/no-unresolved
+import {ADB} from '../../lib/adb';
 import { fs } from '@appium/support';
 import path from 'path';
 
