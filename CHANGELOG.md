@@ -1,3 +1,10 @@
+## [9.12.0](https://github.com/appium/appium-adb/compare/v9.11.7...v9.12.0) (2023-06-14)
+
+
+### Features
+
+* export types ([#661](https://github.com/appium/appium-adb/issues/661)) ([269f3aa](https://github.com/appium/appium-adb/commit/269f3aae28dcb0a7627a780d2130f847bdf6889d))
+
 ## [9.11.7](https://github.com/appium/appium-adb/compare/v9.11.6...v9.11.7) (2023-06-11)
 
 
