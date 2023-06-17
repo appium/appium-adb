@@ -1,3 +1,10 @@
+## [9.12.1](https://github.com/appium/appium-adb/compare/v9.12.0...v9.12.1) (2023-06-17)
+
+
+### Miscellaneous Chores
+
+* Bump @appium/types from 0.11.1 to 0.13.0 ([#670](https://github.com/appium/appium-adb/issues/670)) ([c09f359](https://github.com/appium/appium-adb/commit/c09f35957f7899667d3dff5e6642c32bea22d349))
+
 ## [9.12.0](https://github.com/appium/appium-adb/compare/v9.11.7...v9.12.0) (2023-06-14)
 
 
