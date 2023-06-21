@@ -1,3 +1,10 @@
+## [9.13.0](https://github.com/appium/appium-adb/compare/v9.12.2...v9.13.0) (2023-06-21)
+
+
+### Features
+
+* Add a helper to take screenshots ([#671](https://github.com/appium/appium-adb/issues/671)) ([30e61b5](https://github.com/appium/appium-adb/commit/30e61b554301b5232b69fe3336cc8ea864ddffb1))
+
 ## [9.12.2](https://github.com/appium/appium-adb/compare/v9.12.1...v9.12.2) (2023-06-21)
 
 
