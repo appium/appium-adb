@@ -331,4 +331,10 @@ describe('adb commands', function () {
       }
     });
   });
+
+  describe('takeScreenshot', function () {
+    it('should return screenshot', async function () {
+      _.isEmpty(await adb.takeScreenshot()).should.be.false;
+    });
+  });
 });
