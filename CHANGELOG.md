@@ -1,3 +1,10 @@
+## [9.12.2](https://github.com/appium/appium-adb/compare/v9.12.1...v9.12.2) (2023-06-21)
+
+
+### Bug Fixes
+
+* insert a missing await keyword ([#672](https://github.com/appium/appium-adb/issues/672)) ([63f8281](https://github.com/appium/appium-adb/commit/63f82817547d00014ee6feebaf0aae40c6cca401))
+
 ## [9.12.1](https://github.com/appium/appium-adb/compare/v9.12.0...v9.12.1) (2023-06-17)
 
 
