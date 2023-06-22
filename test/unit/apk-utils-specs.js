@@ -808,10 +808,12 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         User 0: ceDataInode=474317 installed=true hidden=false suspended=false stopped=true notLaunched=true enabled=0
           runtime permissions:`);
       const result = await adb.getPackageInfo('com.example.testapp.first');
-      for (let [name, value] of [
+      for (const [name, value] of [
         ['name', 'com.example.testapp.first'],
         ['versionCode', 1],
-        ['versionName', '1.0']]) {
+        ['versionName', '1.0'],
+        ['isInstalled', true]
+      ]) {
         result.should.have.property(name, value);
       }
     });
