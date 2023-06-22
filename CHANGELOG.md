@@ -1,3 +1,10 @@
+## [9.13.1](https://github.com/appium/appium-adb/compare/v9.13.0...v9.13.1) (2023-06-22)
+
+
+### Miscellaneous Chores
+
+* Speed up app installation detection ([#673](https://github.com/appium/appium-adb/issues/673)) ([dfd8357](https://github.com/appium/appium-adb/commit/dfd835701b912315b89f73b8735d057718d70a2e))
+
 ## [9.13.0](https://github.com/appium/appium-adb/compare/v9.12.2...v9.13.0) (2023-06-21)
 
 
