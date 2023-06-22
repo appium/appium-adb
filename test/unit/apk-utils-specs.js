@@ -50,18 +50,15 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     it('should parse correctly and return true', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
-        .twice().withExactArgs(['dumpsys', 'package', pkg])
-        .returns(`Packages:
-          Package [${pkg}] (2469669):
-            userId=2000`);
+        .twice().withExactArgs(['pm', 'path', pkg])
+        .returns(`package:/system/priv-app/TeleService/TeleService.apk`);
       (await adb.isAppInstalled(pkg)).should.be.true;
     });
     it('should parse correctly and return false', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('shell')
-        .once().withExactArgs(['dumpsys', 'package', pkg])
-        .returns(`Dexopt state:
-          Unable to find package: ${pkg}`);
+        .once().withExactArgs(['pm', 'path', pkg])
+        .throws();
       (await adb.isAppInstalled(pkg)).should.be.false;
     });
   });
