@@ -1,3 +1,10 @@
+## [9.13.2](https://github.com/appium/appium-adb/compare/v9.13.1...v9.13.2) (2023-06-23)
+
+
+### Miscellaneous Chores
+
+* Add a troubleshooting link to the WRITE_SECURE_SETTINGS error message ([#674](https://github.com/appium/appium-adb/issues/674)) ([b04b876](https://github.com/appium/appium-adb/commit/b04b8767e17500ac0a37150bc15f2e51d69a9872))
+
 ## [9.13.1](https://github.com/appium/appium-adb/compare/v9.13.0...v9.13.1) (2023-06-22)
 
 
