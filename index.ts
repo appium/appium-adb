@@ -5,12 +5,13 @@
  */
 
 import {install} from 'source-map-support';
-import {ADB} from './lib/adb';
-
 install();
+
+import {ADB} from './lib/adb';
 
 export * from './lib/adb';
 export type * from './lib/mixins';
 export type * from './lib/tools';
 export type * from './lib/logcat';
+export type * from './lib/options';
 export default ADB;
