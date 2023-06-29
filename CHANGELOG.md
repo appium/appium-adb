@@ -1,3 +1,10 @@
+## [9.13.3](https://github.com/appium/appium-adb/compare/v9.13.2...v9.13.3) (2023-06-29)
+
+
+### Miscellaneous Chores
+
+* Update the name of the 'delete' method of LRU cache ([#678](https://github.com/appium/appium-adb/issues/678)) ([4e04e94](https://github.com/appium/appium-adb/commit/4e04e94d3595d695c64d25e9f9bde37603c82082))
+
 ## [9.13.2](https://github.com/appium/appium-adb/compare/v9.13.1...v9.13.2) (2023-06-23)
 
 
