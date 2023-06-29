@@ -1,3 +1,10 @@
+## [9.14.1](https://github.com/appium/appium-adb/compare/v9.14.0...v9.14.1) (2023-06-29)
+
+
+### Miscellaneous Chores
+
+* add husky and commitlint ([75e86fc](https://github.com/appium/appium-adb/commit/75e86fc6d1bd2a691b3051656fa880503f62380d))
+
 ## [9.14.0](https://github.com/appium/appium-adb/compare/v9.13.3...v9.14.0) (2023-06-29)
 
 
