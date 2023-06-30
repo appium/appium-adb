@@ -104,7 +104,7 @@
     "sinon": "^15.0.0",
     "temp": "^0.x",
     "ts-node": "^10.9.1",
-    "typescript": "~5.0.4"
+    "typescript": "~5.1.6"
   },
   "types": "./build/index.d.ts"
 }
