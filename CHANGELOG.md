@@ -1,3 +1,10 @@
+## [9.14.2](https://github.com/appium/appium-adb/compare/v9.14.1...v9.14.2) (2023-07-07)
+
+
+### Miscellaneous Chores
+
+* Bump prettier from 2.8.8 to 3.0.0 ([#682](https://github.com/appium/appium-adb/issues/682)) ([a2b4e6d](https://github.com/appium/appium-adb/commit/a2b4e6de31f7bd3d98a8202bdb2fcbde3ebee463))
+
 ## [9.14.1](https://github.com/appium/appium-adb/compare/v9.14.0...v9.14.1) (2023-06-29)
 
 
