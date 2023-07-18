@@ -983,12 +983,30 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('isTestPackageOnly', function () {
-    it('should return true on INSTALL_FAILED_TEST_ONLY meesage found in adb install output', function () {
+    it('should return true on INSTALL_FAILED_TEST_ONLY message found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_TEST_ONLY]').should.equal(true);
       apksUtilsMethods.isTestPackageOnlyError(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
     });
-    it('should return false on INSTALL_FAILED_TEST_ONLY meesage not found in adb install output', function () {
+    it('should return false on INSTALL_FAILED_TEST_ONLY message not found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
+    });
+  });
+  describe('isInstallFailed', function () {
+    it('should return true on INSTALL and FAILED words found in adb install output', function () {
+      apksUtilsMethods.isInstallFailed('[INSTALL_PARSE_FAILED_NO_CERTIFICATES]').should.equal(true);
+      apksUtilsMethods.isInstallFailed(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
+    });
+    it('should return false on INSTALL and FAILED words found in adb install output', function () {
+      apksUtilsMethods.isInstallFailed('[INSTALL_PARSE_NO_CERTIFICATE]').should.equal(false);
+    });
+  });
+  describe('isInsufficientSignatureScheme', function () {
+    it('should return true on INSTALL_PARSE_FAILED_NO_CERTIFICATES message found in adb install output', function () {
+      apksUtilsMethods.isInsufficientSignatureScheme('[INSTALL_PARSE_FAILED_NO_CERTIFICATES]').should.equal(true);
+      apksUtilsMethods.isInsufficientSignatureScheme(' [INSTALL_PARSE_FAILED_NO_CERTIFICATES] ').should.equal(true);
+    });
+    it('should return false on INSTALL_PARSE_FAILED_NO_CERTIFICATES message not found in adb install output', function () {
+      apksUtilsMethods.isInsufficientSignatureScheme('[INSTALL_PARSE_FAILED_NO_CERTIFICATE]').should.equal(false);
     });
   });
   describe('installMultipleApks', function () {
