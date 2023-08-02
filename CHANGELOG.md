@@ -1,3 +1,10 @@
+## [9.14.4](https://github.com/appium/appium-adb/compare/v9.14.3...v9.14.4) (2023-08-02)
+
+
+### Miscellaneous Chores
+
+* Bump lru-cache from 7.18.3 to 10.0.0 ([#669](https://github.com/appium/appium-adb/issues/669)) ([95de39f](https://github.com/appium/appium-adb/commit/95de39f78c6f88cbb117f053ed3fc0dd2fffb052))
+
 ## [9.14.3](https://github.com/appium/appium-adb/compare/v9.14.2...v9.14.3) (2023-08-02)
 
 
