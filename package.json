@@ -61,7 +61,7 @@
     "bluebird": "^3.4.7",
     "ini": "^4.1.1",
     "lodash": "^4.0.0",
-    "lru-cache": "^7.3.0",
+    "lru-cache": "^10.0.0",
     "semver": "^7.0.0",
     "source-map-support": "^0.x",
     "teen_process": "^2.0.1",
