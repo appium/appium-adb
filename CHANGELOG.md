@@ -1,3 +1,10 @@
+## [9.14.3](https://github.com/appium/appium-adb/compare/v9.14.2...v9.14.3) (2023-08-02)
+
+
+### Miscellaneous Chores
+
+* Bump ini from 3.0.1 to 4.1.1 ([#657](https://github.com/appium/appium-adb/issues/657)) ([aa156b8](https://github.com/appium/appium-adb/commit/aa156b8452f25ff9bd1330de6ba118c9d9100bef))
+
 ## [9.14.2](https://github.com/appium/appium-adb/compare/v9.14.1...v9.14.2) (2023-07-07)
 
 
