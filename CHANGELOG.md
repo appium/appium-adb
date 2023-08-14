@@ -1,3 +1,10 @@
+## [9.14.5](https://github.com/appium/appium-adb/compare/v9.14.4...v9.14.5) (2023-08-14)
+
+
+### Miscellaneous Chores
+
+* Bump lint-staged from 13.3.0 to 14.0.0 ([#684](https://github.com/appium/appium-adb/issues/684)) ([ba3e7e1](https://github.com/appium/appium-adb/commit/ba3e7e166249007b36694dc6190070a35d813d28))
+
 ## [9.14.4](https://github.com/appium/appium-adb/compare/v9.14.3...v9.14.4) (2023-08-02)
 
 
