@@ -1,3 +1,10 @@
+## [9.14.6](https://github.com/appium/appium-adb/compare/v9.14.5...v9.14.6) (2023-08-25)
+
+
+### Miscellaneous Chores
+
+* Bump semantic-release from 20.1.3 to 21.1.0 ([#686](https://github.com/appium/appium-adb/issues/686)) ([1429917](https://github.com/appium/appium-adb/commit/1429917b78e07934e452d32b199da663e25b0250))
+
 ## [9.14.5](https://github.com/appium/appium-adb/compare/v9.14.4...v9.14.5) (2023-08-14)
 
 
