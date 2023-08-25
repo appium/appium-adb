@@ -1,3 +1,10 @@
+## [9.14.7](https://github.com/appium/appium-adb/compare/v9.14.6...v9.14.7) (2023-08-25)
+
+
+### Bug Fixes
+
+* Arguments order for the LRUCache.dispose call ([#687](https://github.com/appium/appium-adb/issues/687)) ([e4a4eb3](https://github.com/appium/appium-adb/commit/e4a4eb311c599c3c23efef482f300df8a29075ae))
+
 ## [9.14.6](https://github.com/appium/appium-adb/compare/v9.14.5...v9.14.6) (2023-08-25)
 
 
