@@ -1,3 +1,15 @@
+## [9.14.9](https://github.com/appium/appium-adb/compare/v9.14.8...v9.14.9) (2023-08-28)
+
+
+### Bug Fixes
+
+* Move utf7 encoding primitives to the module codebase ([#689](https://github.com/appium/appium-adb/issues/689)) ([334c0b6](https://github.com/appium/appium-adb/commit/334c0b67d2e02d4c3216d7ecd09e9275cd44eb9a))
+
+
+### Miscellaneous Chores
+
+* Bump typescript from 5.0.4 to 5.2.2 ([#688](https://github.com/appium/appium-adb/issues/688)) ([f3b5be1](https://github.com/appium/appium-adb/commit/f3b5be1ae93f2cd6cc1039d6e8f8768a7d246491))
+
 ## [9.14.8](https://github.com/appium/appium-adb/compare/v9.14.7...v9.14.8) (2023-08-28)
 
 
