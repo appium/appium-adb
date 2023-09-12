@@ -1,3 +1,10 @@
+## [9.14.10](https://github.com/appium/appium-adb/compare/v9.14.9...v9.14.10) (2023-09-12)
+
+
+### Bug Fixes
+
+* JSON data parsing with extras ([#691](https://github.com/appium/appium-adb/issues/691)) ([3adb3cd](https://github.com/appium/appium-adb/commit/3adb3cdb635d66696433da3963192d86d0cddda5))
+
 ## [9.14.9](https://github.com/appium/appium-adb/compare/v9.14.8...v9.14.9) (2023-08-28)
 
 
