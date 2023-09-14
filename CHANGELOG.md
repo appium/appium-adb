@@ -1,3 +1,10 @@
+## [9.14.11](https://github.com/appium/appium-adb/compare/v9.14.10...v9.14.11) (2023-09-14)
+
+
+### Miscellaneous Chores
+
+* Log a proper error message if getConnectedDevices API throws an exception ([#692](https://github.com/appium/appium-adb/issues/692)) ([8330a64](https://github.com/appium/appium-adb/commit/8330a64025fad6cb9cd7f59329ea58b190c69d8b))
+
 ## [9.14.10](https://github.com/appium/appium-adb/compare/v9.14.9...v9.14.10) (2023-09-12)
 
 
