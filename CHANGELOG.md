@@ -1,3 +1,15 @@
+## [9.14.12](https://github.com/appium/appium-adb/compare/v9.14.11...v9.14.12) (2023-10-08)
+
+
+### Bug Fixes
+
+* Fallback the boot detection if the device does not have reboot_readiness service ([#697](https://github.com/appium/appium-adb/issues/697)) ([8a84148](https://github.com/appium/appium-adb/commit/8a841483429b1949ac663829f8801f62ee88f49c))
+
+
+### Miscellaneous Chores
+
+* Bump sinon from 15.2.0 to 16.0.0 ([7a51919](https://github.com/appium/appium-adb/commit/7a51919af82716beebba4880e404275925b54488))
+
 ## [9.14.11](https://github.com/appium/appium-adb/compare/v9.14.10...v9.14.11) (2023-09-14)
 
 
