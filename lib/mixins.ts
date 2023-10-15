@@ -16,6 +16,7 @@ import {
   KeyboardCommands,
   ApkSigningCommands,
   ApksUtils,
+  AabUtils,
 } from './tools';
 import {ADBOptions} from './options';
 
@@ -23,6 +24,7 @@ declare module './adb' {
   // note that ADBOptions is the options object, but it's mixed directly in to the instance in the constructor.
   interface ADB
     extends ADBCommands,
+      AabUtils,
       ApkUtils,
       ApksUtils,
       SystemCalls,

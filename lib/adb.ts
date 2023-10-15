@@ -4,6 +4,7 @@ import methods, {getAndroidBinaryPath} from './tools';
 import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './helpers';
 import log from './logger';
 import type {ADBOptions, ADBExecutable} from './options';
+import type { LogcatOpts } from './logcat';
 
 const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -22,6 +23,13 @@ export const DEFAULT_OPTS = {
 export class ADB {
   adbHost?: string;
   adbPort?: number;
+  _apiLevel: number|undefined;
+  _logcatStartupParams: LogcatOpts|undefined;
+  _doesPsSupportAOption: boolean|undefined;
+  _isPgrepAvailable: boolean|undefined;
+  _canPgrepUseFullCmdLineSearch: boolean|undefined;
+  _isPidofAvailable: boolean|undefined;
+  _memoizedFeatures: (() => Promise<string>)|undefined;
 
   executable: ADBExecutable;
   constructor(opts: Partial<ADBOptions> = {}) {
