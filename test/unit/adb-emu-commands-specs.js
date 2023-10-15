@@ -125,7 +125,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'power', 'capacity', 0])
+          .once().withExactArgs(['emu', 'power', 'capacity', '0'])
           .returns();
         await adb.powerCapacity(0);
       });
@@ -156,7 +156,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'sms', 'send', phoneNumber, message])
+          .once().withExactArgs(['emu', 'sms', 'send', `${phoneNumber}`, message])
           .returns();
         await adb.sendSMS(phoneNumber, message);
       });
@@ -174,7 +174,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', 'signal-profile', signalStrength])
+          .once().withExactArgs(['emu', 'gsm', 'signal-profile', `${signalStrength}`])
           .returns();
         await adb.gsmSignal(signalStrength);
       });
@@ -195,7 +195,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, phoneNumber])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, `${phoneNumber}`])
           .returns();
         await adb.gsmCall(phoneNumber, 'call');
       });
@@ -208,7 +208,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, phoneNumber])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, `${phoneNumber}`])
           .returns();
         await adb.gsmCall(phoneNumber, 'accept');
       });
@@ -221,7 +221,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, phoneNumber])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, `${phoneNumber}`])
           .returns();
         await adb.gsmCall(phoneNumber, 'cancel');
       });
@@ -234,7 +234,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, phoneNumber])
+          .once().withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, `${phoneNumber}`])
           .returns();
         await adb.gsmCall(phoneNumber, 'hold');
       });
@@ -362,7 +362,7 @@ describe('adb emulator commands', withMocks({adb}, function (mocks) {
           .once().withExactArgs()
           .returns();
         mocks.adb.expects('adbExec')
-          .once().withExactArgs(['emu', 'sensor', 'set', 'humidity', 100])
+          .once().withExactArgs(['emu', 'sensor', 'set', 'humidity', `${100}`])
           .returns();
         await adb.sensorSet('humidity', 100);
       });
