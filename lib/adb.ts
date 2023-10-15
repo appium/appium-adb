@@ -5,6 +5,7 @@ import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './hel
 import log from './logger';
 import type {ADBOptions, ADBExecutable} from './options';
 import type { LogcatOpts } from './logcat';
+import type { LRUCache } from 'lru-cache';
 
 const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -30,6 +31,9 @@ export class ADB {
   _canPgrepUseFullCmdLineSearch: boolean|undefined;
   _isPidofAvailable: boolean|undefined;
   _memoizedFeatures: (() => Promise<string>)|undefined;
+  _areExtendedLsOptionsSupported: boolean|undefined;
+  remoteAppsCache: LRUCache<string, string>|undefined;
+  _isLockManagementSupported: boolean|undefined;
 
   executable: ADBExecutable;
   constructor(opts: Partial<ADBOptions> = {}) {
