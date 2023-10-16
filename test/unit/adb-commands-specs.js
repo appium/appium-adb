@@ -239,9 +239,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     describe('keyevent', function () {
       it('should call shell with correct args', async function () {
         let keycode = '29';
-        let code = parseInt(keycode, 10);
         mocks.adb.expects('shell')
-          .once().withExactArgs(['input', 'keyevent', code])
+          .once().withExactArgs(['input', 'keyevent', keycode])
           .returns('');
         await adb.keyevent(keycode);
       });
@@ -846,7 +845,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
 
       it('should call kill process correctly', async function () {
         mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', pid])
+          .once().withExactArgs(['kill', `${pid}`])
           .returns('');
         await adb.killProcessByPID(pid);
       });
@@ -1201,8 +1200,8 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
   });
   it('isValidClass should correctly validate class names', function () {
-    adb.isValidClass('some.package/some.package.Activity').index.should.equal(0);
-    should.not.exist(adb.isValidClass('illegalPackage#/adsasd'));
+    adb.isValidClass('some.package/some.package.Activity').should.be.true;
+    adb.isValidClass('illegalPackage#/adsasd').should.be.false;
   });
   it('getAdbPath should correctly return adbPath', function () {
     adb.getAdbPath().should.equal(adb.executable.path);
@@ -1219,7 +1218,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       let proxyPort = 4723;
       mocks.adb.expects('setSetting').once().withExactArgs('global', 'http_proxy', `${proxyHost}:${proxyPort}`);
       mocks.adb.expects('setSetting').once().withExactArgs('global', 'global_http_proxy_host', proxyHost);
-      mocks.adb.expects('setSetting').once().withExactArgs('global', 'global_http_proxy_port', proxyPort);
+      mocks.adb.expects('setSetting').once().withExactArgs('global', 'global_http_proxy_port', `${proxyPort}`);
       await adb.setHttpProxy(proxyHost, proxyPort);
     });
   });
