@@ -1,3 +1,14 @@
+## [10.0.0](https://github.com/appium/appium-adb/compare/v9.14.12...v10.0.0) (2023-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* Some type declarations have been changed in order to make the compiler happy
+
+### Features
+
+* Improve type declarations ([#698](https://github.com/appium/appium-adb/issues/698)) ([7d2588a](https://github.com/appium/appium-adb/commit/7d2588a1842be73dd77c08c493e7aef5aa4ee92d))
+
 ## [9.14.12](https://github.com/appium/appium-adb/compare/v9.14.11...v9.14.12) (2023-10-08)
 
 
