@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import net from 'net';
-import events from 'events';
 import Logcat from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
@@ -870,37 +869,6 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .once().withExactArgs(['am', 'broadcast', '-a', intent])
           .returns('');
         await adb.broadcast(intent);
-      });
-    });
-    describe('instrument', function () {
-      it('should call shell with correct arguments', async function () {
-        let intent = 'intent';
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['am', 'broadcast', '-a', intent])
-          .returns('');
-        await adb.broadcast(intent);
-      });
-    });
-    describe('androidCoverage', function () {
-      it('should call shell with correct arguments', async function () {
-        adb.executable.defaultArgs = [];
-        adb.executable.path = 'dummy_adb_path';
-        let conn = new events.EventEmitter();
-        conn.start = () => { }; // do nothing
-        const instrumentClass = 'instrumentClass',
-              waitPkg = 'waitPkg',
-              waitActivity = 'waitActivity';
-        let args = adb.executable.defaultArgs
-          .concat(['shell', 'am', 'instrument', '-e', 'coverage', 'true', '-w'])
-          .concat([instrumentClass]);
-        mocks.teen_process.expects('SubProcess')
-          .withArgs('dummy_adb_path', args)
-          .onFirstCall()
-          .returns(conn);
-        mocks.adb.expects('waitForActivity')
-          .once().withExactArgs(waitPkg, waitActivity)
-          .returns('');
-        await adb.androidCoverage(instrumentClass, waitPkg, waitActivity);
       });
     });
   });

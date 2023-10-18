@@ -13,7 +13,6 @@ export const DEFAULT_OPTS = {
   executable: {path: 'adb', defaultArgs: []},
   tmpDir: os.tmpdir(),
   binaries: {},
-  jars: {},
   adbPort: DEFAULT_ADB_PORT,
   adbExecTimeout: DEFAULT_ADB_EXEC_TIMEOUT,
   remoteAppsCacheLimit: 10,
