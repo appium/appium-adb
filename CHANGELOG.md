@@ -1,3 +1,11 @@
+## [11.0.1](https://github.com/appium/appium-adb/compare/v11.0.0...v11.0.1) (2023-10-18)
+
+
+### Miscellaneous Chores
+
+* Bump lint-staged from 14.0.1 to 15.0.1 ([#699](https://github.com/appium/appium-adb/issues/699)) ([8b19369](https://github.com/appium/appium-adb/commit/8b193696e8fb07b75ea1e76fe55ff8300ee3b165))
+* Bump semantic-release from 21.1.2 to 22.0.5 ([#696](https://github.com/appium/appium-adb/issues/696)) ([40b8bad](https://github.com/appium/appium-adb/commit/40b8bad87f2a93e99c55e657c28495e7173c586d))
+
 ## [11.0.0](https://github.com/appium/appium-adb/compare/v10.0.0...v11.0.0) (2023-10-18)
 
 
