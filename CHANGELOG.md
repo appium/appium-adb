@@ -1,3 +1,17 @@
+## [11.0.0](https://github.com/appium/appium-adb/compare/v10.0.0...v11.0.0) (2023-10-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* The obsolete emPort property has been removed. Use emulatorPort instead
+* The following coverage-related methods were removed as obsolete: endAndroidCoverage, instrument, androidCoverage
+* The obsolete jars property has been removed.
+* The obsolete instrumentProc property has been removed.
+
+### Code Refactoring
+
+* Remove obsolete methods and properties ([#700](https://github.com/appium/appium-adb/issues/700)) ([2673b96](https://github.com/appium/appium-adb/commit/2673b96915e3942bb3981a4a56740c3db40c36cc))
+
 ## [10.0.0](https://github.com/appium/appium-adb/compare/v9.14.12...v10.0.0) (2023-10-16)
 
 
