@@ -103,9 +103,6 @@ console.log(await adb.getPIDsByName('com.android.phone'));
 - `killProcessByPID`
 - `broadcastProcessEnd`
 - `broadcast`
-- `endAndroidCoverage`
-- `instrument`
-- `androidCoverage`
 - `packageAndLaunchActivityFromManifest`
 - `compileManifest`
 - `insertManifest`

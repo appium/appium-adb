@@ -17,9 +17,7 @@ export interface ADBOptions {
   emulatorPort?: number;
   logcat?: Logcat;
   binaries?: StringRecord;
-  instrumentProc?: SubProcess;
   suppressKillServer?: boolean;
-  jars?: StringRecord;
   adbPort?: number;
   adbHost?: string;
   adbExecTimeout?: number;
@@ -30,7 +28,6 @@ export interface ADBOptions {
   remoteAdbHost?: string;
   remoteAdbPort?: number;
   clearDeviceLogsOnStart?: boolean;
-  emPort?: number;
 }
 
 export interface ADBExecutable {
