@@ -4,6 +4,7 @@
   "compilerOptions": {
     "outDir": "build",
     "checkJs": true,
+    "esModuleInterop": true,
     "types": ["node"],
     "strict": false
   },
