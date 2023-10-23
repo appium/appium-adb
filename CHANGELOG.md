@@ -1,3 +1,15 @@
+## [11.0.2](https://github.com/appium/appium-adb/compare/v11.0.1...v11.0.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* Fix linter errors ([#705](https://github.com/appium/appium-adb/issues/705)) ([c3977b9](https://github.com/appium/appium-adb/commit/c3977b99ed8d2d16e02d81c816f470aed925fc00))
+
+
+### Miscellaneous Chores
+
+* Always use latest types ([618cab3](https://github.com/appium/appium-adb/commit/618cab30441123c463805fd3b1ca14c8dc9215f9))
+
 ## [11.0.1](https://github.com/appium/appium-adb/compare/v11.0.0...v11.0.1) (2023-10-18)
 
 
