@@ -1,3 +1,11 @@
+## [11.0.3](https://github.com/appium/appium-adb/compare/v11.0.2...v11.0.3) (2023-10-24)
+
+
+### Miscellaneous Chores
+
+* Bump @commitlint/cli from 17.8.1 to 18.0.0 ([#703](https://github.com/appium/appium-adb/issues/703)) ([da44361](https://github.com/appium/appium-adb/commit/da443616d397c0c983db4eabd28bd98567492508))
+* Bump sinon from 16.1.3 to 17.0.0 ([#704](https://github.com/appium/appium-adb/issues/704)) ([152b210](https://github.com/appium/appium-adb/commit/152b2108c3b0bbcbd0b114592bbac54c34255eaf))
+
 ## [11.0.2](https://github.com/appium/appium-adb/compare/v11.0.1...v11.0.2) (2023-10-23)
 
 
