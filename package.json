@@ -71,7 +71,7 @@
     "@appium/test-support": "^3.0.1",
     "@appium/types": "^0.x",
     "@commitlint/cli": "^18.0.0",
-    "@commitlint/config-conventional": "^17.6.6",
+    "@commitlint/config-conventional": "^18.0.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/async-lock": "^1.4.0",
