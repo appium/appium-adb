@@ -1,3 +1,10 @@
+## [11.0.4](https://github.com/appium/appium-adb/compare/v11.0.3...v11.0.4) (2023-10-25)
+
+
+### Miscellaneous Chores
+
+* Bump @commitlint/config-conventional from 17.8.1 to 18.1.0 ([#706](https://github.com/appium/appium-adb/issues/706)) ([37a7476](https://github.com/appium/appium-adb/commit/37a7476e66029a51364c42eb1f25b9b4fa2e9625))
+
 ## [11.0.3](https://github.com/appium/appium-adb/compare/v11.0.2...v11.0.3) (2023-10-24)
 
 
