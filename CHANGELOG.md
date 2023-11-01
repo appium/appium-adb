@@ -1,3 +1,10 @@
+## [11.0.5](https://github.com/appium/appium-adb/compare/v11.0.4...v11.0.5) (2023-11-01)
+
+
+### Miscellaneous Chores
+
+* Bump asyncbox from 2.9.4 to 3.0.0 ([#707](https://github.com/appium/appium-adb/issues/707)) ([799dcad](https://github.com/appium/appium-adb/commit/799dcadfda28d60497de32a612ae0f1e02875636))
+
 ## [11.0.4](https://github.com/appium/appium-adb/compare/v11.0.3...v11.0.4) (2023-10-25)
 
 
