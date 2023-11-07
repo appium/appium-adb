@@ -1,3 +1,10 @@
+## [11.0.6](https://github.com/appium/appium-adb/compare/v11.0.5...v11.0.6) (2023-11-07)
+
+
+### Miscellaneous Chores
+
+* Bump @types/sinon from 10.0.20 to 17.0.0 ([#708](https://github.com/appium/appium-adb/issues/708)) ([0d2eabe](https://github.com/appium/appium-adb/commit/0d2eabe03646533bfe5cc46f1d51440f3bf80690))
+
 ## [11.0.5](https://github.com/appium/appium-adb/compare/v11.0.4...v11.0.5) (2023-11-01)
 
 
