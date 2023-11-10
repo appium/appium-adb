@@ -55,7 +55,7 @@
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
     "@appium/support": "^4.0.0",
-    "adbkit-apkreader": "^3.1.2",
+    "@devicefarmer/adbkit-apkreader": "^3.2.4",
     "async-lock": "^1.0.0",
     "asyncbox": "^3.0.0",
     "bluebird": "^3.4.7",
