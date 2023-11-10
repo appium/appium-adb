@@ -1,3 +1,10 @@
+## [11.0.7](https://github.com/appium/appium-adb/compare/v11.0.6...v11.0.7) (2023-11-10)
+
+
+### Miscellaneous Chores
+
+* change the reference of adbkit-apkreader ([#709](https://github.com/appium/appium-adb/issues/709)) ([6acc15e](https://github.com/appium/appium-adb/commit/6acc15e292493edbb61a37c538667571a851f359))
+
 ## [11.0.6](https://github.com/appium/appium-adb/compare/v11.0.5...v11.0.6) (2023-11-07)
 
 
