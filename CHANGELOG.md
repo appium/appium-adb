@@ -1,3 +1,10 @@
+## [11.0.8](https://github.com/appium/appium-adb/compare/v11.0.7...v11.0.8) (2023-11-19)
+
+
+### Miscellaneous Chores
+
+* Update the link in the troubleshooting error message ([#710](https://github.com/appium/appium-adb/issues/710)) ([c4f61dc](https://github.com/appium/appium-adb/commit/c4f61dc19b2180098d7ce850fd4cd739a33f03c6))
+
 ## [11.0.7](https://github.com/appium/appium-adb/compare/v11.0.6...v11.0.7) (2023-11-10)
 
 
