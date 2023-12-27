@@ -1,3 +1,10 @@
+## [11.0.9](https://github.com/appium/appium-adb/compare/v11.0.8...v11.0.9) (2023-12-27)
+
+
+### Miscellaneous Chores
+
+* Bump @types/ini from 1.3.34 to 4.1.0 ([#713](https://github.com/appium/appium-adb/issues/713)) ([d68cb79](https://github.com/appium/appium-adb/commit/d68cb798061cd4a0ebdad211bcea1aced9029962))
+
 ## [11.0.8](https://github.com/appium/appium-adb/compare/v11.0.7...v11.0.8) (2023-11-19)
 
 
