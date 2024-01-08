@@ -1300,7 +1300,9 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
             * ConnectionRecord{fbf1188 u0 CR FGS !PRCP io.appium.settings/.NLService:@339692b}
               binding=AppBindRecord{c78a275 io.appium.settings/.NLService:system}
               conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@339692b flags=0x5000101`;
-      mocks.adb.expects('shell').once().returns(getActivityServiceOutput);
+      mocks.adb.expects('getApiLevel').once().returns(26);
+      mocks.adb.expects('processExists').never();
+      mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
       await adb.hasRunningSettingsAppForegroundService().should.eventually.true;
     });
     it('should return false if the output does not include isForeground=true', async function () {
@@ -1343,8 +1345,18 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           * ConnectionRecord{8f3e709 u0 CR FGS !PRCP io.appium.settings/.NLService:@d481010}
             binding=AppBindRecord{24ce493 io.appium.settings/.NLService:system}
             conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@d481010 flags=0x5000101`;
-      mocks.adb.expects('shell').once().returns(getActivityServiceOutput);
+
+      mocks.adb.expects('getApiLevel').once().returns(26);
+      mocks.adb.expects('processExists').never();
+      mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
       await adb.hasRunningSettingsAppForegroundService().should.eventually.false;
     });
+    it('should rely on processExists for api level 25 and lower', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(25);
+      mocks.adb.expects('processExists').once().returns(1000);
+      mocks.adb.expects('getActivityService').never();
+      await adb.hasRunningSettingsAppForegroundService().should.eventually.eql(1000);
+    });
+
   });
 }));
