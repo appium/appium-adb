@@ -1,3 +1,10 @@
+## [11.1.0](https://github.com/appium/appium-adb/compare/v11.0.9...v11.1.0) (2024-01-09)
+
+
+### Features
+
+* add isSettingsAppServiceRunningInForeground to check the settings' service existence better ([#715](https://github.com/appium/appium-adb/issues/715)) ([be0502e](https://github.com/appium/appium-adb/commit/be0502e28a15916bd4bcb079d569aa7b7d5803fe))
+
 ## [11.0.9](https://github.com/appium/appium-adb/compare/v11.0.8...v11.0.9) (2023-12-27)
 
 
