@@ -1245,7 +1245,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
     });
   });
 
-  describe('hasRunningSettingsAppForegroundService', function () {
+  describe('isSettingsAppServiceRunningInForeground', function () {
     it('should return true if the output includes isForeground=true', async function () {
       // this case is when 'io.appium.settings/.NLService' was started AND
       // the settings app is running as a foreground service.
@@ -1303,7 +1303,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       mocks.adb.expects('getApiLevel').once().returns(26);
       mocks.adb.expects('processExists').never();
       mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
-      await adb.hasRunningSettingsAppForegroundService().should.eventually.true;
+      await adb.isSettingsAppServiceRunningInForeground().should.eventually.true;
     });
     it('should return false if the output does not include isForeground=true', async function () {
       // this case is when 'io.appium.settings/.NLService' was started but
@@ -1349,13 +1349,13 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       mocks.adb.expects('getApiLevel').once().returns(26);
       mocks.adb.expects('processExists').never();
       mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
-      await adb.hasRunningSettingsAppForegroundService().should.eventually.false;
+      await adb.isSettingsAppServiceRunningInForeground().should.eventually.false;
     });
     it('should rely on processExists for api level 25 and lower', async function () {
       mocks.adb.expects('getApiLevel').once().returns(25);
       mocks.adb.expects('processExists').once().returns(1000);
       mocks.adb.expects('getActivityService').never();
-      await adb.hasRunningSettingsAppForegroundService().should.eventually.eql(1000);
+      await adb.isSettingsAppServiceRunningInForeground().should.eventually.eql(1000);
     });
 
   });
