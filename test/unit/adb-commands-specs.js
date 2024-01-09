@@ -1302,7 +1302,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
               conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@339692b flags=0x5000101`;
       mocks.adb.expects('getApiLevel').once().returns(26);
       mocks.adb.expects('processExists').never();
-      mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
+      mocks.adb.expects('shell').once().withArgs(['dumpsys', 'activity', 'services', 'io.appium.settings']).returns(getActivityServiceOutput);
       await adb.isSettingsAppServiceRunningInForeground().should.eventually.true;
     });
     it('should return false if the output does not include isForeground=true', async function () {
@@ -1348,13 +1348,13 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
 
       mocks.adb.expects('getApiLevel').once().returns(26);
       mocks.adb.expects('processExists').never();
-      mocks.adb.expects('getActivityService').once().returns(getActivityServiceOutput);
+      mocks.adb.expects('shell').once().withArgs(['dumpsys', 'activity', 'services', 'io.appium.settings']).returns(getActivityServiceOutput);
       await adb.isSettingsAppServiceRunningInForeground().should.eventually.false;
     });
     it('should rely on processExists for api level 25 and lower', async function () {
       mocks.adb.expects('getApiLevel').once().returns(25);
       mocks.adb.expects('processExists').once().returns(1000);
-      mocks.adb.expects('getActivityService').never();
+      mocks.adb.expects('shell').never().withArgs(['dumpsys', 'activity', 'services', 'io.appium.settings']);
       await adb.isSettingsAppServiceRunningInForeground().should.eventually.eql(1000);
     });
 
