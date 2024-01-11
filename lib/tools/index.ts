@@ -12,7 +12,6 @@ import apkUtilsMethods from './apk-utils';
 import apksUtilsMethods from './apks-utils';
 import aabUtilsMethods from './aab-utils';
 import emuMethods from './adb-emu-commands';
-import settingsClientCommands from './settings-client-commands';
 import lockManagementCommands from './lockmgmt';
 import keyboardCommands from './keyboard-commands';
 
@@ -25,7 +24,6 @@ Object.assign(
   apkUtilsMethods,
   apksUtilsMethods,
   aabUtilsMethods,
-  settingsClientCommands,
   lockManagementCommands,
   keyboardCommands
 );
@@ -40,7 +38,6 @@ export type * from './apk-signing';
 export type * from './apk-utils';
 export type * from './apks-utils';
 export type * from './aab-utils';
-export type * from './settings-client-commands';
 export type * from './android-manifest';
 export type * from './keyboard-commands';
 export type * from './lockmgmt';
