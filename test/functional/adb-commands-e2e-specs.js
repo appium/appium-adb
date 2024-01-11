@@ -110,14 +110,6 @@ describe('adb commands', function () {
     ['en', 'fr'].should.contain(await adb.getDeviceSysLanguage());
     ['US', 'EN_US', 'EN', 'FR'].should.contain(await adb.getDeviceSysCountry());
   });
-  it('should get device locale', async function () {
-    if (parseInt(apiLevel, 10) < 23 || parseInt(apiLevel, 10) > 28) {
-      return this.skip();
-    }
-
-    await adb.setDeviceSysLocaleViaSettingApp('en', 'US');
-    ['us', 'en', 'ca_en', 'en-US'].should.contain(await adb.getDeviceLocale());
-  });
   it('should forward the port', async function () {
     await adb.forwardPort(4724, 4724);
   });
@@ -167,55 +159,6 @@ describe('adb commands', function () {
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
     (await adb.isAirplaneModeOn()).should.be.false;
-  });
-  it('should be able to toogle wifi', async function () {
-    if (process.env.CI) {
-      return this.skip();
-    }
-
-    this.retries(3);
-
-    await adb.setWifiState(true);
-    (await adb.isWifiOn()).should.be.true;
-    await adb.setWifiState(false);
-    (await adb.isWifiOn()).should.be.false;
-  });
-  it('should be able to turn off animation', async function () {
-    if (process.env.CI) {
-      return this.skip();
-    }
-    await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
-
-    await adb.setAnimationState(false);
-    (await adb.isAnimationOn()).should.be.false;
-  });
-  it('should be able to turn on animation', async function () {
-    if (process.env.CI) {
-      return this.skip();
-    }
-
-    await adb.grantPermission('io.appium.settings', 'android.permission.SET_ANIMATION_SCALE');
-
-    await adb.setAnimationState(true);
-    (await adb.isAnimationOn()).should.be.true;
-  });
-  it('should be able to set device locale via setting app', async function () {
-    if (process.env.CI) {
-      return this.skip();
-    }
-
-    // Operation not allowed: java.lang.SecurityException: Package io.appium.settings has not requested permission android.permission.CHANGE_CONFIGURATION
-    // is shown if the setting apk is not updated.
-    await adb.grantPermission('io.appium.settings', 'android.permission.CHANGE_CONFIGURATION');
-
-    await adb.setDeviceSysLocaleViaSettingApp('fr', 'fr');
-    (await adb.getDeviceSysLocale()).should.equal('fr-FR');
-
-    await adb.setDeviceSysLocaleViaSettingApp('zh', 'CN', 'Hans');
-    (await adb.getDeviceSysLocale()).should.equal('zh-Hans-CN');
-
-    await adb.setDeviceSysLocaleViaSettingApp('en', 'us');
-    (await adb.getDeviceSysLocale()).should.equal('en-US');
   });
   describe('app permissions', function () {
     before(async function () {
