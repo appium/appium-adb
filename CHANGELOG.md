@@ -1,3 +1,11 @@
+## [12.0.1](https://github.com/appium/appium-adb/compare/v12.0.0...v12.0.1) (2024-01-17)
+
+
+### Miscellaneous Chores
+
+* Bump semantic-release from 22.0.12 to 23.0.0 ([#717](https://github.com/appium/appium-adb/issues/717)) ([cba0e91](https://github.com/appium/appium-adb/commit/cba0e9100e3364b73df28c21e1c2b4145933dd8b))
+* use latest lts for the publishment ([0312fed](https://github.com/appium/appium-adb/commit/0312fedabf4373d59b5f5152f5add8750866a763))
+
 ## [11.1.0](https://github.com/appium/appium-adb/compare/v11.0.9...v11.1.0) (2024-01-09)
 
 
