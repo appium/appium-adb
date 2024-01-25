@@ -1,3 +1,10 @@
+## [12.0.2](https://github.com/appium/appium-adb/compare/v12.0.1...v12.0.2) (2024-01-25)
+
+
+### Miscellaneous Chores
+
+* Update the implementation of extractStringsFromApk API ([#720](https://github.com/appium/appium-adb/issues/720)) ([ef091f4](https://github.com/appium/appium-adb/commit/ef091f4aa835b6fdaec0d85ce06e7196788ccd9c))
+
 ## [12.0.1](https://github.com/appium/appium-adb/compare/v12.0.0...v12.0.1) (2024-01-17)
 
 
