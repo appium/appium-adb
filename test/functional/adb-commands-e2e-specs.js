@@ -201,7 +201,7 @@ describe('adb commands', function () {
     before(async function () {
       tempRoot = await tempDir.openDir();
       localFile = path.join(tempRoot, 'local.tmp');
-      tempFile = path.path(tempRoot, 'temp.tmp');
+      tempFile = path.join(tempRoot, 'temp.tmp');
 
       await fs.writeFile(localFile, stringData);
     });
