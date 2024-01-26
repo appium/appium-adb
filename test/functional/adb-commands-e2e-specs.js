@@ -4,8 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
-import { fs, mkdirp } from '@appium/support';
-import temp from 'temp';
+import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
 import { waitForCondition } from 'asyncbox';
 
@@ -195,18 +194,20 @@ describe('adb commands', function () {
       return `/data/local/tmp/test${Math.random()}`;
     }
 
-    let localFile = temp.path({prefix: 'appium', suffix: '.tmp'});
-    let tempFile = temp.path({prefix: 'appium', suffix: '.tmp'});
+    let localFile;
+    let tempFile;
+    let tempRoot;
     const stringData = `random string data ${Math.random()}`;
     before(async function () {
-      await mkdirp(path.dirname(localFile));
-      await mkdirp(path.dirname(tempFile));
+      tempRoot = await tempDir.openDir();
+      localFile = path.join(tempRoot, 'local.tmp');
+      tempFile = path.path(tempRoot, 'temp.tmp');
 
       await fs.writeFile(localFile, stringData);
     });
     after(async function () {
-      if (await fs.exists(localFile)) {
-        await fs.unlink(localFile);
+      if (tempRoot) {
+        await fs.rimraf(tempRoot);
       }
     });
     afterEach(async function () {

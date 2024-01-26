@@ -9,10 +9,9 @@
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "lint:staged": "lint-staged",
-    "lint:commit": "commitlint",
     "prepare": "npm run rebuild",
     "rebuild": "npm run clean && npm run build",
+    "format": "prettier -w ./lib",
     "test": "mocha --exit --timeout 1m \"./test/unit/**/*-specs.js\"",
     "e2e-test": "mocha --exit --timeout 5m \"./test/functional/**/*-specs.js\""
   },
@@ -32,12 +31,6 @@
   "bin": {},
   "directories": {
     "lib": "lib"
-  },
-  "lint-staged": {
-    "*.(js|ts)": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   },
   "prettier": {
     "bracketSpacing": false,
@@ -70,8 +63,6 @@
     "@appium/eslint-config-appium": "^6.0.0",
     "@appium/test-support": "^3.0.1",
     "@appium/types": "^0.x",
-    "@commitlint/cli": "^18.0.0",
-    "@commitlint/config-conventional": "^18.1.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/async-lock": "^1.4.0",
@@ -94,14 +85,11 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-mocha": "^9.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.0.1",
     "mocha": "^10.0.0",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
     "semantic-release": "^23.0.0",
     "sinon": "^17.0.0",
-    "temp": "^0.x",
     "ts-node": "^10.9.1",
     "typescript": "~5.2.2"
   },
