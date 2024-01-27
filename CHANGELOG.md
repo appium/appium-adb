@@ -1,3 +1,10 @@
+## [12.0.3](https://github.com/appium/appium-adb/compare/v12.0.2...v12.0.3) (2024-01-27)
+
+
+### Miscellaneous Chores
+
+* Remove husky and commitlint ([#722](https://github.com/appium/appium-adb/issues/722)) ([f7adefb](https://github.com/appium/appium-adb/commit/f7adefb82191de6e7d4c36d60b5b7512eb990e4f))
+
 ## [12.0.2](https://github.com/appium/appium-adb/compare/v12.0.1...v12.0.2) (2024-01-25)
 
 
