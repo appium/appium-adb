@@ -1,3 +1,11 @@
+## [12.0.4](https://github.com/appium/appium-adb/compare/v12.0.3...v12.0.4) (2024-03-07)
+
+
+### Miscellaneous Chores
+
+* bump typescript ([5ee0265](https://github.com/appium/appium-adb/commit/5ee026583dbecb19530cf85174db58795a4b0ddd))
+* Bump typescript from 5.2.2 to 5.4.2 ([#724](https://github.com/appium/appium-adb/issues/724)) ([6b28c01](https://github.com/appium/appium-adb/commit/6b28c0157f307d15c75eff0d4a98415dced207d9))
+
 ## [12.0.3](https://github.com/appium/appium-adb/compare/v12.0.2...v12.0.3) (2024-01-27)
 
 
