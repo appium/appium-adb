@@ -36,7 +36,7 @@ export class ADB {
   _isLockManagementSupported: boolean|undefined;
 
   executable: ADBExecutable;
-  constructor(opts: Partial<ADBOptions> = {}) {
+  constructor(opts: ADBOptions = ({} as ADBOptions)) {
     const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
     _.defaultsDeep(this, options);
 
@@ -61,7 +61,7 @@ export class ADB {
    * @param opts - Additional options mapping to pass to the `ADB` constructor.
    * @returns The resulting class instance.
    */
-  clone(opts: Partial<ADBOptions> = {}): ADB {
+  clone(opts: ADBOptions = ({} as ADBOptions)): ADB {
     const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
     const cloneOptions = _.defaultsDeep(opts, originalOptions);
 
@@ -78,11 +78,11 @@ export class ADB {
     return new ADB(cloneOptions);
   }
 
-  static async createADB(opts: Partial<ADBOptions>) {
+  static async createADB(opts: ADBOptions = ({} as ADBOptions)) {
     const adb = new ADB(opts);
     adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
     await adb.getAdbWithCorrectAdbPath();
-    if (!opts.suppressKillServer) {
+    if (!opts?.suppressKillServer) {
       try {
         await adb.adbExec(['start-server']);
       } catch (e) {
