@@ -1,3 +1,10 @@
+## [12.0.5](https://github.com/appium/appium-adb/compare/v12.0.4...v12.0.5) (2024-03-29)
+
+
+### Bug Fixes
+
+* Do not call 'start-server' if the 'suppressKillServer' option is enabled ([#725](https://github.com/appium/appium-adb/issues/725)) ([0fd0210](https://github.com/appium/appium-adb/commit/0fd021049a5efe8317621ef431ea34d191989e01))
+
 ## [12.0.4](https://github.com/appium/appium-adb/compare/v12.0.3...v12.0.4) (2024-03-07)
 
 
