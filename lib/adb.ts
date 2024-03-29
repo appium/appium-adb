@@ -6,6 +6,7 @@ import log from './logger';
 import type {ADBOptions, ADBExecutable} from './options';
 import type { LogcatOpts } from './logcat';
 import type { LRUCache } from 'lru-cache';
+import type { ExecError } from 'teen_process';
 
 const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -81,11 +82,13 @@ export class ADB {
     const adb = new ADB(opts);
     adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
     await adb.getAdbWithCorrectAdbPath();
-    try {
-      await adb.adbExec(['start-server']);
-    } catch (e) {
-      const err = e as import('teen_process').ExecError;
-      log.warn(err.stderr || err.message);
+    if (!opts.suppressKillServer) {
+      try {
+        await adb.adbExec(['start-server']);
+      } catch (e) {
+        const err = e as ExecError;
+        log.warn(err.stderr || err.message);
+      }
     }
     return adb;
   }
