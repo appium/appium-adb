@@ -6,6 +6,7 @@ import log from './logger';
 import type {ADBOptions, ADBExecutable} from './options';
 import type { LogcatOpts } from './logcat';
 import type { LRUCache } from 'lru-cache';
+import type { ExecError } from 'teen_process';
 
 const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -35,7 +36,7 @@ export class ADB {
   _isLockManagementSupported: boolean|undefined;
 
   executable: ADBExecutable;
-  constructor(opts: Partial<ADBOptions> = {}) {
+  constructor(opts: ADBOptions = ({} as ADBOptions)) {
     const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
     _.defaultsDeep(this, options);
 
@@ -60,7 +61,7 @@ export class ADB {
    * @param opts - Additional options mapping to pass to the `ADB` constructor.
    * @returns The resulting class instance.
    */
-  clone(opts: Partial<ADBOptions> = {}): ADB {
+  clone(opts: ADBOptions = ({} as ADBOptions)): ADB {
     const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
     const cloneOptions = _.defaultsDeep(opts, originalOptions);
 
@@ -77,15 +78,17 @@ export class ADB {
     return new ADB(cloneOptions);
   }
 
-  static async createADB(opts: Partial<ADBOptions>) {
+  static async createADB(opts: ADBOptions = ({} as ADBOptions)) {
     const adb = new ADB(opts);
     adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
     await adb.getAdbWithCorrectAdbPath();
-    try {
-      await adb.adbExec(['start-server']);
-    } catch (e) {
-      const err = e as import('teen_process').ExecError;
-      log.warn(err.stderr || err.message);
+    if (!opts?.suppressKillServer) {
+      try {
+        await adb.adbExec(['start-server']);
+      } catch (e) {
+        const err = e as ExecError;
+        log.warn(err.stderr || err.message);
+      }
     }
     return adb;
   }
