@@ -1,3 +1,10 @@
+## [12.0.6](https://github.com/appium/appium-adb/compare/v12.0.5...v12.0.6) (2024-04-01)
+
+
+### Bug Fixes
+
+* Make 'executable' opt optional ([#726](https://github.com/appium/appium-adb/issues/726)) ([e213744](https://github.com/appium/appium-adb/commit/e2137445762f3fa1c683d14e64474aa51607a86c))
+
 ## [12.0.5](https://github.com/appium/appium-adb/compare/v12.0.4...v12.0.5) (2024-03-29)
 
 
