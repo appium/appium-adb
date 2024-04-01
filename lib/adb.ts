@@ -40,8 +40,8 @@ export class ADB {
     const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
     _.defaultsDeep(this, options);
 
-    // avoid TS error by explicitly assigning
-    this.executable = options.executable;
+    // The above defaultsDeep call guarantees the 'executable' field to be always assigned
+    this.executable = options.executable as ADBExecutable;
 
     if (options.remoteAdbHost) {
       this.executable.defaultArgs.push('-H', options.remoteAdbHost);
