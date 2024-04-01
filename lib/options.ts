@@ -11,7 +11,7 @@ export interface ADBOptions {
   keystorePassword?: string;
   keyAlias?: string;
   keyPassword?: string;
-  executable: ADBExecutable;
+  executable?: ADBExecutable;
   tmpDir?: string;
   curDeviceId?: string;
   emulatorPort?: number;
