@@ -71,7 +71,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(26);
       mocks.adb.expects('shell')
         .once().withExactArgs(['cmd', 'package', 'list', 'packages'])
-        .returns(`package:dummy.package`);
+        .returns(`package:dummy.package\npackage:other.package\n`);
       (await adb.isAppInstalled(pkg)).should.be.true;
     });
     it('should parse correctly and return false for newer versions', async function () {
