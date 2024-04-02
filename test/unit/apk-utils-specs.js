@@ -846,7 +846,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         isInstalled: true,
       });
       mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().throws();
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath, {replace: false}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
@@ -860,7 +860,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1,
         isInstalled: true,
       });
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath).twice().throws();
       await adb.installOrUpgrade(apkPath).should.be.rejected;
     });
@@ -874,7 +874,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1,
         isInstalled: true,
       });
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(false);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(false);
       mocks.adb.expects('install').withArgs(apkPath).once().throws();
       await adb.installOrUpgrade(apkPath).should.be.rejected;
     });
