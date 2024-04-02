@@ -47,18 +47,40 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
   });
 
   describe('isAppInstalled', function () {
-    it('should parse correctly and return true', async function () {
+    it('should parse correctly and return true for older versions', async function () {
       const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel')
+        .returns(25);
       mocks.adb.expects('shell')
-        .twice().withExactArgs(['pm', 'path', pkg])
+        .once().withExactArgs(['pm', 'path', pkg])
         .returns(`package:/system/priv-app/TeleService/TeleService.apk`);
       (await adb.isAppInstalled(pkg)).should.be.true;
     });
-    it('should parse correctly and return false', async function () {
+    it('should parse correctly and return false for older versions', async function () {
       const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel')
+        .returns(25);
       mocks.adb.expects('shell')
         .once().withExactArgs(['pm', 'path', pkg])
         .throws();
+      (await adb.isAppInstalled(pkg)).should.be.false;
+    });
+    it('should parse correctly and return true for newer versions', async function () {
+      const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel')
+        .returns(26);
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['cmd', 'package', 'list', 'packages'])
+        .returns(`package:dummy.package\npackage:other.package\n`);
+      (await adb.isAppInstalled(pkg)).should.be.true;
+    });
+    it('should parse correctly and return false for newer versions', async function () {
+      const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel')
+        .returns(26);
+      mocks.adb.expects('shell')
+        .once().withExactArgs(['cmd', 'package', 'list', 'packages'])
+        .returns(`package:dummy.package1`);
       (await adb.isAppInstalled(pkg)).should.be.false;
     });
   });
@@ -824,7 +846,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         isInstalled: true,
       });
       mocks.adb.expects('install').withArgs(apkPath, {replace: true}).once().throws();
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath, {replace: false}).once().returns(true);
       await adb.installOrUpgrade(apkPath);
     });
@@ -838,7 +860,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1,
         isInstalled: true,
       });
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(true);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(true);
       mocks.adb.expects('install').withArgs(apkPath).twice().throws();
       await adb.installOrUpgrade(apkPath).should.be.rejected;
     });
@@ -852,7 +874,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         versionCode: 1,
         isInstalled: true,
       });
-      mocks.adb.expects('uninstallApk').withExactArgs(pkgId).once().returns(false);
+      mocks.adb.expects('uninstallApk').withArgs(pkgId).once().returns(false);
       mocks.adb.expects('install').withArgs(apkPath).once().throws();
       await adb.installOrUpgrade(apkPath).should.be.rejected;
     });
