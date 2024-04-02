@@ -1,3 +1,10 @@
+## [12.0.7](https://github.com/appium/appium-adb/compare/v12.0.6...v12.0.7) (2024-04-02)
+
+
+### Bug Fixes
+
+* Do not check if app is installed if we know it is ([#727](https://github.com/appium/appium-adb/issues/727)) ([7ddf5f3](https://github.com/appium/appium-adb/commit/7ddf5f393a78eeadd7ddea4aab52cec4cc74fa73))
+
 ## [12.0.6](https://github.com/appium/appium-adb/compare/v12.0.5...v12.0.6) (2024-04-01)
 
 
