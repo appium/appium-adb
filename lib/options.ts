@@ -1,4 +1,3 @@
-import type { SubProcess } from 'teen_process';
 import type Logcat from './logcat';
 import type {StringRecord} from '@appium/types';
 
