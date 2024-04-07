@@ -1,3 +1,10 @@
+## [12.0.8](https://github.com/appium/appium-adb/compare/v12.0.7...v12.0.8) (2024-04-07)
+
+
+### Bug Fixes
+
+* Respect the `udid` option ([#728](https://github.com/appium/appium-adb/issues/728)) ([4e48033](https://github.com/appium/appium-adb/commit/4e480332723b4fae177774b72e98daf24eca9dcb))
+
 ## [12.0.7](https://github.com/appium/appium-adb/compare/v12.0.6...v12.0.7) (2024-04-02)
 
 
