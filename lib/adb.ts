@@ -53,7 +53,6 @@ export class ADB {
       this.adbPort = options.remoteAdbPort;
     }
     this.executable.defaultArgs.push('-P', String(this.adbPort));
-
     if (options.udid) {
       this.setDeviceId(options.udid);
     }
