@@ -80,7 +80,7 @@
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
     "conventional-changelog-conventionalcommits": "^7.0.1",
-    "eslint": "^7.32.0",
+    "eslint": "^9.1.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-mocha": "^9.0.0",
