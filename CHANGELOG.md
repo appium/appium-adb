@@ -1,3 +1,10 @@
+## [12.0.9](https://github.com/appium/appium-adb/compare/v12.0.8...v12.0.9) (2024-05-03)
+
+
+### Bug Fixes
+
+* Add one more condition to the lock state detection ([#732](https://github.com/appium/appium-adb/issues/732)) ([92025fe](https://github.com/appium/appium-adb/commit/92025fe9e0b71f04ad84c479ae1c0e3a81bbf767))
+
 ## [12.0.8](https://github.com/appium/appium-adb/compare/v12.0.7...v12.0.8) (2024-04-07)
 
 
