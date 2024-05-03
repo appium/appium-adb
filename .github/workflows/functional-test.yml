@@ -7,18 +7,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  Test Older APIs:
     strategy:
       matrix:
         include:
-        - platformVersion: "12.0"
-          apiLevel: 32
-          emuTag: google_apis
-          arch: x86_64
-        - platformVersion: "11.0"
-          apiLevel: 30
-          emuTag: google_apis
-          arch: x86
         - platformVersion: "9.0"
           apiLevel: 28
           emuTag: default
@@ -63,7 +55,82 @@ jobs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-${{ matrix.apiLevel }}
+        key: linux-avd-${{ matrix.apiLevel }}
+    # https://github.com/marketplace/actions/android-emulator-runner
+    - uses: reactivecircus/android-emulator-runner@v2
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      name: Generate AVD snapshot for caching
+      with:
+        script: echo "Generated AVD snapshot for caching."
+        avd-name: $ANDROID_AVD
+        force-avd-creation: false
+        api-level: ${{ matrix.apiLevel }}
+        disable-spellchecker: true
+        target: ${{ matrix.emuTag }}
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        arch: ${{ matrix.arch }}
+        disable-animations: true
+    - run: nohup adb logcat > logcat.log &
+      name: Capture Logcat
+    - uses: reactivecircus/android-emulator-runner@v2
+      name: api${{ matrix.apiLevel }}_e2e
+      with:
+        script: npm run e2e-test
+        avd-name: $ANDROID_AVD
+        force-avd-creation: false
+        api-level: ${{ matrix.apiLevel }}
+        disable-spellchecker: true
+        target: ${{ matrix.emuTag }}
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        arch: ${{ matrix.arch }}
+        disable-animations: true
+    - name: Save logcat output
+      if: ${{ always() }}
+      uses: actions/upload-artifact@master
+      with:
+        name: logcat-api${{ matrix.apiLevel }}
+        path: logcat.log
+
+  Test Newer APIs:
+    strategy:
+      matrix:
+        include:
+        - platformVersion: "12.0"
+          apiLevel: 32
+          emuTag: google_apis
+          arch: arm64-v8a
+        - platformVersion: "11.0"
+          apiLevel: 30
+          emuTag: google_apis
+          arch: arm64-v8a
+      fail-fast: false
+    env:
+      CI: true
+      ANDROID_AVD: emulator
+      ANDROID_SDK_VERSION: "${{ matrix.apiLevel }}"
+      PLATFORM_VERSION: "${{ matrix.platformVersion }}"
+      EMU_TAG: "${{ matrix.emuTag }}"
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+        check-latest: true
+    - run: npm install --no-package-lock
+      name: Install dev dependencies
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: AVD cache
+      uses: actions/cache@v3
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: mac-avd-${{ matrix.apiLevel }}
     # https://github.com/marketplace/actions/android-emulator-runner
     - uses: reactivecircus/android-emulator-runner@v2
       if: steps.avd-cache.outputs.cache-hit != 'true'
