@@ -38,11 +38,14 @@ jobs:
       ANDROID_SDK_VERSION: "${{ matrix.apiLevel }}"
       PLATFORM_VERSION: "${{ matrix.platformVersion }}"
       EMU_TAG: "${{ matrix.emuTag }}"
-    # No hardware acceleration is available for emulators on Ubuntu:
-    # https://github.com/marketplace/actions/android-emulator-runner#can-i-use-this-action-on-linux-vms
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Enable KVM group perms
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
     - uses: actions/setup-node@v3
       with:
         node-version: lts/*
@@ -52,7 +55,7 @@ jobs:
     - uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: '11'
+        java-version: '17'
     - name: AVD cache
       uses: actions/cache@v3
       id: avd-cache
@@ -69,14 +72,12 @@ jobs:
         script: echo "Generated AVD snapshot for caching."
         avd-name: $ANDROID_AVD
         force-avd-creation: false
-        sdcard-path-or-size: 1500M
         api-level: ${{ matrix.apiLevel }}
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
         arch: ${{ matrix.arch }}
-        ram-size: 4096M
-        heap-size: 1024M
+        disable-animations: true
     - run: nohup adb logcat > logcat.log &
       name: Capture Logcat
     - uses: reactivecircus/android-emulator-runner@v2
@@ -85,14 +86,12 @@ jobs:
         script: npm run e2e-test
         avd-name: $ANDROID_AVD
         force-avd-creation: false
-        sdcard-path-or-size: 1500M
         api-level: ${{ matrix.apiLevel }}
         disable-spellchecker: true
         target: ${{ matrix.emuTag }}
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
         arch: ${{ matrix.arch }}
-        ram-size: 4096M
-        heap-size: 1024M
+        disable-animations: true
     - name: Save logcat output
       if: ${{ always() }}
       uses: actions/upload-artifact@master
