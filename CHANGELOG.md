@@ -1,3 +1,15 @@
+## [12.1.0](https://github.com/appium/appium-adb/compare/v12.0.9...v12.1.0) (2024-05-07)
+
+
+### Features
+
+* Add a helper method to enable/disable bluetooth ([#737](https://github.com/appium/appium-adb/issues/737)) ([71c0d84](https://github.com/appium/appium-adb/commit/71c0d84243794ac0e70257d59ad4d6ec52930783))
+
+
+### Miscellaneous Chores
+
+* Always use reboot_readiness service to detect emulator startup for API 31+ ([#736](https://github.com/appium/appium-adb/issues/736)) ([c57d18b](https://github.com/appium/appium-adb/commit/c57d18b9597a0d5cc635105658ff2d45c86ca3e5))
+
 ## [12.0.9](https://github.com/appium/appium-adb/compare/v12.0.8...v12.0.9) (2024-05-03)
 
 
