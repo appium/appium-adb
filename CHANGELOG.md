@@ -1,3 +1,10 @@
+## [12.2.0](https://github.com/appium/appium-adb/compare/v12.1.0...v12.2.0) (2024-05-08)
+
+
+### Features
+
+* let pass user for isAppInstalled ([#739](https://github.com/appium/appium-adb/issues/739)) ([90d1fc6](https://github.com/appium/appium-adb/commit/90d1fc66bffef5709f65ae12cf354c749fd96cb0))
+
 ## [12.1.0](https://github.com/appium/appium-adb/compare/v12.0.9...v12.1.0) (2024-05-07)
 
 
