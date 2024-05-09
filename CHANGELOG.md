@@ -1,3 +1,10 @@
+## [12.3.0](https://github.com/appium/appium-adb/compare/v12.2.0...v12.3.0) (2024-05-09)
+
+
+### Features
+
+* Add a method to control NFC adapter state ([#742](https://github.com/appium/appium-adb/issues/742)) ([5c6556f](https://github.com/appium/appium-adb/commit/5c6556fa08e3851390f7dc8cffa154a9ee6bf927))
+
 ## [12.2.0](https://github.com/appium/appium-adb/compare/v12.1.0...v12.2.0) (2024-05-08)
 
 
