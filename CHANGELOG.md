@@ -1,3 +1,10 @@
+## [12.3.2](https://github.com/appium/appium-adb/compare/v12.3.1...v12.3.2) (2024-05-16)
+
+
+### Miscellaneous Chores
+
+* Bump eslint dependency ([#744](https://github.com/appium/appium-adb/issues/744)) ([e327cdc](https://github.com/appium/appium-adb/commit/e327cdc15f65e182213a6b534e72413b079ae05c))
+
 ## [12.3.1](https://github.com/appium/appium-adb/compare/v12.3.0...v12.3.1) (2024-05-16)
 
 
