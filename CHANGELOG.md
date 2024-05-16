@@ -1,3 +1,10 @@
+## [12.3.1](https://github.com/appium/appium-adb/compare/v12.3.0...v12.3.1) (2024-05-16)
+
+
+### Miscellaneous Chores
+
+* Bump sinon from 17.0.2 to 18.0.0 ([#743](https://github.com/appium/appium-adb/issues/743)) ([3fb6f80](https://github.com/appium/appium-adb/commit/3fb6f80c04660de7ea88d056a0a05c1faf632a8f))
+
 ## [12.3.0](https://github.com/appium/appium-adb/compare/v12.2.0...v12.3.0) (2024-05-09)
 
 
