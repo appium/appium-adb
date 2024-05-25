@@ -474,25 +474,25 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1.5);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1.5);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1.5);
-        (await adb.setAnimation(1.5)).should.be.true;
+        (await adb.setAnimationScale(1.5)).should.be.true;
       });
       it('should set 1 for 1', async function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1);
-        (await adb.setAnimation(1)).should.be.true;
+        (await adb.setAnimationScale(1)).should.be.true;
       });
       it('should set 0 for 0', async function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 0);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 0);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 0);
-        (await adb.setAnimation(0)).should.be.true;
+        (await adb.setAnimationScale(0)).should.be.true;
       });
       it('should set 0 for negative values', async function () {
-        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 0);
-        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 0);
-        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 0);
-        (await adb.setAnimation(-1)).should.be.true;
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', -1);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', -1);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', -1);
+        (await adb.setAnimationScale(-1)).should.be.true;
       });
     });
     describe('processExists', function () {
