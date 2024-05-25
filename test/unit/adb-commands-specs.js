@@ -469,6 +469,32 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         (await adb.isAnimationOn()).should.be.true;
       });
     });
+    describe('setAnimation', function () {
+      it('should set 1/5 for 11/5', async function () {
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1.5);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1.5);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1.5);
+        (await adb.setAnimation(1.5)).should.be.true;
+      });
+      it('should set 1 for 1', async function () {
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1);
+        (await adb.setAnimation(1)).should.be.true;
+      });
+      it('should set 0 for 0', async function () {
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 0);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 0);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 0);
+        (await adb.setAnimation(0)).should.be.true;
+      });
+      it('should set 0 for negative values', async function () {
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 0);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 0);
+        mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 0);
+        (await adb.setAnimation(-1)).should.be.true;
+      });
+    });
     describe('processExists', function () {
       it('should call shell with correct args and should find process', async function () {
         mocks.adb.expects('getPIDsByName')
