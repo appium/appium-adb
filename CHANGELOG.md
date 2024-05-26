@@ -1,3 +1,10 @@
+## [12.4.0](https://github.com/appium/appium-adb/compare/v12.3.2...v12.4.0) (2024-05-26)
+
+
+### Features
+
+* enable window animation via settings ([#745](https://github.com/appium/appium-adb/issues/745)) ([d8be21b](https://github.com/appium/appium-adb/commit/d8be21bcc6d5ee0465dca1318ade156fde975c5b))
+
 ## [12.3.2](https://github.com/appium/appium-adb/compare/v12.3.1...v12.3.2) (2024-05-16)
 
 
