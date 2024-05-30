@@ -1,3 +1,10 @@
+## [12.4.1](https://github.com/appium/appium-adb/compare/v12.4.0...v12.4.1) (2024-05-30)
+
+
+### Bug Fixes
+
+* Update lockscreen detection for various firmwares ([#746](https://github.com/appium/appium-adb/issues/746)) ([712d01f](https://github.com/appium/appium-adb/commit/712d01fa186af8dcaf566134a8061cfab25058bb))
+
 ## [12.4.0](https://github.com/appium/appium-adb/compare/v12.3.2...v12.4.0) (2024-05-26)
 
 
