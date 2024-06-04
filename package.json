@@ -80,11 +80,11 @@
     "@types/teen_process": "^2.0.0",
     "chai": "^4.1.0",
     "chai-as-promised": "^7.1.1",
-    "conventional-changelog-conventionalcommits": "^7.0.1",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
     "mocha": "^10.0.0",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
-    "semantic-release": "^23.0.0",
+    "semantic-release": "^24.0.0",
     "sinon": "^18.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.2"
