@@ -1,3 +1,9 @@
+## [12.4.2](https://github.com/appium/appium-adb/compare/v12.4.1...v12.4.2) (2024-06-04)
+
+### Miscellaneous Chores
+
+* Bump semantic-release from 23.1.1 to 24.0.0 and conventional-changelog-conventionalcommits to 8.0.0 ([#747](https://github.com/appium/appium-adb/issues/747)) ([573c274](https://github.com/appium/appium-adb/commit/573c274a3a5acd556b36463c27a502bd0c40f351))
+
 ## [12.4.1](https://github.com/appium/appium-adb/compare/v12.4.0...v12.4.1) (2024-05-30)
 
 
