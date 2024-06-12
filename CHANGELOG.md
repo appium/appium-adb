@@ -1,3 +1,9 @@
+## [12.4.3](https://github.com/appium/appium-adb/compare/v12.4.2...v12.4.3) (2024-06-12)
+
+### Miscellaneous Chores
+
+* Bump @appium/support from 4.5.0 to 5.0.3 ([#749](https://github.com/appium/appium-adb/issues/749)) ([41b0999](https://github.com/appium/appium-adb/commit/41b0999f68515cf4690a7b61164f44528584dfc4))
+
 ## [12.4.2](https://github.com/appium/appium-adb/compare/v12.4.1...v12.4.2) (2024-06-04)
 
 ### Miscellaneous Chores
