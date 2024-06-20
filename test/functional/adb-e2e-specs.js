@@ -6,12 +6,13 @@ import path from 'path';
 
 describe('ADB', function () {
   let chai;
+  let should;
 
   before(async function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
+    should = chai.should();
     chai.use(chaiAsPromised.default);
   });
 
