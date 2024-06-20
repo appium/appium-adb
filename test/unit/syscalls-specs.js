@@ -137,6 +137,16 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
 }));
 
 describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });
