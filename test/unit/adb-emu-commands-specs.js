@@ -1,12 +1,7 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
-
-chai.use(chaiAsPromised);
-chai.should();
 
 const emulators = [
   { udid: 'emulator-5554', state: 'device', port: 5554 },
@@ -17,6 +12,16 @@ const fingerprintId = 1111;
 const adb = new ADB();
 
 describe('adb emulator commands', withMocks({adb}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });

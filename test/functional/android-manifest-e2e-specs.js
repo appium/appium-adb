@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
@@ -14,11 +12,17 @@ const tmpDir = path.resolve(__dirname, '..', 'temp');
 const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
 
-chai.use(chaiAsPromised);
-
 describe('Android-manifest', function () {
   let adb;
+  let chai;
+
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+
     adb = await ADB.createADB();
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {

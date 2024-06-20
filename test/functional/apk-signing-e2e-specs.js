@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
@@ -14,12 +12,17 @@ const tmp = os.tmpdir();
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
 
-chai.use(chaiAsPromised);
-
 describe('Apk-signing', function () {
   let adb;
+  let chai;
 
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+
     adb = await ADB.createADB();
   });
   it('checkApkCert should return false for unsigned apk', async function () {

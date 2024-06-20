@@ -1,13 +1,7 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import Logcat from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
-
-
-chai.use(chaiAsPromised);
-chai.should();
 
 describe('logcat', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -26,7 +20,15 @@ describe('logcat', function () {
 
   let adb;
   let logcat;
+  let chai;
+
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+
     adb = await ADB.createADB();
   });
   afterEach(async function () {

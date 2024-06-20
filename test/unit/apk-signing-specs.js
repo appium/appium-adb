@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import * as helpers from '../../lib/helpers.js';
@@ -7,9 +5,6 @@ import path from 'path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
 import { withMocks } from '@appium/test-support';
-
-
-chai.use(chaiAsPromised);
 
 const selendroidTestApp = path.resolve(__dirname, '..', 'fixtures', 'selendroid-test-app.apk');
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
@@ -31,6 +26,16 @@ adb.keystorePassword = password;
 adb.keyPassword = password;
 
 describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, tempDir}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });
