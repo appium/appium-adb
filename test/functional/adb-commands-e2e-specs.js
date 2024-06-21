@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
@@ -7,11 +5,6 @@ import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
 import { waitForCondition } from 'asyncbox';
-
-
-chai.should();
-chai.use(chaiAsPromised);
-const expect = chai.expect;
 
 const DEFAULT_IMES = [
   'com.android.inputmethod.latin/.LatinIME',
@@ -27,8 +20,17 @@ describe('adb commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
+  let chai;
+  let expect;
   const androidInstallTimeout = 90000;
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+    expect = chai.expect;
+
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
   });
   it('getApiLevel should get correct api level', async function () {

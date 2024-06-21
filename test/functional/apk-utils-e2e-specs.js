@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
@@ -10,13 +8,12 @@ const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 const CONTACT_MANAGER_APP_ID = 'com.example.android.contactmanager';
 
-chai.should();
-chai.use(chaiAsPromised);
-
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
+  let chai;
+
   const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
   const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
   const deviceTempPath = '/data/local/tmp/';
@@ -27,6 +24,12 @@ describe('apk utils', function () {
   };
 
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+
     adb = await ADB.createADB({
       adbExecTimeout: process.env.CI ? 60000 : 40000,
     });

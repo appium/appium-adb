@@ -1,12 +1,18 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
 
 
-chai.use(chaiAsPromised);
-
 describe('ADB', function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   describe('clone', function () {
     it('should copy all options', function () {
       const original = new ADB({

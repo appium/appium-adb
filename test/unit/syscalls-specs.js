@@ -1,18 +1,24 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import B from 'bluebird';
 
-
-chai.use(chaiAsPromised);
 const adb = new ADB();
 adb.executable.path = 'adb_path';
 const avdName = 'AVD_NAME';
 
 describe('System calls', withMocks({teen_process}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });
@@ -131,6 +137,16 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
 }));
 
 describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });

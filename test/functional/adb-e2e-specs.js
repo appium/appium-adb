@@ -1,15 +1,21 @@
 import _ from 'lodash';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { fs } from '@appium/support';
 import path from 'path';
 
-const should = chai.should();
-chai.use(chaiAsPromised);
-
 describe('ADB', function () {
+  let chai;
+  let should;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   it('should correctly return adb if present', async function () {
     let adb = await ADB.createADB();
     should.exist(adb.executable.path);

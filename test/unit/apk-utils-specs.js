@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import * as teen_process from 'teen_process';
 import { fs } from '@appium/support';
 // eslint-disable-next-line import/no-unresolved
@@ -10,9 +8,7 @@ import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 import apksUtilsMethods from '../../lib/tools/apks-utils';
 
-chai.use(chaiAsPromised);
-const should = chai.should(),
-      pkg = 'com.example.android.contactmanager',
+const pkg = 'com.example.android.contactmanager',
       uri = 'content://contacts/people/1',
       act = '.ContactManager',
       startAppOptions = {
@@ -42,6 +38,17 @@ const should = chai.should(),
 const adb = new ADB({ adbExecTimeout: 60000 });
 
 describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
+  let chai;
+  let should;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });

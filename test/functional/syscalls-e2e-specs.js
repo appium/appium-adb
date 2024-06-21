@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
@@ -10,13 +8,19 @@ import _ from 'lodash';
 
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
 
-chai.use(chaiAsPromised);
-
 describe('System calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
+  let chai;
+
   before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+
     adb = await ADB.createADB();
   });
   it('getConnectedDevices should get devices', async function () {

@@ -1,5 +1,3 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 // eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import net from 'net';
@@ -9,10 +7,6 @@ import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 import { EOL } from 'os';
 
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const should = chai.should();
 const apiLevel = 21,
       platformVersion = '4.4.4',
       language = 'en',
@@ -44,6 +38,19 @@ const logcat = new Logcat({
 });
 
 describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
+  let chai;
+  let should;
+  let expect;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    expect = chai.expect;
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });
