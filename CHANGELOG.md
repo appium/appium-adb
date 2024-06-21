@@ -1,3 +1,9 @@
+## [12.4.4](https://github.com/appium/appium-adb/compare/v12.4.3...v12.4.4) (2024-06-21)
+
+### Miscellaneous Chores
+
+* Bump chai and chai-as-promised ([#750](https://github.com/appium/appium-adb/issues/750)) ([e6d8481](https://github.com/appium/appium-adb/commit/e6d84815450d24c19d2cd1b37c755179ec217b92))
+
 ## [12.4.3](https://github.com/appium/appium-adb/compare/v12.4.2...v12.4.3) (2024-06-12)
 
 ### Miscellaneous Chores
