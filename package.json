@@ -57,7 +57,7 @@
     "lru-cache": "^10.0.0",
     "semver": "^7.0.0",
     "source-map-support": "^0.x",
-    "teen_process": "^2.0.1"
+    "teen_process": "^2.1.8"
   },
   "devDependencies": {
     "@appium/eslint-config-appium": "^8.0.0",
