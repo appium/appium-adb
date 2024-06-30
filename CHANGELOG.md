@@ -1,3 +1,9 @@
+## [12.4.6](https://github.com/appium/appium-adb/compare/v12.4.5...v12.4.6) (2024-06-30)
+
+### Bug Fixes
+
+* Prefer indexes over timestamps as logcat keys ([#752](https://github.com/appium/appium-adb/issues/752)) ([f499875](https://github.com/appium/appium-adb/commit/f49987590e9a4935e8fac07bdc1d237c4aec5cd1))
+
 ## [12.4.5](https://github.com/appium/appium-adb/compare/v12.4.4...v12.4.5) (2024-06-30)
 
 ### Miscellaneous Chores
