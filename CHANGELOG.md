@@ -1,3 +1,9 @@
+## [12.4.5](https://github.com/appium/appium-adb/compare/v12.4.4...v12.4.5) (2024-06-30)
+
+### Miscellaneous Chores
+
+* Optimize logcat callbacks handling ([#751](https://github.com/appium/appium-adb/issues/751)) ([5496a24](https://github.com/appium/appium-adb/commit/5496a2445f5f39b587fe081ff7bae819eadd2d5b))
+
 ## [12.4.4](https://github.com/appium/appium-adb/compare/v12.4.3...v12.4.4) (2024-06-21)
 
 ### Miscellaneous Chores
