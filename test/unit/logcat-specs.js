@@ -29,7 +29,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
         .onFirstCall()
         .returns(conn);
       setTimeout(function () {
-        conn.emit('lines-stdout', ['- beginning of system\r']);
+        conn.emit('line-stdout', '- beginning of system\r');
       }, 0);
       await logcat.startCapture({
         format: 'brief',
@@ -46,7 +46,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
         .onFirstCall()
         .returns(conn);
       setTimeout(function () {
-        conn.emit('lines-stderr', ['execvp()']);
+        conn.emit('line-stderr', 'execvp()');
       }, 0);
       await logcat.startCapture().should.eventually.be.rejectedWith('Logcat');
     });
@@ -58,7 +58,7 @@ describe('logcat', withMocks({teen_process}, function (mocks) {
         .onFirstCall()
         .returns(conn);
       setTimeout(function () {
-        conn.emit('lines-stderr', ['something']);
+        conn.emit('line-stderr', 'something');
       }, 0);
       await logcat.startCapture().should.eventually.not.be.rejectedWith('Logcat');
     });
