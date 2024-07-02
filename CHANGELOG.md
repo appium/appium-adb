@@ -1,3 +1,9 @@
+## [12.4.7](https://github.com/appium/appium-adb/compare/v12.4.6...v12.4.7) (2024-07-02)
+
+### Bug Fixes
+
+* Fix recent entry retrieval ([#753](https://github.com/appium/appium-adb/issues/753)) ([67d4b06](https://github.com/appium/appium-adb/commit/67d4b06a1d1b65074c52759e197f2b369f9ede15))
+
 ## [12.4.6](https://github.com/appium/appium-adb/compare/v12.4.5...v12.4.6) (2024-06-30)
 
 ### Bug Fixes
