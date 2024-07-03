@@ -1,3 +1,9 @@
+## [12.4.8](https://github.com/appium/appium-adb/compare/v12.4.7...v12.4.8) (2024-07-03)
+
+### Miscellaneous Chores
+
+* Simplify emulator output handling ([#754](https://github.com/appium/appium-adb/issues/754)) ([d1336e8](https://github.com/appium/appium-adb/commit/d1336e8c98b909a178fe91a5ecd346fd1da802d1))
+
 ## [12.4.7](https://github.com/appium/appium-adb/compare/v12.4.6...v12.4.7) (2024-07-02)
 
 ### Bug Fixes
