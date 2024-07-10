@@ -1,7 +1,7 @@
 import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
-  parseManifest, parseAaptStrings, parseAapt2Strings,
+  parseAaptStrings, parseAapt2Strings,
   extractMatchingPermissions, parseLaunchableActivityNames,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
@@ -185,73 +185,6 @@ describe('helpers', withMocks({fs}, function (mocks) {
         '/some/path/2.3.1',
         '/some/path/1.2.3',
       ]);
-    });
-  });
-
-  describe('parseManifest', function () {
-    const manifest = {
-      versionCode: 1,
-      versionName: '1.0',
-      package: 'com.example.hello.helloapp.app',
-      usesPermissions: [],
-      permissions: [],
-      permissionTrees: [],
-      permissionGroups: [],
-      instrumentation: null,
-      usesSdk: { minSdkVersion: 7, targetSdkVersion: 19 },
-      usesConfiguration: null,
-      usesFeatures: [],
-      supportsScreens: null,
-      compatibleScreens: [],
-      supportsGlTextures: [],
-      application: {
-        theme: 'resourceId:0x7f0b0000',
-        label: 'resourceId:0x7f0a000e',
-        icon: 'resourceId:0x7f020057',
-        debuggable: true,
-        allowBackup: true,
-        activities: [{
-          label: 'resourceId:0x7f0a000e',
-          name: 'com.example.hello.helloapp.app.MainActivity',
-          intentFilters: [{
-            actions: [{
-              name: 'android.intent.action.MAIN'
-            }],
-            categories: [{
-              name: 'android.intent.category.LAUNCHER'
-            }],
-            data: []
-          }],
-          metaData: []
-        }],
-        activityAliases: [],
-        launcherActivities: [{
-          label: 'resourceId:0x7f0a000e',
-          name: 'com.example.hello.helloapp.app.MainActivity',
-          intentFilters: [{
-            actions: [{
-              name: 'android.intent.action.MAIN'
-            }],
-            categories: [{
-              name: 'android.intent.category.LAUNCHER'
-            }],
-            data: []
-          }],
-          metaData: []
-        }],
-        services: [],
-        receivers: [],
-        providers: [],
-        usesLibraries: []
-      }
-    };
-
-    it('should parse manifest', function () {
-      const {pkg, activity, versionCode, versionName} = parseManifest(manifest);
-      pkg.should.eql('com.example.hello.helloapp.app');
-      activity.should.eql('com.example.hello.helloapp.app.MainActivity');
-      versionCode.should.eql(1);
-      versionName.should.eql('1.0');
     });
   });
 
