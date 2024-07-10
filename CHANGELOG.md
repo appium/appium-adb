@@ -1,3 +1,9 @@
+## [12.5.0](https://github.com/appium/appium-adb/compare/v12.4.8...v12.5.0) (2024-07-10)
+
+### Features
+
+* Use aapt2 instead of ApkReader ([#757](https://github.com/appium/appium-adb/issues/757)) ([8efcf5b](https://github.com/appium/appium-adb/commit/8efcf5bdc41c695f8fc699f3cad2baaad0da3b42))
+
 ## [12.4.8](https://github.com/appium/appium-adb/compare/v12.4.7...v12.4.8) (2024-07-03)
 
 ### Miscellaneous Chores
