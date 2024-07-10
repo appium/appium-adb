@@ -29,7 +29,7 @@ describe('Helpers', function () {
     const expected = {
       name: 'io.appium.android.apis',
       versionCode: 24,
-      sdkVersion: 0,
+      minSdkVersion: 17,
       compileSdkVersion: 31,
       usesPermissions: [
         'android.permission.READ_CONTACTS',
