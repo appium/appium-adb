@@ -43,7 +43,7 @@ npm run e2e-test
 example:
 
 ```js
-import ADB from 'appium-adb';
+import {ADB} from 'appium-adb';
 
 const adb = await ADB.createADB();
 console.log(await adb.getPIDsByName('com.android.phone'));
