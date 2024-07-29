@@ -1,3 +1,9 @@
+## [12.5.1](https://github.com/appium/appium-adb/compare/v12.5.0...v12.5.1) (2024-07-29)
+
+### Miscellaneous Chores
+
+* Bump @types/node from 20.14.13 to 22.0.0 ([#760](https://github.com/appium/appium-adb/issues/760)) ([b7308ff](https://github.com/appium/appium-adb/commit/b7308ff360ee90ee9367c5fd32707ac1fe765978))
+
 ## [12.5.0](https://github.com/appium/appium-adb/compare/v12.4.8...v12.5.0) (2024-07-10)
 
 ### Features
