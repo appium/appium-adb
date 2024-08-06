@@ -1,3 +1,9 @@
+## [12.5.2](https://github.com/appium/appium-adb/compare/v12.5.1...v12.5.2) (2024-08-06)
+
+### Bug Fixes
+
+* Enforce '--user 0'  argument if `cmd package list packages` throws an access error ([#761](https://github.com/appium/appium-adb/issues/761)) ([89b3348](https://github.com/appium/appium-adb/commit/89b3348d2f61b55d2f4e2eba4b205d5130b427fa))
+
 ## [12.5.1](https://github.com/appium/appium-adb/compare/v12.5.0...v12.5.1) (2024-07-29)
 
 ### Miscellaneous Chores
