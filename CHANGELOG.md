@@ -1,3 +1,9 @@
+## [12.5.3](https://github.com/appium/appium-adb/compare/v12.5.2...v12.5.3) (2024-09-05)
+
+### Miscellaneous Chores
+
+* Bump ini from 4.1.3 to 5.0.0 ([#762](https://github.com/appium/appium-adb/issues/762)) ([434f7bc](https://github.com/appium/appium-adb/commit/434f7bc0bcb156c6ea5275baeb743314a42fab31))
+
 ## [12.5.2](https://github.com/appium/appium-adb/compare/v12.5.1...v12.5.2) (2024-08-06)
 
 ### Bug Fixes
