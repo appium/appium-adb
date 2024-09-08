@@ -1,3 +1,9 @@
+## [12.6.0](https://github.com/appium/appium-adb/compare/v12.5.3...v12.6.0) (2024-09-08)
+
+### Features
+
+* Add a method to list device ports ([#764](https://github.com/appium/appium-adb/issues/764)) ([01fff96](https://github.com/appium/appium-adb/commit/01fff962d1f6578b7cf5e6cdfb90f72df0743ac7))
+
 ## [12.5.3](https://github.com/appium/appium-adb/compare/v12.5.2...v12.5.3) (2024-09-05)
 
 ### Miscellaneous Chores
