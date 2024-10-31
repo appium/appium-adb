@@ -1,3 +1,9 @@
+## [12.6.1](https://github.com/appium/appium-adb/compare/v12.6.0...v12.6.1) (2024-10-31)
+
+### Miscellaneous Chores
+
+* Streamline locale validation ([#765](https://github.com/appium/appium-adb/issues/765)) ([1b7e859](https://github.com/appium/appium-adb/commit/1b7e85903ecb09104b539d4b723e375235b83e3a))
+
 ## [12.6.0](https://github.com/appium/appium-adb/compare/v12.5.3...v12.6.0) (2024-09-08)
 
 ### Features
