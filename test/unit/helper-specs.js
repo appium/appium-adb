@@ -480,8 +480,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
     });
     it('test invalid activity name', function () {
       const activity = "User@123";
-      const result = String(matchComponentName(activity));
-      result.should.be.eql('null');
+      _.isNull(matchComponentName(activity)).should.be.true;
     });
   });
 }));
