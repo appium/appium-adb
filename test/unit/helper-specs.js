@@ -472,4 +472,16 @@ describe('helpers', withMocks({fs}, function (mocks) {
       names.should.be.eql([]);
     });
   });
+  describe('matchComponentName', function () {
+    it('test valid activity name', function () {
+      const activity = "ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ";
+      const names = matchComponentName(activity);
+      names.should.eql(["ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ"]);
+    });
+    it('test invalid activity name', function () {
+      const activity = "User@123";
+      _.isNull(matchComponentName(activity)).should.be.true;
+    });
+
+  });
 }));
