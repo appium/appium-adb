@@ -474,12 +474,12 @@ describe('helpers', withMocks({fs}, function (mocks) {
   });
   describe('matchComponentName', function () {
     it('test valid activity name', function () {
-      const activity = "ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ";
+      const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
       const names = matchComponentName(activity);
-      names.should.eql(["ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ"]);
+      names.should.eql([activity]);
     });
     it('test invalid activity name', function () {
-      const activity = "User@123";
+      const activity = 'User@123';
       _.isNull(matchComponentName(activity)).should.be.true;
     });
 
