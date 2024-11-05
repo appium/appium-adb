@@ -2,7 +2,7 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseAaptStrings, parseAapt2Strings,
-  extractMatchingPermissions, parseLaunchableActivityNames,
+  extractMatchingPermissions, parseLaunchableActivityNames, matchComponentName,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
