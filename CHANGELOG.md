@@ -1,3 +1,9 @@
+## [12.6.2](https://github.com/appium/appium-adb/compare/v12.6.1...v12.6.2) (2024-11-09)
+
+### Miscellaneous Chores
+
+* use start-activity for api level 26+ ([#771](https://github.com/appium/appium-adb/issues/771)) ([8faa1f3](https://github.com/appium/appium-adb/commit/8faa1f33784307d6c807a1654fd6367fa27387a1))
+
 ## [12.6.1](https://github.com/appium/appium-adb/compare/v12.6.0...v12.6.1) (2024-10-31)
 
 ### Miscellaneous Chores
