@@ -112,6 +112,14 @@ describe('helpers', withMocks({fs}, function (mocks) {
       activity: '.SomeActivity'
     };
 
+    it('should use start', function () {
+      let cmd = buildStartCmd(startOptions, 20);
+      cmd[1].should.eql('start');
+    });
+    it('should use start-activity', function () {
+      let cmd = buildStartCmd(startOptions, 26);
+      cmd[1].should.eql('start-activity');
+    });
     it('should parse optionalIntentArguments with single key', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
       cmd[cmd.length - 2].should.eql('-d');
