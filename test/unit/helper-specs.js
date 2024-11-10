@@ -2,7 +2,7 @@ import {
   getAndroidPlatformAndPath,
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseAaptStrings, parseAapt2Strings,
-  extractMatchingPermissions, parseLaunchableActivityNames,
+  extractMatchingPermissions, parseLaunchableActivityNames, matchComponentName,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
@@ -479,5 +479,17 @@ describe('helpers', withMocks({fs}, function (mocks) {
       const names = parseLaunchableActivityNames(dumpsysOutput);
       names.should.be.eql([]);
     });
+  });
+  describe('matchComponentName', function () {
+    it('test valid activity name', function () {
+      const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
+      const names = matchComponentName(activity);
+      names.should.eql([activity]);
+    });
+    it('test invalid activity name', function () {
+      const activity = 'User@123';
+      _.isNull(matchComponentName(activity)).should.be.true;
+    });
+
   });
 }));
