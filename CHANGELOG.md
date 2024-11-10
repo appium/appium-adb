@@ -1,3 +1,9 @@
+## [12.7.0](https://github.com/appium/appium-adb/compare/v12.6.2...v12.7.0) (2024-11-10)
+
+### Features
+
+* add support for activities with unicode chars ([#773](https://github.com/appium/appium-adb/issues/773)) ([8494f72](https://github.com/appium/appium-adb/commit/8494f7275690e219656c4246c20d0a008532d407))
+
 ## [12.6.2](https://github.com/appium/appium-adb/compare/v12.6.1...v12.6.2) (2024-11-09)
 
 ### Miscellaneous Chores
