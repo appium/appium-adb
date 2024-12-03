@@ -1,3 +1,9 @@
+## [12.7.1](https://github.com/appium/appium-adb/compare/v12.7.0...v12.7.1) (2024-12-03)
+
+### Miscellaneous Chores
+
+* Bump mocha from 10.8.2 to 11.0.1 ([#774](https://github.com/appium/appium-adb/issues/774)) ([32c8b8a](https://github.com/appium/appium-adb/commit/32c8b8a7640075a5f60bda447f1175c6e17a029e))
+
 ## [12.7.0](https://github.com/appium/appium-adb/compare/v12.6.2...v12.7.0) (2024-11-10)
 
 ### Features
