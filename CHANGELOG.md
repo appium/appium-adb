@@ -1,3 +1,9 @@
+## [12.7.2](https://github.com/appium/appium-adb/compare/v12.7.1...v12.7.2) (2024-12-06)
+
+### Miscellaneous Chores
+
+* Bump @appium/support from 5.1.8 to 6.0.0 ([#775](https://github.com/appium/appium-adb/issues/775)) ([15d5f75](https://github.com/appium/appium-adb/commit/15d5f7509669e11ac3201c2df3c6f250e63b4bb0))
+
 ## [12.7.1](https://github.com/appium/appium-adb/compare/v12.7.0...v12.7.1) (2024-12-03)
 
 ### Miscellaneous Chores
