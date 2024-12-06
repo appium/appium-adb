@@ -47,7 +47,7 @@
   ],
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
-    "@appium/support": "^5.0.3",
+    "@appium/support": "^6.0.0",
     "async-lock": "^1.0.0",
     "asyncbox": "^3.0.0",
     "bluebird": "^3.4.7",
