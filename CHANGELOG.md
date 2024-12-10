@@ -1,3 +1,9 @@
+## [12.7.3](https://github.com/appium/appium-adb/compare/v12.7.2...v12.7.3) (2024-12-10)
+
+### Bug Fixes
+
+* Make package of startUri optional ([#776](https://github.com/appium/appium-adb/issues/776)) ([be54566](https://github.com/appium/appium-adb/commit/be545660f18d01b8b30e17b77bf04e0c14ff3c4d))
+
 ## [12.7.2](https://github.com/appium/appium-adb/compare/v12.7.1...v12.7.2) (2024-12-06)
 
 ### Miscellaneous Chores
