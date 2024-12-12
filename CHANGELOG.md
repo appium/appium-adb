@@ -1,3 +1,9 @@
+## [12.7.4](https://github.com/appium/appium-adb/compare/v12.7.3...v12.7.4) (2024-12-12)
+
+### Miscellaneous Chores
+
+* Replace occurrences of the deprecated errorAndThrow API ([#777](https://github.com/appium/appium-adb/issues/777)) ([17aa093](https://github.com/appium/appium-adb/commit/17aa0939c81f530274f2fc6bf528e3d714d2b1d0))
+
 ## [12.7.3](https://github.com/appium/appium-adb/compare/v12.7.2...v12.7.3) (2024-12-10)
 
 ### Bug Fixes
