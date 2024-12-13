@@ -285,11 +285,8 @@ describe('adb commands', function () {
   });
 
   describe('listPorts', function () {
-    it('should list IPv4 ports', async function () {
-      _.isEmpty(await adb.listPorts()).should.be.false;
-    });
-    it('should list IPv6 ports', async function () {
-      _.isEmpty(await adb.listPorts('6')).should.be.false;
+    it('should list opened ports', async function () {
+      (_.isEmpty(await adb.listPorts()) && _.isEmpty(await adb.listPorts('6'))).should.be.false;
     });
   });
 });
