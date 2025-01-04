@@ -1,5 +1,4 @@
 import _ from 'lodash';
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { fs } from '@appium/support';
 import path from 'path';

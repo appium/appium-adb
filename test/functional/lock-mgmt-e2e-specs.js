@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 
 describe('Lock Management', function () {
@@ -11,14 +10,13 @@ describe('Lock Management', function () {
 
     chai.should();
     chai.use(chaiAsPromised.default);
-  });
 
-  before(async function () {
     adb = await ADB.createADB();
     if (!await adb.isLockManagementSupported()) {
       return this.skip();
     }
   });
+
   it('lock credential cleanup should work', async function () {
     await adb.clearLockCredential();
     await adb.verifyLockCredential().should.eventually.be.true;

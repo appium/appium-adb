@@ -1,6 +1,5 @@
 import * as teen_process from 'teen_process';
 import { fs } from '@appium/support';
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
@@ -99,7 +98,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(`package:/system/priv-app/TeleService/TeleService.apk with user`);
       (await adb.isAppInstalled(pkg, {user: '1'})).should.be.true;
     });
-    it('should parse correctly and return false for older versions', async function () {
+    it('should parse correctly and return false for older versions for user', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('getApiLevel')
         .returns(25);
@@ -561,7 +560,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns('');
       (await adb.startApp(startAppOptions));
     });
-    it('should call getApiLevel and shell with correct arguments', async function () {
+    it('should call getApiLevel and shell with correct arguments for class error', async function () {
       mocks.adb.expects('getApiLevel')
         .twice()
         .returns(17);

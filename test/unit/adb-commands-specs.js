@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import net from 'net';
-import Logcat from '../../lib/logcat.js';
+import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';

@@ -3,7 +3,6 @@ import {
   requireSdkRoot,
   readPackageManifest,
 } from '../../lib/helpers.js';
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'node:path';
 

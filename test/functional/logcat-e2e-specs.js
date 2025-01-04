@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
-import Logcat from '../../lib/logcat';
+import { Logcat } from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
 
 describe('logcat', function () {

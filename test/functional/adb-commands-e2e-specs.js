@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
