@@ -166,6 +166,7 @@ export class ADB implements ADBOptions {
   availableIMEs = generalMethods.availableIMEs;
   enabledIMEs = generalMethods.enabledIMEs;
   enableIME = generalMethods.enableIME;
+  disableIME = generalMethods.disableIME;
   setIME = generalMethods.setIME;
   defaultIME = generalMethods.defaultIME;
   keyevent = generalMethods.keyevent;

@@ -5,7 +5,7 @@ import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
-import apksUtilsMethods from '../../lib/tools/apks-utils';
+import * as apksUtilsMethods from '../../lib/tools/apks-utils';
 
 const pkg = 'com.example.android.contactmanager',
       uri = 'content://contacts/people/1',
