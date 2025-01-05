@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import * as helpers from '../../lib/helpers.js';
 import path from 'path';

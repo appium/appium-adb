@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';

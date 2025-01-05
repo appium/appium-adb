@@ -1,4 +1,4 @@
-import type Logcat from './logcat';
+import type {Logcat} from './logcat';
 import type {StringRecord} from '@appium/types';
 
 export interface ADBOptions {

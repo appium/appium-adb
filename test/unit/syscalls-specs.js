@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
@@ -136,7 +135,7 @@ describe('System calls', withMocks({teen_process}, function (mocks) {
   });
 }));
 
-describe('System calls', withMocks({adb, B, teen_process}, function (mocks) {
+describe('System calls 2', withMocks({adb, B, teen_process}, function (mocks) {
   let chai;
 
   before(async function () {

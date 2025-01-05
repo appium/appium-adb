@@ -1,6 +1,6 @@
 import * as teen_process from 'teen_process';
 import events from 'events';
-import Logcat from '../../lib/logcat';
+import { Logcat } from '../../lib/logcat';
 import { withMocks } from '@appium/test-support';
 
 describe('logcat', withMocks({teen_process}, function (mocks) {

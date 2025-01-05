@@ -7,11 +7,24 @@
 import {install} from 'source-map-support';
 install();
 
-import {ADB} from './lib/adb';
-
 export * from './lib/adb';
-export type * from './lib/mixins';
-export type * from './lib/tools';
+// eslint-disable-next-line import/export
+export {getAndroidBinaryPath} from './lib/tools/system-calls';
+export {getSdkRootFromEnv} from './lib/helpers';
+// TODO: move public typedefs into a separate file
 export type * from './lib/logcat';
 export type * from './lib/options';
+export type * from './lib/tools/adb-commands';
+// eslint-disable-next-line import/export
+export type * from './lib/tools/system-calls';
+export type * from './lib/tools/adb-emu-commands';
+export type * from './lib/tools/apk-signing';
+export type * from './lib/tools/apk-utils';
+export type * from './lib/tools/apks-utils';
+export type * from './lib/tools/aab-utils';
+export type * from './lib/tools/android-manifest';
+export type * from './lib/tools/keyboard-commands';
+export type * from './lib/tools/lockmgmt';
+
+import {ADB} from './lib/adb';
 export default ADB;

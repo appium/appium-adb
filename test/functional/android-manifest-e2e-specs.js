@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import { fs, util } from '@appium/support';
+import { fs } from '@appium/support';
 
 
 // All paths below assume tests run under /build/test/ so paths are relative from
@@ -55,9 +54,9 @@ describe('Android-manifest', function () {
     await fs.mkdir(dstDir);
     await fs.writeFile(dstManifest, await fs.readFile(srcManifest, 'utf8'), 'utf8');
     await adb.compileManifest(dstManifest, newPackage, appPackage);
-    (await util.fileExists(dstManifest)).should.be.true;
+    (await fs.fileExists(dstManifest)).should.be.true;
     await adb.insertManifest(dstManifest, serverPath, newServerPath);
-    (await util.fileExists(newServerPath)).should.be.true;
+    (await fs.fileExists(newServerPath)).should.be.true;
     // deleting temp directory
     try {
       await fs.rimraf(tmpDir);

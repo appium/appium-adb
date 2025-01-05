@@ -48,6 +48,7 @@
   "homepage": "https://github.com/appium/appium-adb",
   "dependencies": {
     "@appium/support": "^6.0.0",
+    "@appium/types": "^0.x",
     "async-lock": "^1.0.0",
     "asyncbox": "^3.0.0",
     "bluebird": "^3.4.7",
@@ -59,9 +60,8 @@
     "teen_process": "^2.2.0"
   },
   "devDependencies": {
-    "@appium/eslint-config-appium-ts": "^0.x",
+    "@appium/eslint-config-appium-ts": "^1.x",
     "@appium/test-support": "^3.0.1",
-    "@appium/types": "^0.x",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/async-lock": "^1.4.0",
