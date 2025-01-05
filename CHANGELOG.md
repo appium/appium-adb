@@ -1,3 +1,9 @@
+## [12.8.0](https://github.com/appium/appium-adb/compare/v12.7.4...v12.8.0) (2025-01-05)
+
+### Features
+
+* Bump Eslint ([#781](https://github.com/appium/appium-adb/issues/781)) ([9613100](https://github.com/appium/appium-adb/commit/9613100d8c038e77041ef36d5b3fc88d2c70c0f6))
+
 ## [12.7.4](https://github.com/appium/appium-adb/compare/v12.7.3...v12.7.4) (2024-12-12)
 
 ### Miscellaneous Chores
