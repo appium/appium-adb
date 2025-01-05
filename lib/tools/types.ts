@@ -1,4 +1,3 @@
-import type { ValueOf } from 'type-fest';
 import * as emuConstants from './emu-constants';
 
 export type StringRecord<T = any> = Record<string, T>;
@@ -710,11 +709,11 @@ export interface RootResult {
   wasAlreadyRooted: boolean;
 }
 
-export type Sensors = ValueOf<typeof emuConstants.SENSORS>;
-export type NetworkSpeed = ValueOf<typeof emuConstants.NETWORK_SPEED>;
-export type GsmVoiceStates = ValueOf<typeof emuConstants.GSM_VOICE_STATES>;
-export type GsmCallActions = ValueOf<typeof emuConstants.GSM_CALL_ACTIONS>;
-export type PowerAcStates = ValueOf<typeof emuConstants.POWER_AC_STATES>;
+export type Sensors = typeof emuConstants.SENSORS[keyof typeof emuConstants.SENSORS];
+export type NetworkSpeed = typeof emuConstants.NETWORK_SPEED[keyof typeof emuConstants.NETWORK_SPEED];
+export type GsmVoiceStates = typeof emuConstants.GSM_VOICE_STATES[keyof typeof emuConstants.GSM_VOICE_STATES];
+export type GsmCallActions = typeof emuConstants.GSM_CALL_ACTIONS[keyof typeof emuConstants.GSM_CALL_ACTIONS];
+export type PowerAcStates = typeof emuConstants.POWER_AC_STATES[keyof typeof emuConstants.POWER_AC_STATES];
 
 export interface PlatformInfo {
   /**
