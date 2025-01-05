@@ -10,6 +10,7 @@ install();
 export * from './lib/adb';
 // eslint-disable-next-line import/export
 export {getAndroidBinaryPath} from './lib/tools/system-calls';
+export {getSdkRootFromEnv} from './lib/helpers';
 // TODO: move public typedefs into a separate file
 export type * from './lib/logcat';
 export type * from './lib/options';

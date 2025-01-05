@@ -24,7 +24,7 @@ import * as lockManagementCommands from './tools/lockmgmt';
 import * as keyboardCommands from './tools/keyboard-commands';
 
 
-const DEFAULT_ADB_PORT = 5037;
+export const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
   sdkRoot: getSdkRootFromEnv(),
   executable: {path: 'adb', defaultArgs: []},
@@ -369,6 +369,3 @@ export class ADB implements ADBOptions {
   NETWORK_SPEED = emuMethods.NETWORK_SPEED;
   SENSORS = emuMethods.SENSORS;
 }
-
-
-export {DEFAULT_ADB_PORT, getSdkRootFromEnv};
