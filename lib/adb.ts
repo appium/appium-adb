@@ -6,11 +6,11 @@ import {
   getSdkRootFromEnv
 } from './helpers';
 import log from './logger';
-import type {ADBOptions, ADBExecutable} from './options';
-import type { LogcatOpts, Logcat } from './logcat';
+import type { ADBOptions, ADBExecutable } from './types';
+import type { Logcat } from './logcat';
+import type { LogcatOpts, StringRecord } from './tools/types';
 import type { LRUCache } from 'lru-cache';
 import type { ExecError } from 'teen_process';
-import type { StringRecord } from '@appium/types';
 
 import * as generalMethods from './tools/adb-commands';
 import * as manifestMethods from './tools/android-manifest';
@@ -22,6 +22,7 @@ import * as aabUtilsMethods from './tools/aab-utils';
 import * as emuMethods from './tools/adb-emu-commands';
 import * as lockManagementCommands from './tools/lockmgmt';
 import * as keyboardCommands from './tools/keyboard-commands';
+import * as emuConstants from './tools/emu-constants';
 
 
 export const DEFAULT_ADB_PORT = 5037;
@@ -362,10 +363,10 @@ export class ADB implements ADBOptions {
   getEmuVersionInfo = emuMethods.getEmuVersionInfo;
   getEmuImageProperties = emuMethods.getEmuImageProperties;
   checkAvdExist = emuMethods.checkAvdExist;
-  POWER_AC_STATES = emuMethods.POWER_AC_STATES;
-  GSM_CALL_ACTIONS = emuMethods.GSM_CALL_ACTIONS;
-  GSM_VOICE_STATES = emuMethods.GSM_VOICE_STATES;
-  GSM_SIGNAL_STRENGTHS = emuMethods.GSM_SIGNAL_STRENGTHS;
-  NETWORK_SPEED = emuMethods.NETWORK_SPEED;
-  SENSORS = emuMethods.SENSORS;
+  POWER_AC_STATES = emuConstants.POWER_AC_STATES;
+  GSM_CALL_ACTIONS = emuConstants.GSM_CALL_ACTIONS;
+  GSM_VOICE_STATES = emuConstants.GSM_VOICE_STATES;
+  GSM_SIGNAL_STRENGTHS = emuConstants.GSM_SIGNAL_STRENGTHS;
+  NETWORK_SPEED = emuConstants.NETWORK_SPEED;
+  SENSORS = emuConstants.SENSORS;
 }
