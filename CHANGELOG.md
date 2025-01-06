@@ -1,3 +1,9 @@
+## [12.9.0](https://github.com/appium/appium-adb/compare/v12.8.0...v12.9.0) (2025-01-06)
+
+### Features
+
+* Extract typedefs ([#782](https://github.com/appium/appium-adb/issues/782)) ([82ec0f9](https://github.com/appium/appium-adb/commit/82ec0f9372576102f151a5f3a3fbac304415b689))
+
 ## [12.8.0](https://github.com/appium/appium-adb/compare/v12.7.4...v12.8.0) (2025-01-05)
 
 ### Features
