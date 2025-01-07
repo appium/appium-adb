@@ -654,7 +654,7 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         adb._isPgrepAvailable = true;
         adb._canPgrepUseFullCmdLineSearch = true;
         const escapedProcessName = _.escapeRegExp(`([[:blank:]]|^)${contactManagerPackage}(:[a-zA-Z0-9_-]+)?([[:blank:]]|$)`);
-        mocks.adb.expects('shell').once().withExactArgs(['pgrep', '-f', escapedProcessName]).returns('5080\n5081\n');         
+        mocks.adb.expects('shell').once().withExactArgs(['pgrep', '-f', escapedProcessName]).returns('5080\n5081\n');
         (await adb.getPIDsByName(contactManagerPackage)).should.eql([5080, 5081]);
       });
       it('should call shell and return an empty list if no processes are running', async function () {
