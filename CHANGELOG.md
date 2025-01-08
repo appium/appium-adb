@@ -1,3 +1,9 @@
+## [12.10.0](https://github.com/appium/appium-adb/compare/v12.9.0...v12.10.0) (2025-01-08)
+
+### Features
+
+* Added support for applications with multiple processes ([#785](https://github.com/appium/appium-adb/issues/785)) ([ff18d96](https://github.com/appium/appium-adb/commit/ff18d96842d23e72c859d40923194f421e57480a))
+
 ## [12.9.0](https://github.com/appium/appium-adb/compare/v12.8.0...v12.9.0) (2025-01-06)
 
 ### Features
