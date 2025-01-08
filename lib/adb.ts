@@ -324,12 +324,12 @@ export class ADB implements ADBOptions {
   getEmuVersionInfo = emuMethods.getEmuVersionInfo;
   getEmuImageProperties = emuMethods.getEmuImageProperties;
   checkAvdExist = emuMethods.checkAvdExist;
-  POWER_AC_STATES = emuConstants.POWER_AC_STATES;
-  GSM_CALL_ACTIONS = emuConstants.GSM_CALL_ACTIONS;
-  GSM_VOICE_STATES = emuConstants.GSM_VOICE_STATES;
-  GSM_SIGNAL_STRENGTHS = emuConstants.GSM_SIGNAL_STRENGTHS;
-  NETWORK_SPEED = emuConstants.NETWORK_SPEED;
-  SENSORS = emuConstants.SENSORS;
+  readonly POWER_AC_STATES = emuConstants.POWER_AC_STATES;
+  readonly GSM_CALL_ACTIONS = emuConstants.GSM_CALL_ACTIONS;
+  readonly GSM_VOICE_STATES = emuConstants.GSM_VOICE_STATES;
+  readonly GSM_SIGNAL_STRENGTHS = emuConstants.GSM_SIGNAL_STRENGTHS;
+  readonly NETWORK_SPEED = emuConstants.NETWORK_SPEED;
+  readonly SENSORS = emuConstants.SENSORS;
 
   getDeviceProperty = deviceSettingsCommands.getDeviceProperty;
   setDeviceProperty = deviceSettingsCommands.setDeviceProperty;
