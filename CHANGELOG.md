@@ -1,3 +1,13 @@
+## [12.10.1](https://github.com/appium/appium-adb/compare/v12.10.0...v12.10.1) (2025-01-09)
+
+### Bug Fixes
+
+* Do not prefix activity with package name if it already exists ([#787](https://github.com/appium/appium-adb/issues/787)) ([6395d58](https://github.com/appium/appium-adb/commit/6395d58c90723d84a023aa9bdc997009c91d4806))
+
+### Miscellaneous Chores
+
+* Regroup some adb commands ([#786](https://github.com/appium/appium-adb/issues/786)) ([4b95444](https://github.com/appium/appium-adb/commit/4b95444b963c414bf5a09aa805c779e3bc7e11e9))
+
 ## [12.10.0](https://github.com/appium/appium-adb/compare/v12.9.0...v12.10.0) (2025-01-08)
 
 ### Features
