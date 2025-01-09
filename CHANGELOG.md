@@ -1,3 +1,9 @@
+## [12.10.2](https://github.com/appium/appium-adb/compare/v12.10.1...v12.10.2) (2025-01-09)
+
+### Miscellaneous Chores
+
+* Regroup application and filesystem commands ([#788](https://github.com/appium/appium-adb/issues/788)) ([9908400](https://github.com/appium/appium-adb/commit/990840031f729bf5b51d3a16a517762dd84c4d06))
+
 ## [12.10.1](https://github.com/appium/appium-adb/compare/v12.10.0...v12.10.1) (2025-01-09)
 
 ### Bug Fixes
