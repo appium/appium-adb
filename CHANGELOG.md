@@ -1,3 +1,9 @@
+## [12.10.3](https://github.com/appium/appium-adb/compare/v12.10.2...v12.10.3) (2025-01-10)
+
+### Bug Fixes
+
+* Update focused activity validation logic ([#789](https://github.com/appium/appium-adb/issues/789)) ([c862dbd](https://github.com/appium/appium-adb/commit/c862dbd01ac9684dd08edc9e7bd33a91d2acf05e))
+
 ## [12.10.2](https://github.com/appium/appium-adb/compare/v12.10.1...v12.10.2) (2025-01-09)
 
 ### Miscellaneous Chores
