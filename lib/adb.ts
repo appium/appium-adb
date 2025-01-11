@@ -3,29 +3,31 @@ import os from 'node:os';
 import {
   DEFAULT_ADB_EXEC_TIMEOUT,
   requireSdkRoot,
-  getSdkRootFromEnv
+  getSdkRootFromEnv,
 } from './helpers';
-import log from './logger';
+import { log } from './logger';
 import type { ADBOptions, ADBExecutable } from './types';
 import type { Logcat } from './logcat';
 import type { LogcatOpts, StringRecord } from './tools/types';
 import type { LRUCache } from 'lru-cache';
 import type { ExecError } from 'teen_process';
 
-import * as generalCommands from './tools/adb-commands';
+import * as generalCommands from './tools/general-commands';
 import * as manifestCommands from './tools/android-manifest';
 import * as systemCommands from './tools/system-calls';
 import * as signingCommands from './tools/apk-signing';
 import * as apkUtilCommands from './tools/apk-utils';
 import * as apksUtilCommands from './tools/apks-utils';
 import * as aabUtilCommands from './tools/aab-utils';
-import * as emuCommands from './tools/adb-emu-commands';
+import * as emuCommands from './tools/emulator-commands';
 import * as emuConstants from './tools/emu-constants';
 import * as lockManagementCommands from './tools/lockmgmt';
 import * as keyboardCommands from './tools/keyboard-commands';
 import * as deviceSettingsCommands from './tools/device-settings';
 import * as fsCommands from './tools/fs-commands';
 import * as appCommands from './tools/app-commands';
+import * as networkCommands from './tools/network-commands';
+import * as logcatCommands from './tools/logcat-commands';
 
 
 export const DEFAULT_ADB_PORT = 5037;
@@ -139,8 +141,6 @@ export class ADB implements ADBOptions {
     return adb;
   }
 
-  // TODO: Group methods from general to corresponding modules
-  shellChunks = generalCommands.shellChunks;
   getAdbWithCorrectAdbPath = generalCommands.getAdbWithCorrectAdbPath;
   initAapt = generalCommands.initAapt;
   initAapt2 = generalCommands.initAapt2;
@@ -149,32 +149,32 @@ export class ADB implements ADBOptions {
   getApiLevel = generalCommands.getApiLevel;
   isDeviceConnected = generalCommands.isDeviceConnected;
   clearTextField = generalCommands.clearTextField;
-  lock = generalCommands.lock;
   back = generalCommands.back;
   goToHome = generalCommands.goToHome;
   getAdbPath = generalCommands.getAdbPath;
-  sendTelnetCommand = generalCommands.sendTelnetCommand;
-  getForwardList = generalCommands.getForwardList;
-  forwardPort = generalCommands.forwardPort;
-  removePortForward = generalCommands.removePortForward;
-  getReverseList = generalCommands.getReverseList;
-  reversePort = generalCommands.reversePort;
-  removePortReverse = generalCommands.removePortReverse;
-  forwardAbstractPort = generalCommands.forwardAbstractPort;
-  ping = generalCommands.ping;
   restart = generalCommands.restart;
-  startLogcat = generalCommands.startLogcat;
-  stopLogcat = generalCommands.stopLogcat;
-  getLogcatLogs = generalCommands.getLogcatLogs;
-  setLogcatListener = generalCommands.setLogcatListener;
-  removeLogcatListener = generalCommands.removeLogcatListener;
   bugreport = generalCommands.bugreport;
   screenrecord = generalCommands.screenrecord;
   listFeatures = generalCommands.listFeatures;
   isStreamedInstallSupported = generalCommands.isStreamedInstallSupported;
   isIncrementalInstallSupported = generalCommands.isIncrementalInstallSupported;
   takeScreenshot = generalCommands.takeScreenshot;
-  listPorts = generalCommands.listPorts;
+
+  startLogcat = logcatCommands.startLogcat;
+  stopLogcat = logcatCommands.stopLogcat;
+  getLogcatLogs = logcatCommands.getLogcatLogs;
+  setLogcatListener = logcatCommands.setLogcatListener;
+  removeLogcatListener = logcatCommands.removeLogcatListener;
+
+  getForwardList = networkCommands.getForwardList;
+  forwardPort = networkCommands.forwardPort;
+  listPorts = networkCommands.listPorts;
+  ping = networkCommands.ping;
+  forwardAbstractPort = networkCommands.forwardAbstractPort;
+  removePortReverse = networkCommands.removePortReverse;
+  reversePort = networkCommands.reversePort;
+  getReverseList = networkCommands.getReverseList;
+  removePortForward = networkCommands.removePortForward;
 
   executeApksigner = signingCommands.executeApksigner;
   signWithDefaultCert = signingCommands.signWithDefaultCert;
@@ -239,6 +239,7 @@ export class ADB implements ADBOptions {
   inputText = keyboardCommands.inputText;
   runInImeContext = keyboardCommands.runInImeContext;
 
+  lock = lockManagementCommands.lock;
   isLockManagementSupported = lockManagementCommands.isLockManagementSupported;
   verifyLockCredential = lockManagementCommands.verifyLockCredential;
   clearLockCredential = lockManagementCommands.clearLockCredential;
@@ -262,6 +263,7 @@ export class ADB implements ADBOptions {
   EXEC_OUTPUT_FORMAT = systemCommands.EXEC_OUTPUT_FORMAT;
   adbExec = systemCommands.adbExec;
   shell = systemCommands.shell;
+  shellChunks = systemCommands.shellChunks;
   createSubProcess = systemCommands.createSubProcess;
   getAdbServerPort = systemCommands.getAdbServerPort;
   getEmulatorPort = systemCommands.getEmulatorPort;
@@ -316,6 +318,7 @@ export class ADB implements ADBOptions {
   gsmSignal = emuCommands.gsmSignal;
   gsmVoice = emuCommands.gsmVoice;
   networkSpeed = emuCommands.networkSpeed;
+  sendTelnetCommand = emuCommands.sendTelnetCommand;
   execEmuConsoleCommand = emuCommands.execEmuConsoleCommand;
   getEmuVersionInfo = emuCommands.getEmuVersionInfo;
   getEmuImageProperties = emuCommands.getEmuImageProperties;
