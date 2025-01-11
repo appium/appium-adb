@@ -1,3 +1,9 @@
+## [12.11.0](https://github.com/appium/appium-adb/compare/v12.10.3...v12.11.0) (2025-01-11)
+
+### Features
+
+* Regroup network and logcat commands ([#790](https://github.com/appium/appium-adb/issues/790)) ([1674c6d](https://github.com/appium/appium-adb/commit/1674c6dffa2779578a6be8e1ef79ebf2b68d6a1e))
+
 ## [12.10.3](https://github.com/appium/appium-adb/compare/v12.10.2...v12.10.3) (2025-01-10)
 
 ### Bug Fixes
