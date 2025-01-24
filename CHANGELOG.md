@@ -1,3 +1,9 @@
+## [12.12.0](https://github.com/appium/appium-adb/compare/v12.11.0...v12.12.0) (2025-01-24)
+
+### Features
+
+* add screenState=SCREEN_STATE_OFF as the screen locked ([#791](https://github.com/appium/appium-adb/issues/791)) ([6f6f45a](https://github.com/appium/appium-adb/commit/6f6f45adcd520e8ae369e0735bafd4613c5cc6a1))
+
 ## [12.11.0](https://github.com/appium/appium-adb/compare/v12.10.3...v12.11.0) (2025-01-11)
 
 ### Features
