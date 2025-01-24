@@ -3,7 +3,7 @@ import {
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseAaptStrings, parseAapt2Strings,
   extractMatchingPermissions, parseLaunchableActivityNames, matchComponentName,
-  isScreenOff,
+  isScreenStateOff,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
@@ -59,8 +59,8 @@ describe('helpers', withMocks({fs}, function (mocks) {
     });
   });
 
-  describe('isScreenOff', function () {
-    it('should return true if isScreenOff is off', async function () {
+  describe('isScreenStateOff', function () {
+    it('should return true if isScreenStateOff is off', async function () {
       let dumpsys = `
     KeyguardServiceDelegate
       showing=false
@@ -85,9 +85,9 @@ describe('helpers', withMocks({fs}, function (mocks) {
         mCurrentUserId=0
         ...
       `;
-      (await isScreenOff(dumpsys)).should.be.true;
+      (await isScreenStateOff(dumpsys)).should.be.true;
     });
-    it('should return true if isScreenOff is on', async function () {
+    it('should return true if isScreenStateOff is on', async function () {
       let dumpsys = `
     KeyguardServiceDelegate
       showing=false
@@ -112,7 +112,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
         mCurrentUserId=0
         ...
       `;
-      (await isScreenOff(dumpsys)).should.be.false;
+      (await isScreenStateOff(dumpsys)).should.be.false;
     });
   });
 
