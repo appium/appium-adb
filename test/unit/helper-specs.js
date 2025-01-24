@@ -3,6 +3,7 @@ import {
   buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
   parseAaptStrings, parseAapt2Strings,
   extractMatchingPermissions, parseLaunchableActivityNames, matchComponentName,
+  isScreenOff,
 } from '../../lib/helpers';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
@@ -57,6 +58,64 @@ describe('helpers', withMocks({fs}, function (mocks) {
         .equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
     });
   });
+
+  describe('isScreenOff', function () {
+    it('should return true if isScreenOff is off', async function () {
+      let dumpsys = `
+    KeyguardServiceDelegate
+      showing=false
+      showingAndNotOccluded=true
+      inputRestricted=false
+      occluded=false
+      secure=false
+      dreaming=false
+      systemIsReady=true
+      deviceHasKeyguard=true
+      enabled=true
+      offReason=OFF_BECAUSE_OF_USER
+      currentUser=-10000
+      bootCompleted=true
+      screenState=SCREEN_STATE_OFF
+      interactiveState=INTERACTIVE_STATE_SLEEP
+      KeyguardStateMonitor
+        mIsShowing=false
+        mSimSecure=false
+        mInputRestricted=false
+        mTrusted=false
+        mCurrentUserId=0
+        ...
+      `;
+      (await isScreenOff(dumpsys)).should.be.true;
+    });
+    it('should return true if isScreenOff is on', async function () {
+      let dumpsys = `
+    KeyguardServiceDelegate
+      showing=false
+      showingAndNotOccluded=true
+      inputRestricted=false
+      occluded=false
+      secure=false
+      dreaming=false
+      systemIsReady=true
+      deviceHasKeyguard=true
+      enabled=true
+      offReason=OFF_BECAUSE_OF_USER
+      currentUser=-10000
+      bootCompleted=true
+      screenState=SCREEN_STATE_ON
+      interactiveState=INTERACTIVE_STATE_AWAKE
+      KeyguardStateMonitor
+        mIsShowing=false
+        mSimSecure=false
+        mInputRestricted=false
+        mTrusted=false
+        mCurrentUserId=0
+        ...
+      `;
+      (await isScreenOff(dumpsys)).should.be.false;
+    });
+  });
+
 
   describe('isShowingLockscreen', function () {
     it('should return true if mShowingLockscreen is true', async function () {
