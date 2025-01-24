@@ -85,7 +85,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
         mCurrentUserId=0
         ...
       `;
-      (await isScreenStateOff(dumpsys)).should.be.true;
+      isScreenStateOff(dumpsys).should.be.true;
     });
     it('should return true if isScreenStateOff is on', async function () {
       let dumpsys = `
@@ -112,7 +112,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
         mCurrentUserId=0
         ...
       `;
-      (await isScreenStateOff(dumpsys)).should.be.false;
+      isScreenStateOff(dumpsys).should.be.false;
     });
   });
 
