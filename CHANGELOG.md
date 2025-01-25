@@ -1,3 +1,9 @@
+## [12.12.1](https://github.com/appium/appium-adb/compare/v12.12.0...v12.12.1) (2025-01-25)
+
+### Miscellaneous Chores
+
+* Only keep common functions in helpers ([#792](https://github.com/appium/appium-adb/issues/792)) ([18e7919](https://github.com/appium/appium-adb/commit/18e7919a812b4c1f9078e302ec75b5c86771314a))
+
 ## [12.12.0](https://github.com/appium/appium-adb/compare/v12.11.0...v12.12.0) (2025-01-24)
 
 ### Features
