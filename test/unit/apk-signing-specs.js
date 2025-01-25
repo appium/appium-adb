@@ -4,6 +4,7 @@ import path from 'path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
 import { withMocks } from '@appium/test-support';
+import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 
 const selendroidTestApp = path.resolve(__dirname, '..', 'fixtures', 'selendroid-test-app.apk');
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
@@ -24,7 +25,15 @@ adb.keyAlias = keyAlias;
 adb.keystorePassword = password;
 adb.keyPassword = password;
 
-describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, tempDir}, function (mocks) {
+describe('signing', withMocks({
+  teen_process,
+  helpers,
+  adb,
+  appiumSupport,
+  fs,
+  tempDir,
+  apkSigningHelpers,
+}, function (mocks) {
   let chai;
 
   before(async function () {
@@ -41,7 +50,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
 
   describe('signWithDefaultCert', function () {
     it('should call exec with correct args', async function () {
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
@@ -53,7 +62,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     });
 
     it('should fail if apksigner fails', async function () {
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
@@ -76,7 +85,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should call exec with correct args', async function () {
       adb.useKeystore = true;
 
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .withExactArgs(['sign',
@@ -96,7 +105,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
       }
       adb.useKeystore = true;
 
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
@@ -118,7 +127,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
         .returns({});
       mocks.helpers.expects('getJavaHome')
         .returns(javaHome);
-      mocks.helpers.expects('unsignApk')
+      mocks.apkSigningHelpers.expects('unsignApk')
         .withExactArgs(selendroidTestApp)
         .returns(true);
       await adb.signWithCustomCert(selendroidTestApp);
@@ -161,7 +170,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should check default signature when not using keystore', async function () {
       adb.useKeystore = false;
 
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
@@ -176,7 +185,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should check non default signature when not using keystore', async function () {
       adb.useKeystore = false;
 
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
@@ -193,7 +202,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
     it('should fail if apksigner is not found', async function () {
       adb.useKeystore = false;
 
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .throws();
       mocks.helpers.expects('getJavaForOs')
         .returns(javaDummyPath);
@@ -210,7 +219,7 @@ describe('signing', withMocks({teen_process, helpers, adb, appiumSupport, fs, te
           'sha1': '61ed377e85d386a8dfee6b864bdcccccfaa5af81',
           'sha256': 'a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc',
         });
-      mocks.helpers.expects('getApksignerForOs')
+      mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
