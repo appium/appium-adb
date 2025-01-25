@@ -1,7 +1,7 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import os from 'os';
-import { unsignApk } from '../../lib/helpers.js';
+import { unsignApk } from '../../lib/tools/apk-signing';
 
 
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');

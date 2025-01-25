@@ -1,14 +1,17 @@
 import {
-  getAndroidPlatformAndPath,
-  buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
-  parseAaptStrings, parseAapt2Strings,
-  extractMatchingPermissions, parseLaunchableActivityNames, matchComponentName,
-  isScreenStateOff,
-} from '../../lib/helpers';
+  parseLaunchableActivityNames,
+  matchComponentName,
+  buildStartCmd,
+  extractMatchingPermissions,
+} from '../../lib/tools/app-commands';
+import { isShowingLockscreen, isScreenStateOff } from '../../lib/tools/lockmgmt';
+import { getBuildToolsDirs } from '../../lib/tools/system-calls';
+import { parseAapt2Strings, parseAaptStrings } from '../../lib/tools/apk-utils';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
 import path from 'path';
 import _ from 'lodash';
+import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 
 
 describe('helpers', withMocks({fs}, function (mocks) {
