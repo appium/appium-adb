@@ -1,3 +1,9 @@
+## [12.12.2](https://github.com/appium/appium-adb/compare/v12.12.1...v12.12.2) (2025-04-17)
+
+### Bug Fixes
+
+* Update comparison logic for the activity name when there are multiple active app ([#798](https://github.com/appium/appium-adb/issues/798)) ([dbdd083](https://github.com/appium/appium-adb/commit/dbdd083d70237e623cc7ed903fecf48ddab722f2))
+
 ## [12.12.1](https://github.com/appium/appium-adb/compare/v12.12.0...v12.12.1) (2025-01-25)
 
 ### Miscellaneous Chores
