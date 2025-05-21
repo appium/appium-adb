@@ -1,3 +1,9 @@
+## [12.12.3](https://github.com/appium/appium-adb/compare/v12.12.2...v12.12.3) (2025-05-21)
+
+### Miscellaneous Chores
+
+* Bump conventional-changelog-conventionalcommits ([#799](https://github.com/appium/appium-adb/issues/799)) ([ed65431](https://github.com/appium/appium-adb/commit/ed654316f0ac8e731bde1a4ec6cbf0c8971ec788))
+
 ## [12.12.2](https://github.com/appium/appium-adb/compare/v12.12.1...v12.12.2) (2025-04-17)
 
 ### Bug Fixes
