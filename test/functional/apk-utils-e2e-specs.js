@@ -125,7 +125,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: CONTACT_MANAGER_ACTIVITY,
+        activity: 'ContactManage',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('Activity');
     });
