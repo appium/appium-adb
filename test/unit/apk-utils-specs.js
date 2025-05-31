@@ -7,7 +7,7 @@ import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 import * as apksUtilsMethods from '../../lib/tools/apks-utils';
 
-const pkg = 'com.example.android.contactmanager',
+const pkg = 'com.saucelabs.ContactManager',
       uri = 'content://contacts/people/1',
       act = '.ContactManager',
       startAppOptions = {
@@ -215,7 +215,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
                  'ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
       mocks.adb.expects('dumpWindows')
         .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' +
-                 'ActivityRecord{2c7c4318 u0 com.example.android.contactmanager/.ContactManager t181}}}');
+                 'ActivityRecord{2c7c4318 u0 com.saucelabs.ContactManager/.ContactManager t181}}}');
 
       await adb.waitForActivityOrNot(pkg, act, false);
     });

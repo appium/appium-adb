@@ -5,7 +5,7 @@ import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
-const CONTACT_MANAGER_APP_ID = 'com.example.android.contactmanager';
+const CONTACT_MANAGER_APP_ID = 'com.saucelabs.ContactManager';
 
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -203,7 +203,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        waitPkg: 'com.android.settings, com.example.android.contactmanager',
+        waitPkg: `com.android.settings, ${CONTACT_MANAGER_APP_ID}`,
         activity: 'ContactManager',
         waitActivity: '.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,

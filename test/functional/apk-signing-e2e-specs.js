@@ -10,6 +10,7 @@ const contactManagerPath = path.resolve(fixturesRoot, 'ContactManager.apk');
 const tmp = os.tmpdir();
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
+const CONTACT_MANAGER_APP_ID = 'com.saucelabs.ContactManager';
 
 describe('Apk-signing', function () {
   let adb;
@@ -29,7 +30,7 @@ describe('Apk-signing', function () {
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.false;
   });
   it('checkApkCert should return true for signed apk', async function () {
-    (await adb.checkApkCert(contactManagerPath, 'com.example.android.contactmanager')).should.be.true;
+    (await adb.checkApkCert(contactManagerPath, CONTACT_MANAGER_APP_ID)).should.be.true;
   });
   it('signWithDefaultCert should sign apk', async function () {
     await unsignApk(selendroidTestApp);

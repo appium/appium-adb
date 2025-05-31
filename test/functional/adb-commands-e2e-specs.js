@@ -11,7 +11,7 @@ const DEFAULT_IMES = [
   'io.appium.android.ime/.UnicodeIME',
 ];
 const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
+const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
 
 
