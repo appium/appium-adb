@@ -6,6 +6,7 @@ import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 const CONTACT_MANAGER_APP_ID = 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
 
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -79,7 +80,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION,
       });
       await assertPackageAndActivity();
@@ -124,7 +125,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManage',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('Activity');
     });
@@ -134,7 +135,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: 'foo',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('foo');
@@ -145,7 +146,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -157,7 +158,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -169,7 +170,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -192,7 +193,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*.SuperManager',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('SuperManager');
@@ -204,7 +205,7 @@ describe('apk utils', function () {
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
         waitPkg: `com.android.settings, ${CONTACT_MANAGER_APP_ID}`,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -245,7 +246,7 @@ describe('apk utils', function () {
     });
     await adb.startApp({
       pkg: CONTACT_MANAGER_APP_ID,
-      activity: 'ContactManager',
+      activity: CONTACT_MANAGER_ACTIVITY,
       waitDuration: START_APP_WAIT_DURATION,
     });
     await assertPackageAndActivity();
@@ -273,7 +274,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION,
       });
       await retryInterval(10, 500, async () => {
