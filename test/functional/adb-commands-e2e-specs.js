@@ -12,7 +12,7 @@ const DEFAULT_IMES = [
 ];
 const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
+const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
 
 
 describe('adb commands', function () {
@@ -269,7 +269,10 @@ describe('adb commands', function () {
 
   describe('addToDeviceIdleWhitelist', function () {
     it('should add package to the whitelist', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+      await adb.install(CONTACT_MANAGER_PATH, {
+        timeout: androidInstallTimeout,
+        grantPermissions: true,
+      });
       if (await adb.addToDeviceIdleWhitelist(CONTACT_MANAGER_PKG)) {
         const pkgList = await adb.getDeviceIdleWhitelist();
         pkgList.some((item) => item.includes(CONTACT_MANAGER_PKG)).should.be.true;
