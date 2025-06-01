@@ -44,6 +44,9 @@ describe('apk utils', function () {
     (await adb.isAppInstalled('com.android.phone')).should.be.true;
   });
   it('should be able to install/remove app and detect its status', async function () {
+    const apkNameOnDevice = apiLevel < 23
+      ? 'ContactManager-old.apk'
+      : 'ContactManager.apk';
     (await adb.isAppInstalled('foo')).should.be.false;
     await adb.install(contactManagerPath, {
       grantPermissions: true
@@ -52,9 +55,9 @@ describe('apk utils', function () {
     (await adb.uninstallApk(CONTACT_MANAGER_APP_ID)).should.be.true;
     (await adb.isAppInstalled(CONTACT_MANAGER_APP_ID)).should.be.false;
     (await adb.uninstallApk(CONTACT_MANAGER_APP_ID)).should.be.false;
-    await adb.rimraf(deviceTempPath + 'ContactManager.apk');
+    await adb.rimraf(deviceTempPath + apkNameOnDevice);
     await adb.push(contactManagerPath, deviceTempPath);
-    await adb.installFromDevicePath(deviceTempPath + 'ContactManager.apk');
+    await adb.installFromDevicePath(deviceTempPath + apkNameOnDevice);
 
     // to ensure that the app is installed with grantPermissions.
     await adb.grantAllPermissions(CONTACT_MANAGER_APP_ID);
