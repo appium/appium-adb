@@ -5,8 +5,12 @@ import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
-const CONTACT_MANAGER_APP_ID = 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
+const CONTACT_MANAGER_APP_ID = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.contactmanager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.contactmanager.ContactManager';
 
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -14,7 +18,9 @@ describe('apk utils', function () {
   let adb;
   let chai;
 
-  const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+  const contactManagerPath = apiLevel < 23
+    ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+    : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
   const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {

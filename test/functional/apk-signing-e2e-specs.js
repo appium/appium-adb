@@ -2,17 +2,22 @@ import {ADB} from '../../lib/adb';
 import path from 'path';
 import os from 'os';
 import { unsignApk } from '../../lib/tools/apk-signing';
+import { apiLevel } from './setup';
 
-
+apiLevel
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const selendroidTestApp = path.resolve(fixturesRoot, 'selendroid-test-app.apk');
-const contactManagerPath = path.resolve(fixturesRoot, 'ContactManager.apk');
+const contactManagerPath = apiLevel < 23
+  ? path.resolve(fixturesRoot, 'ContactManager-old.apk')
+  : path.resolve(fixturesRoot, 'ContactManager.apk');
 const tmp = os.tmpdir();
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
-const CONTACT_MANAGER_APP_ID = 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_APP_ID = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.contactmanager';
 
-describe('Apk-signing', function () {
+  describe('Apk-signing', function () {
   let adb;
   let chai;
 

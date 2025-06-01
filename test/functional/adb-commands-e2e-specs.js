@@ -10,9 +10,15 @@ const DEFAULT_IMES = [
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
   'io.appium.android.ime/.UnicodeIME',
 ];
-const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
+const CONTACT_MANAGER_PATH = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.contactmanager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.contactmanager.ContactManager';
 
 
 describe('adb commands', function () {

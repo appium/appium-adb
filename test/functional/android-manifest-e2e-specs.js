@@ -1,16 +1,21 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs } from '@appium/support';
+import { apiLevel } from './setup';
 
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
-const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const contactManagerPath = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const contactMangerSelendroidPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager-selendroid.apk');
 const tmpDir = path.resolve(__dirname, '..', 'temp');
 const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
-const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.contactmanager';
 
 describe('Android-manifest', function () {
   let adb;
