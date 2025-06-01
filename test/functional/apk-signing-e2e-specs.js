@@ -4,7 +4,6 @@ import os from 'os';
 import { unsignApk } from '../../lib/tools/apk-signing';
 import { apiLevel } from './setup';
 
-apiLevel
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const selendroidTestApp = path.resolve(fixturesRoot, 'selendroid-test-app.apk');
 const contactManagerPath = apiLevel < 23
