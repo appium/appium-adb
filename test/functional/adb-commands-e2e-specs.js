@@ -153,6 +153,9 @@ describe('adb commands', function () {
     (await adb.getLocationProviders()).should.include('gps');
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
+
+    // To avoid side effects for other tests, especially on Android 16+
+    await adb.toggleGPSLocationProvider(true);
   });
   it('should be able to toogle airplane mode', async function () {
     await adb.setAirplaneMode(true);
