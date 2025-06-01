@@ -15,10 +15,10 @@ const CONTACT_MANAGER_PATH = apiLevel < 23
   : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const CONTACT_MANAGER_PKG = apiLevel < 23
   ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.contactmanager';
+  : 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
   ? 'ContactManager'
-  : 'com.saucelabs.contactmanager.ContactManager';
+  : 'com.saucelabs.ContactManager.ContactManager';
 
 
 describe('adb commands', function () {

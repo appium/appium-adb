@@ -14,7 +14,7 @@ const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
 const CONTACT_MANAGER_APP_ID = apiLevel < 23
   ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.contactmanager';
+  : 'com.saucelabs.ContactManager';
 
 describe('Apk-signing', function () {
   let adb;

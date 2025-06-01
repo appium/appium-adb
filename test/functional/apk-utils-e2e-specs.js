@@ -7,10 +7,10 @@ const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 const CONTACT_MANAGER_APP_ID = apiLevel < 23
   ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.contactmanager';
+  : 'com.saucelabs.ContactManager';
 const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
   ? 'ContactManager'
-  : 'com.saucelabs.contactmanager.ContactManager';
+  : 'com.saucelabs.ContactManager.ContactManager';
 
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);

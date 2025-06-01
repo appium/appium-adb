@@ -15,7 +15,7 @@ const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'And
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
 const CONTACT_MANAGER_PKG = apiLevel < 23
   ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.contactmanager';
+  : 'com.saucelabs.ContactManager';
 
 describe('Android-manifest', function () {
   let adb;
