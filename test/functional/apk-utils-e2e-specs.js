@@ -239,8 +239,7 @@ describe('apk utils', function () {
     appPackage.should.equal('com.android.settings');
 
     // The appActivity is different depending on the API level.
-    // Newer ones would change also.
-    if (await adb.getApiLevel() <= 36) {
+    if (await adb.getApiLevel() > 35) {
       appActivity.should.equal('.spa.SpaActivity');
     } else {
       appActivity.should.equal('.Settings$NotificationAppListActivity');
