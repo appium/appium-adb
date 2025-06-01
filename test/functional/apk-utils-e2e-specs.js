@@ -237,7 +237,14 @@ describe('apk utils', function () {
     });
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
     appPackage.should.equal('com.android.settings');
-    appActivity.should.equal('.Settings$NotificationAppListActivity');
+
+    // The appActivity is different depending on the API level.
+    // Newer ones would change also.
+    if (await adb.getApiLevel() <= 36) {
+      appActivity.should.equal('.spa.SpaActivity');
+    } else {
+      appActivity.should.equal('.Settings$NotificationAppListActivity');
+    };
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
     // The test sometimes fails due to Emulator slowness on Travis
