@@ -16,7 +16,7 @@ const CONTACT_MANAGER_APP_ID = apiLevel < 23
   ? 'com.example.android.contactmanager'
   : 'com.saucelabs.contactmanager';
 
-  describe('Apk-signing', function () {
+describe('Apk-signing', function () {
   let adb;
   let chai;
 
