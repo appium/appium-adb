@@ -75,6 +75,8 @@ describe('apk utils', function () {
   });
   describe('startApp', function () {
     it('should be able to start with normal package and activity', async function () {
+      // to install the app with grant permissions option
+      await adb.uninstallApk(CONTACT_MANAGER_APP_ID);
       await adb.install(contactManagerPath, {
         grantPermissions: true
       });
