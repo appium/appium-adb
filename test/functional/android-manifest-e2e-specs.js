@@ -1,15 +1,21 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs } from '@appium/support';
+import { apiLevel } from './setup';
 
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
-const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const contactManagerPath = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const contactMangerSelendroidPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager-selendroid.apk');
 const tmpDir = path.resolve(__dirname, '..', 'temp');
 const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.ContactManager';
 
 describe('Android-manifest', function () {
   let adb;
@@ -26,7 +32,7 @@ describe('Android-manifest', function () {
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
-    apkPackage.should.equal('com.example.android.contactmanager');
+    apkPackage.should.equal(CONTACT_MANAGER_PKG);
     apkActivity.endsWith('.ContactManager').should.be.true;
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
@@ -39,7 +45,7 @@ describe('Android-manifest', function () {
   });
   // TODO fix this test
   it.skip('should compile and insert manifest', async function () {
-    let appPackage = 'com.example.android.contactmanager',
+    let appPackage = CONTACT_MANAGER_PKG,
         newServerPath = path.resolve(tmpDir, `selendroid.${appPackage}.apk`),
         newPackage = 'com.example.android.contactmanager.selendroid',
         dstDir = path.resolve(tmpDir, appPackage),

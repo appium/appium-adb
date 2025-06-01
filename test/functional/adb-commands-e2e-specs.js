@@ -10,9 +10,15 @@ const DEFAULT_IMES = [
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
   'io.appium.android.ime/.UnicodeIME',
 ];
-const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
-const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
+const CONTACT_MANAGER_PATH = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.ContactManager.ContactManager';
 
 
 describe('adb commands', function () {
@@ -153,6 +159,9 @@ describe('adb commands', function () {
     (await adb.getLocationProviders()).should.include('gps');
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
+
+    // To avoid side effects for other tests, especially on Android 16+
+    await adb.toggleGPSLocationProvider(true);
   });
   it('should be able to toogle airplane mode', async function () {
     await adb.setAirplaneMode(true);
@@ -269,7 +278,10 @@ describe('adb commands', function () {
 
   describe('addToDeviceIdleWhitelist', function () {
     it('should add package to the whitelist', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+      await adb.install(CONTACT_MANAGER_PATH, {
+        timeout: androidInstallTimeout,
+        grantPermissions: true,
+      });
       if (await adb.addToDeviceIdleWhitelist(CONTACT_MANAGER_PKG)) {
         const pkgList = await adb.getDeviceIdleWhitelist();
         pkgList.some((item) => item.includes(CONTACT_MANAGER_PKG)).should.be.true;
