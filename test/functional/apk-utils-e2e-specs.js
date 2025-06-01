@@ -49,6 +49,9 @@ describe('apk utils', function () {
     await adb.rimraf(deviceTempPath + 'ContactManager.apk');
     await adb.push(contactManagerPath, deviceTempPath);
     await adb.installFromDevicePath(deviceTempPath + 'ContactManager.apk');
+
+    // to ensure that the app is installed with grantPermissions.
+    await adb.grantAllPermissions(CONTACT_MANAGER_APP_ID);
   });
   describe('startUri', function () {
     it('should be able to start a uri', async function () {
@@ -83,7 +86,13 @@ describe('apk utils', function () {
         activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION,
       });
-      await assertPackageAndActivity();
+      await retryInterval(10, 500, async () => {
+        // It might be too fast to check the package and activity
+        // because the started app could take a bit time
+        // to come to the foreground in machine time.
+        await assertPackageAndActivity();
+      });
+
 
     });
     it('should be able to start with an intent and no activity', async function () {
@@ -244,14 +253,13 @@ describe('apk utils', function () {
     };
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
-    this.retries(2);
-
     await adb.install(contactManagerPath, {
       grantPermissions: true
     });
     await adb.startApp({
       pkg: CONTACT_MANAGER_APP_ID,
       activity: CONTACT_MANAGER_ACTIVITY,
+      waitActivity: '.ContactManager',
       waitDuration: START_APP_WAIT_DURATION,
     });
     await assertPackageAndActivity();
