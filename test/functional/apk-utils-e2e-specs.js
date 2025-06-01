@@ -75,8 +75,6 @@ describe('apk utils', function () {
   });
   describe('startApp', function () {
     it('should be able to start with normal package and activity', async function () {
-      // to install the app with grant permissions option
-      await adb.uninstallApk(CONTACT_MANAGER_APP_ID);
       await adb.install(contactManagerPath, {
         grantPermissions: true
       });
@@ -246,7 +244,6 @@ describe('apk utils', function () {
     };
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
-    // The test sometimes fails due to Emulator slowness on Travis
     this.retries(2);
 
     await adb.install(contactManagerPath, {
