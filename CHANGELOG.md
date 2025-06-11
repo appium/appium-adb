@@ -1,3 +1,9 @@
+## [12.12.5](https://github.com/appium/appium-adb/compare/v12.12.4...v12.12.5) (2025-06-11)
+
+### Miscellaneous Chores
+
+* fix typos ([#802](https://github.com/appium/appium-adb/issues/802)) ([52a3591](https://github.com/appium/appium-adb/commit/52a3591b09241b8b08b97275170cd278bba72d7b))
+
 ## [12.12.4](https://github.com/appium/appium-adb/compare/v12.12.3...v12.12.4) (2025-06-10)
 
 ### Miscellaneous Chores
