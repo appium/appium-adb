@@ -199,7 +199,7 @@ describe('helpers', withMocks({fs}, function (mocks) {
       }, 20);
       cmd.includes('com.package/.activity').should.be.true;
     });
-    it('should inlcude package name', function () {
+    it('should include package name', function () {
       let cmd = buildStartCmd(startOptions, 20);
       cmd.includes(`${startOptions.pkg}/${startOptions.activity}`).should.be.true;
     });

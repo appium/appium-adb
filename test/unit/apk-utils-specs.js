@@ -959,11 +959,11 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('isTestPackageOnly', function () {
-    it('should return true on INSTALL_FAILED_TEST_ONLY meesage found in adb install output', function () {
+    it('should return true on INSTALL_FAILED_TEST_ONLY message found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_TEST_ONLY]').should.equal(true);
       apksUtilsMethods.isTestPackageOnlyError(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
     });
-    it('should return false on INSTALL_FAILED_TEST_ONLY meesage not found in adb install output', function () {
+    it('should return false on INSTALL_FAILED_TEST_ONLY message not found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
     });
   });

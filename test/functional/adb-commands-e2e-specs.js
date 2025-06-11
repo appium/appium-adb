@@ -163,7 +163,7 @@ describe('adb commands', function () {
     // To avoid side effects for other tests, especially on Android 16+
     await adb.toggleGPSLocationProvider(true);
   });
-  it('should be able to toogle airplane mode', async function () {
+  it('should be able to toggle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
