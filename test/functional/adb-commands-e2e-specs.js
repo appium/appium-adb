@@ -225,16 +225,19 @@ describe('adb commands', function () {
         await fs.unlink(tempFile);
       }
     });
-    it('should push file to a valid location', async function () {
-      let remoteFile = `${getRandomDir()}/remote.txt`;
+    for (const remotePath of [
+      `${getRandomDir()}/remote.txt`,
+      '/data/local/tmp/one two/remote file.txt',
+    ]) {
+      it(`should push file to a valid location ${remotePath}`, async function () {
+        await adb.push(localFile, remotePath);
 
-      await adb.push(localFile, remoteFile);
-
-      // get the file and its contents, to check
-      await adb.pull(remoteFile, tempFile);
-      let remoteData = await fs.readFile(tempFile);
-      remoteData.toString().should.equal(stringData);
-    });
+        // get the file and its contents, to check
+        await adb.pull(remotePath, tempFile);
+        const remoteData = await fs.readFile(tempFile);
+        remoteData.toString().should.equal(stringData);
+      });
+    }
     it('should throw error if it cannot write to the remote file', async function () {
       await adb.push(localFile, '/foo/bar/remote.txt').should.be.rejectedWith(/\/foo/);
     });

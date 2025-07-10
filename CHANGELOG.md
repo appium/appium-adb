@@ -1,3 +1,14 @@
+## [12.12.6](https://github.com/appium/appium-adb/compare/v12.12.5...v12.12.6) (2025-07-06)
+
+### Bug Fixes
+
+* Properly escape mkdir argments ([#807](https://github.com/appium/appium-adb/issues/807)) ([52c7bf3](https://github.com/appium/appium-adb/commit/52c7bf3ad250f2a2cba62c801da3e2d044fc6b68))
+
+### Code Refactoring
+
+* use an object spread instead of Object.assign ([#804](https://github.com/appium/appium-adb/issues/804)) ([63db2c3](https://github.com/appium/appium-adb/commit/63db2c3576b57de29ff47faeaf3acf1f809686f3))
+* use optional chain for better readability ([#803](https://github.com/appium/appium-adb/issues/803)) ([2d8c822](https://github.com/appium/appium-adb/commit/2d8c8221dbfa08d73c7bf206f971edcb6bc32f8b))
+
 ## [12.12.5](https://github.com/appium/appium-adb/compare/v12.12.4...v12.12.5) (2025-06-11)
 
 ### Miscellaneous Chores
