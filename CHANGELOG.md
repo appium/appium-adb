@@ -1,3 +1,10 @@
+## [12.13.1](https://github.com/appium/appium-adb/compare/v12.13.0...v12.13.1) (2025-08-16)
+
+### Bug Fixes
+
+* lint error ([cf54808](https://github.com/appium/appium-adb/commit/cf5480847c1b0c70a9a8cea77c189a578574bfec))
+* Revert "feat: Bump Node.js version ([#808](https://github.com/appium/appium-adb/issues/808))" ([#809](https://github.com/appium/appium-adb/issues/809)) ([a0dfbc4](https://github.com/appium/appium-adb/commit/a0dfbc410ab377f815887b844c11e794867720c1))
+
 ## [12.13.0](https://github.com/appium/appium-adb/compare/v12.12.6...v12.13.0) (2025-08-16)
 
 ### Features
