@@ -1,3 +1,13 @@
+## [12.13.0](https://github.com/appium/appium-adb/compare/v12.12.6...v12.13.0) (2025-08-16)
+
+### Features
+
+* Bump Node.js version ([#808](https://github.com/appium/appium-adb/issues/808)) ([c5ac205](https://github.com/appium/appium-adb/commit/c5ac20559ab616b70ec9cc4095e95c3095688cb5))
+
+### Code Refactoring
+
+* use startsWith & change from substr to slice ([#805](https://github.com/appium/appium-adb/issues/805)) ([b181460](https://github.com/appium/appium-adb/commit/b181460f9619238dd1b0fd644c6df9a377e8fa88))
+
 ## [12.12.6](https://github.com/appium/appium-adb/compare/v12.12.5...v12.12.6) (2025-07-06)
 
 ### Bug Fixes
