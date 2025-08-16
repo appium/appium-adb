@@ -1,3 +1,14 @@
+## [13.0.0](https://github.com/appium/appium-adb/compare/v12.13.1...v13.0.0) (2025-08-16)
+
+### ⚠ BREAKING CHANGES
+
+* Required Node.js version has been bumped to ^20.19.0 || ^22.12.0 || >=24.0.0
+* Required npm version has been bumped to >=10
+
+### Features
+
+* Bump Node.js version ([#810](https://github.com/appium/appium-adb/issues/810)) ([d2705b9](https://github.com/appium/appium-adb/commit/d2705b9c6bea50b94d374411d1966b9c2aa7b9e5))
+
 ## [12.13.1](https://github.com/appium/appium-adb/compare/v12.13.0...v12.13.1) (2025-08-16)
 
 ### Bug Fixes
