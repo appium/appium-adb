@@ -1,7 +1,6 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import net from 'net';
-import Logcat from '../../lib/logcat.js';
+import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
@@ -25,7 +24,7 @@ const apiLevel = 21,
       enabled=true exported=true processName=com.android.inputmethod.latin
       permission=android.permission.BIND_INPUT_METHOD
       flags=0x0`,
-      contactManagerPackage = 'com.example.android.contactmanager',
+      contactManagerPackage = 'com.saucelabs.ContactManager',
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
       screenSize = `768x1280`;
@@ -648,6 +647,14 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
           .withExactArgs([`pgrep ^${_.escapeRegExp(contactManagerPackage.slice(-15))}$ || pgrep ^${_.escapeRegExp(contactManagerPackage.slice(0, 15))}$`])
           .returns('5078\n5079\n');
         (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
+      });
+      it('should call shell and parse pids with pgrep correctly with package with proccess', async function () {
+        adb._isPidofAvailable = false;
+        adb._isPgrepAvailable = true;
+        adb._canPgrepUseFullCmdLineSearch = true;
+        const escapedProcessName = _.escapeRegExp(`([[:blank:]]|^)${contactManagerPackage}(:[a-zA-Z0-9_-]+)?([[:blank:]]|$)`);
+        mocks.adb.expects('shell').once().withExactArgs(['pgrep', '-f', escapedProcessName]).returns('5080\n5081\n');
+        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5080, 5081]);
       });
       it('should call shell and return an empty list if no processes are running', async function () {
         adb._isPidofAvailable = true;

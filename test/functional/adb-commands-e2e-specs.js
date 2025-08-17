@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
@@ -11,9 +10,15 @@ const DEFAULT_IMES = [
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
   'io.appium.android.ime/.UnicodeIME',
 ];
-const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = 'com.example.android.contactmanager';
-const CONTACT_MANAGER_ACTIVITY = 'ContactManager';
+const CONTACT_MANAGER_PATH = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.ContactManager.ContactManager';
 
 
 describe('adb commands', function () {
@@ -154,8 +159,11 @@ describe('adb commands', function () {
     (await adb.getLocationProviders()).should.include('gps');
     await adb.toggleGPSLocationProvider(false);
     (await adb.getLocationProviders()).should.not.include('gps');
+
+    // To avoid side effects for other tests, especially on Android 16+
+    await adb.toggleGPSLocationProvider(true);
   });
-  it('should be able to toogle airplane mode', async function () {
+  it('should be able to toggle airplane mode', async function () {
     await adb.setAirplaneMode(true);
     (await adb.isAirplaneModeOn()).should.be.true;
     await adb.setAirplaneMode(false);
@@ -217,16 +225,19 @@ describe('adb commands', function () {
         await fs.unlink(tempFile);
       }
     });
-    it('should push file to a valid location', async function () {
-      let remoteFile = `${getRandomDir()}/remote.txt`;
+    for (const remotePath of [
+      `${getRandomDir()}/remote.txt`,
+      '/data/local/tmp/one two/remote file.txt',
+    ]) {
+      it(`should push file to a valid location ${remotePath}`, async function () {
+        await adb.push(localFile, remotePath);
 
-      await adb.push(localFile, remoteFile);
-
-      // get the file and its contents, to check
-      await adb.pull(remoteFile, tempFile);
-      let remoteData = await fs.readFile(tempFile);
-      remoteData.toString().should.equal(stringData);
-    });
+        // get the file and its contents, to check
+        await adb.pull(remotePath, tempFile);
+        const remoteData = await fs.readFile(tempFile);
+        remoteData.toString().should.equal(stringData);
+      });
+    }
     it('should throw error if it cannot write to the remote file', async function () {
       await adb.push(localFile, '/foo/bar/remote.txt').should.be.rejectedWith(/\/foo/);
     });
@@ -270,7 +281,10 @@ describe('adb commands', function () {
 
   describe('addToDeviceIdleWhitelist', function () {
     it('should add package to the whitelist', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {timeout: androidInstallTimeout});
+      await adb.install(CONTACT_MANAGER_PATH, {
+        timeout: androidInstallTimeout,
+        grantPermissions: true,
+      });
       if (await adb.addToDeviceIdleWhitelist(CONTACT_MANAGER_PKG)) {
         const pkgList = await adb.getDeviceIdleWhitelist();
         pkgList.some((item) => item.includes(CONTACT_MANAGER_PKG)).should.be.true;
@@ -281,6 +295,12 @@ describe('adb commands', function () {
   describe('takeScreenshot', function () {
     it('should return screenshot', async function () {
       _.isEmpty(await adb.takeScreenshot()).should.be.false;
+    });
+  });
+
+  describe('listPorts', function () {
+    it('should list opened ports', async function () {
+      (_.isEmpty(await adb.listPorts()) && _.isEmpty(await adb.listPorts('6'))).should.be.false;
     });
   });
 });

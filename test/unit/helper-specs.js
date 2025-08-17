@@ -1,16 +1,30 @@
 import {
-  getAndroidPlatformAndPath,
-  buildStartCmd, isShowingLockscreen, getBuildToolsDirs,
-  parseAaptStrings, parseAapt2Strings,
-  extractMatchingPermissions, parseLaunchableActivityNames,
-} from '../../lib/helpers';
+  parseLaunchableActivityNames,
+  matchComponentName,
+  buildStartCmd,
+  extractMatchingPermissions,
+} from '../../lib/tools/app-commands';
+import { isShowingLockscreen, isScreenStateOff } from '../../lib/tools/lockmgmt';
+import { getBuildToolsDirs } from '../../lib/tools/system-calls';
+import { parseAapt2Strings, parseAaptStrings } from '../../lib/tools/apk-utils';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
 import path from 'path';
 import _ from 'lodash';
+import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 
 
 describe('helpers', withMocks({fs}, function (mocks) {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    chai.should();
+    chai.use(chaiAsPromised.default);
+  });
+
   afterEach(function () {
     mocks.verify();
   });
@@ -47,6 +61,64 @@ describe('helpers', withMocks({fs}, function (mocks) {
         .equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
     });
   });
+
+  describe('isScreenStateOff', function () {
+    it('should return true if isScreenStateOff is off', async function () {
+      let dumpsys = `
+    KeyguardServiceDelegate
+      showing=false
+      showingAndNotOccluded=true
+      inputRestricted=false
+      occluded=false
+      secure=false
+      dreaming=false
+      systemIsReady=true
+      deviceHasKeyguard=true
+      enabled=true
+      offReason=OFF_BECAUSE_OF_USER
+      currentUser=-10000
+      bootCompleted=true
+      screenState=SCREEN_STATE_OFF
+      interactiveState=INTERACTIVE_STATE_SLEEP
+      KeyguardStateMonitor
+        mIsShowing=false
+        mSimSecure=false
+        mInputRestricted=false
+        mTrusted=false
+        mCurrentUserId=0
+        ...
+      `;
+      isScreenStateOff(dumpsys).should.be.true;
+    });
+    it('should return true if isScreenStateOff is on', async function () {
+      let dumpsys = `
+    KeyguardServiceDelegate
+      showing=false
+      showingAndNotOccluded=true
+      inputRestricted=false
+      occluded=false
+      secure=false
+      dreaming=false
+      systemIsReady=true
+      deviceHasKeyguard=true
+      enabled=true
+      offReason=OFF_BECAUSE_OF_USER
+      currentUser=-10000
+      bootCompleted=true
+      screenState=SCREEN_STATE_ON
+      interactiveState=INTERACTIVE_STATE_AWAKE
+      KeyguardStateMonitor
+        mIsShowing=false
+        mSimSecure=false
+        mInputRestricted=false
+        mTrusted=false
+        mCurrentUserId=0
+        ...
+      `;
+      isScreenStateOff(dumpsys).should.be.false;
+    });
+  });
+
 
   describe('isShowingLockscreen', function () {
     it('should return true if mShowingLockscreen is true', async function () {
@@ -107,11 +179,30 @@ describe('helpers', withMocks({fs}, function (mocks) {
   });
 
   describe('buildStartCmd', function () {
-    let startOptions = {
+    const startOptions = {
       pkg: 'com.something',
       activity: '.SomeActivity'
     };
 
+    it('should use start', function () {
+      let cmd = buildStartCmd(startOptions, 20);
+      cmd[1].should.eql('start');
+    });
+    it('should use start-activity', function () {
+      let cmd = buildStartCmd(startOptions, 26);
+      cmd[1].should.eql('start-activity');
+    });
+    it('should not repeat package name', function () {
+      let cmd = buildStartCmd({
+        pkg: 'com.package',
+        activity: 'com.package/.activity',
+      }, 20);
+      cmd.includes('com.package/.activity').should.be.true;
+    });
+    it('should include package name', function () {
+      let cmd = buildStartCmd(startOptions, 20);
+      cmd.includes(`${startOptions.pkg}/${startOptions.activity}`).should.be.true;
+    });
     it('should parse optionalIntentArguments with single key', function () {
       let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
       cmd[cmd.length - 2].should.eql('-d');
@@ -471,5 +562,17 @@ describe('helpers', withMocks({fs}, function (mocks) {
       const names = parseLaunchableActivityNames(dumpsysOutput);
       names.should.be.eql([]);
     });
+  });
+  describe('matchComponentName', function () {
+    it('test valid activity name', function () {
+      const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
+      const names = matchComponentName(activity);
+      names.should.eql([activity]);
+    });
+    it('test invalid activity name', function () {
+      const activity = 'User@123';
+      _.isNull(matchComponentName(activity)).should.be.true;
+    });
+
   });
 }));

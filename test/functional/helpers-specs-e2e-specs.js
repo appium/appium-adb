@@ -1,11 +1,10 @@
 import {
-  getAndroidPlatformAndPath,
   requireSdkRoot,
   readPackageManifest,
 } from '../../lib/helpers.js';
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'node:path';
+import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 
 describe('Helpers', function () {
   let chai;

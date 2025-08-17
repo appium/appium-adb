@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { retryInterval } from 'asyncbox';
@@ -6,7 +5,12 @@ import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT, apiLevel } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
-const CONTACT_MANAGER_APP_ID = 'com.example.android.contactmanager';
+const CONTACT_MANAGER_APP_ID = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.ContactManager.ContactManager';
 
 describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -14,7 +18,9 @@ describe('apk utils', function () {
   let adb;
   let chai;
 
-  const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+  const contactManagerPath = apiLevel < 23
+    ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+    : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
   const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
@@ -38,6 +44,9 @@ describe('apk utils', function () {
     (await adb.isAppInstalled('com.android.phone')).should.be.true;
   });
   it('should be able to install/remove app and detect its status', async function () {
+    const apkNameOnDevice = apiLevel < 23
+      ? 'ContactManager-old.apk'
+      : 'ContactManager.apk';
     (await adb.isAppInstalled('foo')).should.be.false;
     await adb.install(contactManagerPath, {
       grantPermissions: true
@@ -46,9 +55,12 @@ describe('apk utils', function () {
     (await adb.uninstallApk(CONTACT_MANAGER_APP_ID)).should.be.true;
     (await adb.isAppInstalled(CONTACT_MANAGER_APP_ID)).should.be.false;
     (await adb.uninstallApk(CONTACT_MANAGER_APP_ID)).should.be.false;
-    await adb.rimraf(deviceTempPath + 'ContactManager.apk');
+    await adb.rimraf(deviceTempPath + apkNameOnDevice);
     await adb.push(contactManagerPath, deviceTempPath);
-    await adb.installFromDevicePath(deviceTempPath + 'ContactManager.apk');
+    await adb.installFromDevicePath(deviceTempPath + apkNameOnDevice);
+
+    // to ensure that the app is installed with grantPermissions.
+    await adb.grantAllPermissions(CONTACT_MANAGER_APP_ID);
   });
   describe('startUri', function () {
     it('should be able to start a uri', async function () {
@@ -80,10 +92,16 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION,
       });
-      await assertPackageAndActivity();
+      await retryInterval(10, 500, async () => {
+        // It might be too fast to check the package and activity
+        // because the started app could take a bit time
+        // to come to the foreground in machine time.
+        await assertPackageAndActivity();
+      });
+
 
     });
     it('should be able to start with an intent and no activity', async function () {
@@ -135,7 +153,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: 'foo',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('foo');
@@ -146,7 +164,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -158,7 +176,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -170,7 +188,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -193,7 +211,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '*.SuperManager',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
       }).should.eventually.be.rejectedWith('SuperManager');
@@ -204,8 +222,8 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        waitPkg: 'com.android.settings, com.example.android.contactmanager',
-        activity: 'ContactManager',
+        waitPkg: `com.android.settings, ${CONTACT_MANAGER_APP_ID}`,
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitActivity: '.ContactManager',
         waitDuration: START_APP_WAIT_DURATION,
       });
@@ -235,18 +253,22 @@ describe('apk utils', function () {
     });
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
     appPackage.should.equal('com.android.settings');
-    appActivity.should.equal('.Settings$NotificationAppListActivity');
+
+    // The appActivity is different depending on the API level.
+    if (await adb.getApiLevel() > 35) {
+      appActivity.should.equal('.spa.SpaActivity');
+    } else {
+      appActivity.should.equal('.Settings$NotificationAppListActivity');
+    };
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
-    // The test sometimes fails due to Emulator slowness on Travis
-    this.retries(2);
-
     await adb.install(contactManagerPath, {
       grantPermissions: true
     });
     await adb.startApp({
       pkg: CONTACT_MANAGER_APP_ID,
-      activity: 'ContactManager',
+      activity: CONTACT_MANAGER_ACTIVITY,
+      waitActivity: '.ContactManager',
       waitDuration: START_APP_WAIT_DURATION,
     });
     await assertPackageAndActivity();
@@ -274,7 +296,7 @@ describe('apk utils', function () {
       });
       await adb.startApp({
         pkg: CONTACT_MANAGER_APP_ID,
-        activity: 'ContactManager',
+        activity: CONTACT_MANAGER_ACTIVITY,
         waitDuration: START_APP_WAIT_DURATION,
       });
       await retryInterval(10, 500, async () => {

@@ -1,3 +1,190 @@
+## [13.0.0](https://github.com/appium/appium-adb/compare/v12.13.1...v13.0.0) (2025-08-16)
+
+### ⚠ BREAKING CHANGES
+
+* Required Node.js version has been bumped to ^20.19.0 || ^22.12.0 || >=24.0.0
+* Required npm version has been bumped to >=10
+
+### Features
+
+* Bump Node.js version ([#810](https://github.com/appium/appium-adb/issues/810)) ([d2705b9](https://github.com/appium/appium-adb/commit/d2705b9c6bea50b94d374411d1966b9c2aa7b9e5))
+
+## [12.13.1](https://github.com/appium/appium-adb/compare/v12.13.0...v12.13.1) (2025-08-16)
+
+### Bug Fixes
+
+* lint error ([cf54808](https://github.com/appium/appium-adb/commit/cf5480847c1b0c70a9a8cea77c189a578574bfec))
+* Revert "feat: Bump Node.js version ([#808](https://github.com/appium/appium-adb/issues/808))" ([#809](https://github.com/appium/appium-adb/issues/809)) ([a0dfbc4](https://github.com/appium/appium-adb/commit/a0dfbc410ab377f815887b844c11e794867720c1))
+
+## [12.13.0](https://github.com/appium/appium-adb/compare/v12.12.6...v12.13.0) (2025-08-16)
+
+### Features
+
+* Bump Node.js version ([#808](https://github.com/appium/appium-adb/issues/808)) ([c5ac205](https://github.com/appium/appium-adb/commit/c5ac20559ab616b70ec9cc4095e95c3095688cb5))
+
+### Code Refactoring
+
+* use startsWith & change from substr to slice ([#805](https://github.com/appium/appium-adb/issues/805)) ([b181460](https://github.com/appium/appium-adb/commit/b181460f9619238dd1b0fd644c6df9a377e8fa88))
+
+## [12.12.6](https://github.com/appium/appium-adb/compare/v12.12.5...v12.12.6) (2025-07-06)
+
+### Bug Fixes
+
+* Properly escape mkdir argments ([#807](https://github.com/appium/appium-adb/issues/807)) ([52c7bf3](https://github.com/appium/appium-adb/commit/52c7bf3ad250f2a2cba62c801da3e2d044fc6b68))
+
+### Code Refactoring
+
+* use an object spread instead of Object.assign ([#804](https://github.com/appium/appium-adb/issues/804)) ([63db2c3](https://github.com/appium/appium-adb/commit/63db2c3576b57de29ff47faeaf3acf1f809686f3))
+* use optional chain for better readability ([#803](https://github.com/appium/appium-adb/issues/803)) ([2d8c822](https://github.com/appium/appium-adb/commit/2d8c8221dbfa08d73c7bf206f971edcb6bc32f8b))
+
+## [12.12.5](https://github.com/appium/appium-adb/compare/v12.12.4...v12.12.5) (2025-06-11)
+
+### Miscellaneous Chores
+
+* fix typos ([#802](https://github.com/appium/appium-adb/issues/802)) ([52a3591](https://github.com/appium/appium-adb/commit/52a3591b09241b8b08b97275170cd278bba72d7b))
+
+## [12.12.4](https://github.com/appium/appium-adb/compare/v12.12.3...v12.12.4) (2025-06-10)
+
+### Miscellaneous Chores
+
+* Bump @types/node from 22.15.31 to 24.0.0 ([#801](https://github.com/appium/appium-adb/issues/801)) ([18028c7](https://github.com/appium/appium-adb/commit/18028c74eec1b4d3c24887ef3fe118510dbad97d))
+
+## [12.12.3](https://github.com/appium/appium-adb/compare/v12.12.2...v12.12.3) (2025-05-21)
+
+### Miscellaneous Chores
+
+* Bump conventional-changelog-conventionalcommits ([#799](https://github.com/appium/appium-adb/issues/799)) ([ed65431](https://github.com/appium/appium-adb/commit/ed654316f0ac8e731bde1a4ec6cbf0c8971ec788))
+
+## [12.12.2](https://github.com/appium/appium-adb/compare/v12.12.1...v12.12.2) (2025-04-17)
+
+### Bug Fixes
+
+* Update comparison logic for the activity name when there are multiple active app ([#798](https://github.com/appium/appium-adb/issues/798)) ([dbdd083](https://github.com/appium/appium-adb/commit/dbdd083d70237e623cc7ed903fecf48ddab722f2))
+
+## [12.12.1](https://github.com/appium/appium-adb/compare/v12.12.0...v12.12.1) (2025-01-25)
+
+### Miscellaneous Chores
+
+* Only keep common functions in helpers ([#792](https://github.com/appium/appium-adb/issues/792)) ([18e7919](https://github.com/appium/appium-adb/commit/18e7919a812b4c1f9078e302ec75b5c86771314a))
+
+## [12.12.0](https://github.com/appium/appium-adb/compare/v12.11.0...v12.12.0) (2025-01-24)
+
+### Features
+
+* add screenState=SCREEN_STATE_OFF as the screen locked ([#791](https://github.com/appium/appium-adb/issues/791)) ([6f6f45a](https://github.com/appium/appium-adb/commit/6f6f45adcd520e8ae369e0735bafd4613c5cc6a1))
+
+## [12.11.0](https://github.com/appium/appium-adb/compare/v12.10.3...v12.11.0) (2025-01-11)
+
+### Features
+
+* Regroup network and logcat commands ([#790](https://github.com/appium/appium-adb/issues/790)) ([1674c6d](https://github.com/appium/appium-adb/commit/1674c6dffa2779578a6be8e1ef79ebf2b68d6a1e))
+
+## [12.10.3](https://github.com/appium/appium-adb/compare/v12.10.2...v12.10.3) (2025-01-10)
+
+### Bug Fixes
+
+* Update focused activity validation logic ([#789](https://github.com/appium/appium-adb/issues/789)) ([c862dbd](https://github.com/appium/appium-adb/commit/c862dbd01ac9684dd08edc9e7bd33a91d2acf05e))
+
+## [12.10.2](https://github.com/appium/appium-adb/compare/v12.10.1...v12.10.2) (2025-01-09)
+
+### Miscellaneous Chores
+
+* Regroup application and filesystem commands ([#788](https://github.com/appium/appium-adb/issues/788)) ([9908400](https://github.com/appium/appium-adb/commit/990840031f729bf5b51d3a16a517762dd84c4d06))
+
+## [12.10.1](https://github.com/appium/appium-adb/compare/v12.10.0...v12.10.1) (2025-01-09)
+
+### Bug Fixes
+
+* Do not prefix activity with package name if it already exists ([#787](https://github.com/appium/appium-adb/issues/787)) ([6395d58](https://github.com/appium/appium-adb/commit/6395d58c90723d84a023aa9bdc997009c91d4806))
+
+### Miscellaneous Chores
+
+* Regroup some adb commands ([#786](https://github.com/appium/appium-adb/issues/786)) ([4b95444](https://github.com/appium/appium-adb/commit/4b95444b963c414bf5a09aa805c779e3bc7e11e9))
+
+## [12.10.0](https://github.com/appium/appium-adb/compare/v12.9.0...v12.10.0) (2025-01-08)
+
+### Features
+
+* Added support for applications with multiple processes ([#785](https://github.com/appium/appium-adb/issues/785)) ([ff18d96](https://github.com/appium/appium-adb/commit/ff18d96842d23e72c859d40923194f421e57480a))
+
+## [12.9.0](https://github.com/appium/appium-adb/compare/v12.8.0...v12.9.0) (2025-01-06)
+
+### Features
+
+* Extract typedefs ([#782](https://github.com/appium/appium-adb/issues/782)) ([82ec0f9](https://github.com/appium/appium-adb/commit/82ec0f9372576102f151a5f3a3fbac304415b689))
+
+## [12.8.0](https://github.com/appium/appium-adb/compare/v12.7.4...v12.8.0) (2025-01-05)
+
+### Features
+
+* Bump Eslint ([#781](https://github.com/appium/appium-adb/issues/781)) ([9613100](https://github.com/appium/appium-adb/commit/9613100d8c038e77041ef36d5b3fc88d2c70c0f6))
+
+## [12.7.4](https://github.com/appium/appium-adb/compare/v12.7.3...v12.7.4) (2024-12-12)
+
+### Miscellaneous Chores
+
+* Replace occurrences of the deprecated errorAndThrow API ([#777](https://github.com/appium/appium-adb/issues/777)) ([17aa093](https://github.com/appium/appium-adb/commit/17aa0939c81f530274f2fc6bf528e3d714d2b1d0))
+
+## [12.7.3](https://github.com/appium/appium-adb/compare/v12.7.2...v12.7.3) (2024-12-10)
+
+### Bug Fixes
+
+* Make package of startUri optional ([#776](https://github.com/appium/appium-adb/issues/776)) ([be54566](https://github.com/appium/appium-adb/commit/be545660f18d01b8b30e17b77bf04e0c14ff3c4d))
+
+## [12.7.2](https://github.com/appium/appium-adb/compare/v12.7.1...v12.7.2) (2024-12-06)
+
+### Miscellaneous Chores
+
+* Bump @appium/support from 5.1.8 to 6.0.0 ([#775](https://github.com/appium/appium-adb/issues/775)) ([15d5f75](https://github.com/appium/appium-adb/commit/15d5f7509669e11ac3201c2df3c6f250e63b4bb0))
+
+## [12.7.1](https://github.com/appium/appium-adb/compare/v12.7.0...v12.7.1) (2024-12-03)
+
+### Miscellaneous Chores
+
+* Bump mocha from 10.8.2 to 11.0.1 ([#774](https://github.com/appium/appium-adb/issues/774)) ([32c8b8a](https://github.com/appium/appium-adb/commit/32c8b8a7640075a5f60bda447f1175c6e17a029e))
+
+## [12.7.0](https://github.com/appium/appium-adb/compare/v12.6.2...v12.7.0) (2024-11-10)
+
+### Features
+
+* add support for activities with unicode chars ([#773](https://github.com/appium/appium-adb/issues/773)) ([8494f72](https://github.com/appium/appium-adb/commit/8494f7275690e219656c4246c20d0a008532d407))
+
+## [12.6.2](https://github.com/appium/appium-adb/compare/v12.6.1...v12.6.2) (2024-11-09)
+
+### Miscellaneous Chores
+
+* use start-activity for api level 26+ ([#771](https://github.com/appium/appium-adb/issues/771)) ([8faa1f3](https://github.com/appium/appium-adb/commit/8faa1f33784307d6c807a1654fd6367fa27387a1))
+
+## [12.6.1](https://github.com/appium/appium-adb/compare/v12.6.0...v12.6.1) (2024-10-31)
+
+### Miscellaneous Chores
+
+* Streamline locale validation ([#765](https://github.com/appium/appium-adb/issues/765)) ([1b7e859](https://github.com/appium/appium-adb/commit/1b7e85903ecb09104b539d4b723e375235b83e3a))
+
+## [12.6.0](https://github.com/appium/appium-adb/compare/v12.5.3...v12.6.0) (2024-09-08)
+
+### Features
+
+* Add a method to list device ports ([#764](https://github.com/appium/appium-adb/issues/764)) ([01fff96](https://github.com/appium/appium-adb/commit/01fff962d1f6578b7cf5e6cdfb90f72df0743ac7))
+
+## [12.5.3](https://github.com/appium/appium-adb/compare/v12.5.2...v12.5.3) (2024-09-05)
+
+### Miscellaneous Chores
+
+* Bump ini from 4.1.3 to 5.0.0 ([#762](https://github.com/appium/appium-adb/issues/762)) ([434f7bc](https://github.com/appium/appium-adb/commit/434f7bc0bcb156c6ea5275baeb743314a42fab31))
+
+## [12.5.2](https://github.com/appium/appium-adb/compare/v12.5.1...v12.5.2) (2024-08-06)
+
+### Bug Fixes
+
+* Enforce '--user 0'  argument if `cmd package list packages` throws an access error ([#761](https://github.com/appium/appium-adb/issues/761)) ([89b3348](https://github.com/appium/appium-adb/commit/89b3348d2f61b55d2f4e2eba4b205d5130b427fa))
+
+## [12.5.1](https://github.com/appium/appium-adb/compare/v12.5.0...v12.5.1) (2024-07-29)
+
+### Miscellaneous Chores
+
+* Bump @types/node from 20.14.13 to 22.0.0 ([#760](https://github.com/appium/appium-adb/issues/760)) ([b7308ff](https://github.com/appium/appium-adb/commit/b7308ff360ee90ee9367c5fd32707ac1fe765978))
+
 ## [12.5.0](https://github.com/appium/appium-adb/compare/v12.4.8...v12.5.0) (2024-07-10)
 
 ### Features

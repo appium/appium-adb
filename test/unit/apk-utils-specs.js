@@ -1,12 +1,11 @@
 import * as teen_process from 'teen_process';
 import { fs } from '@appium/support';
-// eslint-disable-next-line import/no-unresolved
 import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
 import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
-import apksUtilsMethods from '../../lib/tools/apks-utils';
+import * as apksUtilsMethods from '../../lib/tools/apks-utils';
 
 const pkg = 'com.example.android.contactmanager',
       uri = 'content://contacts/people/1',
@@ -99,7 +98,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns(`package:/system/priv-app/TeleService/TeleService.apk with user`);
       (await adb.isAppInstalled(pkg, {user: '1'})).should.be.true;
     });
-    it('should parse correctly and return false for older versions', async function () {
+    it('should parse correctly and return false for older versions for user', async function () {
       const pkg = 'dummy.package';
       mocks.adb.expects('getApiLevel')
         .returns(25);
@@ -151,6 +150,19 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
       appPackage.should.equal('eu.niko.smart.universal');
       appActivity.should.equal('crc648a3abc16689e594e.MainActivity');
+    });
+    it('should return package and activity if the activity name has the package name itself', async function () {
+      mocks.adb.expects('dumpWindows')
+        .once()
+        .returns(`mFocusedApp=null
+        mFocusedApp=ActivityRecord{caf038a u0 com.android.systemui/.subscreen.SubHomeActivity t7}
+        mFocusedApp=ActivityRecord{a646676 u0 com.example.android/.activity.main.MainActivity t285}
+        mCurrentFocus=null
+        mCurrentFocus=null
+        mCurrentFocus=Window{5e9b13b u0 com.example.android/com.example.android.activity.main.MainActivity}}`);
+      const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal('com.example.android');
+      appActivity.should.equal('.activity.main.MainActivity');
     });
     it('should parse correctly and return package and activity when a comma is present', async function () {
       mocks.adb.expects('dumpWindows')
@@ -517,9 +529,8 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('startUri', function () {
-    it('should fail if uri or pkg are not provided', async function () {
-      await adb.startUri().should.eventually.be.rejectedWith(/arguments are required/);
-      await adb.startUri('foo').should.eventually.be.rejectedWith(/arguments are required/);
+    it('should fail if uri is not provided', async function () {
+      await adb.startUri().should.eventually.be.rejectedWith(/argument is required/);
     });
     it('should fail if "unable to resolve intent" appears in shell command result', async function () {
       mocks.adb.expects('shell')
@@ -532,6 +543,16 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       await adb.startUri(uri, pkg).should.eventually.be.rejectedWith(/Unable to resolve intent/);
     });
     it('should build a call to a VIEW intent with the uri', async function () {
+      mocks.adb.expects('shell')
+        .once().withExactArgs([
+          'am', 'start', '-W', '-a',
+          'android.intent.action.VIEW', '-d', uri
+        ])
+        .returns('Passable result');
+
+      await adb.startUri(uri);
+    });
+    it('should build a call to a VIEW intent with the uri and package', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs([
           'am', 'start', '-W', '-a',
@@ -552,7 +573,7 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
         .returns('');
       (await adb.startApp(startAppOptions));
     });
-    it('should call getApiLevel and shell with correct arguments', async function () {
+    it('should call getApiLevel and shell with correct arguments for class error', async function () {
       mocks.adb.expects('getApiLevel')
         .twice()
         .returns(17);
@@ -938,11 +959,11 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('isTestPackageOnly', function () {
-    it('should return true on INSTALL_FAILED_TEST_ONLY meesage found in adb install output', function () {
+    it('should return true on INSTALL_FAILED_TEST_ONLY message found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_TEST_ONLY]').should.equal(true);
       apksUtilsMethods.isTestPackageOnlyError(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
     });
-    it('should return false on INSTALL_FAILED_TEST_ONLY meesage not found in adb install output', function () {
+    it('should return false on INSTALL_FAILED_TEST_ONLY message not found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
     });
   });
