@@ -1,3 +1,9 @@
+## [13.0.1](https://github.com/appium/appium-adb/compare/v13.0.0...v13.0.1) (2025-08-17)
+
+### Miscellaneous Chores
+
+* Bump lru-cache from 10.4.3 to 11.1.0 ([#794](https://github.com/appium/appium-adb/issues/794)) ([39e8668](https://github.com/appium/appium-adb/commit/39e8668aeeaecc7abca3bcf8a518538fa9391230))
+
 ## [13.0.0](https://github.com/appium/appium-adb/compare/v12.13.1...v13.0.0) (2025-08-16)
 
 ### ⚠ BREAKING CHANGES
