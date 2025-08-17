@@ -1,3 +1,9 @@
+## [13.0.2](https://github.com/appium/appium-adb/compare/v13.0.1...v13.0.2) (2025-08-17)
+
+### Miscellaneous Chores
+
+* drop rimraf deps from dev deps as no references ([#811](https://github.com/appium/appium-adb/issues/811)) ([7e89c36](https://github.com/appium/appium-adb/commit/7e89c369c44613b2a67c8a8bb47de7c3a6338002))
+
 ## [13.0.1](https://github.com/appium/appium-adb/compare/v13.0.0...v13.0.1) (2025-08-17)
 
 ### Miscellaneous Chores
