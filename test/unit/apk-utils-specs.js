@@ -151,6 +151,19 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
       appPackage.should.equal('eu.niko.smart.universal');
       appActivity.should.equal('crc648a3abc16689e594e.MainActivity');
     });
+    it('should return package and activity if the activity name has the package name itself', async function () {
+      mocks.adb.expects('dumpWindows')
+        .once()
+        .returns(`mFocusedApp=null
+        mFocusedApp=ActivityRecord{caf038a u0 com.android.systemui/.subscreen.SubHomeActivity t7}
+        mFocusedApp=ActivityRecord{a646676 u0 com.example.android/.activity.main.MainActivity t285}
+        mCurrentFocus=null
+        mCurrentFocus=null
+        mCurrentFocus=Window{5e9b13b u0 com.example.android/com.example.android.activity.main.MainActivity}}`);
+      const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
+      appPackage.should.equal('com.example.android');
+      appActivity.should.equal('.activity.main.MainActivity');
+    });
     it('should parse correctly and return package and activity when a comma is present', async function () {
       mocks.adb.expects('dumpWindows')
         .once()
@@ -946,11 +959,11 @@ describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
     });
   });
   describe('isTestPackageOnly', function () {
-    it('should return true on INSTALL_FAILED_TEST_ONLY meesage found in adb install output', function () {
+    it('should return true on INSTALL_FAILED_TEST_ONLY message found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_TEST_ONLY]').should.equal(true);
       apksUtilsMethods.isTestPackageOnlyError(' [INSTALL_FAILED_TEST_ONLY] ').should.equal(true);
     });
-    it('should return false on INSTALL_FAILED_TEST_ONLY meesage not found in adb install output', function () {
+    it('should return false on INSTALL_FAILED_TEST_ONLY message not found in adb install output', function () {
       apksUtilsMethods.isTestPackageOnlyError('[INSTALL_FAILED_OTHER]').should.equal(false);
     });
   });
