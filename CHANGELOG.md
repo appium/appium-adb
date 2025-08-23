@@ -1,3 +1,9 @@
+## [13.0.3](https://github.com/appium/appium-adb/compare/v13.0.2...v13.0.3) (2025-08-23)
+
+### Miscellaneous Chores
+
+* Bump chai from 5.3.2 to 6.0.0 ([#813](https://github.com/appium/appium-adb/issues/813)) ([16e0575](https://github.com/appium/appium-adb/commit/16e0575af05312f3154ae7dee0528486430d77e7))
+
 ## [13.0.2](https://github.com/appium/appium-adb/compare/v13.0.1...v13.0.2) (2025-08-17)
 
 ### Miscellaneous Chores
