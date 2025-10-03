@@ -1,3 +1,9 @@
+## [13.0.4](https://github.com/appium/appium-adb/compare/v13.0.3...v13.0.4) (2025-10-03)
+
+### Bug Fixes
+
+* Tune the emulator readiness check ([#815](https://github.com/appium/appium-adb/issues/815)) ([2a81808](https://github.com/appium/appium-adb/commit/2a81808e7beaf50c831640df7d3e8e5faca8c937))
+
 ## [13.0.3](https://github.com/appium/appium-adb/compare/v13.0.2...v13.0.3) (2025-08-23)
 
 ### Miscellaneous Chores
