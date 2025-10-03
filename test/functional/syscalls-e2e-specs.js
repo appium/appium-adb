@@ -22,6 +22,9 @@ describe('System calls', function () {
 
     adb = await ADB.createADB();
   });
+  it('waitForEmulatorReady should succeed', async function () {
+    await adb.waitForEmulatorReady();
+  });
   it('getConnectedDevices should get devices', async function () {
     let devices = await adb.getConnectedDevices();
     devices.should.have.length.above(0);
