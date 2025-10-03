@@ -1,3 +1,9 @@
+## [13.0.5](https://github.com/appium/appium-adb/compare/v13.0.4...v13.0.5) (2025-10-03)
+
+### Bug Fixes
+
+* Enhance possible activity names ([#814](https://github.com/appium/appium-adb/issues/814)) ([b5f989a](https://github.com/appium/appium-adb/commit/b5f989a2c7d048225fa46decbcd5f70d253cef7e))
+
 ## [13.0.4](https://github.com/appium/appium-adb/compare/v13.0.3...v13.0.4) (2025-10-03)
 
 ### Bug Fixes
