@@ -1,3 +1,9 @@
+## [13.0.6](https://github.com/appium/appium-adb/compare/v13.0.5...v13.0.6) (2025-10-04)
+
+### Miscellaneous Chores
+
+* Add a log after emulator readiness check passes ([#816](https://github.com/appium/appium-adb/issues/816)) ([4a3f4f4](https://github.com/appium/appium-adb/commit/4a3f4f42bef30c523d5d55867fa7e589ef8813de))
+
 ## [13.0.5](https://github.com/appium/appium-adb/compare/v13.0.4...v13.0.5) (2025-10-03)
 
 ### Bug Fixes
