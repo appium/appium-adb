@@ -1,3 +1,9 @@
+## [13.0.7](https://github.com/appium/appium-adb/compare/v13.0.6...v13.0.7) (2025-10-04)
+
+### Miscellaneous Chores
+
+* Deprecate appDeviceReadyTimeout property ([#817](https://github.com/appium/appium-adb/issues/817)) ([ebdee1a](https://github.com/appium/appium-adb/commit/ebdee1a876e2ff4d66b69bbabb87fbb54733d314))
+
 ## [13.0.6](https://github.com/appium/appium-adb/compare/v13.0.5...v13.0.6) (2025-10-04)
 
 ### Miscellaneous Chores
