@@ -4,6 +4,7 @@ import type {StringRecord} from './tools/types';
 export interface ADBOptions {
   sdkRoot?: string;
   udid?: string;
+  /** @deprecated Not used anywhere, marked for deletion */
   appDeviceReadyTimeout?: number;
   useKeystore?: boolean;
   keystorePath?: string;
