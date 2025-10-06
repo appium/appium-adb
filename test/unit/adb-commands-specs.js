@@ -3,7 +3,6 @@ import net from 'net';
 import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
-import _ from 'lodash';
 import { EOL } from 'os';
 
 const apiLevel = 21,
@@ -624,100 +623,27 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
       });
     });
     describe('getPIDsByName', function () {
-      beforeEach(function () {
-        mocks.adb.expects('getApiLevel').once().returns(23);
-      });
-      afterEach(function () {
-        adb._isPidofAvailable = undefined;
-        adb._isPgrepAvailable = undefined;
-      });
-      it('should call shell and parse pids with pidof correctly', async function () {
-        adb._isPidofAvailable = true;
-        adb._isPgrepAvailable = false;
+      it(`should properly parse the output of 'dumpsys activity processes'`, async function () {
         mocks.adb.expects('shell')
-          .once().withExactArgs(['pidof', contactManagerPackage])
-          .returns('5078 5079\n');
-        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
-      });
-      it('should call shell and parse pids with pgrep correctly', async function () {
-        adb._isPidofAvailable = false;
-        adb._isPgrepAvailable = true;
-        mocks.adb.expects('shell')
-          .once()
-          .withExactArgs([`pgrep ^${_.escapeRegExp(contactManagerPackage.slice(-15))}$ || pgrep ^${_.escapeRegExp(contactManagerPackage.slice(0, 15))}$`])
-          .returns('5078\n5079\n');
-        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5078, 5079]);
-      });
-      it('should call shell and parse pids with pgrep correctly with package with proccess', async function () {
-        adb._isPidofAvailable = false;
-        adb._isPgrepAvailable = true;
-        adb._canPgrepUseFullCmdLineSearch = true;
-        const escapedProcessName = _.escapeRegExp(`([[:blank:]]|^)${contactManagerPackage}(:[a-zA-Z0-9_-]+)?([[:blank:]]|$)`);
-        mocks.adb.expects('shell').once().withExactArgs(['pgrep', '-f', escapedProcessName]).returns('5080\n5081\n');
-        (await adb.getPIDsByName(contactManagerPackage)).should.eql([5080, 5081]);
-      });
-      it('should call shell and return an empty list if no processes are running', async function () {
-        adb._isPidofAvailable = true;
-        adb._isPgrepAvailable = false;
-        const err = new Error();
-        err.code = 1;
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['pidof', contactManagerPackage])
-          .throws(err);
-        (await adb.getPIDsByName(contactManagerPackage)).length.should.eql(0);
-      });
-      it('should fall back to ps if pidof is not available', async function () {
-        adb._isPidofAvailable = false;
-        adb._isPgrepAvailable = false;
-        mocks.adb.expects('listProcessStatus')
           .once().returns(`
-          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
-          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
-          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
-          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
-          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
-          u0_a1     1349  69    1206724 26164 ffffffff b6db0920 S com.android.providers.calendar
-          u0_a17    1431  69    1217460 26616 ffffffff b6db0920 S com.android.calendar
-          u0_a21    1454  69    1203712 26244 ffffffff b6db0920 S com.android.deskclock
-          u0_a27    1490  69    1206480 24748 ffffffff b6db0920 S com.android.exchange
-          u0_a4     1574  69    1205460 22984 ffffffff b6db0920 S com.android.dialer
-          u0_a2     1590  69    1207456 29340 ffffffff b6db0920 S android.process.acore
-          u0_a11    1608  69    1199320 22448 ffffffff b6db0920 S com.android.sharedstoragebackup
-          u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
-          u0_a5     1646  69    1202716 27004 ffffffff b6db0920 S android.process.media
-          root      1676  2     0      0     c00d0d8c 00000000 S flush-31:1
-          root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
-          root      1681  60    10672  996   00000000 b6f33508 R ps
-          `);
-        (await adb.getPIDsByName('com.android.phone')).should.eql([929, 930]);
-      });
-      it('should fall back to ps and return empty list if no processes were found', async function () {
-        adb._isPidofAvailable = false;
-        adb._isPgrepAvailable = false;
-        mocks.adb.expects('listProcessStatus')
-          .once().returns(`
-          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
-          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
-          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
-          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
-          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
-          `);
-        (await adb.getPIDsByName('com.android.phoner')).length.should.eql(0);
-      });
-      it('should properly parse different ps output formats', async function () {
-        adb._isPidofAvailable = false;
-        adb._isPgrepAvailable = false;
-        mocks.adb.expects('listProcessStatus')
-          .once().returns(`
-          USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
-          shell        21989 32761    4952   2532 sigsuspend   b2f1d778 S sh
-          shell        21992 21989    5568   3016 0            b4396448 R ps
-          `);
-        (await adb.getPIDsByName('sh')).should.eql([21989]);
+        PID mappings:
+          PID #675: ProcessRecord{67854f6 675:system/1000}
+          PID #1094: ProcessRecord{941ba2e 1094:com.android.systemui/u0a187}
+          PID #1098: ProcessRecord{67b5269 1098:com.google.android.permissioncontroller/u0a194}
+          PID #1218: ProcessRecord{3a34961 1218:com.android.networkstack.process/1073}
+          PID #1254: ProcessRecord{e34ef2f 1254:com.google.android.bluetooth/1002}
+          PID #1257: ProcessRecord{83a69e9 1257:com.android.se/1068}
+          PID #1268: ProcessRecord{5a466e 1268:com.android.phone/1001}
+          PID #1415: ProcessRecord{ae3c91 1415:com.google.android.apps.nexuslauncher/u0a182}
+          PID #1443: ProcessRecord{bc968a7 1443:com.google.android.gms.persistent/u0a147}
+          PID #1614: ProcessRecord{d48ef15 1614:com.google.android.gms/u0a147}
+          PID #1615: ProcessRecord{d48ef15 1615:com.google.android.gms/u0a147}
+          PID #1627: ProcessRecord{24bcdec 1627:com.google.android.inputmethod.latin/u0a160}
+          PID #1680: ProcessRecord{5e41aa7 1680:com.google.android.apps.wellbeing/u0a148}
+          PID #1755: ProcessRecord{220c41b 1755:com.google.android.providers.media.module/u0a191}
+          PID #1771: ProcessRecord{808a418 1771:com.google.android.as/u0a140}
+        `);
+        (await adb.getPIDsByName('com.google.android.gms')).should.eql([1614, 1615]);
       });
     });
     describe('killProcessesByName', function () {
