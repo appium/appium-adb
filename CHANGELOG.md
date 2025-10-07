@@ -1,3 +1,9 @@
+## [13.0.8](https://github.com/appium/appium-adb/compare/v13.0.7...v13.0.8) (2025-10-07)
+
+### Bug Fixes
+
+* Update the logic for listing process ids belonging to an app ([#818](https://github.com/appium/appium-adb/issues/818)) ([9aade51](https://github.com/appium/appium-adb/commit/9aade517260c4727292cf0ddd72f90774ef4d29d))
+
 ## [13.0.7](https://github.com/appium/appium-adb/compare/v13.0.6...v13.0.7) (2025-10-04)
 
 ### Miscellaneous Chores
