@@ -1,3 +1,9 @@
+## [13.0.9](https://github.com/appium/appium-adb/compare/v13.0.8...v13.0.9) (2025-10-07)
+
+### Miscellaneous Chores
+
+* Deprecate broadcastProcessEnd ([#819](https://github.com/appium/appium-adb/issues/819)) ([e2cf736](https://github.com/appium/appium-adb/commit/e2cf7360162b6451c9237d3ddfd68d0c0afb605d))
+
 ## [13.0.8](https://github.com/appium/appium-adb/compare/v13.0.7...v13.0.8) (2025-10-07)
 
 ### Bug Fixes
