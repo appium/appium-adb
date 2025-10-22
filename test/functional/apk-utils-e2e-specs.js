@@ -103,6 +103,10 @@ describe('apk utils', function () {
 
     });
     it('should be able to start with an intent and no activity', async function () {
+      if (await adb.getApiLevel() < 28 && process.env.CI) {
+        return this.skip();
+      }
+
       this.timeout(MOCHA_LONG_TIMEOUT);
       await adb.install(CONTACT_MANAGER_PATH, {
         grantPermissions: true
