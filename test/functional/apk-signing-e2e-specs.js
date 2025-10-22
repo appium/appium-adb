@@ -2,19 +2,13 @@ import {ADB} from '../../lib/adb';
 import path from 'path';
 import os from 'os';
 import { unsignApk } from '../../lib/tools/apk-signing';
-import { apiLevel } from './setup';
+import { CONTACT_MANAGER_PATH, CONTACT_MANAGER_PKG } from './setup';
 
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const selendroidTestApp = path.resolve(fixturesRoot, 'selendroid-test-app.apk');
-const contactManagerPath = apiLevel < 23
-  ? path.resolve(fixturesRoot, 'ContactManager-old.apk')
-  : path.resolve(fixturesRoot, 'ContactManager.apk');
 const tmp = os.tmpdir();
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
-const CONTACT_MANAGER_APP_ID = apiLevel < 23
-  ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.ContactManager';
 
 describe('Apk-signing', function () {
   let adb;
@@ -34,7 +28,7 @@ describe('Apk-signing', function () {
     (await adb.checkApkCert(selendroidTestApp, 'io.selendroid.testapp')).should.be.false;
   });
   it('checkApkCert should return true for signed apk', async function () {
-    (await adb.checkApkCert(contactManagerPath, CONTACT_MANAGER_APP_ID)).should.be.true;
+    (await adb.checkApkCert(CONTACT_MANAGER_PATH, CONTACT_MANAGER_PKG)).should.be.true;
   });
   it('signWithDefaultCert should sign apk', async function () {
     await unsignApk(selendroidTestApp);

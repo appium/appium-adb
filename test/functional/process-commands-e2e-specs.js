@@ -1,17 +1,11 @@
 import {ADB} from '../../lib/adb';
-import path from 'path';
-import { apiLevel, MOCHA_TIMEOUT } from './setup';
+import {
+  MOCHA_TIMEOUT,
+  CONTACT_MANAGER_PATH,
+  CONTACT_MANAGER_PKG,
+  CONTACT_MANAGER_ACTIVITY,
+} from './setup';
 import { waitForCondition } from 'asyncbox';
-
-const CONTACT_MANAGER_PATH = apiLevel < 23
-  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
-  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = apiLevel < 23
-  ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
-  ? 'ContactManager'
-  : 'com.saucelabs.ContactManager.ContactManager';
 
 describe('process commands', function () {
   this.timeout(MOCHA_TIMEOUT);

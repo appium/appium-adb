@@ -1,6 +1,12 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
+import {
+  apiLevel,
+  platformVersion,
+  MOCHA_TIMEOUT,
+  CONTACT_MANAGER_PATH,
+  CONTACT_MANAGER_PKG,
+} from './setup';
 import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
 
@@ -9,12 +15,6 @@ const DEFAULT_IMES = [
   'com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME',
   'io.appium.android.ime/.UnicodeIME',
 ];
-const CONTACT_MANAGER_PATH = apiLevel < 23
-  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
-  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = apiLevel < 23
-  ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.ContactManager';
 
 
 describe('adb commands', function () {
@@ -223,6 +223,10 @@ describe('adb commands', function () {
 
   describe('launchable activity', function () {
     it('should resolve the name of the launchable activity', async function () {
+      await adb.install(CONTACT_MANAGER_PATH, {
+        timeout: androidInstallTimeout,
+        grantPermissions: true,
+      });
       (await adb.resolveLaunchableActivity(CONTACT_MANAGER_PKG)).should.not.be.empty;
     });
   });

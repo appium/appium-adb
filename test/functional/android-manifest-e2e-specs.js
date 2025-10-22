@@ -1,21 +1,15 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs } from '@appium/support';
-import { apiLevel } from './setup';
+import { CONTACT_MANAGER_PKG, CONTACT_MANAGER_PATH } from './setup';
 
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
-const contactManagerPath = apiLevel < 23
-  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
-  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const contactMangerSelendroidPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager-selendroid.apk');
 const tmpDir = path.resolve(__dirname, '..', 'temp');
 const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
 const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
-const CONTACT_MANAGER_PKG = apiLevel < 23
-  ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.ContactManager';
 
 describe('Android-manifest', function () {
   let adb;
@@ -31,7 +25,7 @@ describe('Android-manifest', function () {
     adb = await ADB.createADB();
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
-    let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(contactManagerPath);
+    let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(CONTACT_MANAGER_PATH);
     apkPackage.should.equal(CONTACT_MANAGER_PKG);
     apkActivity.endsWith('.ContactManager').should.be.true;
   });
@@ -40,7 +34,7 @@ describe('Android-manifest', function () {
     flag.should.be.true;
   });
   it('hasInternetPermissionFromManifest should be false', async function () {
-    let flag = await adb.hasInternetPermissionFromManifest(contactManagerPath);
+    let flag = await adb.hasInternetPermissionFromManifest(CONTACT_MANAGER_PATH);
     flag.should.be.false;
   });
   // TODO fix this test

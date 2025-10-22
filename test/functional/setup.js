@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 // https://developer.android.com/guide/topics/manifest/uses-sdk-element.html
 const API_LEVEL_MAP = {
   4.1: '16',
@@ -31,4 +33,24 @@ const apiLevel = parseInt(process.env.ANDROID_SDK_VERSION
 const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
-export { apiLevel, platformVersion, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT };
+// Contact Manager test constants
+const CONTACT_MANAGER_PATH = apiLevel < 23
+  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
+  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = apiLevel < 23
+  ? 'com.example.android.contactmanager'
+  : 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
+  ? 'ContactManager'
+  : 'com.saucelabs.ContactManager.ContactManager';
+
+export {
+  apiLevel,
+  platformVersion,
+  avdName,
+  MOCHA_TIMEOUT,
+  MOCHA_LONG_TIMEOUT,
+  CONTACT_MANAGER_PATH,
+  CONTACT_MANAGER_PKG,
+  CONTACT_MANAGER_ACTIVITY
+};
