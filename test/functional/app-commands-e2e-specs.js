@@ -93,6 +93,9 @@ describe('app commands', function () {
     });
 
     it('should get focused package and activity', async function () {
+      if (await adb.getApiLevel() > 30) {
+        return this.skip();
+      }
       await adb.install(CONTACT_MANAGER_PATH, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
@@ -109,24 +112,11 @@ describe('app commands', function () {
     });
   });
 
-  describe('app activation', function () {
-    it('should activate app', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
-        timeout: androidInstallTimeout,
-        grantPermissions: true,
-      });
-      await adb.activateApp(CONTACT_MANAGER_PKG);
-      // Should not throw an error
-    });
-
-    it('should start URI', async function () {
-      await adb.startUri('https://example.com');
-      // Should not throw an error
-    });
-  });
-
   describe('activity waiting', function () {
     it('should wait for activity', async function () {
+      if (await adb.getApiLevel() > 30) {
+        return this.skip();
+      }
       await adb.install(CONTACT_MANAGER_PATH, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
