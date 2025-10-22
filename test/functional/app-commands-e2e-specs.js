@@ -94,7 +94,8 @@ describe('app commands', function () {
         grantPermissions: true,
       });
       const packageInfo = await adb.getPackageInfo(CONTACT_MANAGER_PKG);
-      packageInfo.should.include(CONTACT_MANAGER_PKG);
+      packageInfo.name.should.equal(CONTACT_MANAGER_PKG);
+      packageInfo.isInstalled.should.be.true;
     });
 
     it('should get focused package and activity', async function () {
