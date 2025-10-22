@@ -60,8 +60,6 @@ export class ADB implements ADBOptions {
 
   sdkRoot?: string;
   udid?: string;
-  /** @deprecated Not used anywhere, marked for deletion */
-  appDeviceReadyTimeout?: number;
   useKeystore?: boolean;
   keystorePath?: string;
   keystorePassword?: string;
