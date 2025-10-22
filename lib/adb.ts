@@ -211,13 +211,15 @@ export class ADB implements ADBOptions {
   getPackageInfo = appCommands.getPackageInfo;
   pullApk = appCommands.pullApk;
   activateApp = appCommands.activateApp;
+  listAppProcessIds = appCommands.listAppProcessIds;
+  isAppRunning = appCommands.isAppRunning;
+  broadcast = appCommands.broadcast;
 
   listProcessStatus = processCommands.listProcessStatus;
-  getNameByPid = processCommands.getNameByPid;
-  getPIDsByName = processCommands.getPIDsByName;
+  getProcessNameById = processCommands.getProcessNameById;
+  getProcessIdsByName = processCommands.getProcessIdsByName;
   killProcessesByName = processCommands.killProcessesByName;
   killProcessByPID = processCommands.killProcessByPID;
-  broadcast = processCommands.broadcast;
   processExists = processCommands.processExists;
 
   uninstallApk = apkUtilCommands.uninstallApk;

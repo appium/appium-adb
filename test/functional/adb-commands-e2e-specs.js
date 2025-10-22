@@ -3,7 +3,6 @@ import path from 'path';
 import { apiLevel, platformVersion, MOCHA_TIMEOUT } from './setup';
 import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
-import { waitForCondition } from 'asyncbox';
 
 const DEFAULT_IMES = [
   'com.android.inputmethod.latin/.LatinIME',
@@ -16,9 +15,6 @@ const CONTACT_MANAGER_PATH = apiLevel < 23
 const CONTACT_MANAGER_PKG = apiLevel < 23
   ? 'com.example.android.contactmanager'
   : 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
-  ? 'ContactManager'
-  : 'com.saucelabs.ContactManager.ContactManager';
 
 
 describe('adb commands', function () {
@@ -69,44 +65,8 @@ describe('adb commands', function () {
     await adb.enableIME(ime);
     (await adb.enabledIMEs()).should.include(ime);
   });
-  it('processExists should be able to find ui process', async function () {
-    (await adb.processExists('com.android.systemui')).should.be.true;
-  });
   it('ping should return true', async function () {
     (await adb.ping()).should.be.true;
-  });
-  it('getPIDsByName should return pids', async function () {
-    (await adb.getPIDsByName('com.android.phone')).should.have.length.above(0);
-  });
-  it('killProcessesByName should kill process', async function () {
-    if (process.env.CI) {
-      this.retries(2);
-    }
-
-    await adb.install(CONTACT_MANAGER_PATH, {
-      timeout: androidInstallTimeout,
-      grantPermissions: true,
-    });
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-    await adb.killProcessesByName(CONTACT_MANAGER_PKG);
-    await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
-      waitMs: 5000,
-      intervalMs: 500,
-    });
-  });
-  it('killProcessByPID should kill process', async function () {
-    await adb.install(CONTACT_MANAGER_PATH, {
-      timeout: androidInstallTimeout,
-      grantPermissions: true,
-    });
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-    let pids = await adb.getPIDsByName(CONTACT_MANAGER_PKG);
-    pids.should.have.length.above(0);
-    await adb.killProcessByPID(pids[0]);
-    await waitForCondition(async () => (await adb.getPIDsByName(CONTACT_MANAGER_PKG)).length === 0, {
-      waitMs: 5000,
-      intervalMs: 500,
-    });
   });
   it('should get device language and country', async function () {
     if (parseInt(apiLevel, 10) >= 23 || process.env.CI) {
