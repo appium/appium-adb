@@ -667,19 +667,6 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.killProcessByPID(pid);
       });
     });
-    describe('broadcastProcessEnd', function () {
-      it('should broadcast process end', async function () {
-        let intent = 'intent',
-            processName = 'processName';
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['am', 'broadcast', '-a', intent])
-          .returns('');
-        mocks.adb.expects('processExists')
-          .once().withExactArgs(processName)
-          .returns(false);
-        await adb.broadcastProcessEnd(intent, processName);
-      });
-    });
     describe('broadcast', function () {
       it('should broadcast intent', async function () {
         let intent = 'intent';

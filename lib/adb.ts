@@ -28,6 +28,7 @@ import * as fsCommands from './tools/fs-commands';
 import * as appCommands from './tools/app-commands';
 import * as networkCommands from './tools/network-commands';
 import * as logcatCommands from './tools/logcat-commands';
+import * as processCommands from './tools/process-commands';
 
 
 export const DEFAULT_ADB_PORT = 5037;
@@ -198,14 +199,6 @@ export class ADB implements ADBOptions {
   forceStop = appCommands.forceStop;
   killPackage = appCommands.killPackage;
   clear = appCommands.clear;
-  listProcessStatus = appCommands.listProcessStatus;
-  getNameByPid = appCommands.getNameByPid;
-  getPIDsByName = appCommands.getPIDsByName;
-  killProcessesByName = appCommands.killProcessesByName;
-  killProcessByPID = appCommands.killProcessByPID;
-  broadcastProcessEnd = appCommands.broadcastProcessEnd;
-  broadcast = appCommands.broadcast;
-  processExists = appCommands.processExists;
   readonly APP_INSTALL_STATE = appCommands.APP_INSTALL_STATE;
   isAppInstalled = appCommands.isAppInstalled;
   startUri = appCommands.startUri;
@@ -218,6 +211,14 @@ export class ADB implements ADBOptions {
   getPackageInfo = appCommands.getPackageInfo;
   pullApk = appCommands.pullApk;
   activateApp = appCommands.activateApp;
+
+  listProcessStatus = processCommands.listProcessStatus;
+  getNameByPid = processCommands.getNameByPid;
+  getPIDsByName = processCommands.getPIDsByName;
+  killProcessesByName = processCommands.killProcessesByName;
+  killProcessByPID = processCommands.killProcessByPID;
+  broadcast = processCommands.broadcast;
+  processExists = processCommands.processExists;
 
   uninstallApk = apkUtilCommands.uninstallApk;
   installFromDevicePath = apkUtilCommands.installFromDevicePath;
