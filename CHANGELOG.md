@@ -1,3 +1,9 @@
+## [13.0.10](https://github.com/appium/appium-adb/compare/v13.0.9...v13.0.10) (2025-10-22)
+
+### Miscellaneous Chores
+
+* Bump semantic-release from 24.2.9 to 25.0.1 ([#821](https://github.com/appium/appium-adb/issues/821)) ([ad6be1d](https://github.com/appium/appium-adb/commit/ad6be1deb28ad4f8b6d03b18ae10e62e3882f094))
+
 ## [13.0.9](https://github.com/appium/appium-adb/compare/v13.0.8...v13.0.9) (2025-10-07)
 
 ### Miscellaneous Chores
