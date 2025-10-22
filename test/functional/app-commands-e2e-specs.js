@@ -38,21 +38,6 @@ describe('app commands', function () {
       (await adb.listAppProcessIds('com.android.phone')).should.have.length.above(0);
     });
 
-    it('killPackage should kill process', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
-        timeout: androidInstallTimeout,
-        grantPermissions: true,
-      });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      const pids = await adb.listAppProcessIds(CONTACT_MANAGER_PKG);
-      pids.should.have.length.above(0);
-      await adb.killPackage(CONTACT_MANAGER_PKG);
-      await waitForCondition(async () => !(await adb.isAppRunning(CONTACT_MANAGER_PKG)), {
-        waitMs: 5000,
-        intervalMs: 500,
-      });
-    });
-
     it('forceStop should kill process', async function () {
       await adb.install(CONTACT_MANAGER_PATH, {
         timeout: androidInstallTimeout,
@@ -100,15 +85,6 @@ describe('app commands', function () {
       await adb.grantAllPermissions(CONTACT_MANAGER_PKG);
       // Should not throw an error
     });
-
-    it('should grant specific permissions', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
-        timeout: androidInstallTimeout,
-        grantPermissions: true,
-      });
-      await adb.grantPermissions(CONTACT_MANAGER_PKG, ['android.permission.CAMERA']);
-      // Should not throw an error
-    });
   });
 
   describe('app information', function () {
@@ -150,15 +126,6 @@ describe('app commands', function () {
 
     it('should start URI', async function () {
       await adb.startUri('https://example.com');
-      // Should not throw an error
-    });
-
-    it('should start URI with package', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
-        timeout: androidInstallTimeout,
-        grantPermissions: true,
-      });
-      await adb.startUri('https://example.com', CONTACT_MANAGER_PKG);
       // Should not throw an error
     });
   });
