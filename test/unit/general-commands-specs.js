@@ -34,7 +34,7 @@ const logcat = new Logcat({
   debugTrace: false
 });
 
-describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
+describe('general commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
   let chai;
   let should;
   let expect;

@@ -7,7 +7,7 @@ const adb = new ADB();
 adb.executable.path = 'adb_path';
 const avdName = 'AVD_NAME';
 
-describe('System calls', withMocks({teen_process}, function (mocks) {
+describe('system calls', withMocks({teen_process}, function (mocks) {
   let chai;
 
   before(async function () {

@@ -3,7 +3,7 @@ import events from 'events';
 import { Logcat } from '../../lib/logcat';
 import { withMocks } from '@appium/test-support';
 
-describe('logcat', withMocks({teen_process}, function (mocks) {
+describe('logcat commands', withMocks({teen_process}, function (mocks) {
   const adb = {path: 'dummyPath', defaultArgs: []};
   const logcat = new Logcat({adb, debug: false, debugTrace: false});
   let chai;
