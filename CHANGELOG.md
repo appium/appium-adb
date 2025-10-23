@@ -1,3 +1,16 @@
+## [14.0.0](https://github.com/appium/appium-adb/compare/v13.0.11...v14.0.0) (2025-10-23)
+
+### ⚠ BREAKING CHANGES
+
+* Renamed getPIDsByName to listAppProcessIds
+* Renamed getNameByPid to getProcessNameById
+* Removed the obsolete broadcastProcessEnd method
+* Removed the deprecated appDeviceReadyTimeout property
+
+### Features
+
+* Split process and app commands ([#822](https://github.com/appium/appium-adb/issues/822)) ([1062d4c](https://github.com/appium/appium-adb/commit/1062d4ca2ecd59f636e6fea50add3694f9d14dd3))
+
 ## [13.0.11](https://github.com/appium/appium-adb/compare/v13.0.10...v13.0.11) (2025-10-23)
 
 ### Miscellaneous Chores
