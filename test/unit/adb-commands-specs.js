@@ -23,7 +23,6 @@ const apiLevel = 21,
       enabled=true exported=true processName=com.android.inputmethod.latin
       permission=android.permission.BIND_INPUT_METHOD
       flags=0x0`,
-      contactManagerPackage = 'com.saucelabs.ContactManager',
       model = `Android SDK built for X86_64`,
       manufacturer = `unknown`,
       screenSize = `768x1280`;
@@ -501,20 +500,6 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         expect(await adb.setAnimationScale(-1)).not.throws;
       });
     });
-    describe('processExists', function () {
-      it('should call shell with correct args and should find process', async function () {
-        mocks.adb.expects('getPIDsByName')
-          .once().withExactArgs(contactManagerPackage)
-          .returns([123]);
-        (await adb.processExists(contactManagerPackage)).should.be.true;
-      });
-      it('should call shell with correct args and should not find process', async function () {
-        mocks.adb.expects('getPIDsByName')
-          .once().withExactArgs(contactManagerPackage)
-          .returns([]);
-        (await adb.processExists(contactManagerPackage)).should.be.false;
-      });
-    });
     describe('forwardPort', function () {
       const sysPort = 12345,
             devicePort = 54321;
@@ -584,109 +569,21 @@ describe('adb commands', withMocks({adb, logcat, teen_process, net}, function (m
         await adb.getLogcatLogs();
       });
     });
-    describe('getNameByPid', function () {
-      it('should get package name from valid ps output', async function () {
-        mocks.adb.expects('listProcessStatus')
-          .once().returns(`
-          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
-          radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
-          u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
-          u0_a30    1119  69    1220004 33596 ffffffff b6db0920 S com.android.inputmethod.latin
-          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
-          root      1347  2     0      0     c002f068 00000000 S kworker/0:1
-          u0_a1     1349  69    1206724 26164 ffffffff b6db0920 S com.android.providers.calendar
-          u0_a17    1431  69    1217460 26616 ffffffff b6db0920 S com.android.calendar
-          u0_a21    1454  69    1203712 26244 ffffffff b6db0920 S com.android.deskclock
-          u0_a27    1490  69    1206480 24748 ffffffff b6db0920 S com.android.exchange
-          u0_a4     1574  69    1205460 22984 ffffffff b6db0920 S com.android.dialer
-          u0_a2     1590  69    1207456 29340 ffffffff b6db0920 S android.process.acore
-          u0_a11    1608  69    1199320 22448 ffffffff b6db0920 S com.android.sharedstoragebackup
-          u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
-          u0_a5     1646  69    1202716 27004 ffffffff b6db0920 S android.process.media
-          root      1676  2     0      0     c00d0d8c 00000000 S flush-31:1
-          root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
-          root      1681  60    10672  996   00000000 b6f33508 R ps
-          `);
-        (await adb.getNameByPid('1627')).should.eql('com.android.browser');
-      });
-      it('should fail if no PID could be found in the name', async function () {
-        await adb.getNameByPid('bla').should.eventually.be.rejectedWith(/valid number/);
-      });
-      it('should fail if no PID could be found in ps output', async function () {
-        mocks.adb.expects('listProcessStatus')
-          .once().returns(`
-          USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
-          u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
-          `);
-        await adb.getNameByPid(115).should.eventually.be.rejectedWith(/process name/);
-      });
-    });
-    describe('getPIDsByName', function () {
-      it(`should properly parse the output of 'dumpsys activity processes'`, async function () {
-        mocks.adb.expects('shell')
-          .once().returns(`
-        PID mappings:
-          PID #675: ProcessRecord{67854f6 675:system/1000}
-          PID #1094: ProcessRecord{941ba2e 1094:com.android.systemui/u0a187}
-          PID #1098: ProcessRecord{67b5269 1098:com.google.android.permissioncontroller/u0a194}
-          PID #1218: ProcessRecord{3a34961 1218:com.android.networkstack.process/1073}
-          PID #1254: ProcessRecord{e34ef2f 1254:com.google.android.bluetooth/1002}
-          PID #1257: ProcessRecord{83a69e9 1257:com.android.se/1068}
-          PID #1268: ProcessRecord{5a466e 1268:com.android.phone/1001}
-          PID #1415: ProcessRecord{ae3c91 1415:com.google.android.apps.nexuslauncher/u0a182}
-          PID #1443: ProcessRecord{bc968a7 1443:com.google.android.gms.persistent/u0a147}
-          PID #1614: ProcessRecord{d48ef15 1614:com.google.android.gms/u0a147}
-          PID #1615: ProcessRecord{d48ef15 1615:com.google.android.gms/u0a147}
-          PID #1627: ProcessRecord{24bcdec 1627:com.google.android.inputmethod.latin/u0a160}
-          PID #1680: ProcessRecord{5e41aa7 1680:com.google.android.apps.wellbeing/u0a148}
-          PID #1755: ProcessRecord{220c41b 1755:com.google.android.providers.media.module/u0a191}
-          PID #1771: ProcessRecord{808a418 1771:com.google.android.as/u0a140}
-        `);
-        (await adb.getPIDsByName('com.google.android.gms')).should.eql([1614, 1615]);
-      });
-    });
-    describe('killProcessesByName', function () {
-      it('should call getPIDsByName and kill process correctly', async function () {
-        mocks.adb.expects('getPIDsByName')
-          .once().withExactArgs(contactManagerPackage)
-          .returns([5078]);
-        mocks.adb.expects('killProcessByPID')
-          .once().withExactArgs(5078)
-          .returns('');
-        await adb.killProcessesByName(contactManagerPackage);
-      });
-    });
-    describe('killProcessByPID', function () {
-      const pid = 5078;
-
-      it('should call kill process correctly', async function () {
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['kill', `${pid}`])
-          .returns('');
-        await adb.killProcessByPID(pid);
-      });
-    });
-    describe('broadcastProcessEnd', function () {
-      it('should broadcast process end', async function () {
-        let intent = 'intent',
-            processName = 'processName';
-        mocks.adb.expects('shell')
-          .once().withExactArgs(['am', 'broadcast', '-a', intent])
-          .returns('');
-        mocks.adb.expects('processExists')
-          .once().withExactArgs(processName)
-          .returns(false);
-        await adb.broadcastProcessEnd(intent, processName);
-      });
-    });
     describe('broadcast', function () {
-      it('should broadcast intent', async function () {
-        let intent = 'intent';
+      it('should broadcast intent correctly', async function () {
+        mocks.adb.expects('isValidClass')
+          .once().withExactArgs('com.test.intent')
+          .returns(true);
         mocks.adb.expects('shell')
-          .once().withExactArgs(['am', 'broadcast', '-a', intent])
+          .once().withExactArgs(['am', 'broadcast', '-a', 'com.test.intent'])
           .returns('');
-        await adb.broadcast(intent);
+        await adb.broadcast('com.test.intent');
+      });
+      it('should throw error for invalid intent', async function () {
+        mocks.adb.expects('isValidClass')
+          .once().withExactArgs('invalid-intent')
+          .returns(false);
+        await adb.broadcast('invalid-intent').should.eventually.be.rejectedWith(/Invalid intent/);
       });
     });
   });
