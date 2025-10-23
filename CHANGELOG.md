@@ -1,3 +1,9 @@
+## [13.0.11](https://github.com/appium/appium-adb/compare/v13.0.10...v13.0.11) (2025-10-23)
+
+### Miscellaneous Chores
+
+* Bump ini from 5.0.0 to 6.0.0 ([#823](https://github.com/appium/appium-adb/issues/823)) ([33afeb5](https://github.com/appium/appium-adb/commit/33afeb58d4157e8677262de0dbd559a8cf4cd5df))
+
 ## [13.0.10](https://github.com/appium/appium-adb/compare/v13.0.9...v13.0.10) (2025-10-22)
 
 ### Miscellaneous Chores
