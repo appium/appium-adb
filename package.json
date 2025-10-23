@@ -51,7 +51,7 @@
     "async-lock": "^1.0.0",
     "asyncbox": "^3.0.0",
     "bluebird": "^3.4.7",
-    "ini": "^5.0.0",
+    "ini": "^6.0.0",
     "lodash": "^4.0.0",
     "lru-cache": "^11.1.0",
     "semver": "^7.0.0",
