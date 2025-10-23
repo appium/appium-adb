@@ -10,7 +10,7 @@ const fingerprintId = 1111;
 
 const adb = new ADB();
 
-describe('adb emulator commands', withMocks({adb}, function (mocks) {
+describe('emulator commands', withMocks({adb}, function (mocks) {
   let chai;
 
   before(async function () {
