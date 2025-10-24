@@ -2,7 +2,7 @@ import {ADB} from '../../lib/adb';
 import { Logcat } from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
 
-describe('logcat', function () {
+describe('logcat commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   async function runClearDeviceLogTest (adb, logcat, clear = true) {

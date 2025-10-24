@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
 
-describe('adb emu commands', function () {
+describe('emulator commands', function () {
   let adb;
   let chai;
 

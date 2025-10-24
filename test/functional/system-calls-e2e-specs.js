@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
 
-describe('System calls', function () {
+describe('system calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
