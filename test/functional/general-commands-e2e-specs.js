@@ -17,7 +17,7 @@ const DEFAULT_IMES = [
 ];
 
 
-describe('adb commands', function () {
+describe('general commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
