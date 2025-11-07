@@ -1,3 +1,9 @@
+## [14.0.1](https://github.com/appium/appium-adb/compare/v14.0.0...v14.0.1) (2025-11-07)
+
+### Miscellaneous Chores
+
+* Cycle through old IME state before applying a new one ([#827](https://github.com/appium/appium-adb/issues/827)) ([d40cad0](https://github.com/appium/appium-adb/commit/d40cad088e64ca4a350a5effa50f19959f7fbb1a))
+
 ## [14.0.0](https://github.com/appium/appium-adb/compare/v13.0.11...v14.0.0) (2025-10-23)
 
 ### ⚠ BREAKING CHANGES
