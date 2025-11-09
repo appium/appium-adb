@@ -11,10 +11,10 @@ Module._resolveFilename = function (request, parent, isMain, options) {
   if (libMatch) {
     const libFile = libMatch[1];
     // Remove .js extension if present, or use as-is
-    const baseName = libFile.replace(/\.js$/, '');
+    const prefix = libFile.replace(/\.js$/, '');
 
     // Try to resolve from build/lib/ first
-    const buildPath = path.resolve(__dirname, 'build/lib', `${baseName}.js`);
+    const buildPath = path.resolve(__dirname, 'build', 'lib', `${prefix}.js`);
     if (fs.existsSync(buildPath)) {
       request = buildPath;
     }
