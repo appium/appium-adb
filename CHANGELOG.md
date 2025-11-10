@@ -1,3 +1,9 @@
+## [14.0.2](https://github.com/appium/appium-adb/compare/v14.0.1...v14.0.2) (2025-11-10)
+
+### Miscellaneous Chores
+
+* Migrate logcat.js to logcat.ts ([#828](https://github.com/appium/appium-adb/issues/828)) ([7148a42](https://github.com/appium/appium-adb/commit/7148a428706588e8278ea78a97cbc2773ea14bcf))
+
 ## [14.0.1](https://github.com/appium/appium-adb/compare/v14.0.0...v14.0.1) (2025-11-07)
 
 ### Miscellaneous Chores
