@@ -1,3 +1,9 @@
+## [14.0.3](https://github.com/appium/appium-adb/compare/v14.0.2...v14.0.3) (2025-11-15)
+
+### Miscellaneous Chores
+
+* publish via trusted publisher ([#829](https://github.com/appium/appium-adb/issues/829)) ([967943a](https://github.com/appium/appium-adb/commit/967943adf24031111d5a7cefc088a457050d2861))
+
 ## [14.0.2](https://github.com/appium/appium-adb/compare/v14.0.1...v14.0.2) (2025-11-10)
 
 ### Miscellaneous Chores
