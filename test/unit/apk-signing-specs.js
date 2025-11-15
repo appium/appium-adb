@@ -6,13 +6,13 @@ import * as appiumSupport from '@appium/support';
 import { withMocks } from '@appium/test-support';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 
-const selendroidTestApp = path.resolve(__dirname, '..', 'fixtures', 'selendroid-test-app.apk');
+const contactManagerPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
 const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8');
 const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
 const keyAlias = 'appiumtest';
 const password = 'android';
-const selendroidTestAppPackage = 'io.selendroid.testapp';
+const contactManagerPackage = 'com.saucelabs.ContactManager';
 const javaDummyPath = 'java_dummy_path';
 const javaHome = 'java_home';
 const apksignerDummyPath = '/path/to/apksigner';
@@ -56,9 +56,9 @@ describe('signing', withMocks({
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath,
-          selendroidTestApp
+          contactManagerPath
         ]).returns('');
-      await adb.signWithDefaultCert(selendroidTestApp);
+      await adb.signWithDefaultCert(contactManagerPath);
     });
 
     it('should fail if apksigner fails', async function () {
@@ -68,11 +68,11 @@ describe('signing', withMocks({
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath,
-          selendroidTestApp
+          contactManagerPath
         ]).throws();
       mocks.helpers.expects('getJavaForOs')
         .once().returns(javaDummyPath);
-      await adb.signWithDefaultCert(selendroidTestApp).should.eventually.be.rejected;
+      await adb.signWithDefaultCert(contactManagerPath).should.eventually.be.rejected;
     });
 
     it('should throw error for invalid file path', async function () {
@@ -93,9 +93,9 @@ describe('signing', withMocks({
           '--ks-key-alias', keyAlias,
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
-          selendroidTestApp
+          contactManagerPath
         ]).returns('');
-      await adb.signWithCustomCert(selendroidTestApp);
+      await adb.signWithCustomCert(contactManagerPath);
     });
 
     it('should fallback to jarsigner if apksigner fails', async function () {
@@ -113,7 +113,7 @@ describe('signing', withMocks({
           '--ks-key-alias', keyAlias,
           '--ks-pass', `pass:${password}`,
           '--key-pass', `pass:${password}`,
-          selendroidTestApp
+          contactManagerPath
         ]).throws();
       mocks.teen_process.expects('exec')
         .once().withExactArgs(jarsigner, [
@@ -122,15 +122,15 @@ describe('signing', withMocks({
           '-keystore', keystorePath,
           '-storepass', password,
           '-keypass', password,
-          selendroidTestApp, keyAlias],
+          contactManagerPath, keyAlias],
           { windowsVerbatimArguments: appiumSupport.system.isWindows() })
         .returns({});
       mocks.helpers.expects('getJavaHome')
         .returns(javaHome);
       mocks.apkSigningHelpers.expects('unsignApk')
-        .withExactArgs(selendroidTestApp)
+        .withExactArgs(contactManagerPath)
         .returns(true);
-      await adb.signWithCustomCert(selendroidTestApp);
+      await adb.signWithCustomCert(contactManagerPath);
     });
   });
 
@@ -149,11 +149,11 @@ describe('signing', withMocks({
         .once().withExactArgs(path.dirname(alignedApk))
         .returns({});
       mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', selendroidTestApp, alignedApk]);
+        .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', contactManagerPath, alignedApk]);
       mocks.fs.expects('mv')
-        .once().withExactArgs(alignedApk, selendroidTestApp, { mkdirp: true })
+        .once().withExactArgs(alignedApk, contactManagerPath, { mkdirp: true })
         .returns('');
-      await adb.zipAlignApk(selendroidTestApp);
+      await adb.zipAlignApk(contactManagerPath);
     });
   });
 
@@ -173,13 +173,13 @@ describe('signing', withMocks({
       mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
-        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .once().withExactArgs(['verify', '--print-certs', contactManagerPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`);
-      (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)).should.be.true;
+      (await adb.checkApkCert(contactManagerPath, contactManagerPackage)).should.be.true;
     });
 
     it('should check non default signature when not using keystore', async function () {
@@ -188,13 +188,13 @@ describe('signing', withMocks({
       mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
-        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .once().withExactArgs(['verify', '--print-certs', contactManagerPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
-      (await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage, {
+      (await adb.checkApkCert(contactManagerPath, contactManagerPackage, {
         requireDefaultCert: false,
       })).should.be.true;
     });
@@ -206,7 +206,7 @@ describe('signing', withMocks({
         .throws();
       mocks.helpers.expects('getJavaForOs')
         .returns(javaDummyPath);
-      await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage)
+      await adb.checkApkCert(contactManagerPath, contactManagerPackage)
         .should.eventually.be.rejected;
     });
 
@@ -222,13 +222,13 @@ describe('signing', withMocks({
       mocks.apkSigningHelpers.expects('getApksignerForOs')
         .once().returns(apksignerDummyPath);
       mocks.adb.expects('executeApksigner')
-        .once().withExactArgs(['verify', '--print-certs', selendroidTestApp])
+        .once().withExactArgs(['verify', '--print-certs', contactManagerPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
-      await adb.checkApkCert(selendroidTestApp, selendroidTestAppPackage).should.eventually.be.true;
+      await adb.checkApkCert(contactManagerPath, contactManagerPackage).should.eventually.be.true;
     });
   });
 }));
