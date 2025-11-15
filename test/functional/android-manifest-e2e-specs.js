@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import { fs } from '@appium/support';
+import { fs, tempDir } from '@appium/support';
 import { CONTACT_MANAGER_PKG, CONTACT_MANAGER_PATH } from './setup';
 import {
   requireSdkRoot,
@@ -11,70 +11,90 @@ import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 
 // All paths below assume tests run under /build/test/ so paths are relative from
 // that directory.
-const contactMangerSelendroidPath = path.resolve(__dirname, '..', 'fixtures', 'ContactManager-selendroid.apk');
-const tmpDir = path.resolve(__dirname, '..', 'temp');
-const srcManifest = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'AndroidManifest.xml');
-const serverPath = path.resolve(__dirname, '..', 'fixtures', 'selendroid', 'selendroid.apk');
+const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
 describe('Android-manifest', function () {
   let adb;
-  let chai;
+  let expect;
 
   before(async function () {
-    chai = await import('chai');
+    const chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
     chai.use(chaiAsPromised.default);
+    expect = chai.expect;
 
     adb = await ADB.createADB();
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
-    let {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(CONTACT_MANAGER_PATH);
-    apkPackage.should.equal(CONTACT_MANAGER_PKG);
-    apkActivity.endsWith('.ContactManager').should.be.true;
+    const {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(CONTACT_MANAGER_PATH);
+    expect(apkPackage).to.equal(CONTACT_MANAGER_PKG);
+    expect(apkActivity.endsWith('.ContactManager')).to.be.true;
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
-    let flag = await adb.hasInternetPermissionFromManifest(contactMangerSelendroidPath);
-    flag.should.be.true;
+    expect(await adb.hasInternetPermissionFromManifest(apiDemosPath)).to.be.true;
   });
   it('hasInternetPermissionFromManifest should be false', async function () {
-    let flag = await adb.hasInternetPermissionFromManifest(CONTACT_MANAGER_PATH);
-    flag.should.be.false;
+    expect(await adb.hasInternetPermissionFromManifest(CONTACT_MANAGER_PATH)).to.be.false;
   });
-  // TODO fix this test
-  it.skip('should compile and insert manifest', async function () {
-    let appPackage = CONTACT_MANAGER_PKG,
-        newServerPath = path.resolve(tmpDir, `selendroid.${appPackage}.apk`),
-        newPackage = 'com.example.android.contactmanager.selendroid',
-        dstDir = path.resolve(tmpDir, appPackage),
-        dstManifest = path.resolve(dstDir, 'AndroidManifest.xml');
-    // deleting temp directory if present
+
+  it('should compile and insert manifest', async function () {
+    const tmpDir = await tempDir.openDir();
     try {
+      const appPackage = CONTACT_MANAGER_PKG;
+      const newPackage = `${appPackage}.test`;
+      const dstDir = path.resolve(tmpDir, appPackage);
+      const dstManifest = path.resolve(dstDir, 'AndroidManifest.xml');
+      const newServerPath = path.resolve(tmpDir, `test.${appPackage}.apk`);
+
+      // Create a temporary copy of the source APK to avoid modifying the original fixture
+      const srcApkCopy = path.resolve(tmpDir, path.basename(CONTACT_MANAGER_PATH));
+      await fs.copyFile(CONTACT_MANAGER_PATH, srcApkCopy);
+
+      // Create a simple AndroidManifest.xml template
+      const manifestContent = `<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="1.0"
+    package="${newPackage}">
+    <uses-sdk android:minSdkVersion="17" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:label="TestApp">
+        <activity android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>`;
+
+      await fs.mkdir(dstDir);
+      await fs.writeFile(dstManifest, manifestContent, 'utf8');
+
+      // Compile the manifest
+      await adb.compileManifest(dstManifest, newPackage, appPackage);
+      expect(await fs.exists(dstManifest)).to.be.true;
+      expect(await fs.exists(`${dstManifest}.apk`)).to.be.true;
+
+      // Insert the compiled manifest into the temporary copy of the source APK
+      await adb.insertManifest(dstManifest, srcApkCopy, newServerPath);
+      expect(await fs.exists(newServerPath)).to.be.true;
+
+      // Verify the new APK has the updated manifest
+      const {name: packageName} = await readPackageManifest.bind(adb)(newServerPath);
+      expect(packageName).to.equal(newPackage);
+    } finally {
       await fs.rimraf(tmpDir);
-    } catch (e) {
-      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`); // eslint-disable-line no-console
-    }
-    await fs.mkdir(tmpDir);
-    await fs.mkdir(dstDir);
-    await fs.writeFile(dstManifest, await fs.readFile(srcManifest, 'utf8'), 'utf8');
-    await adb.compileManifest(dstManifest, newPackage, appPackage);
-    (await fs.fileExists(dstManifest)).should.be.true;
-    await adb.insertManifest(dstManifest, serverPath, newServerPath);
-    (await fs.fileExists(newServerPath)).should.be.true;
-    // deleting temp directory
-    try {
-      await fs.rimraf(tmpDir);
-    } catch (e) {
-      console.log(`Unable to delete temp directory. It might not be present. ${e.message}`); // eslint-disable-line no-console
     }
   });
 
   it('getAndroidPlatformAndPath should return platform and path for android', async function () {
     const sdkRoot = await requireSdkRoot();
     const {platform, platformPath} = await getAndroidPlatformAndPath(sdkRoot);
-    platform.should.exist;
-    platformPath.should.exist;
+    expect(platform).to.exist;
+    expect(platformPath).to.exist;
   });
 
   it('should read package manifest', async function () {
@@ -207,8 +227,7 @@ describe('Android-manifest', function () {
     };
 
     const adb = await ADB.createADB();
-    const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
     const manifest = await readPackageManifest.bind(adb)(apiDemosPath);
-    expected.should.eql(manifest);
+    expect(manifest).to.eql(expected);
   });
 });
