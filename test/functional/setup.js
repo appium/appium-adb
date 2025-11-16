@@ -34,15 +34,9 @@ const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
 // Contact Manager test constants
-const CONTACT_MANAGER_PATH = apiLevel < 23
-  ? path.resolve(__dirname, '..', 'fixtures', 'ContactManager-old.apk')
-  : path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-const CONTACT_MANAGER_PKG = apiLevel < 23
-  ? 'com.example.android.contactmanager'
-  : 'com.saucelabs.ContactManager';
-const CONTACT_MANAGER_ACTIVITY = apiLevel < 23
-  ? 'ContactManager'
-  : 'com.saucelabs.ContactManager.ContactManager';
+const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
+const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
+const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
 
 export {
   apiLevel,

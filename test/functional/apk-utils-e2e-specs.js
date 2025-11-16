@@ -42,9 +42,7 @@ describe('apk utils', function () {
     (await adb.isAppInstalled('com.android.phone')).should.be.true;
   });
   it('should be able to install/remove app and detect its status', async function () {
-    const apkNameOnDevice = apiLevel < 23
-      ? 'ContactManager-old.apk'
-      : 'ContactManager.apk';
+    const apkNameOnDevice = 'ContactManager.apk';
     (await adb.isAppInstalled('foo')).should.be.false;
     await adb.install(CONTACT_MANAGER_PATH, {
       grantPermissions: true
