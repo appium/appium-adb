@@ -54,14 +54,15 @@ let downloadPromise = null;
  * @throws {Error} If the download fails
  */
 export async function getApiDemosPath() {
-  // Check if the APK already exists locally
-  if (await fs.exists(APIDEMOS_CACHE_PATH)) {
-    return APIDEMOS_CACHE_PATH;
-  }
-
-  // If a download is already in progress, wait for it
+  // If a download is already in progress, wait for it first
+  // This prevents returning a partially downloaded file
   if (downloadPromise) {
     return downloadPromise;
+  }
+
+  // Check if the APK already exists locally (only after ensuring no download is in progress)
+  if (await fs.exists(APIDEMOS_CACHE_PATH)) {
+    return APIDEMOS_CACHE_PATH;
   }
 
   // Start the download

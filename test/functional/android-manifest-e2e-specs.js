@@ -97,9 +97,9 @@ describe('Android-manifest', function () {
   it('should read package manifest', async function () {
     const expected = {
       name: 'io.appium.android.apis',
-      versionCode: 24,
-      minSdkVersion: 17,
-      compileSdkVersion: 31,
+      versionCode: 26,
+      minSdkVersion: 26,
+      compileSdkVersion: 33,
       usesPermissions: [
         'android.permission.READ_CONTACTS',
         'android.permission.WRITE_CONTACTS',
@@ -111,8 +111,10 @@ describe('Android-manifest', function () {
         'android.permission.SEND_SMS',
         'android.permission.RECEIVE_SMS',
         'android.permission.NFC',
+        'android.permission.POST_NOTIFICATIONS',
         'android.permission.RECORD_AUDIO',
         'android.permission.CAMERA',
+        'io.appium.android.apis.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION',
         'android.permission.READ_EXTERNAL_STORAGE'
       ],
       launchableActivity: {
@@ -216,11 +218,11 @@ describe('Android-manifest', function () {
         640,
         65535
       ],
-      versionName: '4.1.1',
-      platformBuildVersionName: '12',
-      platformBuildVersionCode: 31,
-      compileSdkVersionCodename: '12',
-      targetSdkVersion: 31,
+      versionName: '6.0.0',
+      platformBuildVersionName: '13',
+      platformBuildVersionCode: 33,
+      compileSdkVersionCodename: '13',
+      targetSdkVersion: 33,
     };
 
     const adb = await ADB.createADB();
