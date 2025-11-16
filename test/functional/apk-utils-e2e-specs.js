@@ -8,6 +8,7 @@ import {
   CONTACT_MANAGER_PATH,
   CONTACT_MANAGER_PKG,
   CONTACT_MANAGER_ACTIVITY,
+  getApiDemosPath,
 } from './setup';
 
 const START_APP_WAIT_DURATION = 60000;
@@ -18,8 +19,7 @@ describe('apk utils', function () {
 
   let adb;
   let chai;
-
-  const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
+  let apiDemosPath;
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
     let {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
@@ -37,6 +37,8 @@ describe('apk utils', function () {
     adb = await ADB.createADB({
       adbExecTimeout: process.env.CI ? 60000 : 40000,
     });
+
+    apiDemosPath = await getApiDemosPath();
   });
   it('should be able to check status of third party app', async function () {
     (await adb.isAppInstalled('com.android.phone')).should.be.true;

@@ -1,21 +1,17 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs, tempDir } from '@appium/support';
-import { CONTACT_MANAGER_PKG, CONTACT_MANAGER_PATH } from './setup';
+import { CONTACT_MANAGER_PKG, CONTACT_MANAGER_PATH, getApiDemosPath } from './setup';
 import {
   requireSdkRoot,
   readPackageManifest,
 } from '../../lib/helpers.js';
 import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 
-
-// All paths below assume tests run under /build/test/ so paths are relative from
-// that directory.
-const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
-
 describe('Android-manifest', function () {
   let adb;
   let expect;
+  let apiDemosPath;
 
   before(async function () {
     const chai = await import('chai');
@@ -25,6 +21,7 @@ describe('Android-manifest', function () {
     expect = chai.expect;
 
     adb = await ADB.createADB();
+    apiDemosPath = await getApiDemosPath();
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     const {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(CONTACT_MANAGER_PATH);

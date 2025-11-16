@@ -6,6 +6,7 @@ import {
   MOCHA_TIMEOUT,
   CONTACT_MANAGER_PATH,
   CONTACT_MANAGER_PKG,
+  getApiDemosPath,
 } from './setup';
 import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
@@ -23,6 +24,7 @@ describe('general commands', function () {
   let adb;
   let chai;
   let expect;
+  let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
     chai = await import('chai');
@@ -33,6 +35,7 @@ describe('general commands', function () {
     expect = chai.expect;
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    apiDemosPath = await getApiDemosPath();
   });
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
@@ -142,8 +145,7 @@ describe('general commands', function () {
       }
     });
     it('should install and grant all permission', async function () {
-      let apiDemos = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
-      await adb.install(apiDemos, {timeout: androidInstallTimeout});
+      await adb.install(apiDemosPath, {timeout: androidInstallTimeout});
       (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
       await adb.grantAllPermissions('io.appium.android.apis');
       let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
