@@ -1,7 +1,12 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs, tempDir } from '@appium/support';
-import { CONTACT_MANAGER_PKG, CONTACT_MANAGER_PATH, getApiDemosPath } from './setup';
+import {
+  CONTACT_MANAGER_PKG,
+  CONTACT_MANAGER_PATH,
+  APIDEMOS_PKG,
+  getApiDemosPath,
+} from './setup';
 import {
   requireSdkRoot,
   readPackageManifest,
@@ -96,7 +101,7 @@ describe('Android-manifest', function () {
 
   it('should read package manifest', async function () {
     const expected = {
-      name: 'io.appium.android.apis',
+      name: APIDEMOS_PKG,
       versionCode: 26,
       minSdkVersion: 26,
       compileSdkVersion: 33,
@@ -114,11 +119,11 @@ describe('Android-manifest', function () {
         'android.permission.POST_NOTIFICATIONS',
         'android.permission.RECORD_AUDIO',
         'android.permission.CAMERA',
-        'io.appium.android.apis.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION',
+        `${APIDEMOS_PKG}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`,
         'android.permission.READ_EXTERNAL_STORAGE'
       ],
       launchableActivity: {
-        'name': 'io.appium.android.apis.ApiDemos',
+        'name': `${APIDEMOS_PKG}.ApiDemos`,
       },
       architectures: [],
       locales: [

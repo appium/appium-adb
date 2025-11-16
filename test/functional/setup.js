@@ -39,7 +39,8 @@ export const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'C
 export const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
 export const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
 
-// ApiDemos APK download URL
+
+export const APIDEMOS_PKG = 'io.appium.android.apis';
 const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
