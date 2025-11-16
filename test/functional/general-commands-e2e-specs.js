@@ -6,6 +6,8 @@ import {
   MOCHA_TIMEOUT,
   CONTACT_MANAGER_PATH,
   CONTACT_MANAGER_PKG,
+  APIDEMOS_PKG,
+  getApiDemosPath,
 } from './setup';
 import { fs, tempDir } from '@appium/support';
 import _ from 'lodash';
@@ -23,6 +25,7 @@ describe('general commands', function () {
   let adb;
   let chai;
   let expect;
+  let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
     chai = await import('chai');
@@ -33,6 +36,7 @@ describe('general commands', function () {
     expect = chai.expect;
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    apiDemosPath = await getApiDemosPath();
   });
   it('getApiLevel should get correct api level', async function () {
     (await adb.getApiLevel()).should.equal(apiLevel);
@@ -131,31 +135,41 @@ describe('general commands', function () {
   });
   describe('app permissions', function () {
     before(async function () {
-      let deviceApiLevel = await adb.getApiLevel();
-      if (deviceApiLevel < 23) {
-        //test should skip if the device API < 23
-        return this.skip();
-      }
-      let isInstalled = await adb.isAppInstalled('io.appium.android.apis');
-      if (isInstalled) {
-        await adb.uninstallApk('io.appium.android.apis');
+      if (await adb.isAppInstalled(APIDEMOS_PKG)) {
+        await adb.uninstallApk(APIDEMOS_PKG);
       }
     });
     it('should install and grant all permission', async function () {
-      let apiDemos = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
-      await adb.install(apiDemos, {timeout: androidInstallTimeout});
-      (await adb.isAppInstalled('io.appium.android.apis')).should.be.true;
-      await adb.grantAllPermissions('io.appium.android.apis');
-      let requestedPermissions = await adb.getReqPermissions('io.appium.android.apis');
-      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.have.members(requestedPermissions);
+      await adb.install(apiDemosPath, {timeout: androidInstallTimeout});
+      (await adb.isAppInstalled(APIDEMOS_PKG)).should.be.true;
+      await adb.grantAllPermissions(APIDEMOS_PKG);
+      const requestedPermissions = await adb.getReqPermissions(APIDEMOS_PKG);
+      const grantedPermissions = await adb.getGrantedPermissions(APIDEMOS_PKG);
+      const deviceApiLevel = await adb.getApiLevel();
+
+      // Check that all requested permissions are granted
+      // Some permissions may not be grantable via adb on certain API levels:
+      // - POST_NOTIFICATIONS requires API 33+ (Android 13+)
+      // - Custom permissions may not be grantable
+      for (const permission of requestedPermissions) {
+        // Skip POST_NOTIFICATIONS on API levels < 33
+        if (permission === 'android.permission.POST_NOTIFICATIONS' && deviceApiLevel < 33) {
+          continue;
+        }
+        // Skip custom permissions that may not be grantable via adb
+        if (permission.startsWith(`${APIDEMOS_PKG}.`)) {
+          continue;
+        }
+        grantedPermissions.should.include(permission);
+      }
     });
     it('should revoke permission', async function () {
-      await adb.revokePermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.not.have.members(['android.permission.RECEIVE_SMS']);
+      await adb.revokePermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.not.have.members(['android.permission.RECEIVE_SMS']);
     });
     it('should grant permission', async function () {
-      await adb.grantPermission('io.appium.android.apis', 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions('io.appium.android.apis')).to.include.members(['android.permission.RECEIVE_SMS']);
+      await adb.grantPermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.include.members(['android.permission.RECEIVE_SMS']);
     });
   });
 
