@@ -4,6 +4,7 @@ import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import { EOL } from 'os';
+import { APIDEMOS_PKG } from '../constants.js';
 
 const apiLevel = 21,
       platformVersion = '4.4.4',
@@ -735,13 +736,13 @@ describe('general commands', withMocks({adb, logcat, teen_process, net}, functio
 
     it('should grant requested permission', async function () {
       mocks.adb.expects('shell')
-          .once().withArgs(['pm', 'grant', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
-      await adb.grantPermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
+          .once().withArgs(['pm', 'grant', APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE']);
+      await adb.grantPermission(APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE');
     });
     it('should revoke requested permission', async function () {
       mocks.adb.expects('shell')
-          .once().withArgs(['pm', 'revoke', 'io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE']);
-      await adb.revokePermission('io.appium.android.apis', 'android.permission.READ_EXTERNAL_STORAGE');
+          .once().withArgs(['pm', 'revoke', APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE']);
+      await adb.revokePermission(APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE');
     });
     it('should properly list requested permissions', async function () {
       mocks.adb.expects('shell').once().returns(dumpedOutput);

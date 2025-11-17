@@ -1,9 +1,9 @@
 import {ADB} from '../../lib/adb';
 import {
   MOCHA_TIMEOUT,
-  CONTACT_MANAGER_PATH,
-  CONTACT_MANAGER_PKG,
-  CONTACT_MANAGER_ACTIVITY,
+  APIDEMOS_PKG,
+  APIDEMOS_ACTIVITY,
+  getApiDemosPath,
 } from './setup';
 import { waitForCondition } from 'asyncbox';
 
@@ -12,6 +12,7 @@ describe('process commands', function () {
 
   let adb;
   let chai;
+  let apiDemosPath;
   const androidInstallTimeout = 90000;
 
   before(async function () {
@@ -22,6 +23,7 @@ describe('process commands', function () {
     chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    apiDemosPath = await getApiDemosPath();
   });
 
   it('processExists should be able to find ui process', async function () {
@@ -41,37 +43,57 @@ describe('process commands', function () {
   });
 
   it('should be able to kill processes by name', async function () {
+    // Skip if device doesn't have root access (required for killing processes)
+    const hasRoot = await adb.isRoot().catch(() => false);
+    if (!hasRoot) {
+      // Try to get root, but skip if it fails
+      const rootResult = await adb.root();
+      if (!rootResult.isSuccessful) {
+        return this.skip('Device does not have root access, which is required for killing processes');
+      }
+    }
+
     // Install and start the test app
-    await adb.install(CONTACT_MANAGER_PATH, {
+    await adb.install(apiDemosPath, {
       timeout: androidInstallTimeout,
       grantPermissions: true,
     });
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
 
     // Verify the process is running
-    const pids = await adb.getProcessIdsByName(CONTACT_MANAGER_PKG);
+    const pids = await adb.getProcessIdsByName(APIDEMOS_PKG);
     pids.should.have.length.above(0);
 
     // Kill the processes by name
-    await adb.killProcessesByName(CONTACT_MANAGER_PKG);
+    await adb.killProcessesByName(APIDEMOS_PKG);
 
     // Verify the process is no longer running
-    await waitForCondition(async () => !(await adb.processExists(CONTACT_MANAGER_PKG)), {
+    await waitForCondition(async () => !(await adb.processExists(APIDEMOS_PKG)), {
       waitMs: 5000,
       intervalMs: 500,
     });
   });
 
   it('should be able to kill process by PID', async function () {
+    // Skip if device doesn't have root access (required for killing processes)
+    const hasRoot = await adb.isRoot().catch(() => false);
+    if (!hasRoot) {
+      // Try to get root, but skip if it fails
+      const rootResult = await adb.root();
+      if (!rootResult.isSuccessful) {
+        return this.skip('Device does not have root access, which is required for killing processes');
+      }
+    }
+
     // Install and start the test app
-    await adb.install(CONTACT_MANAGER_PATH, {
+    await adb.install(apiDemosPath, {
       timeout: androidInstallTimeout,
       grantPermissions: true,
     });
-    await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+    await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
 
     // Get the process ID
-    const pids = await adb.getProcessIdsByName(CONTACT_MANAGER_PKG);
+    const pids = await adb.getProcessIdsByName(APIDEMOS_PKG);
     pids.should.have.length.above(0);
     const pid = pids[0];
 
@@ -79,7 +101,7 @@ describe('process commands', function () {
     await adb.killProcessByPID(pid);
 
     // Verify the process is no longer running
-    await waitForCondition(async () => !(await adb.processExists(CONTACT_MANAGER_PKG)), {
+    await waitForCondition(async () => !(await adb.processExists(APIDEMOS_PKG)), {
       waitMs: 5000,
       intervalMs: 500,
     });

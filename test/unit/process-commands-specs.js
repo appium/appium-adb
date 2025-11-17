@@ -3,8 +3,9 @@ import net from 'net';
 import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
+import { APIDEMOS_PKG } from '../constants.js';
 
-const contactManagerPackage = 'com.saucelabs.ContactManager';
+const apiDemosPackage = APIDEMOS_PKG;
 
 const adb = new ADB({ adbExecTimeout: 60000 });
 const logcat = new Logcat({
@@ -31,15 +32,15 @@ describe('process commands', withMocks({adb, logcat, teen_process, net}, functio
   describe('processExists', function () {
     it('should call shell with correct args and should find process', async function () {
       mocks.adb.expects('getProcessIdsByName')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([123]);
-      (await adb.processExists(contactManagerPackage)).should.be.true;
+      (await adb.processExists(apiDemosPackage)).should.be.true;
     });
     it('should call shell with correct args and should not find process', async function () {
       mocks.adb.expects('getProcessIdsByName')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([]);
-      (await adb.processExists(contactManagerPackage)).should.be.false;
+      (await adb.processExists(apiDemosPackage)).should.be.false;
     });
   });
 
@@ -113,24 +114,24 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
   describe('killProcessesByName', function () {
     it('should call getProcessIdsByName and kill process correctly', async function () {
       mocks.adb.expects('getProcessIdsByName')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([5078]);
       mocks.adb.expects('killProcessByPID')
         .once().withExactArgs(5078, 'SIGTERM')
         .returns('');
-      await adb.killProcessesByName(contactManagerPackage);
+      await adb.killProcessesByName(apiDemosPackage);
     });
     it('should handle case when no processes found', async function () {
       mocks.adb.expects('getProcessIdsByName')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([]);
-      await adb.killProcessesByName(contactManagerPackage);
+      await adb.killProcessesByName(apiDemosPackage);
     });
     it('should handle errors from getProcessIdsByName', async function () {
       mocks.adb.expects('getProcessIdsByName')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .throws(new Error('Process lookup failed'));
-      await adb.killProcessesByName(contactManagerPackage).should.eventually.be.rejectedWith(/Unable to kill/);
+      await adb.killProcessesByName(apiDemosPackage).should.eventually.be.rejectedWith(/Unable to kill/);
     });
   });
 

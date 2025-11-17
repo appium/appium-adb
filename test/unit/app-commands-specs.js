@@ -13,8 +13,9 @@ import { getBuildToolsDirs } from '../../lib/tools/system-calls';
 import { parseAapt2Strings, parseAaptStrings } from '../../lib/tools/apk-utils';
 import { fs } from '@appium/support';
 import _ from 'lodash';
+import { APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT } from '../constants.js';
 
-const contactManagerPackage = 'com.saucelabs.ContactManager';
+const apiDemosPackage = APIDEMOS_PKG;
 
 const adb = new ADB({ adbExecTimeout: 60000 });
 const logcat = new Logcat({
@@ -41,71 +42,71 @@ describe('app commands', withMocks({adb, logcat, teen_process, net, fs}, functio
   describe('isAppRunning', function () {
     it('should call listAppProcessIds and return true when app is running', async function () {
       mocks.adb.expects('listAppProcessIds')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([123, 456]);
-      (await adb.isAppRunning(contactManagerPackage)).should.be.true;
+      (await adb.isAppRunning(apiDemosPackage)).should.be.true;
     });
     it('should call listAppProcessIds and return false when app is not running', async function () {
       mocks.adb.expects('listAppProcessIds')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns([]);
-      (await adb.isAppRunning(contactManagerPackage)).should.be.false;
+      (await adb.isAppRunning(apiDemosPackage)).should.be.false;
     });
   });
 
   describe('listAppProcessIds', function () {
     it('should call shell with correct args and parse process IDs', async function () {
-      const mockOutput = `ProcessRecord{abc123 123:com.saucelabs.ContactManager/u0a123}
-ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
+      const mockOutput = `ProcessRecord{abc123 123:io.appium.android.apis/u0a123}
+ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'activity', 'processes'])
         .returns(mockOutput);
-      (await adb.listAppProcessIds(contactManagerPackage)).should.eql([123, 456]);
+      (await adb.listAppProcessIds(apiDemosPackage)).should.eql([123, 456]);
     });
     it('should return empty array when no processes found', async function () {
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'activity', 'processes'])
         .returns('No processes found');
-      (await adb.listAppProcessIds(contactManagerPackage)).should.eql([]);
+      (await adb.listAppProcessIds(apiDemosPackage)).should.eql([]);
     });
   });
 
   describe('killPackage', function () {
     it('should call shell with correct args', async function () {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['am', 'kill', contactManagerPackage])
+        .once().withExactArgs(['am', 'kill', apiDemosPackage])
         .returns('');
-      await adb.killPackage(contactManagerPackage);
+      await adb.killPackage(apiDemosPackage);
     });
   });
 
   describe('forceStop', function () {
     it('should call shell with correct args', async function () {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['am', 'force-stop', contactManagerPackage])
+        .once().withExactArgs(['am', 'force-stop', apiDemosPackage])
         .returns('');
-      await adb.forceStop(contactManagerPackage);
+      await adb.forceStop(apiDemosPackage);
     });
   });
 
   describe('clear', function () {
     it('should call shell with correct args', async function () {
       mocks.adb.expects('shell')
-        .once().withExactArgs(['pm', 'clear', contactManagerPackage])
+        .once().withExactArgs(['pm', 'clear', apiDemosPackage])
         .returns('');
-      await adb.clear(contactManagerPackage);
+      await adb.clear(apiDemosPackage);
     });
   });
 
   describe('stopAndClear', function () {
     it('should call forceStop and clear', async function () {
       mocks.adb.expects('forceStop')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns('');
       mocks.adb.expects('clear')
-        .once().withExactArgs(contactManagerPackage)
+        .once().withExactArgs(apiDemosPackage)
         .returns('');
-      await adb.stopAndClear(contactManagerPackage);
+      await adb.stopAndClear(apiDemosPackage);
     });
   });
 
@@ -121,9 +122,9 @@ ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
     it('should call shell with package when provided', async function () {
       const uri = 'https://example.com';
       mocks.adb.expects('shell')
-        .once().withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, contactManagerPackage])
+        .once().withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, apiDemosPackage])
         .returns('');
-      await adb.startUri(uri, contactManagerPackage);
+      await adb.startUri(uri, apiDemosPackage);
     });
   });
 
@@ -141,15 +142,18 @@ ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
 
   describe('getFocusedPackageAndActivity', function () {
     it('should parse focused package and activity', async function () {
-      const mockOutput = 'mFocusedApp=AppWindowToken{abc123 token=Token{def456 ActivityRecord{ghi789 com.saucelabs.ContactManager/.MainActivity}}}';
+      // The regex expects format: ActivityRecord{... package/activity ...}
+      // Format should be: ActivityRecord{... package/activity ...}
+      // APIDEMOS_ACTIVITY_SHORT is '.ApiDemos', so we use package/.ApiDemos
+      const mockOutput = `mFocusedApp=AppWindowToken{abc123 token=Token{def456 ActivityRecord{ghi789 u0 ${APIDEMOS_PKG}/${APIDEMOS_ACTIVITY_SHORT} t181}}}`;
       mocks.adb.expects('getApiLevel')
         .once().returns(25);
       mocks.adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(mockOutput);
       const result = await adb.getFocusedPackageAndActivity();
-      result.appPackage.should.equal('com.saucelabs.ContactManager');
-      result.appActivity.should.equal('.MainActivity');
+      result.appPackage.should.equal(APIDEMOS_PKG);
+      result.appActivity.should.equal(APIDEMOS_ACTIVITY_SHORT);
     });
   });
 
@@ -158,8 +162,8 @@ ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
       mocks.adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: 'other.package', appActivity: '.Other'})
-        .onCall(1).returns({appPackage: contactManagerPackage, appActivity: '.MainActivity'});
-      await adb.waitForActivity(contactManagerPackage, '.MainActivity', 1000);
+        .onCall(1).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT});
+      await adb.waitForActivity(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, 1000);
     });
   });
 
@@ -167,9 +171,9 @@ ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
     it('should wait for activity to disappear', async function () {
       mocks.adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
-        .onCall(0).returns({appPackage: contactManagerPackage, appActivity: '.MainActivity'})
+        .onCall(0).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT})
         .onCall(1).returns({appPackage: 'other.package', appActivity: '.Other'});
-      await adb.waitForNotActivity(contactManagerPackage, '.MainActivity', 1000);
+      await adb.waitForNotActivity(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, 1000);
     });
   });
 
@@ -178,15 +182,15 @@ ProcessRecord{def456 456:com.saucelabs.ContactManager/u0a123}`;
       mocks.adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: 'other.package', appActivity: '.Other'})
-        .onCall(1).returns({appPackage: contactManagerPackage, appActivity: '.MainActivity'});
-      await adb.waitForActivityOrNot(contactManagerPackage, '.MainActivity', false, 1000);
+        .onCall(1).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT});
+      await adb.waitForActivityOrNot(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, false, 1000);
     });
     it('should wait for activity to disappear when waitForStop is true', async function () {
       mocks.adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
-        .onCall(0).returns({appPackage: contactManagerPackage, appActivity: '.MainActivity'})
+        .onCall(0).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT})
         .onCall(1).returns({appPackage: 'other.package', appActivity: '.Other'});
-      await adb.waitForActivityOrNot(contactManagerPackage, '.MainActivity', true, 1000);
+      await adb.waitForActivityOrNot(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, true, 1000);
     });
   });
 

@@ -34,13 +34,9 @@ export const apiLevel = parseInt(process.env.ANDROID_SDK_VERSION
 export const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 export const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
-// Contact Manager test constants
-export const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-export const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
-export const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
+// Re-export ApiDemos constants from common constants file
+export { APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT } from '../constants.js';
 
-
-export const APIDEMOS_PKG = 'io.appium.android.apis';
 const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 

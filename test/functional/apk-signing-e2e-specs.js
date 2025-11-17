@@ -2,7 +2,7 @@ import {ADB} from '../../lib/adb';
 import path from 'path';
 import { fs, tempDir } from '@appium/support';
 import { unsignApk } from '../../lib/tools/apk-signing';
-import { CONTACT_MANAGER_PATH, CONTACT_MANAGER_PKG } from './setup';
+import { APIDEMOS_PKG, getApiDemosPath } from './setup';
 
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
@@ -12,6 +12,7 @@ describe('Apk-signing', function () {
   let adb;
   let expect;
   let tmpDir;
+  let apiDemosPath;
 
   before(async function () {
     const chai = await import('chai');
@@ -21,6 +22,7 @@ describe('Apk-signing', function () {
     expect = chai.expect;
 
     adb = await ADB.createADB();
+    apiDemosPath = await getApiDemosPath();
   });
 
   beforeEach(async function () {
@@ -34,25 +36,27 @@ describe('Apk-signing', function () {
   });
 
   it('checkApkCert should return false for unsigned apk', async function () {
-    const apkCopy = path.resolve(tmpDir, path.basename(CONTACT_MANAGER_PATH));
-    await fs.copyFile(CONTACT_MANAGER_PATH, apkCopy);
+    const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
+    await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
-    expect(await adb.checkApkCert(apkCopy, CONTACT_MANAGER_PKG)).to.be.false;
+    expect(await adb.checkApkCert(apkCopy, APIDEMOS_PKG)).to.be.false;
   });
   it('checkApkCert should return true for signed apk', async function () {
-    expect(await adb.checkApkCert(CONTACT_MANAGER_PATH, CONTACT_MANAGER_PKG)).to.be.true;
+    // ApiDemos APK is signed but not with the default Appium certificate
+    // So we check with requireDefaultCert: false to verify it's signed
+    expect(await adb.checkApkCert(apiDemosPath, APIDEMOS_PKG, {requireDefaultCert: false})).to.be.true;
   });
   it('signWithDefaultCert should sign apk', async function () {
-    const apkCopy = path.resolve(tmpDir, path.basename(CONTACT_MANAGER_PATH));
-    await fs.copyFile(CONTACT_MANAGER_PATH, apkCopy);
+    const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
+    await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
     (await adb.signWithDefaultCert(apkCopy));
-    expect(await adb.checkApkCert(apkCopy, CONTACT_MANAGER_PKG)).to.be.true;
+    expect(await adb.checkApkCert(apkCopy, APIDEMOS_PKG)).to.be.true;
   });
   it('signWithCustomCert should sign apk with custom certificate', async function () {
     const customAdb = await ADB.createADB();
-    const apkCopy = path.resolve(tmpDir, path.basename(CONTACT_MANAGER_PATH));
-    await fs.copyFile(CONTACT_MANAGER_PATH, apkCopy);
+    const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
+    await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
     customAdb.keystorePath = keystorePath;
     customAdb.keyAlias = keyAlias;
@@ -60,6 +64,6 @@ describe('Apk-signing', function () {
     customAdb.keystorePassword = 'android';
     customAdb.keyPassword = 'android';
     (await customAdb.signWithCustomCert(apkCopy));
-    expect(await customAdb.checkApkCert(apkCopy, CONTACT_MANAGER_PKG)).to.be.true;
+    expect(await customAdb.checkApkCert(apkCopy, APIDEMOS_PKG)).to.be.true;
   });
 });

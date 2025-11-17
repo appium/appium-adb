@@ -1,9 +1,9 @@
 import {ADB} from '../../lib/adb';
 import {
   MOCHA_TIMEOUT,
-  CONTACT_MANAGER_PATH,
-  CONTACT_MANAGER_PKG,
-  CONTACT_MANAGER_ACTIVITY,
+  APIDEMOS_PKG,
+  APIDEMOS_ACTIVITY,
+  getApiDemosPath,
 } from './setup';
 import { waitForCondition } from 'asyncbox';
 
@@ -12,6 +12,7 @@ describe('app commands', function () {
 
   let adb;
   let chai;
+  let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
     chai = await import('chai');
@@ -21,6 +22,7 @@ describe('app commands', function () {
     chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    apiDemosPath = await getApiDemosPath();
   });
 
   describe('app process management', function () {
@@ -33,16 +35,18 @@ describe('app commands', function () {
     });
 
     it('forceStop should kill process', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      const pids = await adb.listAppProcessIds(CONTACT_MANAGER_PKG);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      const pids = await adb.listAppProcessIds(APIDEMOS_PKG);
       pids.should.have.length.above(0);
-      await adb.forceStop(CONTACT_MANAGER_PKG);
-      await waitForCondition(async () => !(await adb.isAppRunning(CONTACT_MANAGER_PKG)), {
-        waitMs: 5000,
+      await adb.forceStop(APIDEMOS_PKG);
+      // Add a small delay to allow the process to fully stop
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await waitForCondition(async () => !(await adb.isAppRunning(APIDEMOS_PKG)), {
+        waitMs: 10000,
         intervalMs: 500,
       });
     });
@@ -50,45 +54,45 @@ describe('app commands', function () {
 
   describe('app data management', function () {
     it('should clear app data', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      await adb.clear(CONTACT_MANAGER_PKG);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      await adb.clear(APIDEMOS_PKG);
       // App should be stopped after clear
     });
 
     it('should stop and clear app', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      await adb.stopAndClear(CONTACT_MANAGER_PKG);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      await adb.stopAndClear(APIDEMOS_PKG);
       // App should be stopped and cleared
     });
   });
 
   describe('app permissions', function () {
     it('should grant all permissions', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.grantAllPermissions(CONTACT_MANAGER_PKG);
+      await adb.grantAllPermissions(APIDEMOS_PKG);
       // Should not throw an error
     });
   });
 
   describe('app information', function () {
     it('should get package info', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      const packageInfo = await adb.getPackageInfo(CONTACT_MANAGER_PKG);
-      packageInfo.name.should.equal(CONTACT_MANAGER_PKG);
+      const packageInfo = await adb.getPackageInfo(APIDEMOS_PKG);
+      packageInfo.name.should.equal(APIDEMOS_PKG);
       packageInfo.isInstalled.should.be.true;
     });
 
@@ -96,13 +100,13 @@ describe('app commands', function () {
       if (await adb.getApiLevel() > 30) {
         return this.skip();
       }
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
       const {appPackage} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.equal(CONTACT_MANAGER_PKG);
+      appPackage.should.equal(APIDEMOS_PKG);
     });
 
     it('should dump windows', async function () {
@@ -117,33 +121,35 @@ describe('app commands', function () {
       if (await adb.getApiLevel() > 30) {
         return this.skip();
       }
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      await adb.waitForActivity(CONTACT_MANAGER_PKG, CONTACT_MANAGER_ACTIVITY, 5000);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      await adb.waitForActivity(APIDEMOS_PKG, APIDEMOS_ACTIVITY, 5000);
       // Should not throw an error
     });
 
     it('should wait for not activity', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      await adb.forceStop(CONTACT_MANAGER_PKG);
-      await adb.waitForNotActivity(CONTACT_MANAGER_PKG, CONTACT_MANAGER_ACTIVITY, 5000);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      await adb.forceStop(APIDEMOS_PKG);
+      // Add a small delay to allow the activity to fully stop
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await adb.waitForNotActivity(APIDEMOS_PKG, APIDEMOS_ACTIVITY, 10000);
       // Should not throw an error
     });
 
     it('should wait for activity or not', async function () {
-      await adb.install(CONTACT_MANAGER_PATH, {
+      await adb.install(apiDemosPath, {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      await adb.startApp({pkg: CONTACT_MANAGER_PKG, activity: CONTACT_MANAGER_ACTIVITY});
-      await adb.waitForActivityOrNot(CONTACT_MANAGER_PKG, CONTACT_MANAGER_ACTIVITY, false, 5000);
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
+      await adb.waitForActivityOrNot(APIDEMOS_PKG, APIDEMOS_ACTIVITY, false, 5000);
       // Should not throw an error
     });
   });
