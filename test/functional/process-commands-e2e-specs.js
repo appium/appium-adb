@@ -4,6 +4,7 @@ import {
   APIDEMOS_PKG,
   APIDEMOS_ACTIVITY,
   getApiDemosPath,
+  ensureRootAccess,
 } from './setup';
 import { waitForCondition } from 'asyncbox';
 
@@ -43,15 +44,7 @@ describe('process commands', function () {
   });
 
   it('should be able to kill processes by name', async function () {
-    // Skip if device doesn't have root access (required for killing processes)
-    const hasRoot = await adb.isRoot().catch(() => false);
-    if (!hasRoot) {
-      // Try to get root, but skip if it fails
-      const rootResult = await adb.root();
-      if (!rootResult.isSuccessful) {
-        return this.skip('Device does not have root access, which is required for killing processes');
-      }
-    }
+    await ensureRootAccess(adb, this, 'Device does not have root access, which is required for killing processes');
 
     // Install and start the test app
     await adb.install(apiDemosPath, {
@@ -75,15 +68,7 @@ describe('process commands', function () {
   });
 
   it('should be able to kill process by PID', async function () {
-    // Skip if device doesn't have root access (required for killing processes)
-    const hasRoot = await adb.isRoot().catch(() => false);
-    if (!hasRoot) {
-      // Try to get root, but skip if it fails
-      const rootResult = await adb.root();
-      if (!rootResult.isSuccessful) {
-        return this.skip('Device does not have root access, which is required for killing processes');
-      }
-    }
+    await ensureRootAccess(adb, this, 'Device does not have root access, which is required for killing processes');
 
     // Install and start the test app
     await adb.install(apiDemosPath, {

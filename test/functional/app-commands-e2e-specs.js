@@ -44,7 +44,7 @@ describe('app commands', function () {
       pids.should.have.length.above(0);
       await adb.forceStop(APIDEMOS_PKG);
       // Add a small delay to allow the process to fully stop
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await waitForCondition(async () => !(await adb.isAppRunning(APIDEMOS_PKG)), {
         waitMs: 10000,
         intervalMs: 500,
@@ -138,7 +138,7 @@ describe('app commands', function () {
       await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
       await adb.forceStop(APIDEMOS_PKG);
       // Add a small delay to allow the activity to fully stop
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       await adb.waitForNotActivity(APIDEMOS_PKG, APIDEMOS_ACTIVITY, 10000);
       // Should not throw an error
     });

@@ -3,7 +3,6 @@ import { retryInterval } from 'asyncbox';
 import {
   MOCHA_TIMEOUT,
   MOCHA_LONG_TIMEOUT,
-  apiLevel,
   APIDEMOS_PKG,
   APIDEMOS_ACTIVITY,
   APIDEMOS_ACTIVITY_SHORT,
@@ -61,6 +60,7 @@ describe('apk utils', function () {
   });
   describe('startUri', function () {
     it('should be able to start a uri', async function () {
+      const apiLevel = await adb.getApiLevel();
       if (apiLevel < 23 || apiLevel > 28) {
         return this.skip();
       }
@@ -307,7 +307,7 @@ describe('apk utils', function () {
       await retryInterval(20, 500, async () => {
         await adb.goToHome();
         // Add a small delay to allow the home screen to fully appear
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300));
         const {appPackage} = await adb.getFocusedPackageAndActivity();
         appPackage.should.not.eql(APIDEMOS_PKG);
       });

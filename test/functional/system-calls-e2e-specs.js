@@ -1,11 +1,12 @@
 import {ADB} from '../../lib/adb';
-import { apiLevel, avdName, MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
+import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
 import path from 'path';
 import { getResourcePath } from '../../lib/helpers.js';
 import { fs } from '@appium/support';
 import _ from 'lodash';
 
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
+const avdName = process.env.ANDROID_AVD || 'Android Emulator';
 
 describe('system calls', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -40,15 +41,18 @@ describe('system calls', function () {
     (await adb.isDeviceConnected()).should.be.true;
   });
   it('shell should execute command in adb shell ', async function () {
+    const apiLevel = await adb.getApiLevel();
     (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
   });
   it('shell should return stderr from adb with full output', async function () {
+    const apiLevel = await adb.getApiLevel();
     const minStderrApiLevel = 24;
     let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
     let outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
     outputWithError.should.contain('Error while accessing provider');
   });
   it('shell should return stdout from adb shell with full output', async function () {
+    const apiLevel = await adb.getApiLevel();
     let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
     fullShellOutput.stderr.should.equal('');
     fullShellOutput.stdout.should.equal(`${apiLevel}`);
@@ -65,9 +69,12 @@ describe('system calls', function () {
   // Skipping for now. Will unskip depending on how it behaves on CI
   it.skip('launchAVD should get all connected avds', async function () {
     this.timeout(MOCHA_LONG_TIMEOUT);
-    let proc = await adb.launchAVD(avdName);
-    (await adb.getConnectedEmulators()).length.should.be.above(0);
-    proc.stop();
+    const proc = await adb.launchAVD(avdName);
+    try {
+      (await adb.getConnectedEmulators()).length.should.be.above(0);
+    } finally {
+      await proc.stop();
+    }
   });
   it('waitForDevice should get all connected avds', async function () {
     await adb.waitForDevice(2);

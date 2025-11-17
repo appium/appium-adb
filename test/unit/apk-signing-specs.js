@@ -3,6 +3,7 @@ import * as helpers from '../../lib/helpers.js';
 import path from 'path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
+import { zip } from '@appium/support';
 import { withMocks } from '@appium/test-support';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 import { APIDEMOS_PATH, APIDEMOS_PKG } from '../constants.js';
@@ -153,19 +154,20 @@ describe('signing', withMocks({
       mocks.tempDir.expects('openDir')
         .returns('/tmp/dummy');
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
-      const zipMock = {
-        readEntries: async function (apkPath, callback) {
-          // Call callback with a non-META-INF entry so hasMetaInf stays false
-          callback({entry: {fileName: 'AndroidManifest.xml'}});
-        }
+      // We need to stub the actual zip object since it's imported as a named import
+      const originalReadEntries = zip.readEntries;
+      // eslint-disable-next-line import/namespace, promise/prefer-await-to-callbacks
+      zip.readEntries = async (apkPath, callback) => {
+        // Call callback with a non-META-INF entry so hasMetaInf stays false
+        // eslint-disable-next-line promise/prefer-await-to-callbacks
+        callback({entry: {fileName: 'AndroidManifest.xml'}});
       };
-      // Replace zip in appiumSupport for this test
-      const originalZip = appiumSupport.zip;
-      appiumSupport.zip = zipMock;
       try {
         await adb.signWithCustomCert(apiDemosPath);
       } finally {
-        appiumSupport.zip = originalZip;
+        // Restore original function
+        // eslint-disable-next-line import/namespace
+        zip.readEntries = originalReadEntries;
       }
     });
   });
