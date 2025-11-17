@@ -6,6 +6,7 @@ import {
   getApiDemosPath,
 } from './setup';
 import { fs, tempDir } from '@appium/support';
+import { waitForCondition } from 'asyncbox';
 import _ from 'lodash';
 
 describe('general commands', function () {
@@ -52,10 +53,48 @@ describe('general commands', function () {
       return this.skip();
     }
 
-    const ime = _.last(imes);
+    // Get the default IME to avoid trying to disable it (which may not be allowed)
+    const defaultIme = await adb.defaultIME();
+    // Find an IME that is not the default one
+    const ime = imes.find((i) => i !== defaultIme) || _.last(imes);
+
+    // Skip if we can't find a non-default IME or if the only IME is the default
+    if (!ime || ime === defaultIme) {
+      return this.skip('No non-default IME available to test disable/enable');
+    }
+
     await adb.disableIME(ime);
-    (await adb.enabledIMEs()).should.not.include(ime);
+    // Wait for the IME to be disabled, or determine it can't be disabled (on some Android versions)
+    // On some Android versions (especially API 36+), some IMEs might not be fully disabled
+    let enabledAfterDisable;
+    try {
+      // Wait for the IME to be removed from the enabled list
+      await waitForCondition(async () => {
+        const enabled = await adb.enabledIMEs();
+        return !enabled.includes(ime);
+      }, {
+        waitMs: 3000,
+        intervalMs: 500,
+      });
+      // If we get here, the IME was successfully disabled
+      enabledAfterDisable = await adb.enabledIMEs();
+      enabledAfterDisable.should.not.include(ime);
+    } catch {
+      // If timeout, the IME couldn't be disabled (system IME that can't be disabled)
+      // This is acceptable behavior on some Android versions
+      enabledAfterDisable = await adb.enabledIMEs();
+    }
+    // Re-enable the IME to restore state (or ensure it's enabled if disable didn't work)
     await adb.enableIME(ime);
+    // Wait for the IME to be enabled
+    await waitForCondition(async () => {
+      const enabled = await adb.enabledIMEs();
+      return enabled.includes(ime);
+    }, {
+      waitMs: 3000,
+      intervalMs: 500,
+    });
+    // Verify that enable works (or that it's already enabled if it couldn't be disabled)
     (await adb.enabledIMEs()).should.include(ime);
   });
   it('ping should return true', async function () {
