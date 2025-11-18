@@ -1,46 +1,12 @@
 import path from 'node:path';
 import { fs, net } from '@appium/support';
 
-// https://developer.android.com/guide/topics/manifest/uses-sdk-element.html
-const API_LEVEL_MAP = {
-  4.1: '16',
-  4.2: '17',
-  4.3: '18',
-  4.4: '19',
-  5: '21',
-  5.1: '22',
-  6: '23',
-  7: '24',
-  7.1: '25',
-  8.0: '26',
-  8.1: '27',
-  9: '28',
-  10: '29',
-  11: '30',
-  12: '32', // and 31
-  13: '33',
-  14: '34',
-  15: '35',
-  16: '36',
-};
-
-export const avdName = process.env.ANDROID_AVD || 'NEXUS_S_18_X86';
-export const platformVersion = process.env.PLATFORM_VERSION || 4.3;
-
-export const apiLevel = parseInt(process.env.ANDROID_SDK_VERSION
-  || process.env.API_LEVEL
-  || API_LEVEL_MAP[platformVersion], 10);
-
 export const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 export const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
-// Contact Manager test constants
-export const CONTACT_MANAGER_PATH = path.resolve(__dirname, '..', 'fixtures', 'ContactManager.apk');
-export const CONTACT_MANAGER_PKG = 'com.saucelabs.ContactManager';
-export const CONTACT_MANAGER_ACTIVITY = 'com.saucelabs.ContactManager.ContactManager';
+// Re-export ApiDemos constants from common constants file
+export { APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT } from '../constants.js';
 
-
-export const APIDEMOS_PKG = 'io.appium.android.apis';
 const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
@@ -89,4 +55,26 @@ export async function getApiDemosPath() {
   })();
 
   return downloadPromise;
+}
+
+/**
+ * Ensures the device has root access, skipping the test if root cannot be obtained.
+ * This is useful for tests that require root privileges (e.g., killing processes).
+ *
+ * @param {import('../../lib/adb').ADB} adb - The ADB instance
+ * @param {Mocha.Context} testContext - The Mocha test context (this)
+ * @param {string} [skipMessage] - Optional custom message for skipping the test
+ * @returns {Promise<boolean>} True if root access is available, false if test was skipped
+ */
+export async function ensureRootAccess(adb, testContext, skipMessage = 'Device does not have root access, which is required for this test') {
+  const hasRoot = await adb.isRoot().catch(() => false);
+  if (!hasRoot) {
+    // Try to get root, but skip if it fails
+    const rootResult = await adb.root();
+    if (!rootResult.isSuccessful) {
+      testContext.skip(skipMessage);
+      return false;
+    }
+  }
+  return true;
 }
