@@ -6,9 +6,11 @@ import * as appiumSupport from '@appium/support';
 import { zip } from '@appium/support';
 import { withMocks } from '@appium/test-support';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
-import { APIDEMOS_PATH, APIDEMOS_PKG } from '../constants.js';
+import { APIDEMOS_PKG } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-const apiDemosPath = APIDEMOS_PATH;
+chai.use(chaiAsPromised);
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
 const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8');
 const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
@@ -36,15 +38,7 @@ describe('signing', withMocks({
   tempDir,
   apkSigningHelpers,
 }, function (mocks) {
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
+  const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
   afterEach(function () {
     mocks.verify();
@@ -52,18 +46,18 @@ describe('signing', withMocks({
 
   describe('signWithDefaultCert', function () {
     it('should call exec with correct args', async function () {
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.helpers.expects('getResourcePath')
+      (mocks as any).helpers.expects('getResourcePath')
         .once().withExactArgs(path.join('keys', 'testkey.pk8'))
         .returns(defaultKeyPath);
-      mocks.helpers.expects('getResourcePath')
+      (mocks as any).helpers.expects('getResourcePath')
         .once().withExactArgs(path.join('keys', 'testkey.x509.pem'))
         .returns(defaultCertPath);
-      mocks.apkSigningHelpers.expects('getApksignerForOs')
+      (mocks as any).apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath,
@@ -73,22 +67,22 @@ describe('signing', withMocks({
     });
 
     it('should fail if apksigner fails', async function () {
-      mocks.apkSigningHelpers.expects('getApksignerForOs')
+      (mocks as any).apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
           '--key', defaultKeyPath,
           '--cert', defaultCertPath,
           apiDemosPath
         ]).throws();
-      mocks.helpers.expects('getJavaForOs')
+      (mocks as any).helpers.expects('getJavaForOs')
         .once().returns(javaDummyPath);
-      await adb.signWithDefaultCert(apiDemosPath).should.eventually.be.rejected;
+      await expect(adb.signWithDefaultCert(apiDemosPath)).to.eventually.be.rejected;
     });
 
     it('should throw error for invalid file path', async function () {
-      let dummyPath = 'dummyPath';
-      await adb.signWithDefaultCert(dummyPath).should.eventually.be.rejected;
+      const dummyPath = 'dummyPath';
+      await expect(adb.signWithDefaultCert(dummyPath)).to.eventually.be.rejected;
     });
   });
 
@@ -96,15 +90,15 @@ describe('signing', withMocks({
     it('should call exec with correct args', async function () {
       adb.useKeystore = true;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(keystorePath)
         .returns(true);
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.apkSigningHelpers.expects('getApksignerForOs')
+      (mocks as any).apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .withExactArgs(['sign',
           '--ks', keystorePath,
           '--ks-key-alias', keyAlias,
@@ -122,15 +116,15 @@ describe('signing', withMocks({
       }
       adb.useKeystore = true;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(keystorePath)
         .returns(true);
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.apkSigningHelpers.expects('getApksignerForOs')
+      (mocks as any).apkSigningHelpers.expects('getApksignerForOs')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['sign',
           '--ks', keystorePath,
           '--ks-key-alias', keyAlias,
@@ -138,7 +132,7 @@ describe('signing', withMocks({
           '--key-pass', `pass:${password}`,
           apiDemosPath
         ]).throws();
-      mocks.teen_process.expects('exec')
+      (mocks as any).teen_process.expects('exec')
         .once().withExactArgs(jarsigner, [
           '-sigalg', 'MD5withRSA',
           '-digestalg', 'SHA1',
@@ -148,10 +142,10 @@ describe('signing', withMocks({
           apiDemosPath, keyAlias],
           { windowsVerbatimArguments: appiumSupport.system.isWindows() })
         .returns({});
-      mocks.helpers.expects('getJavaHome')
+      (mocks as any).helpers.expects('getJavaHome')
         .returns(javaHome);
       // Mock unsignApk's dependencies: tempDir and zip operations
-      mocks.tempDir.expects('openDir')
+      (mocks as any).tempDir.expects('openDir')
         .returns('/tmp/dummy');
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
       // We need to stub the actual zip object since it's imported as a named import
@@ -176,19 +170,19 @@ describe('signing', withMocks({
   // TODO: find ways to mock mkdirp
   describe.skip('zipAlignApk', function () {
     it('should call exec with correct args', async function () {
-      let alignedApk = 'dummy_path';
-      mocks.tempDir.expects('path')
+      const alignedApk = 'dummy_path';
+      (mocks as any).tempDir.expects('path')
         .once().withExactArgs({prefix: 'appium', suffix: '.tmp'})
         .returns(alignedApk);
-      mocks.adb.expects('initZipAlign')
+      (mocks as any).adb.expects('initZipAlign')
         .once().withExactArgs()
         .returns('');
-      mocks.appiumSupport.expects('mkdirp')
+      (mocks as any).appiumSupport.expects('mkdirp')
         .once().withExactArgs(path.dirname(alignedApk))
         .returns({});
-      mocks.teen_process.expects('exec')
-        .once().withExactArgs(adb.binaries.zipalign, ['-f', '4', apiDemosPath, alignedApk]);
-      mocks.fs.expects('mv')
+      (mocks as any).teen_process.expects('exec')
+        .once().withExactArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk]);
+      (mocks as any).fs.expects('mv')
         .once().withExactArgs(alignedApk, apiDemosPath, { mkdirp: true })
         .returns('');
       await adb.zipAlignApk(apiDemosPath);
@@ -197,100 +191,100 @@ describe('signing', withMocks({
 
   describe('checkApkCert', function () {
     beforeEach(function () {
-      mocks.fs.expects('hash')
+      (mocks as any).fs.expects('hash')
         .returns(Math.random().toString(36));
     });
 
     it('should return false for apk not present', async function () {
-      (await adb.checkApkCert('dummyPath', 'dummyPackage')).should.be.false;
+      expect(await adb.checkApkCert('dummyPath', 'dummyPackage')).to.be.false;
     });
 
     it('should check default signature when not using keystore', async function () {
       adb.useKeystore = false;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once() // For apksigner.jar existence check in getBinaryFromSdkRoot
         .returns(true);
-      mocks.adb.expects('getBinaryFromSdkRoot')
+      (mocks as any).adb.expects('getBinaryFromSdkRoot')
         .once().withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', apiDemosPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`);
-      (await adb.checkApkCert(apiDemosPath, apiDemosPackage)).should.be.true;
+      expect(await adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.be.true;
     });
 
     it('should check non default signature when not using keystore', async function () {
       adb.useKeystore = false;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once() // For apksigner.jar existence check in getBinaryFromSdkRoot
         .returns(true);
-      mocks.adb.expects('getBinaryFromSdkRoot')
+      (mocks as any).adb.expects('getBinaryFromSdkRoot')
         .once().withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', apiDemosPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
-      (await adb.checkApkCert(apiDemosPath, apiDemosPackage, {
+      const result = await adb.checkApkCert(apiDemosPath, apiDemosPackage, {
         requireDefaultCert: false,
-      })).should.be.true;
+      });
+      expect(result).to.be.true;
     });
 
     it('should fail if apksigner is not found', async function () {
       adb.useKeystore = false;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.apkSigningHelpers.expects('getApksignerForOs')
+      (mocks as any).apkSigningHelpers.expects('getApksignerForOs')
         .throws();
-      mocks.helpers.expects('getJavaForOs')
+      (mocks as any).helpers.expects('getJavaForOs')
         .returns(javaDummyPath);
-      await adb.checkApkCert(apiDemosPath, apiDemosPackage)
-        .should.eventually.be.rejected;
+      await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.rejected;
     });
 
     it('should call getKeystoreHash when using keystore', async function () {
       adb.useKeystore = true;
 
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once().withExactArgs(apiDemosPath)
         .returns(true);
-      mocks.fs.expects('exists')
+      (mocks as any).fs.expects('exists')
         .once() // For apksigner.jar existence check in getBinaryFromSdkRoot
         .returns(true);
-      mocks.adb.expects('getKeystoreHash')
+      (mocks as any).adb.expects('getKeystoreHash')
         .once().returns({
           'md5': 'e89b158e4bcf988ebd09eb83f53ccccc',
           'sha1': '61ed377e85d386a8dfee6b864bdcccccfaa5af81',
           'sha256': 'a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc',
         });
-      mocks.adb.expects('getBinaryFromSdkRoot')
+      (mocks as any).adb.expects('getBinaryFromSdkRoot')
         .once().withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.adb.expects('executeApksigner')
+      (mocks as any).adb.expects('executeApksigner')
         .once().withExactArgs(['verify', '--print-certs', apiDemosPath])
         .returns(`
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
           Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`);
-      await adb.checkApkCert(apiDemosPath, apiDemosPackage).should.eventually.be.true;
+      await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.true;
     });
   });
 }));

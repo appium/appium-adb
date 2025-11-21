@@ -1,5 +1,7 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import {
   MOCHA_TIMEOUT,
   APIDEMOS_PKG,
@@ -9,43 +11,37 @@ import { fs, tempDir } from '@appium/support';
 import { waitForCondition } from 'asyncbox';
 import _ from 'lodash';
 
+chai.use(chaiAsPromised);
+
 describe('general commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  let chai;
-  let expect;
   let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-    expect = chai.expect;
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
     apiDemosPath = await getApiDemosPath();
   });
   it('getApiLevel should get correct api level', async function () {
     const actualApiLevel = await adb.getApiLevel();
-    actualApiLevel.should.be.above(0);
+    expect(actualApiLevel).to.be.above(0);
   });
   it('getPlatformVersion should get correct platform version', async function () {
     const actualPlatformVersion = await adb.getPlatformVersion();
-    parseFloat(actualPlatformVersion).should.be.above(0);
+    expect(parseFloat(actualPlatformVersion)).to.be.above(0);
   });
   it('availableIMEs should get list of available IMEs', async function () {
-    (await adb.availableIMEs()).should.have.length.above(0);
+    expect(await adb.availableIMEs()).to.have.length.above(0);
   });
   it('enabledIMEs should get list of enabled IMEs', async function () {
-    (await adb.enabledIMEs()).should.have.length.above(0);
+    expect(await adb.enabledIMEs()).to.have.length.above(0);
   });
   it('defaultIME should get default IME', async function () {
     const defaultIME = await adb.defaultIME();
-    defaultIME.should.be.a('string');
-    defaultIME.length.should.be.above(0);
+    expect(defaultIME).to.be.a('string');
+    expect(defaultIME.length).to.be.above(0);
   });
   it('enableIME and disableIME should enable and disable IME', async function () {
     const imes = await adb.availableIMEs();
@@ -60,7 +56,8 @@ describe('general commands', function () {
 
     // Skip if we can't find a non-default IME or if the only IME is the default
     if (!ime || ime === defaultIme) {
-      return this.skip('No non-default IME available to test disable/enable');
+      this.skip();
+      return;
     }
 
     await adb.disableIME(ime);
@@ -78,7 +75,7 @@ describe('general commands', function () {
       });
       // If we get here, the IME was successfully disabled
       enabledAfterDisable = await adb.enabledIMEs();
-      enabledAfterDisable.should.not.include(ime);
+      expect(enabledAfterDisable).to.not.include(ime);
     } catch {
       // If timeout, the IME couldn't be disabled (system IME that can't be disabled)
       // This is acceptable behavior on some Android versions
@@ -95,19 +92,19 @@ describe('general commands', function () {
       intervalMs: 500,
     });
     // Verify that enable works (or that it's already enabled if it couldn't be disabled)
-    (await adb.enabledIMEs()).should.include(ime);
+    expect(await adb.enabledIMEs()).to.include(ime);
   });
   it('ping should return true', async function () {
-    (await adb.ping()).should.be.true;
+    expect(await adb.ping()).to.be.true;
   });
   it('should forward the port', async function () {
     await adb.forwardPort(4724, 4724);
   });
   it('should remove forwarded port', async function () {
     await adb.forwardPort(8200, 6790);
-    (await adb.adbExec([`forward`, `--list`])).should.contain('tcp:8200');
+    expect(await adb.adbExec([`forward`, `--list`])).to.contain('tcp:8200');
     await adb.removePortForward(8200);
-    (await adb.adbExec([`forward`, `--list`])).should.not.contain('tcp:8200');
+    expect(await adb.adbExec([`forward`, `--list`])).to.not.contain('tcp:8200');
 
   });
   it('should reverse forward the port', async function () {
@@ -115,43 +112,43 @@ describe('general commands', function () {
   });
   it('should remove reverse forwarded port', async function () {
     await adb.reversePort(6790, 8200);
-    (await adb.adbExec([`reverse`, `--list`])).should.contain('tcp:6790');
+    expect(await adb.adbExec([`reverse`, `--list`])).to.contain('tcp:6790');
     await adb.removePortReverse(6790);
-    (await adb.adbExec([`reverse`, `--list`])).should.not.contain('tcp:6790');
+    expect(await adb.adbExec([`reverse`, `--list`])).to.not.contain('tcp:6790');
 
   });
   it('should start logcat from adb', async function () {
     await adb.startLogcat();
-    let logs = adb.logcat.getLogs();
-    logs.should.have.length.above(0);
+    const logs = adb.logcat.getLogs();
+    expect(logs).to.have.length.above(0);
     await adb.stopLogcat();
   });
   it('should get model', async function () {
-    (await adb.getModel()).should.not.be.null;
+    expect(await adb.getModel()).to.not.be.null;
   });
   it('should get manufacturer', async function () {
-    (await adb.getManufacturer()).should.not.be.null;
+    expect(await adb.getManufacturer()).to.not.be.null;
   });
   it('should get screen size', async function () {
-    (await adb.getScreenSize()).should.not.be.null;
+    expect(await adb.getScreenSize()).to.not.be.null;
   });
   it('should get screen density', async function () {
-    (await adb.getScreenDensity()).should.not.be.null;
+    expect(await adb.getScreenDensity()).to.not.be.null;
   });
   it('should be able to toggle gps location provider', async function () {
     await adb.toggleGPSLocationProvider(true);
-    (await adb.getLocationProviders()).should.include('gps');
+    expect(await adb.getLocationProviders()).to.include('gps');
     await adb.toggleGPSLocationProvider(false);
-    (await adb.getLocationProviders()).should.not.include('gps');
+    expect(await adb.getLocationProviders()).to.not.include('gps');
 
     // To avoid side effects for other tests, especially on Android 16+
     await adb.toggleGPSLocationProvider(true);
   });
   it('should be able to toggle airplane mode', async function () {
     await adb.setAirplaneMode(true);
-    (await adb.isAirplaneModeOn()).should.be.true;
+    expect(await adb.isAirplaneModeOn()).to.be.true;
     await adb.setAirplaneMode(false);
-    (await adb.isAirplaneModeOn()).should.be.false;
+    expect(await adb.isAirplaneModeOn()).to.be.false;
   });
   describe('app permissions', function () {
     before(async function () {
@@ -161,7 +158,7 @@ describe('general commands', function () {
     });
     it('should install and grant all permission', async function () {
       await adb.install(apiDemosPath, {timeout: androidInstallTimeout});
-      (await adb.isAppInstalled(APIDEMOS_PKG)).should.be.true;
+      expect(await adb.isAppInstalled(APIDEMOS_PKG)).to.be.true;
       await adb.grantAllPermissions(APIDEMOS_PKG);
       const requestedPermissions = await adb.getReqPermissions(APIDEMOS_PKG);
       const grantedPermissions = await adb.getGrantedPermissions(APIDEMOS_PKG);
@@ -180,7 +177,7 @@ describe('general commands', function () {
         if (permission.startsWith(`${APIDEMOS_PKG}.`)) {
           continue;
         }
-        grantedPermissions.should.include(permission);
+        expect(grantedPermissions).to.include(permission);
       }
     });
     it('should revoke permission', async function () {
@@ -229,11 +226,11 @@ describe('general commands', function () {
         // get the file and its contents, to check
         await adb.pull(remotePath, tempFile);
         const remoteData = await fs.readFile(tempFile);
-        remoteData.toString().should.equal(stringData);
+        expect(remoteData.toString()).to.equal(stringData);
       });
     }
     it('should throw error if it cannot write to the remote file', async function () {
-      await adb.push(localFile, '/foo/bar/remote.txt').should.be.rejectedWith(/\/foo/);
+      await expect(adb.push(localFile, '/foo/bar/remote.txt')).to.be.rejectedWith(/\/foo/);
     });
   });
 
@@ -245,13 +242,14 @@ describe('general commands', function () {
       }
       const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
       this.timeout(BUG_REPORT_TIMEOUT);
-      (await adb.bugreport()).should.be.a('string');
+      expect(await adb.bugreport()).to.be.a('string');
     });
   });
 
   describe('features', function () {
     it('should return the features as a list', async function () {
-      _.isArray(await adb.listFeatures()).should.be.true;
+      const features = await adb.listFeatures();
+      expect(_.isArray(features)).to.be.true;
     });
   });
 
@@ -261,19 +259,21 @@ describe('general commands', function () {
         timeout: androidInstallTimeout,
         grantPermissions: true,
       });
-      (await adb.resolveLaunchableActivity(APIDEMOS_PKG)).should.not.be.empty;
+      expect(await adb.resolveLaunchableActivity(APIDEMOS_PKG)).to.not.be.empty;
     });
   });
 
   describe('isStreamedInstallSupported', function () {
     it('should return boolean value', async function () {
-      _.isBoolean(await adb.isStreamedInstallSupported()).should.be.true;
+      const result = await adb.isStreamedInstallSupported();
+      expect(_.isBoolean(result)).to.be.true;
     });
   });
 
   describe('isIncrementalInstallSupported', function () {
     it('should return boolean value', async function () {
-      _.isBoolean(await adb.isIncrementalInstallSupported()).should.be.true;
+      const result = await adb.isIncrementalInstallSupported();
+      expect(_.isBoolean(result)).to.be.true;
     });
   });
 
@@ -285,20 +285,23 @@ describe('general commands', function () {
       });
       if (await adb.addToDeviceIdleWhitelist(APIDEMOS_PKG)) {
         const pkgList = await adb.getDeviceIdleWhitelist();
-        pkgList.some((item) => item.includes(APIDEMOS_PKG)).should.be.true;
+        expect(pkgList.some((item) => item.includes(APIDEMOS_PKG))).to.be.true;
       }
     });
   });
 
   describe('takeScreenshot', function () {
     it('should return screenshot', async function () {
-      _.isEmpty(await adb.takeScreenshot()).should.be.false;
+      const screenshot = await adb.takeScreenshot();
+      expect(_.isEmpty(screenshot)).to.be.false;
     });
   });
 
   describe('listPorts', function () {
     it('should list opened ports', async function () {
-      (_.isEmpty(await adb.listPorts()) && _.isEmpty(await adb.listPorts('6'))).should.be.false;
+      const ports1 = await adb.listPorts();
+      const ports2 = await adb.listPorts('6');
+      expect((_.isEmpty(ports1) && _.isEmpty(ports2))).to.be.false;
     });
   });
 });

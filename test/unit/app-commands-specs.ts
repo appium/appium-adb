@@ -13,7 +13,11 @@ import { getBuildToolsDirs } from '../../lib/tools/system-calls';
 import { parseAapt2Strings, parseAaptStrings } from '../../lib/tools/apk-utils';
 import { fs } from '@appium/support';
 import _ from 'lodash';
-import { APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT } from '../constants.js';
+import { APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -25,15 +29,6 @@ const logcat = new Logcat({
 });
 
 describe('app commands', withMocks({adb, logcat, teen_process, net, fs}, function (mocks) {
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();
@@ -41,16 +36,16 @@ describe('app commands', withMocks({adb, logcat, teen_process, net, fs}, functio
 
   describe('isAppRunning', function () {
     it('should call listAppProcessIds and return true when app is running', async function () {
-      mocks.adb.expects('listAppProcessIds')
+      (mocks as any).adb.expects('listAppProcessIds')
         .once().withExactArgs(apiDemosPackage)
         .returns([123, 456]);
-      (await adb.isAppRunning(apiDemosPackage)).should.be.true;
+      expect(await adb.isAppRunning(apiDemosPackage)).to.be.true;
     });
     it('should call listAppProcessIds and return false when app is not running', async function () {
-      mocks.adb.expects('listAppProcessIds')
+      (mocks as any).adb.expects('listAppProcessIds')
         .once().withExactArgs(apiDemosPackage)
         .returns([]);
-      (await adb.isAppRunning(apiDemosPackage)).should.be.false;
+      expect(await adb.isAppRunning(apiDemosPackage)).to.be.false;
     });
   });
 
@@ -58,22 +53,22 @@ describe('app commands', withMocks({adb, logcat, teen_process, net, fs}, functio
     it('should call shell with correct args and parse process IDs', async function () {
       const mockOutput = `ProcessRecord{abc123 123:io.appium.android.apis/u0a123}
 ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'activity', 'processes'])
         .returns(mockOutput);
-      (await adb.listAppProcessIds(apiDemosPackage)).should.eql([123, 456]);
+      expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([123, 456]);
     });
     it('should return empty array when no processes found', async function () {
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'activity', 'processes'])
         .returns('No processes found');
-      (await adb.listAppProcessIds(apiDemosPackage)).should.eql([]);
+      expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([]);
     });
   });
 
   describe('killPackage', function () {
     it('should call shell with correct args', async function () {
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['am', 'kill', apiDemosPackage])
         .returns('');
       await adb.killPackage(apiDemosPackage);
@@ -82,7 +77,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('forceStop', function () {
     it('should call shell with correct args', async function () {
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['am', 'force-stop', apiDemosPackage])
         .returns('');
       await adb.forceStop(apiDemosPackage);
@@ -91,7 +86,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('clear', function () {
     it('should call shell with correct args', async function () {
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['pm', 'clear', apiDemosPackage])
         .returns('');
       await adb.clear(apiDemosPackage);
@@ -100,10 +95,10 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('stopAndClear', function () {
     it('should call forceStop and clear', async function () {
-      mocks.adb.expects('forceStop')
+      (mocks as any).adb.expects('forceStop')
         .once().withExactArgs(apiDemosPackage)
         .returns('');
-      mocks.adb.expects('clear')
+      (mocks as any).adb.expects('clear')
         .once().withExactArgs(apiDemosPackage)
         .returns('');
       await adb.stopAndClear(apiDemosPackage);
@@ -114,14 +109,14 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
   describe('startUri', function () {
     it('should call shell with correct args', async function () {
       const uri = 'https://example.com';
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri])
         .returns('');
       await adb.startUri(uri);
     });
     it('should call shell with package when provided', async function () {
       const uri = 'https://example.com';
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, apiDemosPackage])
         .returns('');
       await adb.startUri(uri, apiDemosPackage);
@@ -130,13 +125,13 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('dumpWindows', function () {
     it('should call shell with correct args', async function () {
-      mocks.adb.expects('getApiLevel')
+      (mocks as any).adb.expects('getApiLevel')
         .once().returns(25);
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns('Window information');
       const result = await adb.dumpWindows();
-      result.should.equal('Window information');
+      expect(result).to.equal('Window information');
     });
   });
 
@@ -146,20 +141,20 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       // Format should be: ActivityRecord{... package/activity ...}
       // APIDEMOS_ACTIVITY_SHORT is '.ApiDemos', so we use package/.ApiDemos
       const mockOutput = `mFocusedApp=AppWindowToken{abc123 token=Token{def456 ActivityRecord{ghi789 u0 ${APIDEMOS_PKG}/${APIDEMOS_ACTIVITY_SHORT} t181}}}`;
-      mocks.adb.expects('getApiLevel')
+      (mocks as any).adb.expects('getApiLevel')
         .once().returns(25);
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['dumpsys', 'window', 'windows'])
         .returns(mockOutput);
       const result = await adb.getFocusedPackageAndActivity();
-      result.appPackage.should.equal(APIDEMOS_PKG);
-      result.appActivity.should.equal(APIDEMOS_ACTIVITY_SHORT);
+      expect(result.appPackage).to.equal(APIDEMOS_PKG);
+      expect(result.appActivity).to.equal(APIDEMOS_ACTIVITY_SHORT);
     });
   });
 
   describe('waitForActivity', function () {
     it('should wait for activity to appear', async function () {
-      mocks.adb.expects('getFocusedPackageAndActivity')
+      (mocks as any).adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: 'other.package', appActivity: '.Other'})
         .onCall(1).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT});
@@ -169,7 +164,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('waitForNotActivity', function () {
     it('should wait for activity to disappear', async function () {
-      mocks.adb.expects('getFocusedPackageAndActivity')
+      (mocks as any).adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT})
         .onCall(1).returns({appPackage: 'other.package', appActivity: '.Other'});
@@ -179,14 +174,14 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('waitForActivityOrNot', function () {
     it('should wait for activity to appear when waitForStop is false', async function () {
-      mocks.adb.expects('getFocusedPackageAndActivity')
+      (mocks as any).adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: 'other.package', appActivity: '.Other'})
         .onCall(1).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT});
       await adb.waitForActivityOrNot(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, false, 1000);
     });
     it('should wait for activity to disappear when waitForStop is true', async function () {
-      mocks.adb.expects('getFocusedPackageAndActivity')
+      (mocks as any).adb.expects('getFocusedPackageAndActivity')
         .exactly(2)
         .onCall(0).returns({appPackage: apiDemosPackage, appActivity: APIDEMOS_ACTIVITY_SHORT})
         .onCall(1).returns({appPackage: 'other.package', appActivity: '.Other'});
@@ -201,93 +196,93 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
     };
 
     it('should use start', function () {
-      let cmd = buildStartCmd(startOptions, 20);
-      cmd[1].should.eql('start');
+      const cmd = buildStartCmd(startOptions, 20);
+      expect(cmd[1]).to.eql('start');
     });
     it('should use start-activity', function () {
-      let cmd = buildStartCmd(startOptions, 26);
-      cmd[1].should.eql('start-activity');
+      const cmd = buildStartCmd(startOptions, 26);
+      expect(cmd[1]).to.eql('start-activity');
     });
     it('should not repeat package name', function () {
-      let cmd = buildStartCmd({
+      const cmd = buildStartCmd({
         pkg: 'com.package',
         activity: 'com.package/.activity',
       }, 20);
-      cmd.includes('com.package/.activity').should.be.true;
+      expect(cmd.includes('com.package/.activity')).to.be.true;
     });
     it('should include package name', function () {
-      let cmd = buildStartCmd(startOptions, 20);
-      cmd.includes(`${startOptions.pkg}/${startOptions.activity}`).should.be.true;
+      const cmd = buildStartCmd(startOptions, 20);
+      expect(cmd.includes(`${startOptions.pkg}/${startOptions.activity}`)).to.be.true;
     });
     it('should parse optionalIntentArguments with single key', function () {
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
-      cmd[cmd.length - 2].should.eql('-d');
-      cmd[cmd.length - 1].should.eql('key');
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
+      expect(cmd[cmd.length - 2]).to.eql('-d');
+      expect(cmd[cmd.length - 1]).to.eql('key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value'}, startOptions), 20);
-      cmd[cmd.length - 3].should.eql('-d');
-      cmd[cmd.length - 2].should.eql('key');
-      cmd[cmd.length - 1].should.eql('value');
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value'}, startOptions), 20);
+      expect(cmd[cmd.length - 3]).to.eql('-d');
+      expect(cmd[cmd.length - 2]).to.eql('key');
+      expect(cmd[cmd.length - 1]).to.eql('value');
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value value2'}, startOptions), 20);
-      cmd[cmd.length - 3].should.eql('-d');
-      cmd[cmd.length - 2].should.eql('key');
-      cmd[cmd.length - 1].should.eql('value value2');
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key value value2'}, startOptions), 20);
+      expect(cmd[cmd.length - 3]).to.eql('-d');
+      expect(cmd[cmd.length - 2]).to.eql('key');
+      expect(cmd[cmd.length - 1]).to.eql('value value2');
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions), 20);
-      cmd[cmd.length - 4].should.eql('-d');
-      cmd[cmd.length - 3].should.eql('key1');
-      cmd[cmd.length - 2].should.eql('-e');
-      cmd[cmd.length - 1].should.eql('key2');
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions), 20);
+      expect(cmd[cmd.length - 4]).to.eql('-d');
+      expect(cmd[cmd.length - 3]).to.eql('key1');
+      expect(cmd[cmd.length - 2]).to.eql('-e');
+      expect(cmd[cmd.length - 1]).to.eql('key2');
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions), 20);
-      cmd[cmd.length - 6].should.eql('-d');
-      cmd[cmd.length - 5].should.eql('key1');
-      cmd[cmd.length - 4].should.eql('value1');
-      cmd[cmd.length - 3].should.eql('-e');
-      cmd[cmd.length - 2].should.eql('key2');
-      cmd[cmd.length - 1].should.eql('value2');
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions), 20);
+      expect(cmd[cmd.length - 6]).to.eql('-d');
+      expect(cmd[cmd.length - 5]).to.eql('key1');
+      expect(cmd[cmd.length - 4]).to.eql('value1');
+      expect(cmd[cmd.length - 3]).to.eql('-e');
+      expect(cmd[cmd.length - 2]).to.eql('key2');
+      expect(cmd[cmd.length - 1]).to.eql('value2');
     });
     it('should parse optionalIntentArguments with hyphens', function () {
-      let arg = 'http://some-url-with-hyphens.com/';
-      let cmd = buildStartCmd(_.defaults({optionalIntentArguments: `-d ${arg}`}, startOptions), 20);
-      cmd[cmd.length - 2].should.eql('-d');
-      cmd[cmd.length - 1].should.eql(arg);
+      const arg = 'http://some-url-with-hyphens.com/';
+      const cmd = buildStartCmd(_.defaults({optionalIntentArguments: `-d ${arg}`}, startOptions), 20);
+      expect(cmd[cmd.length - 2]).to.eql('-d');
+      expect(cmd[cmd.length - 1]).to.eql(arg);
     });
     it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
-      let arg1 = 'http://some-url-with-hyphens.com/';
-      let arg2 = 'http://some-other-url-with-hyphens.com/';
-      let cmd = buildStartCmd(_.defaults({
+      const arg1 = 'http://some-url-with-hyphens.com/';
+      const arg2 = 'http://some-other-url-with-hyphens.com/';
+      const cmd = buildStartCmd(_.defaults({
         optionalIntentArguments: `-d ${arg1} -e key ${arg2}`
       }, startOptions), 20);
-      cmd[cmd.length - 5].should.eql('-d');
-      cmd[cmd.length - 4].should.eql(arg1);
-      cmd[cmd.length - 3].should.eql('-e');
-      cmd[cmd.length - 2].should.eql('key');
-      cmd[cmd.length - 1].should.eql(arg2);
+      expect(cmd[cmd.length - 5]).to.eql('-d');
+      expect(cmd[cmd.length - 4]).to.eql(arg1);
+      expect(cmd[cmd.length - 3]).to.eql('-e');
+      expect(cmd[cmd.length - 2]).to.eql('key');
+      expect(cmd[cmd.length - 1]).to.eql(arg2);
     });
     it('should have -S option when stopApp is set', function () {
-      let cmd = buildStartCmd(_.defaults({stopApp: true}, startOptions), 20);
-      cmd[cmd.length - 1].should.eql('-S');
+      const cmd = buildStartCmd(_.defaults({stopApp: true}, startOptions), 20);
+      expect(cmd[cmd.length - 1]).to.eql('-S');
     });
     it('should not have -S option when stopApp is not set', function () {
-      let cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
-      cmd[cmd.length - 1].should.not.eql('-S');
+      const cmd = buildStartCmd(_.defaults({stopApp: false}, startOptions), 20);
+      expect(cmd[cmd.length - 1]).to.not.eql('-S');
     });
   });
 
   describe('getBuildToolsDirs', function () {
     it('should sort build-tools folder names by semantic version', async function () {
-      mocks.fs.expects('glob').once().returns([
+      (mocks as any).fs.expects('glob').once().returns([
         '/some/path/1.2.3',
         '/some/path/4.5.6',
         '/some/path/2.3.1',
       ]);
-      (await getBuildToolsDirs('/dummy/path')).should.be.eql([
+      expect(await getBuildToolsDirs('/dummy/path')).to.be.eql([
         '/some/path/4.5.6',
         '/some/path/2.3.1',
         '/some/path/1.2.3',
@@ -314,7 +309,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
               (string16) "Horizontal"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, '(default)');
-      aaptStrings.linear_layout_8_horizontal.should.eql('Horizontal');
+      expect(aaptStrings.linear_layout_8_horizontal).to.eql('Horizontal');
     });
     it('should parse plurals received from aapt output', function () {
       const aaptOutput = `
@@ -383,8 +378,8 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
                   (string8) "res/menu/toolbar_sketch.xml"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, 'de-rDE');
-      aaptStrings.abc_action_bar_home_description.should.eql('Navigate "home"');
-      aaptStrings.calling__conversation_full__message.should.eql([
+      expect(aaptStrings.abc_action_bar_home_description).to.eql('Navigate "home"');
+      expect(aaptStrings.calling__conversation_full__message).to.eql([
         'Calls work in conversations with up to 1 person.',
         'Calls work in conversations with up to %1$d people. "blabla"',
       ]);
@@ -408,7 +403,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
             (fr) "Top"
       `;
       const aapt2Strings = parseAapt2Strings(aapt2Output, '');
-      aapt2Strings.linear_layout_8_horizontal.should.eql('Horizontal');
+      expect(aapt2Strings.linear_layout_8_horizontal).to.eql('Horizontal');
     });
     it('should parse plurals received from aapt2 output', function () {
       const aapt2Output = `
@@ -458,7 +453,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
               other="%1$s ludzi oczekujących"
       `;
       const aapt2Strings = parseAapt2Strings(aapt2Output, 'de');
-      aapt2Strings.connect_inbox__link__name.should.eql([
+      expect(aapt2Strings.connect_inbox__link__name).to.eql([
         'Eine Kontaktanfrage',
         '%1$s Kontaktanfragen\\n\\n"blabla"',
       ]);
@@ -498,19 +493,19 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         `;
     it('test install permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], true);
-      per.length.should.eql(4);
+      expect(per.length).to.eql(4);
     });
     it('test install permission with granted false', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], false);
-      per.length.should.eql(0);
+      expect(per.length).to.eql(0);
     });
     it('test requested permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['requested'], true);
-      per.length.should.eql(0);
+      expect(per.length).to.eql(0);
     });
     it('test runtime permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['runtime'], true);
-      per.length.should.eql(1);
+      expect(per.length).to.eql(1);
     });
   });
 
@@ -547,7 +542,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       Domain verification status:
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      names.should.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
+      expect(names).to.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
     });
     it('test valid output parsing (older Android versions)', function () {
       const dumpsysOutput = `
@@ -563,7 +558,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
              Signing KeySets: 2
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      names.should.eql([
+      expect(names).to.eql([
         'com.example.android.contactmanager/.ContactManager2',
         'com.example.android.contactmanager/.ContactManager3',
         'com.example.android.contactmanager/.ContactManager',
@@ -575,18 +570,18 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       Failure printing domain verification information
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      names.should.be.eql([]);
+      expect(names).to.be.eql([]);
     });
   });
   describe('matchComponentName', function () {
     it('test valid activity name', function () {
       const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
       const names = matchComponentName(activity);
-      names.should.eql([activity]);
+      expect(names).to.eql([activity]);
     });
     it('test invalid activity name', function () {
       const activity = 'User@123';
-      _.isNull(matchComponentName(activity)).should.be.true;
+      expect(_.isNull(matchComponentName(activity))).to.be.true;
     });
 
   });

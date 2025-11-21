@@ -5,8 +5,8 @@
     "outDir": "build",
     "checkJs": true,
     "esModuleInterop": true,
-    "types": ["node"],
+    "types": ["node", "mocha"],
     "strict": false
   },
-  "include": ["index.ts", "lib"]
+  "include": ["index.ts", "lib", "test"]
 }

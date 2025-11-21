@@ -5,13 +5,13 @@ export const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 export const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
 // Re-export ApiDemos constants from common constants file
-export { APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT } from '../constants.js';
+export { APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT } from '../constants';
 
 const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
 // Cache the download promise to prevent concurrent downloads
-let downloadPromise = null;
+let downloadPromise: Promise<string> | null = null;
 
 /**
  * Downloads and caches the ApiDemos APK from GitHub if it doesn't already exist locally.

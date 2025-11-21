@@ -2,17 +2,12 @@ import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
 import path from 'path';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('android manifest', withMocks({fs}, function (mocks) {
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();
@@ -22,12 +17,12 @@ describe('android manifest', withMocks({fs}, function (mocks) {
     it('should get the latest available API', async function () {
       const ANDROID_HOME = '/path/to/android/home';
 
-      mocks.fs.expects('glob').returns([
+      (mocks as any).fs.expects('glob').returns([
         path.resolve(ANDROID_HOME, 'platforms', 'android-17', 'build.prop'),
         path.resolve(ANDROID_HOME, 'platforms', 'android-25', 'build.prop'),
         path.resolve(ANDROID_HOME, 'platforms', 'android-22', 'build.prop'),
       ]);
-      mocks.fs.expects('readFile')
+      (mocks as any).fs.expects('readFile')
         .exactly(3)
         .onCall(0).returns(`
           ro.build.version.incremental=1425461
@@ -44,10 +39,9 @@ describe('android manifest', withMocks({fs}, function (mocks) {
           ro.build.version.sdk=22
           ro.build.version.codename=REL
           ro.build.version.release=5.1`);
-      let platformAndPath = await getAndroidPlatformAndPath(ANDROID_HOME);
-      platformAndPath.platform.should.equal('android-25');
-      platformAndPath.platformPath.should
-        .equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
+      const platformAndPath = await getAndroidPlatformAndPath(ANDROID_HOME);
+      expect(platformAndPath.platform).to.equal('android-25');
+      expect(platformAndPath.platformPath).to.equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
     });
   });
 }));

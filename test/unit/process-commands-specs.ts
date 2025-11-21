@@ -3,7 +3,11 @@ import net from 'net';
 import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
-import { APIDEMOS_PKG } from '../constants.js';
+import { APIDEMOS_PKG } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -15,38 +19,29 @@ const logcat = new Logcat({
 });
 
 describe('process commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
-    mocks.verify();
+    (mocks as any).verify();
   });
 
   describe('processExists', function () {
     it('should call shell with correct args and should find process', async function () {
-      mocks.adb.expects('getProcessIdsByName')
+      (mocks as any).adb.expects('getProcessIdsByName')
         .once().withExactArgs(apiDemosPackage)
         .returns([123]);
-      (await adb.processExists(apiDemosPackage)).should.be.true;
+      expect(await adb.processExists(apiDemosPackage)).to.be.true;
     });
     it('should call shell with correct args and should not find process', async function () {
-      mocks.adb.expects('getProcessIdsByName')
+      (mocks as any).adb.expects('getProcessIdsByName')
         .once().withExactArgs(apiDemosPackage)
         .returns([]);
-      (await adb.processExists(apiDemosPackage)).should.be.false;
+      expect(await adb.processExists(apiDemosPackage)).to.be.false;
     });
   });
 
   describe('getProcessNameById', function () {
     it('should get package name from valid ps output', async function () {
-      mocks.adb.expects('listProcessStatus')
+      (mocks as any).adb.expects('listProcessStatus')
         .once().returns(`
         USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
         radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
@@ -68,24 +63,24 @@ describe('process commands', withMocks({adb, logcat, teen_process, net}, functio
         root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
         root      1681  60    10672  996   00000000 b6f33508 R ps
         `);
-      (await adb.getProcessNameById('1627')).should.eql('com.android.browser');
+      expect(await adb.getProcessNameById('1627')).to.eql('com.android.browser');
     });
     it('should fail if no PID could be found in the name', async function () {
-      await adb.getProcessNameById('bla').should.eventually.be.rejectedWith(/valid number/);
+      await expect(adb.getProcessNameById('bla')).to.eventually.be.rejectedWith(/valid number/);
     });
     it('should fail if no PID could be found in ps output', async function () {
-      mocks.adb.expects('listProcessStatus')
+      (mocks as any).adb.expects('listProcessStatus')
         .once().returns(`
         USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
         u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
         `);
-      await adb.getProcessNameById(115).should.eventually.be.rejectedWith(/process name/);
+      await expect(adb.getProcessNameById(115)).to.eventually.be.rejectedWith(/process name/);
     });
   });
 
   describe('getProcessIdsByName', function () {
     it('should properly parse ps output to find process IDs by name', async function () {
-      mocks.adb.expects('listProcessStatus')
+      (mocks as any).adb.expects('listProcessStatus')
         .once().returns(`USER     PID   PPID  VSIZE  RSS     WCHAN    PC   S    NAME
 radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
 radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
@@ -93,45 +88,45 @@ u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
 u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
 u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
 u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
-      (await adb.getProcessIdsByName('com.android.browser')).should.eql([1627, 1628]);
+      expect(await adb.getProcessIdsByName('com.android.browser')).to.eql([1627, 1628]);
     });
     it('should return empty array when no matching processes found', async function () {
-      mocks.adb.expects('listProcessStatus')
+      (mocks as any).adb.expects('listProcessStatus')
         .once().returns(`
         USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
         radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
         u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
         `);
-      (await adb.getProcessIdsByName('com.nonexistent.app')).should.eql([]);
+      expect(await adb.getProcessIdsByName('com.nonexistent.app')).to.eql([]);
     });
     it('should fail if ps output cannot be parsed', async function () {
-      mocks.adb.expects('listProcessStatus')
+      (mocks as any).adb.expects('listProcessStatus')
         .once().returns('Invalid output without proper headers');
-      await adb.getProcessIdsByName('com.android.phone').should.eventually.be.rejectedWith(/Could not parse process list/);
+      await expect(adb.getProcessIdsByName('com.android.phone')).to.eventually.be.rejectedWith(/Could not parse process list/);
     });
   });
 
   describe('killProcessesByName', function () {
     it('should call getProcessIdsByName and kill process correctly', async function () {
-      mocks.adb.expects('getProcessIdsByName')
+      (mocks as any).adb.expects('getProcessIdsByName')
         .once().withExactArgs(apiDemosPackage)
         .returns([5078]);
-      mocks.adb.expects('killProcessByPID')
+      (mocks as any).adb.expects('killProcessByPID')
         .once().withExactArgs(5078, 'SIGTERM')
         .returns('');
       await adb.killProcessesByName(apiDemosPackage);
     });
     it('should handle case when no processes found', async function () {
-      mocks.adb.expects('getProcessIdsByName')
+      (mocks as any).adb.expects('getProcessIdsByName')
         .once().withExactArgs(apiDemosPackage)
         .returns([]);
       await adb.killProcessesByName(apiDemosPackage);
     });
     it('should handle errors from getProcessIdsByName', async function () {
-      mocks.adb.expects('getProcessIdsByName')
+      (mocks as any).adb.expects('getProcessIdsByName')
         .once().withExactArgs(apiDemosPackage)
         .throws(new Error('Process lookup failed'));
-      await adb.killProcessesByName(apiDemosPackage).should.eventually.be.rejectedWith(/Unable to kill/);
+      await expect(adb.killProcessesByName(apiDemosPackage)).to.eventually.be.rejectedWith(/Unable to kill/);
     });
   });
 
@@ -139,50 +134,50 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
     const pid = 5078;
 
     it('should call kill process correctly', async function () {
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .returns('');
       await adb.killProcessByPID(pid);
     });
     it('should handle "No such process" error gracefully', async function () {
       const error = new Error('kill failed');
-      error.stderr = 'No such process';
-      mocks.adb.expects('shell')
+      (error as any).stderr = 'No such process';
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
       await adb.killProcessByPID(pid);
     });
     it('should retry with root privileges on permission error', async function () {
       const error = new Error('kill failed');
-      error.stderr = 'Operation not permitted';
-      mocks.adb.expects('shell')
+      (error as any).stderr = 'Operation not permitted';
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', `${pid}`], {privileged: true})
         .returns('');
       await adb.killProcessByPID(pid);
     });
     it('should handle "No such process" error on retry', async function () {
       const error = new Error('kill failed');
-      error.stderr = 'Operation not permitted';
+      (error as any).stderr = 'Operation not permitted';
       const retryError = new Error('kill failed');
-      retryError.stderr = 'No such process';
-      mocks.adb.expects('shell')
+      (retryError as any).stderr = 'No such process';
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
-      mocks.adb.expects('shell')
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', `${pid}`], {privileged: true})
         .throws(retryError);
       await adb.killProcessByPID(pid);
     });
     it('should throw error if kill fails for other reasons', async function () {
       const error = new Error('kill failed');
-      error.stderr = 'Some other error';
-      mocks.adb.expects('shell')
+      (error as any).stderr = 'Some other error';
+      (mocks as any).adb.expects('shell')
         .once().withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
-      await adb.killProcessByPID(pid).should.eventually.be.rejectedWith('kill failed');
+      await expect(adb.killProcessByPID(pid)).to.eventually.be.rejectedWith('kill failed');
     });
   });
 }));

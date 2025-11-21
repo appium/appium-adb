@@ -1,15 +1,13 @@
 import {ADB} from '../../lib/adb';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('emulator commands', function () {
   let adb;
-  let chai;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
 
     if (process.env.REAL_DEVICE) {
       return this.skip();
@@ -23,11 +21,11 @@ describe('emulator commands', function () {
   describe('execEmuConsoleCommand', function () {
     it('should print name', async function () {
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);
-      name.should.not.be.empty;
+      expect(name).to.not.be.empty;
     });
 
     it('should fail if the command is unknown', async function () {
-      await adb.execEmuConsoleCommand(['avd', 'namer']).should.eventually
+      await expect(adb.execEmuConsoleCommand(['avd', 'namer'])).to.eventually
         .be.rejected;
     });
   });
@@ -35,8 +33,8 @@ describe('emulator commands', function () {
   describe('getEmuVersionInfo', function () {
     it('should get version info', async function () {
       const {revision, buildId} = await adb.getEmuVersionInfo();
-      revision.should.not.be.empty;
-      (buildId > 0).should.be.true;
+      expect(revision).to.not.be.empty;
+      expect(buildId > 0).to.be.true;
     });
   });
 
@@ -49,7 +47,7 @@ describe('emulator commands', function () {
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);
       const {target} = await adb.getEmuImageProperties(name);
       const apiMatch = /\d+/.exec(target);
-      (parseInt(apiMatch[0], 10) > 0).should.be.true;
+      expect(apiMatch && parseInt(apiMatch[0], 10) > 0).to.be.true;
     });
   });
 });

@@ -12,8 +12,8 @@
     "prepare": "npm run rebuild",
     "rebuild": "npm run clean && npm run build",
     "format": "prettier -w ./lib",
-    "test": "mocha --exit --timeout 1m \"./test/unit/**/*-specs.js\"",
-    "e2e-test": "mocha --exit --timeout 5m \"./test/functional/**/*-specs.js\""
+    "test": "mocha --exit --timeout 1m \"./test/unit/**/*-specs.ts\"",
+    "e2e-test": "mocha --exit --timeout 5m \"./test/functional/**/*-specs.ts\""
   },
   "repository": {
     "type": "git",

@@ -1,16 +1,13 @@
 import {ADB} from '../../lib/adb';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('Lock Management', function () {
   let adb;
-  let chai;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-
     adb = await ADB.createADB();
     if (!await adb.isLockManagementSupported()) {
       return this.skip();
@@ -22,8 +19,8 @@ describe('Lock Management', function () {
       return this.skip();
     }
     await adb.clearLockCredential();
-    await adb.verifyLockCredential().should.eventually.be.true;
-    await adb.isLockEnabled().should.eventually.be.false;
+    await expect(adb.verifyLockCredential()).to.eventually.be.true;
+    await expect(adb.isLockEnabled()).to.eventually.be.false;
   });
 
   describe('Lock and unlock life cycle', function () {
@@ -42,13 +39,13 @@ describe('Lock Management', function () {
     it('device lock and unlock scenario should work', async function () {
       await adb.setLockCredential('password', password);
       await adb.keyevent(26);
-      await adb.isLockEnabled().should.eventually.be.true;
-      await adb.isScreenLocked().should.eventually.be.true;
+      await expect(adb.isLockEnabled()).to.eventually.be.true;
+      await expect(adb.isScreenLocked()).to.eventually.be.true;
       await adb.clearLockCredential(password);
       await adb.cycleWakeUp();
       await adb.dismissKeyguard();
-      await adb.isLockEnabled().should.eventually.be.false;
-      await adb.isScreenLocked().should.eventually.be.false;
+      await expect(adb.isLockEnabled()).to.eventually.be.false;
+      await expect(adb.isScreenLocked()).to.eventually.be.false;
     });
   });
 });
