@@ -131,34 +131,34 @@ describe('apk utils', function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         action: 'android.intent.action.DEFAULT',
         pkg: 'com.google.android.telephony',
         optionalIntentArguments: '-d tel:555-5555',
         waitDuration: START_APP_WAIT_DURATION,
         stopApp: false
-      }).to.eventually.be.rejectedWith(/Cannot start the .* application/);
+      })).to.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
     it('should throw error for wrong activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         pkg: APIDEMOS_PKG,
         activity: 'ApiDemo',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
-      }).to.eventually.be.rejectedWith('Activity');
+      })).to.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         pkg: APIDEMOS_PKG,
         activity: APIDEMOS_ACTIVITY,
         waitActivity: 'foo',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
-      }).to.eventually.be.rejectedWith('foo');
+      })).to.eventually.be.rejectedWith('foo');
     });
     it('should start activity with wait activity', async function () {
       await adb.install(apiDemosPath, {
@@ -200,23 +200,23 @@ describe('apk utils', function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         pkg: APIDEMOS_PKG,
         activity: 'SuperManager',
         waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
         waitDuration: START_APP_WAIT_DURATION_FAIL,
-      }).to.eventually.be.rejectedWith('Activity');
+      })).to.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         pkg: APIDEMOS_PKG,
         activity: APIDEMOS_ACTIVITY,
         waitActivity: '*.SuperManager',
         waitDuration: START_APP_WAIT_DURATION_FAIL,
-      }).to.eventually.be.rejectedWith('SuperManager');
+      })).to.eventually.be.rejectedWith('SuperManager');
     });
     it('should start activity with comma separated wait packages list', async function () {
       await adb.install(apiDemosPath, {
@@ -235,13 +235,13 @@ describe('apk utils', function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true
       });
-      await adb.startApp({
+      await expect(adb.startApp({
         pkg: APIDEMOS_PKG,
         waitPkg: 'com.android.settings, com.example.somethingelse',
         activity: 'SuperManager',
         waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
         waitDuration: START_APP_WAIT_DURATION_FAIL,
-      }).to.eventually.be.rejectedWith('Activity');
+      })).to.eventually.be.rejectedWith('Activity');
     });
   });
   it('should start activity when start activity is an inner class', async function () {

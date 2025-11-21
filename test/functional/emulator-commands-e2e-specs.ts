@@ -28,7 +28,7 @@ describe('emulator commands', function () {
     });
 
     it('should fail if the command is unknown', async function () {
-      await adb.execEmuConsoleCommandexpect(['avd', 'namer']).to.eventually
+      await expect(adb.execEmuConsoleCommand(['avd', 'namer'])).to.eventually
         .be.rejected;
     });
   });
