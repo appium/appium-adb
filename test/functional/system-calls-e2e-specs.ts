@@ -13,12 +13,13 @@ describe('system calls', function () {
 
   let adb;
   let chai;
+  let expect;
 
   before(async function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
+    expect = chai.expect;
     chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB();
@@ -27,51 +28,51 @@ describe('system calls', function () {
     await adb.waitForEmulatorReady();
   });
   it('getConnectedDevices should get devices', async function () {
-    let devices = await adb.getConnectedDevices();
-    devices.should.have.length.above(0);
+    const devices = await adb.getConnectedDevices();
+    expect(devices).to.have.length.above(0);
   });
   it('getDevicesWithRetry should get devices', async function () {
-    let devices = await adb.getDevicesWithRetry();
-    devices.should.have.length.above(0);
+    const devices = await adb.getDevicesWithRetry();
+    expect(devices).to.have.length.above(0);
   });
   it('adbExec should get devices when with devices', async function () {
-    (await adb.adbExec('devices')).should.contain('List of devices attached');
+    expect(await adb.adbExec('devices')).to.contain('List of devices attached');
   });
   it('isDeviceConnected should be true', async function () {
-    (await adb.isDeviceConnected()).should.be.true;
+    expect(await adb.isDeviceConnected()).to.be.true;
   });
   it('shell should execute command in adb shell ', async function () {
     const apiLevel = await adb.getApiLevel();
-    (await adb.shell(['getprop', 'ro.build.version.sdk'])).should.equal(`${apiLevel}`);
+    expect(await adb.shell(['getprop', 'ro.build.version.sdk'])).to.equal(`${apiLevel}`);
   });
   it('shell should return stderr from adb with full output', async function () {
     const apiLevel = await adb.getApiLevel();
     const minStderrApiLevel = 24;
-    let fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
-    let outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
-    outputWithError.should.contain('Error while accessing provider');
+    const fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
+    const outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
+    expect(outputWithError).to.contain('Error while accessing provider');
   });
   it('shell should return stdout from adb shell with full output', async function () {
     const apiLevel = await adb.getApiLevel();
-    let fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
-    fullShellOutput.stderr.should.equal('');
-    fullShellOutput.stdout.should.equal(`${apiLevel}`);
+    const fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
+    expect(fullShellOutput.stderr).to.equal('');
+    expect(fullShellOutput.stdout).to.equal(`${apiLevel}`);
   });
   it('getConnectedEmulators should get all connected emulators', async function () {
-    (await adb.getConnectedEmulators()).length.should.be.above(0);
+    expect(await adb.getConnectedEmulators()).to.have.length.above(0);
   });
   it('getRunningAVD should get all connected avd', async function () {
-    (await adb.getRunningAVD(avdName)).should.not.be.null;
+    expect(await adb.getRunningAVD(avdName)).to.not.be.null;
   });
   it('getRunningAVDWithRetry should get all connected avds', async function () {
-    (await adb.getRunningAVDWithRetry(avdName)).should.not.be.null;
+    expect(await adb.getRunningAVDWithRetry(avdName)).to.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI
   it.skip('launchAVD should get all connected avds', async function () {
     this.timeout(MOCHA_LONG_TIMEOUT);
     const proc = await adb.launchAVD(avdName);
     try {
-      (await adb.getConnectedEmulators()).length.should.be.above(0);
+      expect(await adb.getConnectedEmulators()).to.have.length.above(0);
     } finally {
       await proc.stop();
     }
@@ -89,28 +90,28 @@ describe('system calls', function () {
       await adb.reboot();
       await adb.ping();
     } catch (e) {
-      e.message.should.include('must be root');
+      expect(e.message).to.include('must be root');
     }
   });
   it('fileExists should detect when files do and do not exist', async function () {
-    (await adb.fileExists('/foo/bar/baz.zip')).should.be.false;
-    (await adb.fileExists('/data/local/tmp')).should.be.true;
+    expect(await adb.fileExists('/foo/bar/baz.zip')).to.be.false;
+    expect(await adb.fileExists('/data/local/tmp')).to.be.true;
   });
   it('ls should list files', async function () {
-    (await adb.ls('/foo/bar')).should.eql([]);
+    expect(await adb.ls('/foo/bar')).to.eql([]);
     await adb.shell(['touch', '/data/local/tmp/test']);
-    (await adb.ls('/data/local/tmp')).should.contain('test');
+    expect(await adb.ls('/data/local/tmp')).to.contain('test');
   });
   it('should check if the given certificate is already installed', async function () {
     const certBuffer = await fs.readFile(await getResourcePath(DEFAULT_CERTIFICATE));
-    (await adb.isMitmCertificateInstalled(certBuffer)).should.be.false;
+    expect(await adb.isMitmCertificateInstalled(certBuffer)).to.be.false;
   });
   it('should return version', async function () {
     const {binary, bridge} = await adb.getVersion();
     if (binary) {
-      _.has(binary, 'version').should.be.true;
-      _.has(binary, 'build').should.be.true;
+      expect(_.has(binary, 'version')).to.be.true;
+      expect(_.has(binary, 'build')).to.be.true;
     }
-    _.has(bridge, 'version').should.be.true;
+    expect(_.has(bridge, 'version')).to.be.true;
   });
 });

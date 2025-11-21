@@ -3,12 +3,13 @@ import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
 
 describe('ADB', function () {
   let chai;
+  let expect;
 
   before(async function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
+    expect = chai.expect;
     chai.use(chaiAsPromised.default);
   });
 
@@ -19,8 +20,8 @@ describe('ADB', function () {
       });
       const clone = original.clone();
 
-      clone.executable.path.should.equal(original.executable.path);
-      clone.executable.defaultArgs.should.deep.equal(original.executable.defaultArgs);
+      expect(clone.executable.path).to.equal(original.executable.path);
+      expect(clone.executable.defaultArgs).to.deep.equal(original.executable.defaultArgs);
     });
 
     it('should replace specified options', function () {
@@ -31,10 +32,10 @@ describe('ADB', function () {
         remoteAdbHost: 'example.com',
       });
 
-      clone.executable.path.should.equal(original.executable.path);
-      clone.executable.defaultArgs.should.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
-      clone.remoteAdbHost.should.equal('example.com');
-      clone.adbHost.should.not.equal(original.adbHost);
+      expect(clone.executable.path).to.equal(original.executable.path);
+      expect(clone.executable.defaultArgs).to.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
+      expect(clone.remoteAdbHost).to.equal('example.com');
+      expect(clone.adbHost).to.not.equal(original.adbHost);
     });
   });
 });

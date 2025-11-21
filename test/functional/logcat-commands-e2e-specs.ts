@@ -6,26 +6,27 @@ describe('logcat commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   async function runClearDeviceLogTest (adb, logcat, clear = true) {
-    let logs = await adb.adbExec(['logcat', '-d']);
+    const logs = await adb.adbExec(['logcat', '-d']);
     await logcat.startCapture();
     await logcat.stopCapture();
-    let newLogs = await adb.adbExec(['logcat', '-d']);
+    const newLogs = await adb.adbExec(['logcat', '-d']);
     if (clear) {
-      newLogs.should.not.include(logs);
+      expect(newLogs).to.not.include(logs);
     } else {
-      newLogs.should.include(logs);
+      expect(newLogs).to.include(logs);
     }
   }
 
   let adb;
   let logcat;
   let chai;
+  let expect;
 
   before(async function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
+    expect = chai.expect;
     chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB();
@@ -45,13 +46,13 @@ describe('logcat commands', function () {
     });
     it('getLogs should return logs', async function () {
       await logcat.startCapture();
-      let logs = logcat.getLogs();
-      logs.should.have.length.above(0);
+      const logs = logcat.getLogs();
+      expect(logs).to.have.length.above(0);
     });
     it('getAllLogs should return all logs', async function () {
       await logcat.startCapture();
-      let logs = logcat.getAllLogs();
-      logs.should.have.length.above(0);
+      const logs = logcat.getAllLogs();
+      expect(logs).to.have.length.above(0);
     });
     it('should not affect device logs', async function () {
       if (process.env.CI) {

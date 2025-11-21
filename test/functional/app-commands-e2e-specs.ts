@@ -12,13 +12,14 @@ describe('app commands', function () {
 
   let adb;
   let chai;
+  let expect;
   let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    chai.should();
+    expect = chai.expect;
     chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
@@ -27,11 +28,11 @@ describe('app commands', function () {
 
   describe('app process management', function () {
     it('isAppRunning should be able to find ui process', async function () {
-      (await adb.isAppRunning('com.android.systemui')).should.be.true;
+      expect(await adb.isAppRunning('com.android.systemui')).to.be.true;
     });
 
     it('listAppProcessIds should return pids', async function () {
-      (await adb.listAppProcessIds('com.android.phone')).should.have.length.above(0);
+      expect(await adb.listAppProcessIds('com.android.phone')).to.have.length.above(0);
     });
 
     it('forceStop should kill process', async function () {
@@ -41,7 +42,7 @@ describe('app commands', function () {
       });
       await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
       const pids = await adb.listAppProcessIds(APIDEMOS_PKG);
-      pids.should.have.length.above(0);
+      expect(pids).to.have.length.above(0);
       await adb.forceStop(APIDEMOS_PKG);
       // Add a small delay to allow the process to fully stop
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -92,8 +93,8 @@ describe('app commands', function () {
         grantPermissions: true,
       });
       const packageInfo = await adb.getPackageInfo(APIDEMOS_PKG);
-      packageInfo.name.should.equal(APIDEMOS_PKG);
-      packageInfo.isInstalled.should.be.true;
+      expect(packageInfo.name).to.equal(APIDEMOS_PKG);
+      expect(packageInfo.isInstalled).to.be.true;
     });
 
     it('should get focused package and activity', async function () {
@@ -106,13 +107,13 @@ describe('app commands', function () {
       });
       await adb.startApp({pkg: APIDEMOS_PKG, activity: APIDEMOS_ACTIVITY});
       const {appPackage} = await adb.getFocusedPackageAndActivity();
-      appPackage.should.equal(APIDEMOS_PKG);
+      expect(appPackage).to.equal(APIDEMOS_PKG);
     });
 
     it('should dump windows', async function () {
       const windows = await adb.dumpWindows();
-      windows.should.be.a('string');
-      windows.length.should.be.above(0);
+      expect(windows).to.be.a('string');
+      expect(windows.length).to.be.above(0);
     });
   });
 
