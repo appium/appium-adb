@@ -1,6 +1,10 @@
 import {ADB} from '../../lib/adb';
 import { withMocks } from '@appium/test-support';
 import _ from 'lodash';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const emulators = [
   { udid: 'emulator-5554', state: 'device', port: 5554 },
@@ -11,16 +15,6 @@ const fingerprintId = 1111;
 const adb = new ADB();
 
 describe('emulator commands', withMocks({adb}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     (mocks as any).verify();

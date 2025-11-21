@@ -1,17 +1,11 @@
 import { isShowingLockscreen, isScreenStateOff } from '../../lib/tools/lockmgmt';
 import { withMocks } from '@appium/test-support';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('lock management', withMocks({}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();

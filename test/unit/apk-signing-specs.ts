@@ -6,9 +6,12 @@ import * as appiumSupport from '@appium/support';
 import { zip } from '@appium/support';
 import { withMocks } from '@appium/test-support';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
-import { APIDEMOS_PATH, APIDEMOS_PKG } from '../constants';
+import { APIDEMOS_PKG } from '../constants';
+import { getApiDemosPath } from '../functional/setup';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-const apiDemosPath = APIDEMOS_PATH;
+chai.use(chaiAsPromised);
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
 const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8');
 const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
@@ -36,15 +39,10 @@ describe('signing', withMocks({
   tempDir,
   apkSigningHelpers,
 }, function (mocks) {
-  let chai;
-  let expect;
+  let apiDemosPath: string;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
+    apiDemosPath = await getApiDemosPath();
   });
 
   afterEach(function () {

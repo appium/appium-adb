@@ -2,22 +2,16 @@ import {ADB} from '../../lib/adb';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import B from 'bluebird';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const adb = new ADB();
 adb.executable.path = 'adb_path';
 const avdName = 'AVD_NAME';
 
 describe('system calls', withMocks({teen_process}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     (mocks as any).verify();
@@ -134,16 +128,6 @@ describe('system calls', withMocks({teen_process}, function (mocks) {
 }));
 
 describe('System calls 2', withMocks({adb, B, teen_process}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     (mocks as any).verify();
@@ -275,13 +259,13 @@ describe('System calls 2', withMocks({adb, B, teen_process}, function (mocks) {
       (mocks as any).adb.expects('execEmuConsoleCommand')
         .once()
         .returns('OTHER_AVD');
-      chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
+      expect(await adb.getRunningAVD(avdName)).to.be.null;
     });
     it('should return null when no avd is connected', async function () {
       (mocks as any).adb.expects('getConnectedEmulators')
         .once().withExactArgs()
         .returns([]);
-      chai.expect(await adb.getRunningAVD(avdName)).to.be.null;
+      expect(await adb.getRunningAVD(avdName)).to.be.null;
     });
   });
 

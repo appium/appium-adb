@@ -1,16 +1,13 @@
 import {ADB} from '../../lib/adb';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('emulator commands', function () {
   let adb;
-  let chai;
-  let expect;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
 
     if (process.env.REAL_DEVICE) {
       return this.skip();

@@ -6,6 +6,10 @@ import _ from 'lodash';
 import B from 'bluebird';
 import { REMOTE_CACHE_ROOT } from '../../lib/tools/apk-utils';
 import * as apksUtilsMethods from '../../lib/tools/apks-utils';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const pkg = 'com.example.android.contactmanager',
       uri = 'content://contacts/people/1',
@@ -37,16 +41,6 @@ const pkg = 'com.example.android.contactmanager',
 const adb = new ADB({ adbExecTimeout: 60000 });
 
 describe('Apk-utils', withMocks({adb, fs, teen_process}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();

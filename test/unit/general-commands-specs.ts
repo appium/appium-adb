@@ -5,6 +5,10 @@ import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import { EOL } from 'os';
 import { APIDEMOS_PKG } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const apiLevel = 21,
       platformVersion = '4.4.4',
@@ -36,16 +40,6 @@ const logcat = new Logcat({
 });
 
 describe('general commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();

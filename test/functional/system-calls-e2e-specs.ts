@@ -4,6 +4,10 @@ import path from 'path';
 import { getResourcePath } from '../../lib/helpers.js';
 import { fs } from '@appium/support';
 import _ from 'lodash';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
 const avdName = process.env.ANDROID_AVD || 'Android Emulator';
@@ -12,16 +16,8 @@ describe('system calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  let chai;
-  let expect;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-
     adb = await ADB.createADB();
   });
   it('waitForEmulatorReady should succeed', async function () {

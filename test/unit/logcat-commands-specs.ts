@@ -2,20 +2,14 @@ import * as teen_process from 'teen_process';
 import events from 'events';
 import { Logcat } from '../../lib/logcat';
 import { withMocks } from '@appium/test-support';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('logcat commands', withMocks({teen_process}, function (mocks) {
   const adb = {path: 'dummyPath', defaultArgs: []};
   const logcat = new Logcat({adb, debug: false, debugTrace: false});
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     (mocks as any).verify();

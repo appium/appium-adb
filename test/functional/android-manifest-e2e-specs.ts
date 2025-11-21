@@ -11,19 +11,16 @@ import {
   readPackageManifest,
 } from '../../lib/helpers.js';
 import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('Android-manifest', function () {
   let adb;
-  let expect;
   let apiDemosPath;
 
   before(async function () {
-    const chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.use(chaiAsPromised.default);
-    expect = chai.expect;
-
     adb = await ADB.createADB();
     apiDemosPath = await getApiDemosPath();
   });

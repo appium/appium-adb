@@ -1,5 +1,7 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import {
   MOCHA_TIMEOUT,
   APIDEMOS_PKG,
@@ -9,21 +11,15 @@ import { fs, tempDir } from '@appium/support';
 import { waitForCondition } from 'asyncbox';
 import _ from 'lodash';
 
+chai.use(chaiAsPromised);
+
 describe('general commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  let chai;
-  let expect;
   let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-    expect = chai.expect;
 
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
     apiDemosPath = await getApiDemosPath();

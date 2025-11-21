@@ -1,17 +1,10 @@
 import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
+chai.use(chaiAsPromised);
 
 describe('ADB', function () {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   describe('clone', function () {
     it('should copy all options', function () {

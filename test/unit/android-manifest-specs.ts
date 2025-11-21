@@ -2,18 +2,12 @@ import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
 import { withMocks } from '@appium/test-support';
 import { fs } from '@appium/support';
 import path from 'path';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('android manifest', withMocks({fs}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();

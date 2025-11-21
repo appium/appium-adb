@@ -3,6 +3,10 @@ import path from 'path';
 import { fs, tempDir } from '@appium/support';
 import { unsignApk } from '../../lib/tools/apk-signing';
 import { APIDEMOS_PKG, getApiDemosPath } from './setup';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const fixturesRoot = path.resolve(__dirname, '..', 'fixtures');
 const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
@@ -10,17 +14,10 @@ const keyAlias = 'appiumtest';
 
 describe('Apk-signing', function () {
   let adb;
-  let expect;
   let tmpDir;
   let apiDemosPath;
 
   before(async function () {
-    const chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.use(chaiAsPromised.default);
-    expect = chai.expect;
-
     adb = await ADB.createADB();
     apiDemosPath = await getApiDemosPath();
   });

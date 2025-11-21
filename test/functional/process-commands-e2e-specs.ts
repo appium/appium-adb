@@ -7,23 +7,19 @@ import {
   ensureRootAccess,
 } from './setup';
 import { waitForCondition } from 'asyncbox';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('process commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb;
-  let chai;
-  let expect;
   let apiDemosPath;
   const androidInstallTimeout = 90000;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-
     adb = await ADB.createADB({ adbExecTimeout: 60000 });
     apiDemosPath = await getApiDemosPath();
   });

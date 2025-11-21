@@ -1,5 +1,7 @@
 import {ADB} from '../../lib/adb';
 import { retryInterval } from 'asyncbox';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import {
   MOCHA_TIMEOUT,
   MOCHA_LONG_TIMEOUT,
@@ -9,6 +11,8 @@ import {
   getApiDemosPath,
 } from './setup';
 
+chai.use(chaiAsPromised);
+
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 
@@ -16,8 +20,6 @@ describe('apk utils', function () {
   this.timeout(MOCHA_TIMEOUT);
 
   let adb: any;
-  let chai: any;
-  let expect: any;
   let apiDemosPath: string;
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
@@ -27,11 +29,6 @@ describe('apk utils', function () {
   };
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
 
     adb = await ADB.createADB({
       adbExecTimeout: process.env.CI ? 60000 : 40000,

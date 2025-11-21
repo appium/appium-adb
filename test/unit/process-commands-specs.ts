@@ -4,6 +4,10 @@ import { Logcat } from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import { withMocks } from '@appium/test-support';
 import { APIDEMOS_PKG } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -15,16 +19,6 @@ const logcat = new Logcat({
 });
 
 describe('process commands', withMocks({adb, logcat, teen_process, net}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     (mocks as any).verify();

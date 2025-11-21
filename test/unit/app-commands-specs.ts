@@ -14,6 +14,10 @@ import { parseAapt2Strings, parseAaptStrings } from '../../lib/tools/apk-utils';
 import { fs } from '@appium/support';
 import _ from 'lodash';
 import { APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT } from '../constants';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -25,16 +29,6 @@ const logcat = new Logcat({
 });
 
 describe('app commands', withMocks({adb, logcat, teen_process, net, fs}, function (mocks) {
-  let chai;
-  let expect;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-  });
 
   afterEach(function () {
     mocks.verify();

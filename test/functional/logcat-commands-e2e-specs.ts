@@ -1,6 +1,10 @@
 import {ADB} from '../../lib/adb';
 import { Logcat } from '../../lib/logcat';
 import { MOCHA_TIMEOUT } from './setup';
+import chai, { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised);
 
 describe('logcat commands', function () {
   this.timeout(MOCHA_TIMEOUT);
@@ -19,16 +23,8 @@ describe('logcat commands', function () {
 
   let adb;
   let logcat;
-  let chai;
-  let expect;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    expect = chai.expect;
-    chai.use(chaiAsPromised.default);
-
     adb = await ADB.createADB();
   });
   afterEach(async function () {
