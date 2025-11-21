@@ -7,7 +7,6 @@ import { zip } from '@appium/support';
 import { withMocks } from '@appium/test-support';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 import { APIDEMOS_PKG } from '../constants';
-import { getApiDemosPath } from '../functional/setup';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
@@ -39,11 +38,7 @@ describe('signing', withMocks({
   tempDir,
   apkSigningHelpers,
 }, function (mocks) {
-  let apiDemosPath: string;
-
-  before(async function () {
-    apiDemosPath = await getApiDemosPath();
-  });
+  const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
   afterEach(function () {
     mocks.verify();
