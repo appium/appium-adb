@@ -6,7 +6,7 @@ import {
   DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv
 } from '../helpers.js';
 import { exec, SubProcess, type ExecError } from 'teen_process';
-import { sleep, retry, retryInterval, waitForCondition } from 'asyncbox';
+import { retry, retryInterval, waitForCondition } from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
 import type { ADB } from '../adb.js';
@@ -282,7 +282,7 @@ export async function getConnectedDevices (this: ADB, opts: ConnectedDevicesOpti
 export async function getDevicesWithRetry (this: ADB, timeoutMs: number = 20000): Promise<Device[]> {
   log.debug('Trying to find connected Android devices');
   try {
-    let devices: Device[] | undefined;
+    let devices: Device[] = [];
     await waitForCondition(async () => {
       try {
         devices = await this.getConnectedDevices();
@@ -306,9 +306,6 @@ export async function getDevicesWithRetry (this: ADB, timeoutMs: number = 20000)
       waitMs: timeoutMs,
       intervalMs: 200,
     });
-    if (!devices) {
-      throw new Error(`Could not find a connected Android device in ${timeoutMs}ms`);
-    }
     return devices;
   } catch (e: unknown) {
     const error = e as Error;
@@ -455,7 +452,6 @@ export async function adbExec<TExecOpts extends ShellExecOptions & SpecialAdbExe
       const errText = `${error.message}, ${error.stdout}, ${error.stderr}`;
       if (ADB_RETRY_ERROR_PATTERNS.some((p) => p.test(errText))) {
         log.info(`Error sending command, reconnecting device and retrying: ${cmd}`);
-        await sleep(1000);
         await this.getDevicesWithRetry();
 
         // try again one time
@@ -550,15 +546,12 @@ export function createSubProcess (this: ADB, args: string[] = []): SubProcess {
 /**
  * Retrieve the current adb port.
  * @todo can probably deprecate this now that the logic is just to read this.adbPort
+ * @deprecated Use this.adbPort instead
  *
  * @returns The ADB server port number
- * @throws {Error} If ADB port is not set
  */
 export function getAdbServerPort (this: ADB): number {
-  if (this.adbPort === undefined || this.adbPort === null) {
-    throw new Error('ADB port is not set');
-  }
-  return this.adbPort;
+  return this.adbPort as number;
 }
 
 /**
@@ -569,7 +562,7 @@ export function getAdbServerPort (this: ADB): number {
  */
 export async function getEmulatorPort (this: ADB): Promise<number> {
   log.debug('Getting running emulator port');
-  if (this.emulatorPort !== null && this.emulatorPort !== undefined) {
+  if (!_.isNil(this.emulatorPort)) {
     return this.emulatorPort;
   }
   try {
@@ -595,10 +588,7 @@ export async function getEmulatorPort (this: ADB): Promise<number> {
 export function getPortFromEmulatorString (this: ADB, emStr: string): number | false {
   const portPattern = /emulator-(\d+)/;
   const match = portPattern.exec(emStr);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-  return false;
+  return match ? parseInt(match[1], 10) : false;
 }
 
 /**
@@ -981,7 +971,7 @@ export async function waitForEmulatorReady (this: ADB, timeoutMs: number = 20000
   } catch {
     let suffix = '';
     const servicesValue = services;
-    if (servicesValue !== undefined && servicesValue) {
+    if (servicesValue) {
       const missingServices = _.zip(REQUIRED_SERVICES, requiredServicesRe)
         .filter(([, pattern]) => !(pattern as RegExp).test(servicesValue))
         .map(([name]) => name);
