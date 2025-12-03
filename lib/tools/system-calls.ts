@@ -4,12 +4,23 @@ import B from 'bluebird';
 import { system, fs, util, tempDir, timing } from '@appium/support';
 import {
   DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv
-} from '../helpers';
-import { exec, SubProcess } from 'teen_process';
+} from '../helpers.js';
+import { exec, SubProcess, type ExecError } from 'teen_process';
 import { sleep, retry, retryInterval, waitForCondition } from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
-
+import type { ADB } from '../adb.js';
+import type {
+  ConnectedDevicesOptions,
+  Device,
+  AvdLaunchOptions,
+  Version,
+  RootResult,
+  ShellExecOptions,
+  SpecialAdbExecOptions,
+  TFullOutputOption,
+  ExecResult,
+} from './types.js';
 
 const DEFAULT_ADB_REBOOT_RETRIES = 90;
 const LINKER_WARNING_REGEXP = /^WARNING: linker.+$/m;
@@ -17,11 +28,11 @@ const ADB_RETRY_ERROR_PATTERNS = [
   /protocol fault \(no status\)/i,
   /error: device ('.+' )?not found/i,
   /error: device still connecting/i,
-];
+] as const;
 const BINARY_VERSION_PATTERN = /^Version ([\d.]+)-(\d+)/m;
 const BRIDGE_VERSION_PATTERN = /^Android Debug Bridge version ([\d.]+)/m;
 const CERTS_ROOT = '/system/etc/security/cacerts';
-const SDK_BINARY_ROOTS = [
+const SDK_BINARY_ROOTS: (string | string[])[] = [
   'platform-tools',
   'emulator',
   ['cmdline-tools', 'latest', 'bin'],
@@ -30,28 +41,15 @@ const SDK_BINARY_ROOTS = [
   '.' // Allow custom sdkRoot to specify full folder path
 ];
 const MIN_DELAY_ADB_API_LEVEL = 28;
-const REQUIRED_SERVICES = ['activity', 'package', 'window'];
+const REQUIRED_SERVICES = ['activity', 'package', 'window'] as const;
 const MAX_SHELL_BUFFER_LENGTH = 1000;
 
-/**
- * Retrieve full path to the given binary.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} binaryName - The name of the binary.
- * @return {Promise<string>} Full path to the given binary including current SDK root.
- */
-export async function getSdkBinaryPath (binaryName) {
-  return await this.getBinaryFromSdkRoot(binaryName);
-}
+// Private methods (defined early as they're used by public methods)
 
 /**
  * Retrieve full binary name for the current operating system.
- *
- * @param {string} binaryName - simple binary name, for example 'android'.
- * @return {string} Formatted binary name depending on the current platform,
- *                  for example, 'android.bat' on Windows.
  */
-function _getBinaryNameForOS (binaryName) {
+function _getBinaryNameForOS (binaryName: string): string {
   if (!system.isWindows()) {
     return binaryName;
   }
@@ -65,33 +63,53 @@ function _getBinaryNameForOS (binaryName) {
   return binaryName;
 }
 
+/**
+ *  Returns the Android binaries locations
+ */
+function getSdkBinaryLocationCandidates (sdkRoot: string, fullBinaryName: string): string[] {
+  return SDK_BINARY_ROOTS.map((x) =>
+    path.resolve(sdkRoot, ...(_.isArray(x) ? x : [x]), fullBinaryName));
+}
+
+/**
+ *
+ */
+async function getOpenSslForOs (): Promise<string> {
+  const binaryName = `openssl${system.isWindows() ? '.exe' : ''}`;
+  try {
+    return await fs.which(binaryName);
+  } catch {
+    throw new Error('The openssl tool must be installed on the system and available on the path');
+  }
+}
+
+// Public methods
+
+/**
+ * Retrieve full path to the given binary.
+ */
+export async function getSdkBinaryPath (this: ADB, binaryName: string): Promise<string> {
+  return await this.getBinaryFromSdkRoot(binaryName);
+}
+
 export const getBinaryNameForOS = _.memoize(_getBinaryNameForOS);
 
 /**
  * Retrieve full path to the given binary and caches it into `binaries`
  * property of the current ADB instance.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} binaryName - Simple name of a binary file.
- * @return {Promise<string>} Full path to the given binary. The method tries
- *                  to enumerate all the known locations where the binary
- *                  might be located and stops the search as soon as the first
- *                  match is found on the local file system.
- * @throws {Error} If the binary with given name is not present at any
- *                 of known locations or Android SDK is not installed on the
- *                 local file system.
  */
-export async function getBinaryFromSdkRoot (binaryName) {
-  if ((/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName]) {
-    return (/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName];
+export async function getBinaryFromSdkRoot (this: ADB, binaryName: string): Promise<string> {
+  if (this.binaries?.[binaryName]) {
+    return this.binaries[binaryName];
   }
   const fullBinaryName = this.getBinaryNameForOS(binaryName);
-  const binaryLocs = getSdkBinaryLocationCandidates(
-    /** @type {string} */(this.sdkRoot), fullBinaryName
-  );
+  if (!this.sdkRoot) {
+    throw new Error('SDK root is not set');
+  }
+  const binaryLocs = getSdkBinaryLocationCandidates(this.sdkRoot, fullBinaryName);
 
   // get subpaths for currently installed build tool directories
-  let buildToolsDirs = await getBuildToolsDirs(/** @type {string} */(this.sdkRoot));
+  let buildToolsDirs = await getBuildToolsDirs(this.sdkRoot);
   if (this.buildToolsVersion) {
     buildToolsDirs = buildToolsDirs
       .filter((x) => path.basename(x) === this.buildToolsVersion);
@@ -108,7 +126,7 @@ export async function getBinaryFromSdkRoot (binaryName) {
     ]))
   ));
 
-  let binaryLoc = null;
+  let binaryLoc: string | null = null;
   for (const loc of binaryLocs) {
     if (await fs.exists(loc)) {
       binaryLoc = loc;
@@ -121,39 +139,18 @@ export async function getBinaryFromSdkRoot (binaryName) {
       `installed at '${this.sdkRoot}'?`);
   }
   log.info(`Using '${fullBinaryName}' from '${binaryLoc}'`);
-  (/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName] = binaryLoc;
+  if (!this.binaries) {
+    this.binaries = {};
+  }
+  this.binaries[binaryName] = binaryLoc;
   return binaryLoc;
-}
-
-/**
- *  Returns the Android binaries locations
- *
- * @param {string} sdkRoot The path to Android SDK root.
- * @param {string} fullBinaryName The name of full binary name.
- * @return {string[]} The list of SDK_BINARY_ROOTS paths
- *                          with sdkRoot and fullBinaryName.
- */
-function getSdkBinaryLocationCandidates (sdkRoot, fullBinaryName) {
-  return SDK_BINARY_ROOTS.map((x) =>
-    path.resolve(sdkRoot, ...(_.isArray(x) ? x : [x]), fullBinaryName));
 }
 
 /**
  * Retrieve full path to the given binary.
  * This method does not have cache.
- *
- * @param {string} binaryName - Simple name of a binary file.
- *                              e.g. 'adb', 'android'
- * @return {Promise<string>} Full path to the given binary. The method tries
- *                  to enumerate all the known locations where the binary
- *                  might be located and stops the search as soon as the first
- *                  match is found on the local file system.
- *                  e.g. '/Path/To/Android/sdk/platform-tools/adb'
- * @throws {Error} If the binary with given name is not present at any
- *                 of known locations or Android SDK is not installed on the
- *                 local file system.
  */
-export async function getAndroidBinaryPath (binaryName) {
+export async function getAndroidBinaryPath (binaryName: string): Promise<string> {
   const fullBinaryName = getBinaryNameForOS(binaryName);
   const sdkRoot = getSdkRootFromEnv();
   const binaryLocs = getSdkBinaryLocationCandidates(sdkRoot ?? '', fullBinaryName);
@@ -168,23 +165,20 @@ export async function getAndroidBinaryPath (binaryName) {
 
 /**
  * Retrieve full path to a binary file using the standard system lookup tool.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} binaryName - The name of the binary.
- * @return {Promise<string>} Full path to the binary received from 'which'/'where'
- *                  output.
- * @throws {Error} If lookup tool returns non-zero return code.
  */
-export async function getBinaryFromPath (binaryName) {
-  if ((/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName]) {
-    return (/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName];
+export async function getBinaryFromPath (this: ADB, binaryName: string): Promise<string> {
+  if (this.binaries?.[binaryName]) {
+    return this.binaries[binaryName];
   }
 
   const fullBinaryName = this.getBinaryNameForOS(binaryName);
   try {
     const binaryLoc = await fs.which(fullBinaryName);
     log.info(`Using '${fullBinaryName}' from '${binaryLoc}'`);
-    (/** @type {import('./types').StringRecord} */ (this.binaries))[binaryName] = binaryLoc;
+    if (!this.binaries) {
+      this.binaries = {};
+    }
+    this.binaries[binaryName] = binaryLoc;
     return binaryLoc;
   } catch {
     throw new Error(`Could not find '${fullBinaryName}' in PATH. Please set the ANDROID_HOME ` +
@@ -194,25 +188,20 @@ export async function getBinaryFromPath (binaryName) {
 
 /**
  * Retrieve the list of devices visible to adb.
- *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').ConnectedDevicesOptions} [opts={}] - Additional options mapping.
- * @return {Promise<import('./types').Device[]>} The list of devices or an empty list if
- *                          no devices are connected.
- * @throws {Error} If there was an error while listing devices.
  */
-export async function getConnectedDevices (opts = {}) {
+export async function getConnectedDevices (this: ADB, opts: ConnectedDevicesOptions = {}): Promise<Device[]> {
   log.debug('Getting connected devices');
   const args = [...this.executable.defaultArgs, 'devices'];
   if (opts.verbose) {
     args.push('-l');
   }
 
-  let stdout;
+  let stdout: string;
   try {
     ({stdout} = await exec(this.executable.path, args));
-  } catch (e) {
-    throw new Error(`Error while getting connected devices. Original error: ${e.message}`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`Error while getting connected devices. Original error: ${error.message}`);
   }
   const listHeader = 'List of devices';
   // expecting adb devices to return output as
@@ -224,7 +213,7 @@ export async function getConnectedDevices (opts = {}) {
   }
   // slicing output we care about
   stdout = stdout.slice(startingIndex);
-  let excludedLines = [listHeader, 'adb server', '* daemon'];
+  const excludedLines = [listHeader, 'adb server', '* daemon'];
   if (!this.allowOfflineDevices) {
     excludedLines.push('offline');
   }
@@ -234,7 +223,7 @@ export async function getConnectedDevices (opts = {}) {
     .map((line) => {
       // state is "device", afaic
       const [udid, state, ...description] = line.split(/\s+/);
-      const device = {udid, state};
+      const device: Device & Record<string, string> = {udid, state} as Device & Record<string, string>;
       if (opts.verbose) {
         for (const entry of description) {
           if (entry.includes(':')) {
@@ -256,17 +245,11 @@ export async function getConnectedDevices (opts = {}) {
 
 /**
  * Retrieve the list of devices visible to adb within the given timeout.
- *
- * @this {import('../adb.js').ADB}
- * @param {number} timeoutMs - The maximum number of milliseconds to get at least
- *                             one list item.
- * @return {Promise<import('./types').Device[]>} The list of connected devices.
- * @throws {Error} If no connected devices can be detected within the given timeout.
  */
-export async function getDevicesWithRetry (timeoutMs = 20000) {
+export async function getDevicesWithRetry (this: ADB, timeoutMs: number = 20000): Promise<Device[]> {
   log.debug('Trying to find connected Android devices');
   try {
-    let devices;
+    let devices: Device[] | undefined;
     await waitForCondition(async () => {
       try {
         devices = await this.getConnectedDevices();
@@ -274,9 +257,10 @@ export async function getDevicesWithRetry (timeoutMs = 20000) {
           return true;
         }
         log.debug('Could not find online devices');
-      } catch (err) {
-        log.debug(err.stack);
-        log.warn(`Got an unexpected error while fetching connected devices list: ${err.message}`);
+      } catch (err: unknown) {
+        const error = err as Error;
+        log.debug(error.stack);
+        log.warn(`Got an unexpected error while fetching connected devices list: ${error.message}`);
       }
 
       try {
@@ -289,9 +273,13 @@ export async function getDevicesWithRetry (timeoutMs = 20000) {
       waitMs: timeoutMs,
       intervalMs: 200,
     });
-    return /** @type {any} */ (devices);
-  } catch (e) {
-    if (/Condition unmet/.test(e.message)) {
+    if (!devices) {
+      throw new Error(`Could not find a connected Android device in ${timeoutMs}ms`);
+    }
+    return devices;
+  } catch (e: unknown) {
+    const error = e as Error;
+    if (/Condition unmet/.test(error.message)) {
       throw new Error(`Could not find a connected Android device in ${timeoutMs}ms`);
     } else {
       throw e;
@@ -301,16 +289,8 @@ export async function getDevicesWithRetry (timeoutMs = 20000) {
 
 /**
  * Kick current connection from host/device side and make it reconnect
- *
- * @this {import('../adb.js').ADB}
- * @param {string} [target=offline] One of possible targets to reconnect:
- * offline, device or null
- * Providing `null` will cause reconnection to happen from the host side.
- *
- * @throws {Error} If either ADB version is too old and does not support this
- * command or there was a failure during reconnect.
  */
-export async function reconnect (target = 'offline') {
+export async function reconnect (this: ADB, target: string | null = 'offline'): Promise<void> {
   log.debug(`Reconnecting adb (target ${target})`);
 
   const args = ['reconnect'];
@@ -319,17 +299,16 @@ export async function reconnect (target = 'offline') {
   }
   try {
     await this.adbExec(args);
-  } catch (e) {
-    throw new Error(`Cannot reconnect adb. Original error: ${e.stderr || e.message}`);
+  } catch (e: unknown) {
+    const error = e as ExecError;
+    throw new Error(`Cannot reconnect adb. Original error: ${error.stderr || error.message}`);
   }
 }
 
 /**
  * Restart adb server, unless _this.suppressKillServer_ property is true.
- *
- * @this {import('../adb.js').ADB}
  */
-export async function restartAdb () {
+export async function restartAdb (this: ADB): Promise<void> {
   if (this.suppressKillServer) {
     log.debug(`Not restarting abd since 'suppressKillServer' is on`);
     return;
@@ -346,9 +325,8 @@ export async function restartAdb () {
 
 /**
  * Kill adb server.
- * @this {import('../adb.js').ADB}
  */
-export async function killServer () {
+export async function killServer (this: ADB): Promise<void> {
   log.debug(`Killing adb server on port '${this.adbPort}'`);
   await this.adbExec(['kill-server'], {
     exclusive: true,
@@ -358,11 +336,8 @@ export async function killServer () {
 /**
  * Reset Telnet authentication token.
  * @see {@link http://tools.android.com/recent/emulator2516releasenotes} for more details.
- *
- * @this {import('../adb.js').ADB}
- * @returns {Promise<boolean>} If token reset was successful.
  */
-export const resetTelnetAuthToken = _.memoize(async function resetTelnetAuthToken () {
+export const resetTelnetAuthToken = _.memoize(async function resetTelnetAuthToken (): Promise<boolean> {
   // The methods is used to remove telnet auth token
   //
   const homeFolderPath = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -374,8 +349,9 @@ export const resetTelnetAuthToken = _.memoize(async function resetTelnetAuthToke
   log.debug(`Overriding ${dstPath} with an empty string to avoid telnet authentication for emulator commands`);
   try {
     await fs.writeFile(dstPath, '');
-  } catch (e) {
-    log.warn(`Error ${e.message} while resetting the content of ${dstPath}. Ignoring resetting of emulator's telnet authentication token`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    log.warn(`Error ${error.message} while resetting the content of ${dstPath}. Ignoring resetting of emulator's telnet authentication token`);
     return false;
   }
   return true;
@@ -383,11 +359,8 @@ export const resetTelnetAuthToken = _.memoize(async function resetTelnetAuthToke
 
 /**
  * Execute the given emulator command using _adb emu_ tool.
- *
- * @this {import('../adb.js').ADB}
- * @param {string[]} cmd - The array of rest command line parameters.
  */
-export async function adbExecEmu (cmd) {
+export async function adbExecEmu (this: ADB, cmd: string[]): Promise<void> {
   await this.verifyEmulatorConnected();
   await this.resetTelnetAuthToken();
   await this.adbExec(['emu', ...cmd]);
@@ -395,38 +368,24 @@ export async function adbExecEmu (cmd) {
 
 let isExecLocked = false;
 
-/** @type {{STDOUT: 'stdout', FULL: 'full'}} */
-export const EXEC_OUTPUT_FORMAT = Object.freeze({
+export const EXEC_OUTPUT_FORMAT = {
   STDOUT: 'stdout',
   FULL: 'full',
-});
+} as const;
 
 /**
  * Execute the given adb command.
- *
- * @template {import('teen_process').TeenProcessExecOptions & import('./types').ShellExecOptions & import('./types').SpecialAdbExecOptions} TExecOpts
- * @this {import('../adb.js').ADB}
- * @param {string|string[]} cmd - The array of rest command line parameters
- *                      or a single string parameter.
- * @param {TExecOpts} [opts] Additional options mapping. See
- * {@link https://github.com/appium/node-teen_process}
- * for more details.
- * You can also set the additional `exclusive` param
- * to `true` that assures no other parallel adb commands
- * are going to be executed while the current one is running
- * You can set the `outputFormat` param to `stdout` to receive just the stdout
- * output (default) or `full` to receive the stdout and stderr response from a
- * command with a zero exit code
- * @return {Promise<TExecOpts extends import('./types').TFullOutputOption ? import('teen_process').TeenProcessExecResult : string>}
- * Command's stdout or an object containing stdout and stderr.
- * @throws {Error} If the command returned non-zero exit code.
  */
-export async function adbExec (cmd, opts) {
+export async function adbExec<TExecOpts extends ShellExecOptions & SpecialAdbExecOptions = ShellExecOptions & SpecialAdbExecOptions>(
+  this: ADB,
+  cmd: string | string[],
+  opts?: TExecOpts
+): Promise<TExecOpts extends TFullOutputOption ? ExecResult : string> {
   if (!cmd) {
     throw new Error('You need to pass in a command to adbExec()');
   }
 
-  const optsCopy = _.cloneDeep(opts) ?? /** @type {TExecOpts} */ ({});
+  const optsCopy = _.cloneDeep(opts ?? {}) as TExecOpts;
   // setting default timeout for each command to prevent infinite wait.
   optsCopy.timeout = optsCopy.timeout || this.adbExecTimeout || DEFAULT_ADB_EXEC_TIMEOUT;
   optsCopy.timeoutCapName = optsCopy.timeoutCapName || 'adbExecTimeout'; // For error message
@@ -435,43 +394,44 @@ export async function adbExec (cmd, opts) {
 
   cmd = _.isArray(cmd) ? cmd : [cmd];
   let adbRetried = false;
-  const execFunc = async () => {
+  const execFunc = async (): Promise<string | ExecResult> => {
     try {
       const args = [...this.executable.defaultArgs, ...cmd];
       log.debug(`Running '${this.executable.path} ` +
         (args.find((arg) => /\s+/.test(arg)) ? util.quote(args) : args.join(' ')) + `'`);
-      let {stdout, stderr} = await exec(this.executable.path, args, optsCopy);
+      const {stdout: rawStdout, stderr} = await exec(this.executable.path, args, optsCopy);
       // sometimes ADB prints out weird stdout warnings that we don't want
       // to include in any of the response data, so let's strip it out
-      stdout = stdout.replace(LINKER_WARNING_REGEXP, '').trim();
+      const stdout = rawStdout.replace(LINKER_WARNING_REGEXP, '').trim();
       return outputFormat === this.EXEC_OUTPUT_FORMAT.FULL ? {stdout, stderr} : stdout;
-    } catch (e) {
-      const errText = `${e.message}, ${e.stdout}, ${e.stderr}`;
+    } catch (e: unknown) {
+      const error = e as ExecError;
+      const errText = `${error.message}, ${error.stdout}, ${error.stderr}`;
       if (ADB_RETRY_ERROR_PATTERNS.some((p) => p.test(errText))) {
         log.info(`Error sending command, reconnecting device and retrying: ${cmd}`);
         await sleep(1000);
         await this.getDevicesWithRetry();
 
         // try again one time
-        if (adbRetried) {
+        if (!adbRetried) {
           adbRetried = true;
           return await execFunc();
         }
       }
 
-      if (e.code === 0 && e.stdout) {
-        return e.stdout.replace(LINKER_WARNING_REGEXP, '').trim();
+      if (error.code === 0 && error.stdout) {
+        return error.stdout.replace(LINKER_WARNING_REGEXP, '').trim();
       }
 
-      if (_.isNull(e.code)) {
-        e.message = `Error executing adbExec. Original error: '${e.message}'. ` +
+      if (_.isNull(error.code)) {
+        error.message = `Error executing adbExec. Original error: '${error.message}'. ` +
           `Try to increase the ${optsCopy.timeout}ms adb execution timeout ` +
           `represented by '${optsCopy.timeoutCapName}' capability`;
       } else {
-        e.message = `Error executing adbExec. Original error: '${e.message}'; ` +
-          `Command output: ${e.stderr || e.stdout || '<empty>'}`;
+        error.message = `Error executing adbExec. Original error: '${error.message}'; ` +
+          `Command output: ${error.stderr || error.stdout || '<empty>'}`;
       }
-      throw e;
+      throw error;
     }
   };
 
@@ -487,7 +447,7 @@ export async function adbExec (cmd, opts) {
     isExecLocked = true;
   }
   try {
-    return await execFunc();
+    return await execFunc() as TExecOpts extends TFullOutputOption ? ExecResult : string;
   } finally {
     if (optsCopy.exclusive) {
       isExecLocked = false;
@@ -497,23 +457,18 @@ export async function adbExec (cmd, opts) {
 
 /**
  * Execute the given command using _adb shell_ prefix.
- *
- * @this {import('../adb.js').ADB}
- * @template {import('./types').ShellExecOptions} TShellExecOpts
- * @param {string|string[]} cmd - The array of rest command line parameters or a single
- *                                      string parameter.
- * @param {TShellExecOpts} [opts] - Additional options mapping.
- * @return {Promise<TShellExecOpts extends import('./types').TFullOutputOption ? import('teen_process').TeenProcessExecResult : string>}
- * Command's stdout.
- * @throws {Error} If the command returned non-zero exit code.
  */
-export async function shell (cmd, opts) {
+export async function shell<TShellExecOpts extends ShellExecOptions = ShellExecOptions>(
+  this: ADB,
+  cmd: string | string[],
+  opts?: TShellExecOpts
+): Promise<TShellExecOpts extends TFullOutputOption ? ExecResult : string> {
   const {
     privileged,
-  } = opts ?? /** @type {TShellExecOpts} */ ({});
+  } = opts ?? {} as TShellExecOpts;
 
   const cmdArr = _.isArray(cmd) ? cmd : [cmd];
-  const fullCmd = ['shell'];
+  const fullCmd: string[] = ['shell'];
   if (privileged) {
     log.info(`'adb shell ${util.quote(cmdArr)}' requires root access`);
     if (await this.isRoot()) {
@@ -530,11 +485,8 @@ export async function shell (cmd, opts) {
 
 /**
  *
- * @this {import('../adb.js').ADB}
- * @param {string[]} [args=[]]
- * @returns {import('teen_process').SubProcess}
  */
-export function createSubProcess (args = []) {
+export function createSubProcess (this: ADB, args: string[] = []): SubProcess {
   // add the default arguments
   const finalArgs = [...this.executable.defaultArgs, ...args];
   log.debug(`Creating ADB subprocess with args: ${JSON.stringify(finalArgs)}`);
@@ -544,69 +496,58 @@ export function createSubProcess (args = []) {
 /**
  * Retrieve the current adb port.
  * @todo can probably deprecate this now that the logic is just to read this.adbPort
- *
- * @this {import('../adb.js').ADB}
- * @return {number} The current adb port number.
  */
-export function getAdbServerPort () {
-  return /** @type {number} */ (this.adbPort);
+export function getAdbServerPort (this: ADB): number {
+  if (this.adbPort === undefined || this.adbPort === null) {
+    throw new Error('ADB port is not set');
+  }
+  return this.adbPort;
 }
 
 /**
  * Retrieve the current emulator port from _adb devives_ output.
- *
- * @this {import('../adb.js').ADB}
- * @return {Promise<number>} The current emulator port.
- * @throws {Error} If there are no connected devices.
  */
-export async function getEmulatorPort () {
+export async function getEmulatorPort (this: ADB): Promise<number> {
   log.debug('Getting running emulator port');
-  if (this.emulatorPort !== null) {
-    return /** @type {number} */ (this.emulatorPort);
+  if (this.emulatorPort !== null && this.emulatorPort !== undefined) {
+    return this.emulatorPort;
   }
   try {
-    let devices = await this.getConnectedDevices();
-    let port = this.getPortFromEmulatorString(devices[0].udid);
+    const devices = await this.getConnectedDevices();
+    const port = this.getPortFromEmulatorString(devices[0].udid);
     if (port) {
       return port;
     } else {
       throw new Error(`Emulator port not found`);
     }
-  } catch (e) {
-    throw new Error(`No devices connected. Original error: ${e.message}`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`No devices connected. Original error: ${error.message}`);
   }
 }
 
 /**
  * Retrieve the current emulator port by parsing emulator name string.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} emStr - Emulator name string.
- * @return {number|false} Either the current emulator port or
- * _false_ if port number cannot be parsed.
  */
-export function getPortFromEmulatorString (emStr) {
-  let portPattern = /emulator-(\d+)/;
-  if (portPattern.test(emStr)) {
-    return parseInt((/** @type {RegExpExecArray} */(portPattern.exec(emStr)))[1], 10);
+export function getPortFromEmulatorString (this: ADB, emStr: string): number | false {
+  const portPattern = /emulator-(\d+)/;
+  const match = portPattern.exec(emStr);
+  if (match) {
+    return parseInt(match[1], 10);
   }
   return false;
 }
 
 /**
  * Retrieve the list of currently connected emulators.
- *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').ConnectedDevicesOptions} [opts={}] - Additional options mapping.
- * @return {Promise<import('./types').Device[]>} The list of connected devices.
  */
-export async function getConnectedEmulators (opts = {}) {
+export async function getConnectedEmulators (this: ADB, opts: ConnectedDevicesOptions = {}): Promise<Device[]> {
   log.debug('Getting connected emulators');
   try {
-    let devices = await this.getConnectedDevices(opts);
-    let emulators = [];
-    for (let device of devices) {
-      let port = this.getPortFromEmulatorString(device.udid);
+    const devices = await this.getConnectedDevices(opts);
+    const emulators: Device[] = [];
+    for (const device of devices) {
+      const port = this.getPortFromEmulatorString(device.udid);
       if (port) {
         device.port = port;
         emulators.push(device);
@@ -614,31 +555,26 @@ export async function getConnectedEmulators (opts = {}) {
     }
     log.debug(`${util.pluralize('emulator', emulators.length, true)} connected`);
     return emulators;
-  } catch (e) {
-    throw new Error(`Error getting emulators. Original error: ${e.message}`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`Error getting emulators. Original error: ${error.message}`);
   }
 }
 
 /**
  * Set _emulatorPort_ property of the current class.
- *
- * @this {import('../adb.js').ADB}
- * @param {number} emPort - The emulator port to be set.
  */
-export function setEmulatorPort (emPort) {
+export function setEmulatorPort (this: ADB, emPort: number): void {
   this.emulatorPort = emPort;
 }
 
 /**
  * Set the identifier of the current device (_this.curDeviceId_).
- *
- * @this {import('../adb.js').ADB}
- * @param {string} deviceId - The device identifier.
  */
-export function setDeviceId (deviceId) {
+export function setDeviceId (this: ADB, deviceId: string): void {
   log.debug(`Setting device id to ${deviceId}`);
   this.curDeviceId = deviceId;
-  let argsHasDevice = this.executable.defaultArgs.indexOf('-s');
+  const argsHasDevice = this.executable.defaultArgs.indexOf('-s');
   if (argsHasDevice !== -1) {
     // remove the old device id from the arguments
     this.executable.defaultArgs.splice(argsHasDevice, 2);
@@ -648,11 +584,8 @@ export function setDeviceId (deviceId) {
 
 /**
  * Set the the current device object.
- *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').Device} deviceObj - The device object to be set.
  */
-export function setDevice (deviceObj) {
+export function setDevice (this: ADB, deviceObj: Device): void {
   const deviceId = deviceObj.udid;
   const emPort = this.getPortFromEmulatorString(deviceId);
   if (_.isNumber(emPort)) {
@@ -666,12 +599,8 @@ export function setDevice (deviceObj) {
  * !!! This method has a side effect - it implicitly changes the
  * `deviceId` (only if AVD with a matching name is found)
  * and `emulatorPort` instance properties.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} avdName - Emulator name.
- * @return {Promise<import('./types').Device|null>} Currently running emulator or _null_.
  */
-export async function getRunningAVD (avdName) {
+export async function getRunningAVD (this: ADB, avdName: string): Promise<Device | null> {
   log.debug(`Trying to find '${avdName}' emulator`);
   try {
     const emulators = await this.getConnectedEmulators();
@@ -692,48 +621,41 @@ export async function getRunningAVD (avdName) {
     }
     log.debug(`Emulator '${avdName}' not running`);
     return null;
-  } catch (e) {
-    throw new Error(`Error getting AVD. Original error: ${e.message}`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`Error getting AVD. Original error: ${error.message}`);
   }
 }
 
 /**
  * Get the object for the currently running emulator.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} avdName - Emulator name.
- * @param {number} [timeoutMs=20000] - The maximum number of milliseconds
- *                                     to wait until at least one running AVD object
- *                                     is detected.
- * @return {Promise<import('./types').Device|null>} Currently running emulator or _null_.
- * @throws {Error} If no device has been detected within the timeout.
  */
-export async function getRunningAVDWithRetry (avdName, timeoutMs = 20000) {
+export async function getRunningAVDWithRetry (this: ADB, avdName: string, timeoutMs: number = 20000): Promise<Device | null> {
   try {
-    return /** @type {import('./types').Device|null} */ (await waitForCondition(async () => {
+    return await waitForCondition(async () => {
       try {
         return await this.getRunningAVD(avdName.replace('@', ''));
-      } catch (e) {
-        log.debug(e.message);
+      } catch (e: unknown) {
+        const error = e as Error;
+        log.debug(error.message);
         return false;
       }
     }, {
       waitMs: timeoutMs,
       intervalMs: 1000,
-    }));
-  } catch (e) {
-    throw new Error(`Error getting AVD with retry. Original error: ${e.message}`);
+    }) as Device | null;
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`Error getting AVD with retry. Original error: ${error.message}`);
   }
 }
 
 /**
  * Shutdown all running emulators by killing their processes.
- *
- * @this {import('../adb.js').ADB}
- * @throws {Error} If killing tool returned non-zero return code.
  */
-export async function killAllEmulators () {
-  let cmd, args;
+export async function killAllEmulators (this: ADB): Promise<void> {
+  let cmd: string;
+  let args: string[];
   if (system.isWindows()) {
     cmd = 'TASKKILL';
     args = ['TASKKILL', '/IM', 'emulator.exe'];
@@ -743,24 +665,17 @@ export async function killAllEmulators () {
   }
   try {
     await exec(cmd, args);
-  } catch (e) {
-    throw new Error(`Error killing emulators. Original error: ${e.message}`);
+  } catch (e: unknown) {
+    const error = e as Error;
+    throw new Error(`Error killing emulators. Original error: ${error.message}`);
   }
 }
 
 /**
  * Kill emulator with the given name. No error
  * is thrown is given avd does not exist/is not running.
- *
- * @this {import('../adb.js').ADB}
- * @param {string?} [avdName=null] - The name of the emulator to be killed. If empty,
- *                            the current emulator will be killed.
- * @param {number} [timeout=60000] - The amount of time to wait before throwing
- *                                    an exception about unsuccessful killing
- * @return {Promise<boolean>} - True if the emulator was killed, false otherwise.
- * @throws {Error} if there was a failure by killing the emulator
  */
-export async function killEmulator (avdName = null, timeout = 60000) {
+export async function killEmulator (this: ADB, avdName: string | null = null, timeout: number = 60000): Promise<boolean> {
   if (util.hasValue(avdName)) {
     log.debug(`Killing avd '${avdName}'`);
     const device = await this.getRunningAVD(avdName);
@@ -782,10 +697,11 @@ export async function killEmulator (avdName = null, timeout = 60000) {
     await waitForCondition(async () => {
       try {
         return util.hasValue(avdName)
-          ? !await this.getRunningAVD(avdName)
+          ? !await this.getRunningAVD(avdName as string)
           : !await this.isEmulatorConnected();
-      } catch {}
-      return false;
+      } catch {
+        return false;
+      }
     }, {
       waitMs: timeout,
       intervalMs: 2000,
@@ -799,14 +715,8 @@ export async function killEmulator (avdName = null, timeout = 60000) {
 
 /**
  * Start an emulator with given parameters and wait until it is fully started.
- *
- * @this {import('../adb.js').ADB}
- * @param {string} avdName - The name of an existing emulator.
- * @param {import('./types').AvdLaunchOptions} [opts={}]
- * @returns {Promise<SubProcess>} Emulator subprocess instance
- * @throws {Error} If the emulator fails to start within the given timeout.
  */
-export async function launchAVD (avdName, opts = {}) {
+export async function launchAVD (this: ADB, avdName: string, opts: AvdLaunchOptions = {}): Promise<SubProcess> {
   const {
     args = [],
     env = {},
@@ -819,13 +729,13 @@ export async function launchAVD (avdName, opts = {}) {
   log.debug(`Launching Emulator with AVD ${avdName}, launchTimeout ` +
             `${launchTimeout}ms and readyTimeout ${readyTimeout}ms`);
   const emulatorBinaryPath = await this.getSdkBinaryPath('emulator');
-  if (avdName.startsWith('@')) {
-    avdName = avdName.slice(1);
+  let processedAvdName = avdName;
+  if (processedAvdName.startsWith('@')) {
+    processedAvdName = processedAvdName.slice(1);
   }
-  await this.checkAvdExist(avdName);
+  await this.checkAvdExist(processedAvdName);
 
-  /** @type {string[]} */
-  const launchArgs = ['-avd', avdName];
+  const launchArgs: string[] = ['-avd', processedAvdName];
   launchArgs.push(...(toAvdLocaleArgs(language ?? null, country ?? null)));
 
   let isDelayAdbFeatureEnabled = false;
@@ -834,7 +744,7 @@ export async function launchAVD (avdName, opts = {}) {
     if (revision && util.compareVersions(revision, '>=', '29.0.7')) {
       // https://androidstudio.googleblog.com/2019/05/emulator-2907-canary.html
       try {
-        const {target} = await this.getEmuImageProperties(avdName);
+        const {target} = await this.getEmuImageProperties(processedAvdName);
         const apiMatch = /\d+/.exec(target);
         // https://issuetracker.google.com/issues/142533355
         if (apiMatch && parseInt(apiMatch[0], 10) >= MIN_DELAY_ADB_API_LEVEL) {
@@ -843,9 +753,10 @@ export async function launchAVD (avdName, opts = {}) {
         } else {
           throw new Error(`The actual image API version is below ${MIN_DELAY_ADB_API_LEVEL}`);
         }
-      } catch (e) {
+      } catch (e: unknown) {
+        const error = e as Error;
         log.info(`The -delay-adb emulator startup detection feature will not be enabled. ` +
-          `Original error: ${e.message}`);
+          `Original error: ${error.message}`);
       }
     }
   } else {
@@ -853,7 +764,7 @@ export async function launchAVD (avdName, opts = {}) {
   }
 
   if (!_.isEmpty(args)) {
-    launchArgs.push(...(_.isArray(args) ? args : /** @type {string[]} */ (util.shellParse(`${args}`))));
+    launchArgs.push(...(_.isArray(args) ? args : util.shellParse(`${args}`)));
   }
 
   log.debug(`Running '${emulatorBinaryPath}' with args: ${util.quote(launchArgs)}`);
@@ -865,19 +776,20 @@ export async function launchAVD (avdName, opts = {}) {
   });
   await proc.start(0);
   for (const streamName of ['stderr', 'stdout']) {
-    proc.on(`line-${streamName}`, (line) => log.debug(`[AVD OUTPUT] ${line}`));
+    proc.on(`line-${streamName}`, (line: string) => log.debug(`[AVD OUTPUT] ${line}`));
   }
-  proc.on('die', (code, signal) => {
-    log.warn(`Emulator avd ${avdName} exited with code ${code}${signal ? `, signal ${signal}` : ''}`);
+  proc.on('die', (code: number | null, signal: string | null) => {
+    log.warn(`Emulator avd ${processedAvdName} exited with code ${code}${signal ? `, signal ${signal}` : ''}`);
   });
-  await retry(retryTimes, async () => await this.getRunningAVDWithRetry(avdName, launchTimeout));
+  await retry(retryTimes, async () => await this.getRunningAVDWithRetry(processedAvdName, launchTimeout));
   // At this point we have deviceId already assigned
   const timer = new timing.Timer().start();
   if (isDelayAdbFeatureEnabled) {
     try {
       await this.adbExec(['wait-for-device'], {timeout: readyTimeout});
-    } catch (e) {
-      throw new Error(`'${avdName}' Emulator has failed to boot: ${e.stderr || e.message}`);
+    } catch (e: unknown) {
+      const error = e as ExecError;
+      throw new Error(`'${processedAvdName}' Emulator has failed to boot: ${error.stderr || error.message}`);
     }
   }
   await this.waitForEmulatorReady(Math.trunc(readyTimeout - timer.getDuration().asMilliSeconds));
@@ -886,49 +798,40 @@ export async function launchAVD (avdName, opts = {}) {
 
 /**
  * Get the adb version. The result of this method is cached.
- *
- * @this {import('../adb.js').ADB}
- * @return {Promise<import('./types').Version>}
- * @throws {Error} If it is not possible to parse adb binary version.
  */
-export const getVersion = _.memoize(async function getVersion () {
-  let stdout;
+export const getVersion = _.memoize(async function getVersion (this: ADB): Promise<Version> {
+  let stdout: string;
   try {
     stdout = await this.adbExec('version');
-  } catch (e) {
-    throw new Error(`Error getting adb version: ${e.stderr || e.message}`);
+  } catch (e: unknown) {
+    const error = e as ExecError;
+    throw new Error(`Error getting adb version: ${error.stderr || error.message}`);
   }
 
-  const result = {};
+  const result: Partial<Version> = {};
   const binaryVersionMatch = BINARY_VERSION_PATTERN.exec(stdout);
   if (binaryVersionMatch) {
     result.binary = {
-      version: semver.coerce(binaryVersionMatch[1]),
+      version: semver.coerce(binaryVersionMatch[1])?.version || binaryVersionMatch[1],
       build: parseInt(binaryVersionMatch[2], 10),
     };
   }
   const bridgeVersionMatch = BRIDGE_VERSION_PATTERN.exec(stdout);
   if (bridgeVersionMatch) {
     result.bridge = {
-      version: semver.coerce(bridgeVersionMatch[1]),
+      version: semver.coerce(bridgeVersionMatch[1])?.version || bridgeVersionMatch[1],
     };
   }
-  return result;
+  return result as Version;
 });
 
 /**
  * Check if the current emulator is ready to accept further commands (booting completed).
- *
- * @this {import('../adb.js').ADB}
- * @param {number} [timeoutMs=20000] - The maximum number of milliseconds to wait.
- * @returns {Promise<void>}
- * @throws {Error} If the emulator is not ready within the given timeout.
  */
-export async function waitForEmulatorReady (timeoutMs = 20000) {
+export async function waitForEmulatorReady (this: ADB, timeoutMs: number = 20000): Promise<void> {
   log.debug(`Waiting up to ${timeoutMs}ms for the emulator to be ready`);
-  /** @type {RegExp[]} */
   const requiredServicesRe = REQUIRED_SERVICES.map((name) => new RegExp(`\\b${name}:`));
-  let services;
+  let services: string | undefined;
   const timer = new timing.Timer().start();
   let isFirstCheck = true;
   let isBootCompleted = false;
@@ -958,15 +861,17 @@ export async function waitForEmulatorReady (timeoutMs = 20000) {
           isBootCompleted = true;
         }
 
-        services = await this.shell(['service', 'list']);
-        if (!requiredServicesRe.every((pattern) => pattern.test(services))) {
-          log.debug(`Running services: ${services}`);
+        const servicesOutput = await this.shell(['service', 'list']);
+        services = servicesOutput;
+        if (!servicesOutput || !requiredServicesRe.every((pattern) => pattern.test(servicesOutput))) {
+          log.debug(`Running services: ${servicesOutput}`);
           return false;
         }
 
         return true;
-      } catch (err) {
-        log.debug(`Intermediate error: ${err.message}`);
+      } catch (err: unknown) {
+        const error = err as Error;
+        log.debug(`Intermediate error: ${error.message}`);
         return false;
       }
     }, {
@@ -975,9 +880,10 @@ export async function waitForEmulatorReady (timeoutMs = 20000) {
     });
   } catch {
     let suffix = '';
-    if (services !== undefined) {
+    const servicesValue = services;
+    if (servicesValue !== undefined && servicesValue) {
       const missingServices = _.zip(REQUIRED_SERVICES, requiredServicesRe)
-        .filter(([, pattern]) => !(/** @type {RegExp} */ (pattern)).test(services))
+        .filter(([, pattern]) => !(pattern as RegExp).test(servicesValue))
         .map(([name]) => name);
       suffix = ` (${missingServices} service${missingServices.length === 1 ? ' is' : 's are'} not running)`;
     }
@@ -992,15 +898,10 @@ export async function waitForEmulatorReady (timeoutMs = 20000) {
 
 /**
  * Check if the current device is ready to accept further commands (booting completed).
- *
- * @this {import('../adb.js').ADB}
- * @param {number} [appDeviceReadyTimeout=30] - The maximum number of seconds to wait.
- * @throws {Error} If the device is not ready within the given timeout.
  */
-export async function waitForDevice (appDeviceReadyTimeout = 30) {
+export async function waitForDevice (this: ADB, appDeviceReadyTimeout: number = 30): Promise<void> {
   const timeoutMs = appDeviceReadyTimeout * 1000;
-  /** @type {Error|null} */
-  let lastError = null;
+  let lastErrorMessage: string | null = null;
   try {
     await waitForCondition(
       async () => {
@@ -1008,8 +909,9 @@ export async function waitForDevice (appDeviceReadyTimeout = 30) {
           await this.adbExec('wait-for-device', {timeout: Math.trunc(timeoutMs * 0.99)});
           await this.ping();
           return true;
-        } catch (e) {
-          lastError = e;
+        } catch (e: unknown) {
+          const error = e as Error;
+          lastErrorMessage = error.message;
           try {
             try {
               await this.reconnect();
@@ -1017,7 +919,9 @@ export async function waitForDevice (appDeviceReadyTimeout = 30) {
               await this.restartAdb();
             }
             await this.getConnectedDevices();
-          } catch {}
+          } catch {
+            // Ignore errors during reconnection
+          }
           return false;
         }
       }, {
@@ -1027,8 +931,8 @@ export async function waitForDevice (appDeviceReadyTimeout = 30) {
     );
   } catch {
     let suffix = '';
-    if (lastError) {
-      suffix = ` Original error: ${ /** @type {Error} */ (lastError).message}`;
+    if (lastErrorMessage) {
+      suffix = ` Original error: ${lastErrorMessage}`;
     }
     throw new Error(`The device is not ready after ${appDeviceReadyTimeout}s.${suffix}`);
   }
@@ -1036,12 +940,8 @@ export async function waitForDevice (appDeviceReadyTimeout = 30) {
 
 /**
  * Reboot the current device and wait until it is completed.
- *
- * @this {import('../adb.js').ADB}
- * @param {number} [retries=DEFAULT_ADB_REBOOT_RETRIES] - The maximum number of reboot retries.
- * @throws {Error} If the device failed to reboot and number of retries is exceeded.
  */
-export async function reboot (retries = DEFAULT_ADB_REBOOT_RETRIES) {
+export async function reboot (this: ADB, retries: number = DEFAULT_ADB_REBOOT_RETRIES): Promise<void> {
   // Get root access so we can run the next shell commands which require root access
   const { wasAlreadyRooted } = await this.root();
   try {
@@ -1052,15 +952,16 @@ export async function reboot (retries = DEFAULT_ADB_REBOOT_RETRIES) {
       privileged: false // no need to set privileged true because device already rooted
     });
     await this.shell(['start']);
-  } catch (e) {
-    const {message} = e;
+  } catch (e: unknown) {
+    const error = e as Error;
+    const {message} = error;
 
     // provide a helpful error message if the reason reboot failed was because ADB couldn't gain root access
     if (message.includes('must be root')) {
       throw new Error(`Could not reboot device. Rebooting requires root access and ` +
         `attempt to get root access on device failed with error: '${message}'`);
     }
-    throw e;
+    throw error;
   } finally {
     // Return root state to what it was before
     if (!wasAlreadyRooted) {
@@ -1081,22 +982,19 @@ export async function reboot (retries = DEFAULT_ADB_REBOOT_RETRIES) {
 
 /**
  * Switch adb server root privileges.
- *
- * @this {import('../adb.js').ADB}
- * @param {boolean} isElevated - Should we elevate to to root or unroot? (default true)
- * @return {Promise<import('./types').RootResult>}
  */
-export async function changeUserPrivileges (isElevated) {
+export async function changeUserPrivileges (this: ADB, isElevated: boolean): Promise<RootResult> {
   const cmd = isElevated ? 'root' : 'unroot';
 
-  const retryIfOffline = async (cmdFunc) => {
+  const retryIfOffline = async (cmdFunc: () => Promise<any>): Promise<any> => {
     try {
       return await cmdFunc();
-    } catch (err) {
+    } catch (err: unknown) {
+      const error = err as ExecError;
       // Check the output of the stdErr to see if there's any clues that show that the device went offline
       // and if it did go offline, restart ADB
       if (['closed', 'device offline', 'timeout expired']
-          .some((x) => (err.stderr || '').toLowerCase().includes(x))) {
+          .some((x) => (error.stderr || '').toLowerCase().includes(x))) {
         log.warn(`Attempt to ${cmd} caused ADB to think the device went offline`);
         try {
           await this.reconnect();
@@ -1105,7 +1003,7 @@ export async function changeUserPrivileges (isElevated) {
         }
         return await cmdFunc();
       } else {
-        throw err;
+        throw error;
       }
     }
   };
@@ -1132,8 +1030,9 @@ export async function changeUserPrivileges (isElevated) {
       }
     }
     return {isSuccessful: true, wasAlreadyRooted};
-  } catch (err) {
-    const {stderr = '', message} = err;
+  } catch (err: unknown) {
+    const error = err as ExecError;
+    const {stderr = '', message} = error;
     log.warn(`Unable to ${cmd} adb daemon. Original error: '${message}'. Stderr: '${stderr}'. Continuing.`);
     return {isSuccessful: false, wasAlreadyRooted};
   }
@@ -1141,33 +1040,22 @@ export async function changeUserPrivileges (isElevated) {
 
 /**
  * Switch adb server to root mode
- *
- * @this {import('../adb.js').ADB}
- * @return {Promise<import('./types').RootResult>}
  */
-export async function root () {
+export async function root (this: ADB): Promise<RootResult> {
   return await this.changeUserPrivileges(true);
 }
 
 /**
  * Switch adb server to non-root mode.
- *
- * @this {import('../adb.js').ADB}
- * @return {Promise<import('./types').RootResult>}
  */
-export async function unroot () {
+export async function unroot (this: ADB): Promise<RootResult> {
   return await this.changeUserPrivileges(false);
 }
 
 /**
  * Checks whether the current user is root
- *
- * @this {import('../adb.js').ADB}
- * @return {Promise<boolean>} True if the user is root
- * @throws {Error} if there was an error while identifying
- * the user.
  */
-export async function isRoot () {
+export async function isRoot (this: ADB): Promise<boolean> {
   return (await this.shell(['whoami'])).trim() === 'root';
 }
 
@@ -1179,14 +1067,8 @@ export async function isRoot () {
  * openssl tool to be available on the destination system.
  * Read https://github.com/appium/appium/issues/10964
  * for more details on this topic
- *
- * @this {import('../adb.js').ADB}
- * @param {Buffer|string} cert - base64-decoded content of the actual certificate
- * represented as a string or a buffer
- * @throws {Error} If openssl tool is not available on the destination system
- * or if there was an error while installing the certificate
  */
-export async function installMitmCertificate (cert) {
+export async function installMitmCertificate (this: ADB, cert: Buffer | string): Promise<void> {
   const openSsl = await getOpenSslForOs();
 
   const tmpRoot = await tempDir.openDir();
@@ -1215,11 +1097,12 @@ export async function installMitmCertificate (cert) {
     await this.push(dstCert, CERTS_ROOT);
     log.debug('Remounting /system to confirm changes');
     await this.adbExec(['remount']);
-  } catch (err) {
+  } catch (err: unknown) {
+    const error = err as Error;
     throw new Error(`Cannot inject the custom certificate. ` +
                     `Is the certificate properly encoded into base64-string? ` +
                     `Do you have root permissions on the device? ` +
-                    `Original error: ${err.message}`);
+                    `Original error: ${error.message}`);
   } finally {
     await fs.rimraf(tmpRoot);
   }
@@ -1227,28 +1110,22 @@ export async function installMitmCertificate (cert) {
 
 /**
  * Verifies if the given root certificate is already installed on the device.
- *
- * @this {import('../adb.js').ADB}
- * @param {Buffer|string} cert - base64-decoded content of the actual certificate
- * represented as a string or a buffer
- * @throws {Error} If openssl tool is not available on the destination system
- * or if there was an error while checking the certificate
- * @returns {Promise<boolean>} true if the given certificate is already installed
  */
-export async function isMitmCertificateInstalled (cert) {
+export async function isMitmCertificateInstalled (this: ADB, cert: Buffer | string): Promise<boolean> {
   const openSsl = await getOpenSslForOs();
 
   const tmpRoot = await tempDir.openDir();
-  let certHash;
+  let certHash: string;
   try {
     const tmpCert = path.resolve(tmpRoot, 'source.cer');
     await fs.writeFile(tmpCert, Buffer.isBuffer(cert) ? cert : Buffer.from(cert, 'base64'));
     const {stdout} = await exec(openSsl, ['x509', '-noout', '-hash', '-in', tmpCert]);
     certHash = stdout.trim();
-  } catch (err) {
+  } catch (err: unknown) {
+    const error = err as Error;
     throw new Error(`Cannot retrieve the certificate hash. ` +
                     `Is the certificate properly encoded into base64-string? ` +
-                    `Original error: ${err.message}`);
+                    `Original error: ${error.message}`);
   } finally {
     await fs.rimraf(tmpRoot);
   }
@@ -1262,20 +1139,10 @@ export async function isMitmCertificateInstalled (cert) {
  * This is faster than calling `adb shell` separately for each arg, however
  * there is a limit for a maximum length of a single adb command. that is why
  * we need all this complicated logic.
- *
- * @this {import('../adb.js').ADB}
- * @param {(x: string) => string[]} argTransformer A function, that receives single argument
- * from the `args` array and transforms it into a shell command. The result
- * of the function must be an array, where each item is a part of a single command.
- * The last item of the array could be ';'. If this is not a semicolon then it is going to
- * be added automatically.
- * @param {string[]} args Array of argument values to create chunks for
- * @throws {Error} If any of the chunks returns non-zero exit code after being executed
  */
-export async function shellChunks (argTransformer, args) {
-  const commands = [];
-  /** @type {string[]} */
-  let cmdChunk = [];
+export async function shellChunks (this: ADB, argTransformer: (x: string) => string[], args: string[]): Promise<void> {
+  const commands: string[][] = [];
+  let cmdChunk: string[] = [];
   for (const arg of args) {
     const nextCmd = argTransformer(arg);
     if (!_.isArray(nextCmd)) {
@@ -1294,12 +1161,12 @@ export async function shellChunks (argTransformer, args) {
     commands.push(cmdChunk);
   }
   log.debug(`Got the following command chunks to execute: ${JSON.stringify(commands)}`);
-  let lastError = null;
+  let lastError: Error | null = null;
   for (const cmd of commands) {
     try {
       await this.shell(cmd);
-    } catch (e) {
-      lastError = e;
+    } catch (e: unknown) {
+      lastError = e as Error;
     }
   }
   if (lastError) {
@@ -1307,26 +1174,19 @@ export async function shellChunks (argTransformer, args) {
   }
 }
 
-// #region Private functions
-
 /**
  * Transforms the given language and country abbreviations
  * to AVD arguments array
- *
- * @param {?string} language Language name, for example 'fr'
- * @param {?string} country Country name, for example 'CA'
- * @returns {Array<string>} The generated arguments. The
- * resulting array might be empty if both arguments are empty
  */
-export function toAvdLocaleArgs (language, country) {
-  const result = [];
+export function toAvdLocaleArgs (language: string | null, country: string | null): string[] {
+  const result: string[] = [];
   if (language && _.isString(language)) {
     result.push('-prop', `persist.sys.language=${language.toLowerCase()}`);
   }
   if (country && _.isString(country)) {
     result.push('-prop', `persist.sys.country=${country.toUpperCase()}`);
   }
-  let locale;
+  let locale: string | undefined;
   if (_.isString(language) && _.isString(country) && language && country) {
     locale = language.toLowerCase() + '-' + country.toUpperCase();
   } else if (language && _.isString(language)) {
@@ -1340,52 +1200,34 @@ export function toAvdLocaleArgs (language, country) {
   return result;
 }
 
-
 /**
  * Retrieves full paths to all 'build-tools' subfolders under the particular
  * SDK root folder
- *
- * @type {(sdkRoot: string) => Promise<string[]>}
  */
-export const getBuildToolsDirs = _.memoize(async function getBuildToolsDirs (sdkRoot) {
+export const getBuildToolsDirs = _.memoize(async function getBuildToolsDirs (sdkRoot: string): Promise<string[]> {
   let buildToolsDirs = await fs.glob('*/', {
     cwd: path.resolve(sdkRoot, 'build-tools'),
     absolute: true,
   });
   try {
     buildToolsDirs = buildToolsDirs
-      .map((dir) => [path.basename(dir), dir])
+      .map((dir) => [path.basename(dir), dir] as [string, string])
       .sort((a, b) => semver.rcompare(a[0], b[0]))
       .map((pair) => pair[1]);
-  } catch (err) {
+  } catch (err: unknown) {
+    const error = err as Error;
     log.warn(`Cannot sort build-tools folders ${JSON.stringify(buildToolsDirs.map((dir) => path.basename(dir)))} ` +
       `by semantic version names.`);
-    log.warn(`Falling back to sorting by modification date. Original error: ${err.message}`);
-    /** @type {[number, string][]} */
-    const pairs = await B.map(buildToolsDirs, async (dir) => [(await fs.stat(dir)).mtime.valueOf(), dir]);
+    log.warn(`Falling back to sorting by modification date. Original error: ${error.message}`);
+    const pairs = await B.map(buildToolsDirs, async (dir) => [(await fs.stat(dir)).mtime.valueOf(), dir] as [number, string]);
     buildToolsDirs = pairs
-      // @ts-ignore This sorting works
-      .sort((a, b) => a[0] < b[0])
+      .sort((a, b) => a[0] < b[0] ? 1 : -1)
       .map((pair) => pair[1]);
   }
   log.info(`Found ${buildToolsDirs.length} 'build-tools' folders under '${sdkRoot}' (newest first):`);
-  for (let dir of buildToolsDirs) {
+  for (const dir of buildToolsDirs) {
     log.info(`    ${dir}`);
   }
   return buildToolsDirs;
 });
 
-/**
- *
- * @returns {Promise<string>}
- */
-async function getOpenSslForOs () {
-  const binaryName = `openssl${system.isWindows() ? '.exe' : ''}`;
-  try {
-    return await fs.which(binaryName);
-  } catch {
-    throw new Error('The openssl tool must be installed on the system and available on the path');
-  }
-}
-
-// #endregion
