@@ -27,7 +27,7 @@ const HIDDEN_API_POLICY_KEYS = [
  * @returns The value of the given property.
  */
 export async function getDeviceProperty (this: ADB, property: string): Promise<string> {
-  const stdout = await this.shell(['getprop', property]) as string;
+  const stdout = await this.shell(['getprop', property]);
   const val = stdout.trim();
   log.debug(`Current device property '${property}': ${val}`);
   return val;
@@ -114,7 +114,7 @@ export async function getManufacturer (this: ADB): Promise<string> {
  * _null_ if it cannot be determined.
  */
 export async function getScreenSize (this: ADB): Promise<string | null> {
-  const stdout = await this.shell(['wm', 'size']) as string;
+  const stdout = await this.shell(['wm', 'size']);
   const size = new RegExp(/Physical size: ([^\r?\n]+)*/g).exec(stdout);
   if (size && size.length >= 2) {
     return size[1].trim();
@@ -129,7 +129,7 @@ export async function getScreenSize (this: ADB): Promise<string | null> {
  * cannot be determined
  */
 export async function getScreenDensity (this: ADB): Promise<number | null> {
-  const stdout = await this.shell(['wm', 'density']) as string;
+  const stdout = await this.shell(['wm', 'density']);
   const density = new RegExp(/Physical density: ([^\r?\n]+)*/g).exec(stdout);
   if (density && density.length >= 2) {
     const densityNumber = parseInt(density[1].trim(), 10);
@@ -191,7 +191,7 @@ export async function deleteHttpProxy (this: ADB): Promise<void> {
  * @returns command output.
  */
 export async function setSetting (this: ADB, namespace: string, setting: string, value: string | number): Promise<string> {
-  return await this.shell(['settings', 'put', namespace, setting, `${value}`]) as string;
+  return await this.shell(['settings', 'put', namespace, setting, `${value}`]);
 }
 
 /**
@@ -203,7 +203,7 @@ export async function setSetting (this: ADB, namespace: string, setting: string,
  * @returns property value.
  */
 export async function getSetting (this: ADB, namespace: string, setting: string): Promise<string> {
-  return await this.shell(['settings', 'get', namespace, setting]) as string;
+  return await this.shell(['settings', 'get', namespace, setting]);
 }
 
 /**
@@ -257,7 +257,7 @@ export async function getLocationProviders (this: ADB): Promise<string[]> {
   }
 
   // To emulate the legacy behavior
-  return _.includes(await this.shell(['cmd', 'location', 'is-location-enabled']) as string, 'true')
+  return _.includes(await this.shell(['cmd', 'location', 'is-location-enabled']), 'true')
     ? ['gps']
     : [];
 }
@@ -499,7 +499,7 @@ export async function getDeviceIdleWhitelist (this: ADB): Promise<string[]> {
   }
 
   log.info('Listing packages in Doze whitelist');
-  const output = await this.shell(['dumpsys', 'deviceidle', 'whitelist']) as string;
+  const output = await this.shell(['dumpsys', 'deviceidle', 'whitelist']);
   return _.trim(output).split(/\n/)
     .map((line) => _.trim(line))
     .filter(Boolean);
@@ -678,7 +678,7 @@ export async function setAnimationScale (this: ADB, value: number): Promise<void
  * @returns The current orientation encoded as an integer number.
  */
 export async function getScreenOrientation (this: ADB): Promise<number | null> {
-  const stdout = await this.shell(['dumpsys', 'input']) as string;
+  const stdout = await this.shell(['dumpsys', 'input']);
   return getSurfaceOrientation(stdout);
 }
 

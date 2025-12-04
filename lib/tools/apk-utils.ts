@@ -73,7 +73,7 @@ export async function uninstallApk (this: ADB, pkg: string, options: UninstallOp
  * @throws If there was a failure during application install.
  */
 export async function installFromDevicePath (this: ADB, apkPathOnDevice: string, opts: ShellExecOptions = {}): Promise<void> {
-  const stdout = await this.shell(['pm', 'install', '-r', apkPathOnDevice], opts) as string;
+  const stdout = await this.shell(['pm', 'install', '-r', apkPathOnDevice], opts);
   if (stdout.includes('Failure')) {
     throw new Error(`Remote install failed: ${stdout}`);
   }
@@ -96,14 +96,14 @@ export async function cacheApk (this: ADB, apkPath: string, options: CachingOpti
     const errorMarker = '_ERROR_';
     let lsOutput: string | null = null;
     if (this._areExtendedLsOptionsSupported === true || !_.isBoolean(this._areExtendedLsOptionsSupported)) {
-      lsOutput = await this.shell([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]) as string;
+      lsOutput = await this.shell([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
     }
     if (!_.isString(lsOutput) || (lsOutput.includes(errorMarker) && !lsOutput.includes(REMOTE_CACHE_ROOT))) {
       if (!_.isBoolean(this._areExtendedLsOptionsSupported)) {
         log.debug('The current Android API does not support extended ls options. ' +
           'Defaulting to no-options call');
       }
-      lsOutput = await this.shell([`ls ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]) as string;
+      lsOutput = await this.shell([`ls ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
       this._areExtendedLsOptionsSupported = false;
     } else {
       this._areExtendedLsOptionsSupported = true;
@@ -227,7 +227,7 @@ export async function install (this: ADB, appPath: string, options: InstallOptio
           ...installArgs,
           remotePath,
         ];
-        const output = await this.shell(pmInstallCmdByRemotePath(cachedAppPath), installOpts) as string;
+        const output = await this.shell(pmInstallCmdByRemotePath(cachedAppPath), installOpts);
         // https://github.com/appium/appium/issues/13970
         if (/\bINSTALL_FAILED_INSUFFICIENT_STORAGE\b/.test(output)) {
           log.warn(`There was a failure while installing '${appPath}' ` +
@@ -236,7 +236,7 @@ export async function install (this: ADB, appPath: string, options: InstallOptio
           log.info(`Consider decreasing the maximum amount of cached apps ` +
             `(currently ${this.remoteAppsCacheLimit}) to avoid such issues in the future`);
           const newCachedAppPath = await cacheApp();
-          return await this.shell(pmInstallCmdByRemotePath(newCachedAppPath), installOpts) as string;
+          return await this.shell(pmInstallCmdByRemotePath(newCachedAppPath), installOpts);
         }
         return output;
       };
@@ -250,7 +250,7 @@ export async function install (this: ADB, appPath: string, options: InstallOptio
   }
   try {
     const timer = new timing.Timer().start();
-    const output = await performAppInstall() as string;
+    const output = await performAppInstall();
     log.info(`The installation of '${path.basename(appPath)}' took ${timer.getDuration().asMilliSeconds.toFixed(0)}ms`);
     const truncatedOutput = (!_.isString(output) || output.length <= 300) ?
       output : `${output.substring(0, 150)}...${output.substring(output.length - 150)}`;
