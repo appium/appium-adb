@@ -304,8 +304,7 @@ export async function getApplicationInstallState (this: ADB, appPath: string, pk
   }
   const pkgVersionName = semver.valid(semver.coerce(pkgVersionNameStr));
   if (!apkInfo) {
-    const apkInfoResult = await this.getApkInfo(appPath);
-    apkInfo = 'name' in apkInfoResult ? apkInfoResult as AppInfo : null;
+    apkInfo = (await this.getApkInfo(appPath)) as AppInfo;
   }
   // @ts-ignore We validate the values below
   const {versionCode: apkVersionCode, versionName: apkVersionNameStr} = apkInfo || {};
