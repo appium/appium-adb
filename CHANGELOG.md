@@ -1,3 +1,9 @@
+## [14.0.5](https://github.com/appium/appium-adb/compare/v14.0.4...v14.0.5) (2025-12-04)
+
+### Miscellaneous Chores
+
+* Migrate app commands to typescript ([#843](https://github.com/appium/appium-adb/issues/843)) ([8993e7c](https://github.com/appium/appium-adb/commit/8993e7c5fcbabda3796b8246ecac39046bf6fe3f))
+
 ## [14.0.4](https://github.com/appium/appium-adb/compare/v14.0.3...v14.0.4) (2025-12-04)
 
 ### Miscellaneous Chores
