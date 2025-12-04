@@ -2,48 +2,26 @@ import path from 'path';
 import { system, fs, zip, util } from '@appium/support';
 import { log } from './logger.js';
 import _ from 'lodash';
-import { exec } from 'teen_process';
+import { exec, type ExecError } from 'teen_process';
+import type { ADB } from './adb.js';
+import type { ApkManifest } from './tools/types.js';
 
+// Declare __filename for CommonJS compatibility
+declare const __filename: string;
+
+// Constants
 export const APKS_EXTENSION = '.apks';
 export const APK_EXTENSION = '.apk';
 export const APK_INSTALL_TIMEOUT = 60000;
 export const DEFAULT_ADB_EXEC_TIMEOUT = 20000; // in milliseconds
 const MODULE_NAME = 'appium-adb';
 
-/**
- * Calculates the absolute path to the current module's root folder
- *
- * @returns {Promise<string>} The full path to module root
- * @throws {Error} If the current module root folder cannot be determined
- */
-const getModuleRoot = _.memoize(async function getModuleRoot () {
-  let moduleRoot = path.dirname(path.resolve(__filename));
-  let isAtFsRoot = false;
-  while (!isAtFsRoot) {
-    const manifestPath = path.join(moduleRoot, 'package.json');
-    try {
-      if (await fs.exists(manifestPath) &&
-          JSON.parse(await fs.readFile(manifestPath, 'utf8')).name === MODULE_NAME) {
-        return moduleRoot;
-      }
-    } catch {}
-    moduleRoot = path.dirname(moduleRoot);
-    isAtFsRoot = moduleRoot.length <= path.dirname(moduleRoot).length;
-  }
-  if (isAtFsRoot) {
-    throw new Error(`Cannot find the root folder of the ${MODULE_NAME} Node.js module`);
-  }
-  return moduleRoot;
-});
+// Public methods
 
 /**
- * Calculates the absolsute path to the given resource
- *
- * @param {string} relPath Relative path to the resource starting from the current module root
- * @returns {Promise<string>} The full path to the resource
- * @throws {Error} If the absolute resource path cannot be determined
+ * Calculates the absolute path to the given resource
  */
-export const getResourcePath = _.memoize(async function getResourcePath (relPath) {
+export const getResourcePath = _.memoize(async function getResourcePath (relPath: string): Promise<string> {
   const moduleRoot = await getModuleRoot();
   const resultPath = path.resolve(moduleRoot, relPath);
   if (!await fs.exists(resultPath)) {
@@ -55,51 +33,43 @@ export const getResourcePath = _.memoize(async function getResourcePath (relPath
 
 /**
  * Retrieves the actual path to SDK root folder from the system environment
- *
- * @return {string|undefined} The full path to the SDK root folder
  */
-export function getSdkRootFromEnv () {
+export function getSdkRootFromEnv (): string | undefined {
   return process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT;
 }
 
 /**
  * Retrieves the actual path to SDK root folder
- *
- * @param {string?} [customRoot]
- * @return {Promise<string>} The full path to the SDK root folder
- * @throws {Error} If either the corresponding env variable is unset or is
- * pointing to an invalid file system entry
  */
-export async function requireSdkRoot (customRoot = null) {
+export async function requireSdkRoot (customRoot: string | null = null): Promise<string> {
   const sdkRoot = customRoot || getSdkRootFromEnv();
   const docMsg = 'Read https://developer.android.com/studio/command-line/variables for more details';
-  if (_.isEmpty(sdkRoot)) {
+  if (!sdkRoot || _.isEmpty(sdkRoot)) {
     throw new Error(`Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`);
   }
-
-  if (!await fs.exists(/** @type {string} */ (sdkRoot))) {
+  if (!await fs.exists(sdkRoot)) {
     throw new Error(`The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`);
   }
-  const stats = await fs.stat(/** @type {string} */ (sdkRoot));
+
+  const stats = await fs.stat(sdkRoot);
   if (!stats.isDirectory()) {
     throw new Error(`The Android SDK root '${sdkRoot}' must be a folder. ${docMsg}`);
   }
-  return /** @type {string} */ (sdkRoot);
+  return sdkRoot;
 }
 
 /**
- * @param {string} zipPath
- * @param {string} dstRoot
+ * @param zipPath
+ * @param dstRoot
  */
-export async function unzipFile (zipPath, dstRoot = path.dirname(zipPath)) {
+export async function unzipFile (zipPath: string, dstRoot: string = path.dirname(zipPath)): Promise<void> {
   log.debug(`Unzipping '${zipPath}' to '${dstRoot}'`);
   await zip.assertValidZip(zipPath);
   await zip.extractAllTo(zipPath, dstRoot);
   log.debug('Unzip successful');
 }
 
-/** @type {() => Promise<string>} */
-export const getJavaHome = _.memoize(async function getJavaHome () {
+export const getJavaHome = _.memoize(async function getJavaHome (): Promise<string> {
   const result = process.env.JAVA_HOME;
   if (!result) {
     throw new Error('The JAVA_HOME environment variable is not set for the current process');
@@ -114,14 +84,14 @@ export const getJavaHome = _.memoize(async function getJavaHome () {
   return result;
 });
 
-/** @type {() => Promise<string>} */
-export const getJavaForOs = _.memoize(async function getJavaForOs () {
-  let javaHome;
-  let errMsg;
+export const getJavaForOs = _.memoize(async function getJavaForOs (): Promise<string> {
+  let javaHome: string | undefined;
+  let errMsg: string | undefined;
   try {
     javaHome = await getJavaHome();
-  } catch (err) {
-    errMsg = err.message;
+  } catch (err: unknown) {
+    const error = err as Error;
+    errMsg = error.message;
   }
   const executableName = `java${system.isWindows() ? '.exe' : ''}`;
   if (javaHome) {
@@ -132,20 +102,21 @@ export const getJavaForOs = _.memoize(async function getJavaForOs () {
   }
   try {
     return await fs.which(executableName);
-  } catch {}
+  } catch {
+    // Ignore and throw custom error below
+  }
   throw new Error(`The '${executableName}' binary could not be found ` +
     `neither in PATH nor under JAVA_HOME (${javaHome ? path.resolve(javaHome, 'bin') : errMsg})`);
 });
 
 /**
  * Transforms given options into the list of `adb install.install-multiple` command arguments
- *
- * @param {number} apiLevel - The current API level
- * @param {InstallOptions} [options={}] - The options mapping to transform
- * @returns {string[]} The array of arguments
  */
-export function buildInstallArgs (apiLevel, options = {}) {
-  const result = [];
+export function buildInstallArgs (
+  apiLevel: number,
+  options: BuildInstallArgsOptions = {}
+): string[] {
+  const result: string[] = [];
 
   if (!util.hasValue(options.replace) || options.replace) {
     result.push('-r');
@@ -176,57 +147,56 @@ export function buildInstallArgs (apiLevel, options = {}) {
 /**
  * Extracts various package manifest details
  * from the given application file.
- *
- * @this {import('./adb.js').ADB}
- * @param {string} apkPath Full path to the application file.
- * @returns {Promise<import('./tools/types').ApkManifest>}
  */
-export async function readPackageManifest(apkPath) {
+export async function readPackageManifest (this: ADB, apkPath: string): Promise<ApkManifest> {
   await this.initAapt2();
-  const aapt2Binary = (/** @type {import('./tools/types').StringRecord} */ (this.binaries)).aapt2;
+  const aapt2Binary = this.binaries?.aapt2;
+  if (!aapt2Binary) {
+    throw new Error('aapt2 binary is not available');
+  }
 
   const args = ['dump', 'badging', apkPath];
   log.debug(`Reading package manifest: '${util.quote([aapt2Binary, ...args])}'`);
-  /** @type {string} */
-  let stdout;
+  let stdout: string;
   try {
     ({stdout} = await exec(aapt2Binary, args));
-  } catch (e) {
+  } catch (e: unknown) {
+    const error = e as ExecError;
     const prefix = `Cannot read the manifest from '${apkPath}'`;
-    const suffix = `Original error: ${e.stderr || e.message}`;
-    if (_.includes(e.stderr, `Unable to open 'badging'`)) {
+    const suffix = `Original error: ${error.stderr || error.message}`;
+    if (error.stderr && _.includes(error.stderr, `Unable to open 'badging'`)) {
       throw new Error(`${prefix}. Update build tools to use a newer aapt2 version. ${suffix}`);
     }
     throw new Error(`${prefix}. ${suffix}`);
   }
 
   const extractValue = (
-    /** @type {string} */ line,
-    /** @type {RegExp} */ propPattern,
-    /** @type {((x: string) => any)|null} */ valueTransformer
-  ) => {
+    line: string,
+    propPattern: RegExp,
+    valueTransformer: ((x: string) => any) | null
+  ): any => {
     const match = propPattern.exec(line);
     if (match) {
       return valueTransformer ? valueTransformer(match[1]) : match[1];
     }
+    return undefined;
   };
   const extractArray = (
-    /** @type {string} */ line,
-    /** @type {RegExp} */ propPattern,
-    /** @type {((x: string) => any)|null} */ valueTransformer
-  ) => {
-    let match;
-    const resultArray = [];
+    line: string,
+    propPattern: RegExp,
+    valueTransformer: ((x: string) => any) | null
+  ): any[] => {
+    let match: RegExpExecArray | null;
+    const resultArray: any[] = [];
     while ((match = propPattern.exec(line))) {
       resultArray.push(valueTransformer ? valueTransformer(match[1]) : match[1]);
     }
     return resultArray;
   };
 
-  const toInt = (/** @type {string} */ x) => parseInt(x, 10);
+  const toInt = (x: string): number => parseInt(x, 10);
 
-  /** @type {import('./tools/types').ApkManifest} */
-  const result = {
+  const result: ApkManifest = {
     name: '',
     versionCode: 0,
     minSdkVersion: 0,
@@ -242,21 +212,21 @@ export async function readPackageManifest(apkPath) {
   for (const line of stdout.split('\n')) {
     if (line.startsWith('package:')) {
       for (const [name, pattern, transformer] of [
-        ['name', /name='([^']+)'/],
+        ['name', /name='([^']+)'/, null],
         ['versionCode', /versionCode='([^']+)'/, toInt],
-        ['versionName', /versionName='([^']+)'/],
-        ['platformBuildVersionName', /platformBuildVersionName='([^']+)'/],
+        ['versionName', /versionName='([^']+)'/, null],
+        ['platformBuildVersionName', /platformBuildVersionName='([^']+)'/, null],
         ['platformBuildVersionCode', /platformBuildVersionCode='([^']+)'/, toInt],
         ['compileSdkVersion', /compileSdkVersion='([^']+)'/, toInt],
-        ['compileSdkVersionCodename', /compileSdkVersionCodename='([^']+)'/],
-      ]) {
+        ['compileSdkVersionCodename', /compileSdkVersionCodename='([^']+)'/, null],
+      ] as const) {
         const value = extractValue(
           line,
-          /** @type {RegExp} */ (pattern),
-          /** @type {((x: string) => any)|null} */ (transformer)
+          pattern,
+          transformer
         );
         if (!_.isUndefined(value)) {
-          result[/** @type {string} */ (name)] = value;
+          (result as Record<string, any>)[name] = value;
         }
       }
     } else if (line.startsWith('sdkVersion:') || line.startsWith('minSdkVersion:')) {
@@ -272,44 +242,70 @@ export async function readPackageManifest(apkPath) {
     } else if (line.startsWith('uses-permission:')) {
       const value = extractValue(line, /name='([^']+)'/, null);
       if (value) {
-        result.usesPermissions.push(/** @type {string} */ (value));
+        result.usesPermissions.push(value);
       }
     } else if (line.startsWith('launchable-activity:')) {
       for (const [name, pattern] of [
         ['name', /name='([^']+)'/],
         ['label', /label='([^']+)'/],
         ['icon', /icon='([^']+)'/],
-      ]) {
-        const value = extractValue(line, /** @type {RegExp} */ (pattern), null);
+      ] as const) {
+        const value = extractValue(line, pattern, null);
         if (value) {
-          result.launchableActivity[/** @type {string} */ (name)] = value;
+          (result.launchableActivity as Record<string, any>)[name] = value;
         }
       }
     } else if (line.startsWith('locales:')) {
-      result.locales = /** @type {string[]} */ (extractArray(line, /'([^']+)'/g, null));
+      result.locales = extractArray(line, /'([^']+)'/g, null) as string[];
     } else if (line.startsWith('native-code:')) {
-      result.architectures = /** @type {string[]} */ (extractArray(line, /'([^']+)'/g, null));
+      result.architectures = extractArray(line, /'([^']+)'/g, null) as string[];
     } else if (line.startsWith('densities:')) {
-      result.densities = /** @type {number[]} */ (extractArray(line, /'([^']+)'/g, toInt));
+      result.densities = extractArray(line, /'([^']+)'/g, toInt) as number[];
     }
   }
   return result;
 }
 
-/**
- * @typedef {Object} InstallOptions
- * @property {boolean} [allowTestPackages=false] - Set to true in order to allow test
- *                                                 packages installation.
- * @property {boolean} [useSdcard=false] - Set to true to install the app on sdcard
- *                                         instead of the device memory.
- * @property {boolean} [grantPermissions=false] - Set to true in order to grant all the
- *                                                permissions requested in the application's manifest
- *                                                automatically after the installation is completed
- *                                                under Android 6+.
- * @property {boolean} [replace=true] - Set it to false if you don't want
- *                                      the application to be upgraded/reinstalled
- *                                      if it is already present on the device.
- * @property {boolean} [partialInstall=false] - Install apks partially. It is used for 'install-multiple'.
- *                                             https://android.stackexchange.com/questions/111064/what-is-a-partial-application-install-via-adb
- */
+// Private methods
 
+/**
+ * Calculates the absolute path to the current module's root folder
+ */
+const getModuleRoot = _.memoize(async function getModuleRoot (): Promise<string> {
+  let moduleRoot = path.dirname(path.resolve(__filename));
+  let isAtFsRoot = false;
+  while (!isAtFsRoot) {
+    const manifestPath = path.join(moduleRoot, 'package.json');
+    try {
+      if (await fs.exists(manifestPath)) {
+        const manifestContent = await fs.readFile(manifestPath, 'utf8');
+        const manifest = JSON.parse(manifestContent) as { name?: string };
+        if (manifest.name === MODULE_NAME) {
+          return moduleRoot;
+        }
+      }
+    } catch {
+      // Ignore errors and continue searching
+    }
+    const parentDir = path.dirname(moduleRoot);
+    isAtFsRoot = moduleRoot.length <= parentDir.length;
+    moduleRoot = parentDir;
+  }
+  if (isAtFsRoot) {
+    throw new Error(`Cannot find the root folder of the ${MODULE_NAME} Node.js module`);
+  }
+  return moduleRoot;
+});
+
+// Type definitions
+
+/**
+ * Options for building install arguments
+ */
+interface BuildInstallArgsOptions {
+  replace?: boolean;
+  allowTestPackages?: boolean;
+  useSdcard?: boolean;
+  grantPermissions?: boolean;
+  partialInstall?: boolean;
+}
