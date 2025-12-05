@@ -1,3 +1,9 @@
+## [14.0.6](https://github.com/appium/appium-adb/compare/v14.0.5...v14.0.6) (2025-12-05)
+
+### Miscellaneous Chores
+
+* Migrate apk-utils and device-settings to typescript ([#844](https://github.com/appium/appium-adb/issues/844)) ([d5bd207](https://github.com/appium/appium-adb/commit/d5bd20751e1f69b1f54db173241d42a55ffb596c))
+
 ## [14.0.5](https://github.com/appium/appium-adb/compare/v14.0.4...v14.0.5) (2025-12-04)
 
 ### Miscellaneous Chores
