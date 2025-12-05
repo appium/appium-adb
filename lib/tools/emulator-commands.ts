@@ -297,7 +297,7 @@ export async function execEmuConsoleCommand (this: ADB, cmd: string[] | string, 
     let execTimeoutObj: NodeJS.Timeout;
     let initTimeoutObj: NodeJS.Timeout;
     let isCommandSent = false;
-    const serverResponse: Buffer[] = [];
+    let serverResponse: Buffer[] = [];
 
     client.once('error', (e) => {
       clearTimeout(connTimeoutObj);
@@ -319,7 +319,7 @@ export async function execEmuConsoleCommand (this: ADB, cmd: string[] | string, 
         // The initial incoming data chunk confirms the interface is ready for input
         if (!isCommandSent) {
           clearTimeout(initTimeoutObj);
-          serverResponse.length = 0;
+          serverResponse = [];
           const cmdStr = _.isArray(cmd) ? util.quote(cmd) : `${cmd}`;
           log.debug(`Executing Emulator console command: ${cmdStr}`);
           client.write(cmdStr);
