@@ -1,3 +1,9 @@
+## [14.1.0](https://github.com/appium/appium-adb/compare/v14.0.7...v14.1.0) (2025-12-06)
+
+### Features
+
+* add listenAllNetwork option ([#846](https://github.com/appium/appium-adb/issues/846)) ([7fa5935](https://github.com/appium/appium-adb/commit/7fa5935b1726717366e2ddae2a5a26296cff46fd))
+
 ## [14.0.7](https://github.com/appium/appium-adb/compare/v14.0.6...v14.0.7) (2025-12-06)
 
 ### Miscellaneous Chores
