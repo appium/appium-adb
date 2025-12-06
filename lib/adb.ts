@@ -90,21 +90,22 @@ export class ADB implements ADBOptions {
     // The above defaultsDeep call guarantees the 'executable' field to be always assigned
     this.executable = options.executable as ADBExecutable;
 
-    if (options.remoteAdbHost) {
-      this.executable.defaultArgs.push('-H', options.remoteAdbHost);
-      this.adbHost = options.remoteAdbHost;
-    }
-    // TODO figure out why we have this option as it does not appear to be
-    // used anywhere. Probably deprecate in favor of simple opts.adbPort
-    if (options.remoteAdbPort) {
-      this.adbPort = options.remoteAdbPort;
-    }
-
     // do not add -a option twice if the defualtArgs already had it.
     if (options.listenAllNetwork && !this.executable.defaultArgs.includes('-a')) {
       this.executable.defaultArgs.push('-a');
     } else if (this.executable.defaultArgs.includes('-a')) {
       this.listenAllNetwork = true;
+    }
+
+    if (options.remoteAdbHost) {
+      this.executable.defaultArgs.push('-H', options.remoteAdbHost);
+      this.adbHost = options.remoteAdbHost;
+    }
+
+    // TODO figure out why we have this option as it does not appear to be
+    // used anywhere. Probably deprecate in favor of simple opts.adbPort
+    if (options.remoteAdbPort) {
+      this.adbPort = options.remoteAdbPort;
     }
 
     this.executable.defaultArgs.push('-P', String(this.adbPort));

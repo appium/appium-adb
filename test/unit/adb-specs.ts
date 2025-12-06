@@ -66,6 +66,24 @@ describe('ADB', function () {
         expect(clone.listenAllNetwork).to.be.true;
       });
 
+      it('should add -a option only for clone', function () {
+        const original = new ADB({
+          executable: {path: 'adb', defaultArgs: []}
+        });
+        const clone = original.clone({
+          remoteAdbHost: 'example.com',
+          listenAllNetwork: true
+        });
+
+        expect(original.executable.defaultArgs).to.deep.equal(['-P', String(DEFAULT_ADB_PORT)]);
+        expect(original.listenAllNetwork).to.be.false;
+
+        expect(clone.executable.path).to.equal(original.executable.path);
+        expect(clone.executable.defaultArgs).to.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
+        expect(clone.remoteAdbHost).to.equal('example.com');
+        expect(clone.listenAllNetwork).to.be.true;
+      });
+
       it('should not repeat -a option', function () {
         const original = new ADB({
           executable: {path: 'adb', defaultArgs: ['-a']}
