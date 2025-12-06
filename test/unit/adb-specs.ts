@@ -36,6 +36,15 @@ describe('ADB', function () {
       const REMOTE_HOST = 'example.com';
       const scenarios = [
         {
+          name: 'should not have -a option by default',
+          originalOptions: {executable: {path: 'adb', defaultArgs: []}},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST},
+          expectedOriginalArgs: ['-P', portArg],
+          expectedCloneArgs: ['-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: false,
+          expectedCloneListen: false,
+        },
+        {
           name: 'should add -a option',
           originalOptions: {executable: {path: 'adb', defaultArgs: []}, listenAllNetwork: true},
           cloneOptions: {remoteAdbHost: REMOTE_HOST},
