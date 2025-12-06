@@ -5,16 +5,29 @@ import { util, fs } from '@appium/support';
 import B from 'bluebird';
 import path from 'path';
 import * as ini from 'ini';
+import type { ADB } from '../adb.js';
+import type {
+  EmuInfo,
+  EmuVersionInfo,
+  StringRecord,
+  PowerAcStates,
+  Sensors,
+  GsmCallActions,
+  GsmSignalStrength,
+  GsmVoiceStates,
+  NetworkSpeed,
+  ExecTelnetOptions
+} from './types.js';
 
 /**
  * Retrieves the list of available Android emulators
  *
- * @returns {Promise<import('./types').EmuInfo[]>}
+ * @returns
  */
-async function listEmulators () {
+async function listEmulators (): Promise<EmuInfo[]> {
   let avdsRoot = process.env.ANDROID_AVD_HOME;
   if (await dirExists(avdsRoot ?? '')) {
-    return await getAvdConfigPaths(/** @type {string} */ (avdsRoot));
+    return await getAvdConfigPaths(avdsRoot as string);
   }
 
   if (avdsRoot) {
@@ -38,10 +51,10 @@ async function listEmulators () {
 /**
  * Get configuration paths of all virtual devices
  *
- * @param {string} avdsRoot Path to the directory that contains the AVD .ini files
- * @returns {Promise<import('./types').EmuInfo[]>}
+ * @param avdsRoot Path to the directory that contains the AVD .ini files
+ * @returns
  */
-async function getAvdConfigPaths (avdsRoot) {
+async function getAvdConfigPaths (avdsRoot: string): Promise<EmuInfo[]> {
   const configs = await fs.glob('*.ini', {
     cwd: avdsRoot,
     absolute: true,
@@ -55,21 +68,19 @@ async function getAvdConfigPaths (avdsRoot) {
 /**
  * Check the emulator state.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<boolean>} True if Emulator is visible to adb.
+ * @returns True if Emulator is visible to adb.
  */
-export async function isEmulatorConnected () {
-  let emulators = await this.getConnectedEmulators();
+export async function isEmulatorConnected (this: ADB): Promise<boolean> {
+  const emulators = await this.getConnectedEmulators();
   return !!_.find(emulators, (x) => x && x.udid === this.curDeviceId);
 }
 
 /**
  * Verify the emulator is connected.
  *
- * @this {import('../adb.js').ADB}
- * @throws {Error} If Emulator is not visible to adb.
+ * @throws If Emulator is not visible to adb.
  */
-export async function verifyEmulatorConnected () {
+export async function verifyEmulatorConnected (this: ADB): Promise<void> {
   if (!(await this.isEmulatorConnected())) {
     throw new Error(`The emulator "${this.curDeviceId}" was unexpectedly disconnected`);
   }
@@ -78,15 +89,14 @@ export async function verifyEmulatorConnected () {
 /**
  * Emulate fingerprint touch event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} fingerprintId - The ID of the fingerprint.
+ * @param fingerprintId - The ID of the fingerprint.
  */
-export async function fingerprint (fingerprintId) {
+export async function fingerprint (this: ADB, fingerprintId: string): Promise<void> {
   if (!fingerprintId) {
     throw new Error('Fingerprint id parameter must be defined');
   }
   // the method used only works for API level 23 and above
-  let level = await this.getApiLevel();
+  const level = await this.getApiLevel();
   if (level < 23) {
     throw new Error(`Device API Level must be >= 23. Current Api level '${level}'`);
   }
@@ -97,19 +107,17 @@ export async function fingerprint (fingerprintId) {
  * Change the display orientation on the connected emulator.
  * The orientation is changed (PI/2 is added) every time
  * this method is called.
- * @this {import('../adb.js').ADB}
  */
-export async function rotate () {
+export async function rotate (this: ADB): Promise<void> {
   await this.adbExecEmu(['rotate']);
 }
 
 /**
  * Emulate power state change on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').PowerAcStates} [state='on'] - Either 'on' or 'off'.
+ * @param state - Either 'on' or 'off'.
  */
-export async function powerAC (state = 'on') {
+export async function powerAC (this: ADB, state: PowerAcStates = 'on'): Promise<void> {
   if (_.values(this.POWER_AC_STATES).indexOf(state) === -1) {
     throw new TypeError(`Wrong power AC state sent '${state}'. `
       + `Supported values: ${_.values(this.POWER_AC_STATES)}]`);
@@ -120,12 +128,11 @@ export async function powerAC (state = 'on') {
 /**
  * Emulate sensors values on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} sensor - Sensor type declared in SENSORS items.
- * @param {import('./types').Sensors} value  - Number to set as the sensor value.
- * @throws {TypeError} - If sensor type or sensor value is not defined
+ * @param sensor - Sensor type declared in SENSORS items.
+ * @param value  - Number to set as the sensor value.
+ * @throws - If sensor type or sensor value is not defined
  */
-export async function sensorSet (sensor, value) {
+export async function sensorSet (this: ADB, sensor: string, value: Sensors): Promise<void> {
   if (!_.includes(this.SENSORS, sensor)) {
     throw new TypeError(`Unsupported sensor sent '${sensor}'. `
       + `Supported values: ${_.values(this.SENSORS)}]`);
@@ -141,22 +148,20 @@ export async function sensorSet (sensor, value) {
 /**
  * Emulate power capacity change on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {string|number} [percent=100] - Percentage value in range [0, 100].
+ * @param percent - Percentage value in range [0, 100].
  */
-export async function powerCapacity (percent = 100) {
-  percent = parseInt(`${percent}`, 10);
-  if (isNaN(percent) || percent < 0 || percent > 100) {
+export async function powerCapacity (this: ADB, percent: string | number = 100): Promise<void> {
+  const percentInt = parseInt(`${percent}`, 10);
+  if (isNaN(percentInt) || percentInt < 0 || percentInt > 100) {
     throw new TypeError(`The percentage value should be valid integer between 0 and 100`);
   }
-  await this.adbExecEmu(['power', 'capacity', `${percent}`]);
+  await this.adbExecEmu(['power', 'capacity', `${percentInt}`]);
 }
 
 /**
  * Emulate power off event on the connected emulator.
- * @this {import('../adb.js').ADB}
  */
-export async function powerOFF () {
+export async function powerOFF (this: ADB): Promise<void> {
   await this.powerAC(this.POWER_AC_STATES.POWER_AC_OFF);
   await this.powerCapacity(0);
 }
@@ -164,12 +169,11 @@ export async function powerOFF () {
 /**
  * Emulate send SMS event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {string|number} phoneNumber - The phone number of message sender.
- * @param {string} [message=''] - The message content.
- * @throws {TypeError} If phone number has invalid format.
+ * @param phoneNumber - The phone number of message sender.
+ * @param message - The message content.
+ * @throws If phone number has invalid format.
  */
-export async function sendSMS (phoneNumber, message = '') {
+export async function sendSMS (this: ADB, phoneNumber: string | number, message = ''): Promise<void> {
   if (_.isEmpty(message)) {
     throw new TypeError('SMS message must not be empty');
   }
@@ -182,13 +186,12 @@ export async function sendSMS (phoneNumber, message = '') {
 /**
  * Emulate GSM call event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {string|number} phoneNumber - The phone number of the caller.
- * @param {import('./types').GsmCallActions} action - One of available GSM call actions.
- * @throws {TypeError} If phone number has invalid format.
- * @throws {TypeError} If _action_ value is invalid.
+ * @param phoneNumber - The phone number of the caller.
+ * @param action - One of available GSM call actions.
+ * @throws If phone number has invalid format.
+ * @throws If _action_ value is invalid.
  */
-export async function gsmCall (phoneNumber, action) {
+export async function gsmCall (this: ADB, phoneNumber: string | number, action: GsmCallActions): Promise<void> {
   if (!_.values(this.GSM_CALL_ACTIONS).includes(action)) {
     throw new TypeError(
       `Invalid gsm action param ${action}. Supported values: ${_.values(this.GSM_CALL_ACTIONS)}`
@@ -203,11 +206,10 @@ export async function gsmCall (phoneNumber, action) {
 /**
  * Emulate GSM signal strength change event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').GsmSignalStrength} [strength=4] - A number in range [0, 4];
- * @throws {TypeError} If _strength_ value is invalid.
+ * @param strength - A number in range [0, 4];
+ * @throws If _strength_ value is invalid.
  */
-export async function gsmSignal (strength = 4) {
+export async function gsmSignal (this: ADB, strength: GsmSignalStrength = 4): Promise<void> {
   const strengthInt = parseInt(`${strength}`, 10);
   if (!_.includes(this.GSM_SIGNAL_STRENGTHS, strengthInt)) {
     throw new TypeError(
@@ -221,11 +223,10 @@ export async function gsmSignal (strength = 4) {
 /**
  * Emulate GSM voice event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').GsmVoiceStates} [state='on'] - Either 'on' or 'off'.
- * @throws {TypeError} If _state_ value is invalid.
+ * @param state - Either 'on' or 'off'.
+ * @throws If _state_ value is invalid.
  */
-export async function gsmVoice (state = 'on') {
+export async function gsmVoice (this: ADB, state: GsmVoiceStates = 'on'): Promise<void> {
   // gsm voice <state> allows you to change the state of your GPRS connection
   if (!_.values(this.GSM_VOICE_STATES).includes(state)) {
     throw new TypeError(
@@ -238,12 +239,11 @@ export async function gsmVoice (state = 'on') {
 /**
  * Emulate network speed change event on the connected emulator.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').NetworkSpeed} [speed='full']
+ * @param speed
  *  One of possible NETWORK_SPEED values.
- * @throws {TypeError} If _speed_ value is invalid.
+ * @throws If _speed_ value is invalid.
  */
-export async function networkSpeed (speed = 'full') {
+export async function networkSpeed (this: ADB, speed: NetworkSpeed = 'full'): Promise<void> {
   // network speed <speed> allows you to set the network speed emulation.
   if (!_.values(this.NETWORK_SPEED).includes(speed)) {
     throw new Error(
@@ -256,19 +256,18 @@ export async function networkSpeed (speed = 'full') {
 /**
  * Executes a command through emulator telnet console interface and returns its output
  *
- * @this {import('../adb.js').ADB}
- * @param {string[]|string} cmd - The actual command to execute. See
+ * @param cmd - The actual command to execute. See
  * https://developer.android.com/studio/run/emulator-console for more details
  * on available commands
- * @param {import('./types').ExecTelnetOptions} [opts={}]
- * @returns {Promise<string>} The command output
- * @throws {Error} If there was an error while connecting to the Telnet console
+ * @param opts
+ * @returns The command output
+ * @throws If there was an error while connecting to the Telnet console
  * or if the given command returned non-OK response
  */
-export async function execEmuConsoleCommand (cmd, opts = {}) {
+export async function execEmuConsoleCommand (this: ADB, cmd: string[] | string, opts: ExecTelnetOptions = {}): Promise<string> {
   let port = parseInt(`${opts.port}`, 10);
   if (!port) {
-    const portMatch = /emulator-(\d+)/i.exec(/** @type {string} */(this.curDeviceId));
+    const portMatch = /emulator-(\d+)/i.exec(this.curDeviceId as string);
     if (!portMatch) {
       throw new Error(`Cannot parse the console port number from the device identifier '${this.curDeviceId}'. ` +
         `Is it an emulator?`);
@@ -295,10 +294,10 @@ export async function execEmuConsoleCommand (cmd, opts = {}) {
     const connTimeoutObj = setTimeout(
       () => reject(new Error(`Cannot connect to the Emulator console at ${host}:${port} ` +
         `after ${connTimeout}ms`)), connTimeout);
-    let execTimeoutObj;
-    let initTimeoutObj;
+    let execTimeoutObj: NodeJS.Timeout;
+    let initTimeoutObj: NodeJS.Timeout;
     let isCommandSent = false;
-    let serverResponse = [];
+    let serverResponse: Buffer[] = [];
 
     client.once('error', (e) => {
       clearTimeout(connTimeoutObj);
@@ -341,7 +340,7 @@ export async function execEmuConsoleCommand (cmd, opts = {}) {
         clearTimeout(execTimeoutObj);
         client.end();
         const outputArr = output.split(eol);
-        return reject(_.trim(_.last(outputArr)));
+        return reject(_.trim(_.last(outputArr) || ''));
       }
     });
   });
@@ -350,19 +349,18 @@ export async function execEmuConsoleCommand (cmd, opts = {}) {
 /**
  * Retrieves emulator version from the file system
  *
- * @this {import('../adb.js').ADB}
- * @returns {Promise<import('./types').EmuVersionInfo>} If no version info could be parsed then an empty
+ * @returns If no version info could be parsed then an empty
  * object is returned
  */
-export async function getEmuVersionInfo () {
-  const propsPath = path.join(/** @type {string} */ (this.sdkRoot), 'emulator', 'source.properties');
+export async function getEmuVersionInfo (this: ADB): Promise<EmuVersionInfo> {
+  const propsPath = path.join(this.sdkRoot as string, 'emulator', 'source.properties');
   if (!await fs.exists(propsPath)) {
     return {};
   }
 
   const content = await fs.readFile(propsPath, 'utf8');
   const revisionMatch = /^Pkg\.Revision=([\d.]+)$/m.exec(content);
-  const result = {};
+  const result: EmuVersionInfo = {};
   if (revisionMatch) {
     result.revision = revisionMatch[1];
   }
@@ -376,17 +374,16 @@ export async function getEmuVersionInfo () {
 /**
  * Retrieves emulator image properties from the local file system
  *
- * @this {import('../adb.js').ADB}
- * @param {string} avdName Emulator name. Should NOT start with '@' character
- * @throws {Error} if there was a failure while extracting the properties
- * @returns {Promise<import('./types').StringRecord>} The content of emulator image properties file.
+ * @param avdName Emulator name. Should NOT start with '@' character
+ * @throws if there was a failure while extracting the properties
+ * @returns The content of emulator image properties file.
  * Usually this configuration .ini file has the following content:
  *   avd.ini.encoding=UTF-8
  *   path=/Users/username/.android/avd/Pixel_XL_API_30.avd
  *   path.rel=avd/Pixel_XL_API_30.avd
  *   target=android-30
  */
-export async function getEmuImageProperties (avdName) {
+export async function getEmuImageProperties (this: ADB, avdName: string): Promise<StringRecord> {
   const avds = await listEmulators();
   const avd = avds.find(({name}) => name === avdName);
   if (!avd) {
@@ -404,12 +401,11 @@ export async function getEmuImageProperties (avdName) {
 /**
  * Check if given emulator exists in the list of available avds.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} avdName - The name of emulator to verify for existence.
+ * @param avdName - The name of emulator to verify for existence.
  * Should NOT start with '@' character
- * @throws {Error} If the emulator with given name does not exist.
+ * @throws If the emulator with given name does not exist.
  */
-export async function checkAvdExist (avdName) {
+export async function checkAvdExist (this: ADB, avdName: string): Promise<boolean> {
   const avds = await listEmulators();
   if (!avds.some(({name}) => name === avdName)) {
     let msg = `Avd '${avdName}' is not available. `;
@@ -426,11 +422,10 @@ export async function checkAvdExist (avdName) {
 /**
  * Send an arbitrary Telnet command to the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} command - The command to be sent.
- * @return {Promise<string>} The actual output of the given command.
+ * @param command - The command to be sent.
+ * @returns The actual output of the given command.
  */
-export async function sendTelnetCommand (command) {
+export async function sendTelnetCommand (this: ADB, command: string): Promise<string> {
   return await this.execEmuConsoleCommand(command, {port: await this.getEmulatorPort()});
 }
 
@@ -440,9 +435,9 @@ export async function sendTelnetCommand (command) {
 /**
  * Retrieves the full path to the Android preferences root
  *
- * @returns {Promise<string?>} The full path to the folder or `null` if the folder cannot be found
+ * @returns The full path to the folder or `null` if the folder cannot be found
  */
-async function getAndroidPrefsRoot () {
+async function getAndroidPrefsRoot (): Promise<string | null> {
   let location = process.env.ANDROID_EMULATOR_HOME;
   if (await dirExists(location ?? '')) {
     return location ?? null;
@@ -468,11 +463,12 @@ async function getAndroidPrefsRoot () {
 /**
  * Check if a path exists on the filesystem and is a directory
  *
- * @param {string} location The full path to the directory
- * @returns {Promise<boolean>}
+ * @param location The full path to the directory
+ * @returns
  */
-async function dirExists (location) {
+async function dirExists (location: string): Promise<boolean> {
   return await fs.exists(location) && (await fs.stat(location)).isDirectory();
 }
 
 // #endregion
+

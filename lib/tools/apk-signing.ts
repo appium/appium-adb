@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import _fs from 'fs';
-import { exec } from 'teen_process';
+import { exec, type ExecError } from 'teen_process';
 import path from 'path';
 import { log } from '../logger.js';
 import { tempDir, system, mkdirp, fs, util, zip } from '@appium/support';
@@ -11,6 +11,13 @@ import {
   APKS_EXTENSION,
   getResourcePath,
 } from '../helpers.js';
+import type { ADB } from '../adb.js';
+import type {
+  StringRecord,
+  SignedAppCacheValue,
+  CertCheckOptions,
+  KeystoreHash
+} from './types.js';
 
 const DEFAULT_PRIVATE_KEY = path.join('keys', 'testkey.pk8');
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
@@ -20,25 +27,23 @@ const SHA1 = 'sha1';
 const SHA256 = 'sha256';
 const SHA512 = 'sha512';
 const MD5 = 'md5';
-const DEFAULT_CERT_HASH = {
+const DEFAULT_CERT_HASH: KeystoreHash = {
   [SHA256]: 'a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc'
 };
 const JAVA_PROPS_INIT_ERROR = 'java.lang.Error: Properties init';
-/** @type {LRUCache<string, import('./types').SignedAppCacheValue>} */
-const SIGNED_APPS_CACHE = new LRUCache({
+const SIGNED_APPS_CACHE = new LRUCache<string, SignedAppCacheValue>({
   max: 30,
 });
 
 /**
  * Execute apksigner utility with given arguments.
  *
- * @this {import('../adb.js').ADB}
- * @param {string[]} args - The list of tool arguments.
- * @return {Promise<string>} - Command stdout
- * @throws {Error} If apksigner binary is not present on the local file system
+ * @param args - The list of tool arguments.
+ * @returns - Command stdout
+ * @throws If apksigner binary is not present on the local file system
  *                 or the return code is not equal to zero.
  */
-export async function executeApksigner (args) {
+export async function executeApksigner (this: ADB, args: string[]): Promise<string> {
   const apkSignerJar = await getApksignerForOs.bind(this)();
   const fullCmd = [
     await getJavaForOs(), '-Xmx1024M', '-Xss1m',
@@ -52,18 +57,20 @@ export async function executeApksigner (args) {
     // @ts-ignore This works
     windowsVerbatimArguments: system.isWindows(),
   });
-  for (let [name, stream] of [['stdout', stdout], ['stderr', stderr]]) {
+  for (const [name, stream] of [['stdout', stdout], ['stderr', stderr]] as const) {
     if (!_.trim(stream)) {
       continue;
     }
 
     if (name === 'stdout') {
       // Make the output less talkative
-      stream = stream.split('\n')
+      const filteredStream = stream.split('\n')
         .filter((line) => !line.includes('WARNING:'))
         .join('\n');
+      log.debug(`apksigner ${name}: ${filteredStream}`);
+    } else {
+      log.debug(`apksigner ${name}: ${stream}`);
     }
-    log.debug(`apksigner ${name}: ${stream}`);
   }
   return stdout;
 }
@@ -71,11 +78,10 @@ export async function executeApksigner (args) {
 /**
  * (Re)sign the given apk file on the local file system with the default certificate.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} apk - The full path to the local apk file.
- * @throws {Error} If signing fails.
+ * @param apk - The full path to the local apk file.
+ * @throws If signing fails.
  */
-export async function signWithDefaultCert (apk) {
+export async function signWithDefaultCert (this: ADB, apk: string): Promise<void> {
   log.debug(`Signing '${apk}' with default cert`);
   if (!(await fs.exists(apk))) {
     throw new Error(`${apk} file doesn't exist.`);
@@ -90,21 +96,21 @@ export async function signWithDefaultCert (apk) {
   try {
     await this.executeApksigner(args);
   } catch (e) {
+    const err = e as ExecError;
     throw new Error(`Could not sign '${apk}' with the default certificate. ` +
-      `Original error: ${e.stderr || e.stdout || e.message}`);
+      `Original error: ${err.stderr || err.stdout || err.message}`);
   }
 }
 
 /**
  * (Re)sign the given apk file on the local file system with a custom certificate.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} apk - The full path to the local apk file.
- * @throws {Error} If signing fails.
+ * @param apk - The full path to the local apk file.
+ * @throws If signing fails.
  */
-export async function signWithCustomCert (apk) {
+export async function signWithCustomCert (this: ADB, apk: string): Promise<void> {
   log.debug(`Signing '${apk}' with custom cert`);
-  if (!(await fs.exists(/** @type {string} */(this.keystorePath)))) {
+  if (!(await fs.exists(this.keystorePath as string))) {
     throw new Error(`Keystore: ${this.keystorePath} doesn't exist.`);
   }
   if (!(await fs.exists(apk))) {
@@ -113,14 +119,15 @@ export async function signWithCustomCert (apk) {
 
   try {
     await this.executeApksigner(['sign',
-      '--ks', /** @type {string} */(this.keystorePath),
-      '--ks-key-alias', /** @type {string} */(this.keyAlias),
+      '--ks', this.keystorePath as string,
+      '--ks-key-alias', this.keyAlias as string,
       '--ks-pass', `pass:${this.keystorePassword}`,
       '--key-pass', `pass:${this.keyPassword}`,
       apk]);
   } catch (err) {
+    const error = err as ExecError;
     log.warn(`Cannot use apksigner tool for signing. Defaulting to jarsigner. ` +
-      `Original error: ${err.stderr || err.stdout || err.message}`);
+      `Original error: ${error.stderr || error.stdout || error.message}`);
     try {
       if (await unsignApk(apk)) {
         log.debug(`'${apk}' has been successfully unsigned`);
@@ -129,22 +136,22 @@ export async function signWithCustomCert (apk) {
       }
       const jarsigner = path.resolve(await getJavaHome(), 'bin',
         `jarsigner${system.isWindows() ? '.exe' : ''}`);
-      /** @type {string[]} */
-      const fullCmd = [jarsigner,
+      const fullCmd: string[] = [jarsigner,
         '-sigalg', 'MD5withRSA',
         '-digestalg', 'SHA1',
-        '-keystore', /** @type {string} */(this.keystorePath),
-        '-storepass', /** @type {string} */(this.keystorePassword),
-        '-keypass', /** @type {string} */(this.keyPassword),
-        apk, /** @type {string} */(this.keyAlias)];
+        '-keystore', this.keystorePath as string,
+        '-storepass', this.keystorePassword as string,
+        '-keypass', this.keyPassword as string,
+        apk, this.keyAlias as string];
       log.debug(`Starting jarsigner: ${util.quote(fullCmd)}`);
       await exec(fullCmd[0], fullCmd.slice(1), {
         // @ts-ignore This works
         windowsVerbatimArguments: system.isWindows(),
       });
     } catch (e) {
+      const execErr = e as ExecError;
       throw new Error(`Could not sign with custom certificate. ` +
-        `Original error: ${e.stderr || e.message}`);
+        `Original error: ${execErr.stderr || execErr.message}`);
     }
   }
 }
@@ -154,11 +161,10 @@ export async function signWithCustomCert (apk) {
  * custom or default certificate based on _this.useKeystore_ property value
  * and Zip-aligns it after signing.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} appPath - The full path to the local .apk(s) file.
- * @throws {Error} If signing fails.
+ * @param appPath - The full path to the local .apk(s) file.
+ * @throws If signing fails.
  */
-export async function sign (appPath) {
+export async function sign (this: ADB, appPath: string): Promise<void> {
   if (appPath.endsWith(APKS_EXTENSION)) {
     let message = 'Signing of .apks-files is not supported. ';
     if (this.useKeystore) {
@@ -186,16 +192,15 @@ export async function sign (appPath) {
 /**
  * Perform zip-aligning to the given local apk file.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} apk - The full path to the local apk file.
- * @returns {Promise<boolean>} True if the apk has been successfully aligned
+ * @param apk - The full path to the local apk file.
+ * @returns True if the apk has been successfully aligned
  * or false if the apk has been already aligned.
- * @throws {Error} If zip-align fails.
+ * @throws If zip-align fails.
  */
-export async function zipAlignApk (apk) {
+export async function zipAlignApk (this: ADB, apk: string): Promise<boolean> {
   await this.initZipAlign();
   try {
-    await exec((/** @type {import('./types').StringRecord} */ (this.binaries)).zipalign, ['-c', '4', apk]);
+    await exec((this.binaries as StringRecord).zipalign as string, ['-c', '4', apk]);
     log.debug(`${apk}' is already zip-aligned. Doing nothing`);
     return false;
   } catch {
@@ -212,43 +217,44 @@ export async function zipAlignApk (apk) {
   await mkdirp(path.dirname(alignedApk));
   try {
     await exec(
-      (/** @type {import('./types').StringRecord} */ (this.binaries)).zipalign,
+      (this.binaries as StringRecord).zipalign as string,
       ['-f', '4', apk, alignedApk]
     );
     await fs.mv(alignedApk, apk, { mkdirp: true });
     return true;
   } catch (e) {
+    const err = e as Error;
     if (await fs.exists(alignedApk)) {
       await fs.unlink(alignedApk);
     }
-    throw new Error(`zipAlignApk failed. Original error: ${e.stderr || e.message}`);
+    throw new Error(`zipAlignApk failed. Original error: ${err.message || (err as ExecError).stderr}`);
   }
 }
 
 /**
  * Check if the app is already signed with the default Appium certificate.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} appPath - The full path to the local .apk(s) file.
- * @param {string} pkg - The name of application package.
- * @param {import('./types').CertCheckOptions} [opts={}] - Certificate checking options
- * @return {Promise<boolean>} True if given application is already signed.
+ * @param appPath - The full path to the local .apk(s) file.
+ * @param pkg - The name of application package.
+ * @param opts - Certificate checking options
+ * @returns True if given application is already signed.
  */
-export async function checkApkCert (appPath, pkg, opts = {}) {
+export async function checkApkCert (this: ADB, appPath: string, pkg: string, opts: CertCheckOptions = {}): Promise<boolean> {
   log.debug(`Checking app cert for ${appPath}`);
   if (!await fs.exists(appPath)) {
     log.debug(`'${appPath}' does not exist`);
     return false;
   }
 
+  let actualAppPath = appPath;
   if (path.extname(appPath) === APKS_EXTENSION) {
-    appPath = await this.extractBaseApk(appPath);
+    actualAppPath = await this.extractBaseApk(appPath);
   }
 
-  const hashMatches = (apksignerOutput, expectedHashes) => {
+  const hashMatches = (apksignerOutput: string, expectedHashes: KeystoreHash): boolean => {
     for (const [name, value] of _.toPairs(expectedHashes)) {
-      if (new RegExp(`digest:\\s+${value}\\b`, 'i').test(apksignerOutput)) {
-        log.debug(`${name} hash did match for '${path.basename(appPath)}'`);
+      if (value && new RegExp(`digest:\\s+${value}\\b`, 'i').test(apksignerOutput)) {
+        log.debug(`${name} hash did match for '${path.basename(actualAppPath)}'`);
         return true;
       }
     }
@@ -259,27 +265,28 @@ export async function checkApkCert (appPath, pkg, opts = {}) {
     requireDefaultCert = true,
   } = opts;
 
-  const appHash = await fs.hash(appPath);
+  const appHash = await fs.hash(actualAppPath);
   if (SIGNED_APPS_CACHE.has(appHash)) {
-    log.debug(`Using the previously cached signature entry for '${path.basename(appPath)}'`);
-    const {keystorePath, output, expected} = /** @type {import('./types').SignedAppCacheValue} */ (
-      SIGNED_APPS_CACHE.get(appHash)
-    );
-    if (this.useKeystore && this.keystorePath === keystorePath || !this.useKeystore) {
-      return (!this.useKeystore && !requireDefaultCert) || hashMatches(output, expected);
+    log.debug(`Using the previously cached signature entry for '${path.basename(actualAppPath)}'`);
+    const cached = SIGNED_APPS_CACHE.get(appHash);
+    if (cached) {
+      const {keystorePath, output, expected} = cached;
+      if (this.useKeystore && this.keystorePath === keystorePath || !this.useKeystore) {
+        return (!this.useKeystore && !requireDefaultCert) || hashMatches(output, expected);
+      }
     }
   }
 
   const expected = this.useKeystore ? await this.getKeystoreHash() : DEFAULT_CERT_HASH;
   try {
     await getApksignerForOs.bind(this)();
-    const output = await this.executeApksigner(['verify', '--print-certs', appPath]);
+    const output = await this.executeApksigner(['verify', '--print-certs', actualAppPath]);
     const hasMatch = hashMatches(output, expected);
     if (hasMatch) {
-      log.info(`'${appPath}' is signed with the ` +
+      log.info(`'${actualAppPath}' is signed with the ` +
         `${this.useKeystore ? 'keystore' : 'default'} certificate`);
     } else {
-      log.info(`'${appPath}' is signed with a ` +
+      log.info(`'${actualAppPath}' is signed with a ` +
         `non-${this.useKeystore ? 'keystore' : 'default'} certificate`);
     }
     const isSigned = (!this.useKeystore && !requireDefaultCert) || hasMatch;
@@ -287,17 +294,18 @@ export async function checkApkCert (appPath, pkg, opts = {}) {
       SIGNED_APPS_CACHE.set(appHash, {
         output,
         expected,
-        keystorePath: /** @type {string} */ (this.keystorePath),
+        keystorePath: this.keystorePath as string,
       });
     }
     return isSigned;
   } catch (err) {
+    const error = err as ExecError;
     // check if there is no signature
-    if (_.includes(err.stderr, APKSIGNER_VERIFY_FAIL)) {
-      log.info(`'${appPath}' is not signed`);
+    if (_.includes(error.stderr, APKSIGNER_VERIFY_FAIL)) {
+      log.info(`'${actualAppPath}' is not signed`);
       return false;
     }
-    const errMsg = err.stderr || err.stdout || err.message;
+    const errMsg = error.stderr || error.stdout || error.message;
     if (_.includes(errMsg, JAVA_PROPS_INIT_ERROR)) {
       // This error pops up randomly and we are not quite sure why.
       // My guess - a race condition in java vm initialization.
@@ -308,10 +316,10 @@ export async function checkApkCert (appPath, pkg, opts = {}) {
       // would anyway fail.
       // See https://github.com/appium/appium/issues/14724 for more details.
       log.warn(errMsg);
-      log.warn(`Assuming '${appPath}' is already signed and continuing anyway`);
+      log.warn(`Assuming '${actualAppPath}' is already signed and continuing anyway`);
       return true;
     }
-    throw new Error(`Cannot verify the signature of '${appPath}'. ` +
+    throw new Error(`Cannot verify the signature of '${actualAppPath}'. ` +
       `Original error: ${errMsg}`);
   }
 }
@@ -319,23 +327,21 @@ export async function checkApkCert (appPath, pkg, opts = {}) {
 /**
  * Retrieve the the hash of the given keystore.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<import('./types').KeystoreHash>}
- * @throws {Error} If getting keystore hash fails.
+ * @returns
+ * @throws If getting keystore hash fails.
  */
-export async function getKeystoreHash () {
+export async function getKeystoreHash (this: ADB): Promise<KeystoreHash> {
   log.debug(`Getting hash of the '${this.keystorePath}' keystore`);
   const keytool = path.resolve(await getJavaHome(), 'bin',
     `keytool${system.isWindows() ? '.exe' : ''}`);
   if (!await fs.exists(keytool)) {
     throw new Error(`The keytool utility cannot be found at '${keytool}'`);
   }
-  /** @type {string[]} */
-  const args = [
+  const args: string[] = [
     '-v', '-list',
-    '-alias', /** @type {string} */ (this.keyAlias),
-    '-keystore', /** @type {string} */ (this.keystorePath),
-    '-storepass', /** @type {string} */ (this.keystorePassword),
+    '-alias', this.keyAlias as string,
+    '-keystore', this.keystorePath as string,
+    '-storepass', this.keystorePassword as string,
   ];
   log.info(`Running '${keytool}' with arguments: ${util.quote(args)}`);
   try {
@@ -343,7 +349,7 @@ export async function getKeystoreHash () {
       // @ts-ignore This property is ok
       windowsVerbatimArguments: system.isWindows(),
     });
-    const result = {};
+    const result: KeystoreHash = {};
     for (const hashName of [SHA512, SHA256, SHA1, MD5]) {
       const hashRe = new RegExp(`^\\s*${hashName}:\\s*([a-f0-9:]+)`, 'mi');
       const match = hashRe.exec(stdout);
@@ -359,8 +365,9 @@ export async function getKeystoreHash () {
     log.debug(`Keystore hash: ${JSON.stringify(result)}`);
     return result;
   } catch (e) {
+    const err = e as ExecError;
     throw new Error(`Cannot get the hash of '${this.keystorePath}' keystore. ` +
-      `Original error: ${e.stderr || e.message}`);
+      `Original error: ${err.stderr || err.message}`);
   }
 }
 
@@ -369,11 +376,10 @@ export async function getKeystoreHash () {
 /**
  * Get the absolute path to apksigner tool
  *
- * @this {import('../adb').ADB}
- * @returns {Promise<string>} An absolute path to apksigner tool.
- * @throws {Error} If the tool is not present on the local file system.
+ * @returns An absolute path to apksigner tool.
+ * @throws If the tool is not present on the local file system.
  */
-export async function getApksignerForOs () {
+export async function getApksignerForOs (this: ADB): Promise<string> {
   return await this.getBinaryFromSdkRoot('apksigner.jar');
 }
 
@@ -382,12 +388,12 @@ export async function getApksignerForOs () {
  * META-INF folder recursively from the archive.
  * !!! The function overwrites the given apk after successful unsigning !!!
  *
- * @param {string} apkPath The path to the apk
- * @returns {Promise<boolean>} `true` if the apk has been successfully
+ * @param apkPath The path to the apk
+ * @returns `true` if the apk has been successfully
  * unsigned and overwritten
- * @throws {Error} if there was an error during the unsign operation
+ * @throws if there was an error during the unsign operation
  */
-export async function unsignApk (apkPath) {
+export async function unsignApk (apkPath: string): Promise<boolean> {
   const tmpRoot = await tempDir.openDir();
   const metaInfFolderName = 'META-INF';
   try {
@@ -416,3 +422,4 @@ export async function unsignApk (apkPath) {
 }
 
 // #endregion
+
