@@ -30,5 +30,89 @@ describe('ADB', function () {
       expect(clone.remoteAdbHost).to.equal('example.com');
       expect(clone.adbHost).to.not.equal(original.adbHost);
     });
+
+    describe('-a option', function() {
+      const portArg = String(DEFAULT_ADB_PORT);
+      const REMOTE_HOST = 'example.com';
+      const scenarios = [
+        {
+          name: 'should not have -a option by default',
+          originalOptions: {executable: {path: 'adb', defaultArgs: []}},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST},
+          expectedOriginalArgs: ['-P', portArg],
+          expectedCloneArgs: ['-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: false,
+          expectedCloneListen: false,
+        },
+        {
+          name: 'should add -a option',
+          originalOptions: {executable: {path: 'adb', defaultArgs: []}, listenAllNetwork: true},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST},
+          expectedOriginalArgs: ['-a', '-P', portArg],
+          expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: true,
+          expectedCloneListen: true,
+        },
+        {
+          name: 'should add -a option only for clone',
+          originalOptions: {executable: {path: 'adb', defaultArgs: []}},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST, listenAllNetwork: true},
+          expectedOriginalArgs: ['-P', portArg],
+          expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: false,
+          expectedCloneListen: true,
+        },
+        {
+          name: 'should not repeat -a option',
+          originalOptions: {executable: {path: 'adb', defaultArgs: ['-a']}},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST, listenAllNetwork: true},
+          expectedOriginalArgs: ['-a', '-P', portArg],
+          expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: true,
+          expectedCloneListen: true,
+        },
+        {
+          name: 'should not add -a option if it was already in the defaultArgs with listenAllNetwork: true',
+          originalOptions: {executable: {path: 'adb', defaultArgs: ['-a']}, listenAllNetwork: true},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST},
+          expectedOriginalArgs: ['-a', '-P', portArg],
+          expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: true,
+          expectedCloneListen: true,
+        },
+        {
+          name: 'should listenAllNetwork be true if the given defaultArgs included -a',
+          originalOptions: {executable: {path: 'adb', defaultArgs: ['-a']}, listenAllNetwork: false},
+          cloneOptions: {remoteAdbHost: REMOTE_HOST},
+          expectedOriginalArgs: ['-a', '-P', portArg],
+          expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
+          expectedOriginalListen: true,
+          expectedCloneListen: true,
+        },
+      ];
+
+      scenarios.forEach(({
+        name,
+        originalOptions,
+        cloneOptions,
+        expectedOriginalArgs,
+        expectedCloneArgs,
+        expectedOriginalListen,
+        expectedCloneListen
+      }) => {
+        it(name, function () {
+          const original = new ADB(originalOptions);
+          const clone = original.clone(cloneOptions);
+
+          expect(original.executable.defaultArgs).to.deep.equal(expectedOriginalArgs);
+          expect(original.listenAllNetwork).to.equal(expectedOriginalListen);
+
+          expect(clone.executable.path).to.equal(original.executable.path);
+          expect(clone.executable.defaultArgs).to.deep.equal(expectedCloneArgs);
+          expect(clone.remoteAdbHost).to.equal(cloneOptions.remoteAdbHost);
+          expect(clone.listenAllNetwork).to.equal(expectedCloneListen);
+        });
+      });
+    });
   });
 });
