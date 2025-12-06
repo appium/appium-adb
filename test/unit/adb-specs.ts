@@ -91,7 +91,15 @@ describe('ADB', function () {
         },
       ];
 
-      scenarios.forEach(({name, originalOptions, cloneOptions, expectedOriginalArgs, expectedCloneArgs, expectedOriginalListen, expectedCloneListen}) => {
+      scenarios.forEach(({
+        name,
+        originalOptions,
+        cloneOptions,
+        expectedOriginalArgs,
+        expectedCloneArgs,
+        expectedOriginalListen,
+        expectedCloneListen
+      }) => {
         it(name, function () {
           const original = new ADB(originalOptions);
           const clone = original.clone(cloneOptions);
