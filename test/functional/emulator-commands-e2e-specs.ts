@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -8,7 +8,6 @@ describe('emulator commands', function () {
   let adb;
 
   before(async function () {
-
     if (process.env.REAL_DEVICE) {
       return this.skip();
     }
@@ -25,8 +24,7 @@ describe('emulator commands', function () {
     });
 
     it('should fail if the command is unknown', async function () {
-      await expect(adb.execEmuConsoleCommand(['avd', 'namer'])).to.eventually
-        .be.rejected;
+      await expect(adb.execEmuConsoleCommand(['avd', 'namer'])).to.eventually.be.rejected;
     });
   });
 

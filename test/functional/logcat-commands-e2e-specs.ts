@@ -1,7 +1,7 @@
 import {ADB} from '../../lib/adb';
-import { Logcat } from '../../lib/logcat';
-import { MOCHA_TIMEOUT } from './setup';
-import chai, { expect } from 'chai';
+import {Logcat} from '../../lib/logcat';
+import {MOCHA_TIMEOUT} from './setup';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -9,7 +9,7 @@ chai.use(chaiAsPromised);
 describe('logcat commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  async function runClearDeviceLogTest (adb, logcat, clear = true) {
+  async function runClearDeviceLogTest(adb, logcat, clear = true) {
     const logs = await adb.adbExec(['logcat', '-d']);
     await logcat.startCapture();
     await logcat.stopCapture();

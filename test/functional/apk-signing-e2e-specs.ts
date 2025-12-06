@@ -1,9 +1,9 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import { fs, tempDir } from '@appium/support';
-import { unsignApk } from '../../lib/tools/apk-signing';
-import { APIDEMOS_PKG, getApiDemosPath } from './setup';
-import chai, { expect } from 'chai';
+import {fs, tempDir} from '@appium/support';
+import {unsignApk} from '../../lib/tools/apk-signing';
+import {APIDEMOS_PKG, getApiDemosPath} from './setup';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -41,13 +41,14 @@ describe('Apk-signing', function () {
   it('checkApkCert should return true for signed apk', async function () {
     // ApiDemos APK is signed but not with the default Appium certificate
     // So we check with requireDefaultCert: false to verify it's signed
-    expect(await adb.checkApkCert(apiDemosPath, APIDEMOS_PKG, {requireDefaultCert: false})).to.be.true;
+    expect(await adb.checkApkCert(apiDemosPath, APIDEMOS_PKG, {requireDefaultCert: false})).to.be
+      .true;
   });
   it('signWithDefaultCert should sign apk', async function () {
     const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
     await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
-    (await adb.signWithDefaultCert(apkCopy));
+    await adb.signWithDefaultCert(apkCopy);
     expect(await adb.checkApkCert(apkCopy, APIDEMOS_PKG)).to.be.true;
   });
   it('signWithCustomCert should sign apk with custom certificate', async function () {
@@ -60,7 +61,7 @@ describe('Apk-signing', function () {
     customAdb.useKeystore = true;
     customAdb.keystorePassword = 'android';
     customAdb.keyPassword = 'android';
-    (await customAdb.signWithCustomCert(apkCopy));
+    await customAdb.signWithCustomCert(apkCopy);
     expect(await customAdb.checkApkCert(apkCopy, APIDEMOS_PKG)).to.be.true;
   });
 });

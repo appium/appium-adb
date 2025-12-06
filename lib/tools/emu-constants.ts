@@ -1,13 +1,12 @@
-
 export const POWER_AC_STATES = {
   POWER_AC_ON: 'on',
-  POWER_AC_OFF: 'off'
+  POWER_AC_OFF: 'off',
 } as const;
 export const GSM_CALL_ACTIONS = {
   GSM_CALL: 'call',
   GSM_ACCEPT: 'accept',
   GSM_CANCEL: 'cancel',
-  GSM_HOLD: 'hold'
+  GSM_HOLD: 'hold',
 } as const;
 export const GSM_VOICE_STATES = {
   GSM_VOICE_UNREGISTERED: 'unregistered',
@@ -16,7 +15,7 @@ export const GSM_VOICE_STATES = {
   GSM_VOICE_SEARCHING: 'searching',
   GSM_VOICE_DENIED: 'denied',
   GSM_VOICE_OFF: 'off',
-  GSM_VOICE_ON: 'on'
+  GSM_VOICE_ON: 'on',
 } as const;
 export const GSM_SIGNAL_STRENGTHS = [0, 1, 2, 3, 4] as const;
 export const NETWORK_SPEED = {
@@ -28,7 +27,7 @@ export const NETWORK_SPEED = {
   HSDPA: 'hsdpa', // HSDPA (up: 5760.0, down: 13,980.0).
   LTE: 'lte', // LTE (up: 58,000, down: 173,000).
   EVDO: 'evdo', // EVDO (up: 75,000, down: 280,000).
-  FULL: 'full' // No limit, the default (up: 0.0, down: 0.0).
+  FULL: 'full', // No limit, the default (up: 0.0, down: 0.0).
 } as const;
 export const SENSORS = {
   ACCELERATION: 'acceleration',

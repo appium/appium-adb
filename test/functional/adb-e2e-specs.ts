@@ -1,14 +1,13 @@
 import _ from 'lodash';
 import {ADB} from '../../lib/adb';
-import { fs } from '@appium/support';
+import {fs} from '@appium/support';
 import path from 'path';
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
 describe('ADB', function () {
-
   it('should correctly return adb if present', async function () {
     const adb = await ADB.createADB();
     expect(adb.executable.path);

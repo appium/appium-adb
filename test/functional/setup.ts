@@ -1,13 +1,14 @@
 import path from 'node:path';
-import { fs, net } from '@appium/support';
+import {fs, net} from '@appium/support';
 
 export const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 export const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
 
 // Re-export ApiDemos constants from common constants file
-export { APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT } from '../constants';
+export {APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT} from '../constants';
 
-const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
+const APIDEMOS_URL =
+  'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
 
 // Cache the download promise to prevent concurrent downloads
@@ -66,7 +67,11 @@ export async function getApiDemosPath() {
  * @param {string} [skipMessage] - Optional custom message for skipping the test
  * @returns {Promise<boolean>} True if root access is available, false if test was skipped
  */
-export async function ensureRootAccess(adb, testContext, skipMessage = 'Device does not have root access, which is required for this test') {
+export async function ensureRootAccess(
+  adb,
+  testContext,
+  skipMessage = 'Device does not have root access, which is required for this test',
+) {
   const hasRoot = await adb.isRoot().catch(() => false);
   if (!hasRoot) {
     // Try to get root, but skip if it fails

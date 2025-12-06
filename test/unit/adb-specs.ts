@@ -1,11 +1,10 @@
-import { ADB, DEFAULT_ADB_PORT } from '../../lib/adb';
-import chai, { expect } from 'chai';
+import {ADB, DEFAULT_ADB_PORT} from '../../lib/adb';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
 describe('ADB', function () {
-
   describe('clone', function () {
     it('should copy all options', function () {
       const original = new ADB({
@@ -26,12 +25,18 @@ describe('ADB', function () {
       });
 
       expect(clone.executable.path).to.equal(original.executable.path);
-      expect(clone.executable.defaultArgs).to.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
+      expect(clone.executable.defaultArgs).to.deep.equal([
+        '-a',
+        '-H',
+        'example.com',
+        '-P',
+        String(DEFAULT_ADB_PORT),
+      ]);
       expect(clone.remoteAdbHost).to.equal('example.com');
       expect(clone.adbHost).to.not.equal(original.adbHost);
     });
 
-    describe('-a option', function() {
+    describe('-a option', function () {
       const portArg = String(DEFAULT_ADB_PORT);
       const REMOTE_HOST = 'example.com';
       const scenarios = [
@@ -82,7 +87,10 @@ describe('ADB', function () {
         },
         {
           name: 'should listenAllNetwork be true if the given defaultArgs included -a',
-          originalOptions: {executable: {path: 'adb', defaultArgs: ['-a']}, listenAllNetwork: false},
+          originalOptions: {
+            executable: {path: 'adb', defaultArgs: ['-a']},
+            listenAllNetwork: false,
+          },
           cloneOptions: {remoteAdbHost: REMOTE_HOST},
           expectedOriginalArgs: ['-a', '-P', portArg],
           expectedCloneArgs: ['-a', '-H', REMOTE_HOST, '-P', portArg],
@@ -91,28 +99,30 @@ describe('ADB', function () {
         },
       ];
 
-      scenarios.forEach(({
-        name,
-        originalOptions,
-        cloneOptions,
-        expectedOriginalArgs,
-        expectedCloneArgs,
-        expectedOriginalListen,
-        expectedCloneListen
-      }) => {
-        it(name, function () {
-          const original = new ADB(originalOptions);
-          const clone = original.clone(cloneOptions);
+      scenarios.forEach(
+        ({
+          name,
+          originalOptions,
+          cloneOptions,
+          expectedOriginalArgs,
+          expectedCloneArgs,
+          expectedOriginalListen,
+          expectedCloneListen,
+        }) => {
+          it(name, function () {
+            const original = new ADB(originalOptions);
+            const clone = original.clone(cloneOptions);
 
-          expect(original.executable.defaultArgs).to.deep.equal(expectedOriginalArgs);
-          expect(original.listenAllNetwork).to.equal(expectedOriginalListen);
+            expect(original.executable.defaultArgs).to.deep.equal(expectedOriginalArgs);
+            expect(original.listenAllNetwork).to.equal(expectedOriginalListen);
 
-          expect(clone.executable.path).to.equal(original.executable.path);
-          expect(clone.executable.defaultArgs).to.deep.equal(expectedCloneArgs);
-          expect(clone.remoteAdbHost).to.equal(cloneOptions.remoteAdbHost);
-          expect(clone.listenAllNetwork).to.equal(expectedCloneListen);
-        });
-      });
+            expect(clone.executable.path).to.equal(original.executable.path);
+            expect(clone.executable.defaultArgs).to.deep.equal(expectedCloneArgs);
+            expect(clone.remoteAdbHost).to.equal(cloneOptions.remoteAdbHost);
+            expect(clone.listenAllNetwork).to.equal(expectedCloneListen);
+          });
+        },
+      );
     });
   });
 });

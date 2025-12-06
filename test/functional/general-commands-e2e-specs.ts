@@ -1,14 +1,10 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {
-  MOCHA_TIMEOUT,
-  APIDEMOS_PKG,
-  getApiDemosPath,
-} from './setup';
-import { fs, tempDir } from '@appium/support';
-import { waitForCondition } from 'asyncbox';
+import {MOCHA_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
+import {fs, tempDir} from '@appium/support';
+import {waitForCondition} from 'asyncbox';
 import _ from 'lodash';
 
 chai.use(chaiAsPromised);
@@ -20,8 +16,7 @@ describe('general commands', function () {
   let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
-
-    adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    adb = await ADB.createADB({adbExecTimeout: 60000});
     apiDemosPath = await getApiDemosPath();
   });
   it('getApiLevel should get correct api level', async function () {
@@ -66,13 +61,16 @@ describe('general commands', function () {
     let enabledAfterDisable;
     try {
       // Wait for the IME to be removed from the enabled list
-      await waitForCondition(async () => {
-        const enabled = await adb.enabledIMEs();
-        return !enabled.includes(ime);
-      }, {
-        waitMs: 3000,
-        intervalMs: 500,
-      });
+      await waitForCondition(
+        async () => {
+          const enabled = await adb.enabledIMEs();
+          return !enabled.includes(ime);
+        },
+        {
+          waitMs: 3000,
+          intervalMs: 500,
+        },
+      );
       // If we get here, the IME was successfully disabled
       enabledAfterDisable = await adb.enabledIMEs();
       expect(enabledAfterDisable).to.not.include(ime);
@@ -84,13 +82,16 @@ describe('general commands', function () {
     // Re-enable the IME to restore state (or ensure it's enabled if disable didn't work)
     await adb.enableIME(ime);
     // Wait for the IME to be enabled
-    await waitForCondition(async () => {
-      const enabled = await adb.enabledIMEs();
-      return enabled.includes(ime);
-    }, {
-      waitMs: 3000,
-      intervalMs: 500,
-    });
+    await waitForCondition(
+      async () => {
+        const enabled = await adb.enabledIMEs();
+        return enabled.includes(ime);
+      },
+      {
+        waitMs: 3000,
+        intervalMs: 500,
+      },
+    );
     // Verify that enable works (or that it's already enabled if it couldn't be disabled)
     expect(await adb.enabledIMEs()).to.include(ime);
   });
@@ -105,7 +106,6 @@ describe('general commands', function () {
     expect(await adb.adbExec([`forward`, `--list`])).to.contain('tcp:8200');
     await adb.removePortForward(8200);
     expect(await adb.adbExec([`forward`, `--list`])).to.not.contain('tcp:8200');
-
   });
   it('should reverse forward the port', async function () {
     await adb.reversePort(4724, 4724);
@@ -115,7 +115,6 @@ describe('general commands', function () {
     expect(await adb.adbExec([`reverse`, `--list`])).to.contain('tcp:6790');
     await adb.removePortReverse(6790);
     expect(await adb.adbExec([`reverse`, `--list`])).to.not.contain('tcp:6790');
-
   });
   it('should start logcat from adb', async function () {
     await adb.startLogcat();
@@ -182,16 +181,20 @@ describe('general commands', function () {
     });
     it('should revoke permission', async function () {
       await adb.revokePermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.not.have.members(['android.permission.RECEIVE_SMS']);
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.not.have.members([
+        'android.permission.RECEIVE_SMS',
+      ]);
     });
     it('should grant permission', async function () {
       await adb.grantPermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.include.members(['android.permission.RECEIVE_SMS']);
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.include.members([
+        'android.permission.RECEIVE_SMS',
+      ]);
     });
   });
 
   describe('push file', function () {
-    function getRandomDir () {
+    function getRandomDir() {
       return `/data/local/tmp/test${Math.random()}`;
     }
 
@@ -301,7 +304,7 @@ describe('general commands', function () {
     it('should list opened ports', async function () {
       const ports1 = await adb.listPorts();
       const ports2 = await adb.listPorts('6');
-      expect((_.isEmpty(ports1) && _.isEmpty(ports2))).to.be.false;
+      expect(_.isEmpty(ports1) && _.isEmpty(ports2)).to.be.false;
     });
   });
 });

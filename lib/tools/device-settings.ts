@@ -1,21 +1,21 @@
-import { log } from '../logger.js';
+import {log} from '../logger.js';
 import _ from 'lodash';
-import { retryInterval } from 'asyncbox';
-import { util } from '@appium/support';
+import {retryInterval} from 'asyncbox';
+import {util} from '@appium/support';
 import B from 'bluebird';
-import type { ADB } from '../adb.js';
-import type { SetPropOpts } from './types.js';
-import type { ExecError } from 'teen_process';
+import type {ADB} from '../adb.js';
+import type {SetPropOpts} from './types.js';
+import type {ExecError} from 'teen_process';
 
 const ANIMATION_SCALE_KEYS = [
   'animator_duration_scale',
   'transition_animation_scale',
-  'window_animation_scale'
+  'window_animation_scale',
 ] as const;
 const HIDDEN_API_POLICY_KEYS = [
   'hidden_api_policy_pre_p_apps',
   'hidden_api_policy_p_apps',
-  'hidden_api_policy'
+  'hidden_api_policy',
 ] as const;
 
 /**
@@ -26,7 +26,7 @@ const HIDDEN_API_POLICY_KEYS = [
  *
  * @returns The value of the given property.
  */
-export async function getDeviceProperty (this: ADB, property: string): Promise<string> {
+export async function getDeviceProperty(this: ADB, property: string): Promise<string> {
   const stdout = await this.shell(['getprop', property]);
   const val = stdout.trim();
   log.debug(`Current device property '${property}': ${val}`);
@@ -43,7 +43,12 @@ export async function getDeviceProperty (this: ADB, property: string): Promise<s
  *
  * @throws If _setprop_ utility fails to change property value.
  */
-export async function setDeviceProperty (this: ADB, prop: string, val: string, opts: SetPropOpts = {}): Promise<void> {
+export async function setDeviceProperty(
+  this: ADB,
+  prop: string,
+  val: string,
+  opts: SetPropOpts = {},
+): Promise<void> {
   const {privileged = true} = opts;
   log.debug(`Setting device property '${prop}' to '${val}'`);
   await this.shell(['setprop', prop, val], {
@@ -54,56 +59,56 @@ export async function setDeviceProperty (this: ADB, prop: string, val: string, o
 /**
  * @returns Current system language on the device under test.
  */
-export async function getDeviceSysLanguage (this: ADB): Promise<string> {
+export async function getDeviceSysLanguage(this: ADB): Promise<string> {
   return await this.getDeviceProperty('persist.sys.language');
 }
 
 /**
  * @returns Current country name on the device under test.
  */
-export async function getDeviceSysCountry (this: ADB): Promise<string> {
+export async function getDeviceSysCountry(this: ADB): Promise<string> {
   return await this.getDeviceProperty('persist.sys.country');
 }
 
 /**
  * @returns Current system locale name on the device under test.
  */
-export async function getDeviceSysLocale (this: ADB): Promise<string> {
+export async function getDeviceSysLocale(this: ADB): Promise<string> {
   return await this.getDeviceProperty('persist.sys.locale');
 }
 
 /**
  * @returns Current product language name on the device under test.
  */
-export async function getDeviceProductLanguage (this: ADB): Promise<string> {
+export async function getDeviceProductLanguage(this: ADB): Promise<string> {
   return await this.getDeviceProperty('ro.product.locale.language');
 }
 
 /**
  * @returns Current product country name on the device under test.
  */
-export async function getDeviceProductCountry (this: ADB): Promise<string> {
+export async function getDeviceProductCountry(this: ADB): Promise<string> {
   return await this.getDeviceProperty('ro.product.locale.region');
 }
 
 /**
  * @returns Current product locale name on the device under test.
  */
-export async function getDeviceProductLocale (this: ADB): Promise<string> {
+export async function getDeviceProductLocale(this: ADB): Promise<string> {
   return await this.getDeviceProperty('ro.product.locale');
 }
 
 /**
  * @returns The model name of the device under test.
  */
-export async function getModel (this: ADB): Promise<string> {
+export async function getModel(this: ADB): Promise<string> {
   return await this.getDeviceProperty('ro.product.model');
 }
 
 /**
  * @returns The manufacturer name of the device under test.
  */
-export async function getManufacturer (this: ADB): Promise<string> {
+export async function getManufacturer(this: ADB): Promise<string> {
   return await this.getDeviceProperty('ro.product.manufacturer');
 }
 
@@ -113,7 +118,7 @@ export async function getManufacturer (this: ADB): Promise<string> {
  * @returns Device screen size as string in format 'WxH' or
  * _null_ if it cannot be determined.
  */
-export async function getScreenSize (this: ADB): Promise<string | null> {
+export async function getScreenSize(this: ADB): Promise<string | null> {
   const stdout = await this.shell(['wm', 'size']);
   const size = new RegExp(/Physical size: ([^\r?\n]+)*/g).exec(stdout);
   if (size && size.length >= 2) {
@@ -128,7 +133,7 @@ export async function getScreenSize (this: ADB): Promise<string | null> {
  * @returns Device screen density as a number or _null_ if it
  * cannot be determined
  */
-export async function getScreenDensity (this: ADB): Promise<number | null> {
+export async function getScreenDensity(this: ADB): Promise<number | null> {
   const stdout = await this.shell(['wm', 'density']);
   const density = new RegExp(/Physical density: ([^\r?\n]+)*/g).exec(stdout);
   if (density && density.length >= 2) {
@@ -145,7 +150,11 @@ export async function getScreenDensity (this: ADB): Promise<number | null> {
  * @param proxyHost - The host name of the proxy.
  * @param proxyPort - The port number to be set.
  */
-export async function setHttpProxy (this: ADB, proxyHost: string, proxyPort: string | number): Promise<void> {
+export async function setHttpProxy(
+  this: ADB,
+  proxyHost: string,
+  proxyPort: string | number,
+): Promise<void> {
   const proxy = `${proxyHost}:${proxyPort}`;
   if (_.isUndefined(proxyHost)) {
     throw new Error(`Call to setHttpProxy method with undefined proxy_host: ${proxy}`);
@@ -158,7 +167,7 @@ export async function setHttpProxy (this: ADB, proxyHost: string, proxyPort: str
   const httpProxySettins: [string, string][] = [
     ['http_proxy', proxy],
     ['global_http_proxy_host', proxyHost],
-    ['global_http_proxy_port', `${proxyPort}`]
+    ['global_http_proxy_port', `${proxyPort}`],
   ];
   for (const [settingKey, settingValue] of httpProxySettins) {
     await this.setSetting('global', settingKey, settingValue);
@@ -169,12 +178,12 @@ export async function setHttpProxy (this: ADB, proxyHost: string, proxyPort: str
  * Delete HTTP proxy in device global settings.
  * Rebooting the test device is necessary to apply the change.
  */
-export async function deleteHttpProxy (this: ADB): Promise<void> {
+export async function deleteHttpProxy(this: ADB): Promise<void> {
   const httpProxySettins = [
     'http_proxy',
     'global_http_proxy_host',
     'global_http_proxy_port',
-    'global_http_proxy_exclusion_list' // `global_http_proxy_exclusion_list=` was generated by `settings global htto_proxy xxxx`
+    'global_http_proxy_exclusion_list', // `global_http_proxy_exclusion_list=` was generated by `settings global htto_proxy xxxx`
   ];
   for (const setting of httpProxySettins) {
     await this.shell(['settings', 'delete', 'global', setting]);
@@ -190,7 +199,12 @@ export async function deleteHttpProxy (this: ADB): Promise<void> {
  * @param value - property value.
  * @returns command output.
  */
-export async function setSetting (this: ADB, namespace: string, setting: string, value: string | number): Promise<string> {
+export async function setSetting(
+  this: ADB,
+  namespace: string,
+  setting: string,
+  value: string | number,
+): Promise<string> {
   return await this.shell(['settings', 'put', namespace, setting, `${value}`]);
 }
 
@@ -202,7 +216,7 @@ export async function setSetting (this: ADB, namespace: string, setting: string,
  * @param setting - property name.
  * @returns property value.
  */
-export async function getSetting (this: ADB, namespace: string, setting: string): Promise<string> {
+export async function getSetting(this: ADB, namespace: string, setting: string): Promise<string> {
   return await this.shell(['settings', 'get', namespace, setting]);
 }
 
@@ -212,7 +226,7 @@ export async function getSetting (this: ADB, namespace: string, setting: string)
  * @returns TZ database Time Zones format
  * @throws If any exception is reported by adb shell.
  */
-export async function getTimeZone (this: ADB): Promise<string> {
+export async function getTimeZone(this: ADB): Promise<string> {
   log.debug('Getting current timezone');
   try {
     return await this.getDeviceProperty('persist.sys.timezone');
@@ -228,30 +242,28 @@ export async function getTimeZone (this: ADB): Promise<string> {
  * @returns The platform version as a string, for example '5.0' for
  * Android Lollipop.
  */
-export async function getPlatformVersion (this: ADB): Promise<string> {
+export async function getPlatformVersion(this: ADB): Promise<string> {
   log.info('Getting device platform version');
   try {
     return await this.getDeviceProperty('ro.build.version.release');
   } catch (e) {
     const err = e as Error;
-    throw new Error(
-      `Error getting device platform version. ` +
-      `Original error: ${err.message}`
-    );
+    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`);
   }
 }
-
 
 /**
  * Retrieve the list of location providers for the device under test.
  *
  * @returns The list of available location providers or an empty list.
  */
-export async function getLocationProviders (this: ADB): Promise<string[]> {
-  if (await this.getApiLevel() < 31) {
+export async function getLocationProviders(this: ADB): Promise<string[]> {
+  if ((await this.getApiLevel()) < 31) {
     // https://stackoverflow.com/questions/70939503/settings-secure-location-providers-allowed-returns-null-in-android-12
     const stdout = await this.getSetting('secure', 'location_providers_allowed');
-    return stdout.trim().split(',')
+    return stdout
+      .trim()
+      .split(',')
       .map((p) => p.trim())
       .filter(Boolean);
   }
@@ -267,8 +279,8 @@ export async function getLocationProviders (this: ADB): Promise<string[]> {
  *
  * @param enabled - Whether to enable (true) or disable (false) the GPS provider.
  */
-export async function toggleGPSLocationProvider (this: ADB, enabled: boolean): Promise<void> {
-  if (await this.getApiLevel() < 31) {
+export async function toggleGPSLocationProvider(this: ADB, enabled: boolean): Promise<void> {
+  if ((await this.getApiLevel()) < 31) {
     // https://stackoverflow.com/questions/70939503/settings-secure-location-providers-allowed-returns-null-in-android-12
     await this.setSetting('secure', 'location_providers_allowed', `${enabled ? '+' : '-'}gps`);
     return;
@@ -282,7 +294,7 @@ export async function toggleGPSLocationProvider (this: ADB, enabled: boolean): P
  * @param e The error object to be decorated
  * @returns Either the same error or the decorated one
  */
-function decorateWriteSecureSettingsException (e: Error): Error {
+function decorateWriteSecureSettingsException(e: Error): Error {
   if (_.includes(e.message, 'requires:android.permission.WRITE_SECURE_SETTINGS')) {
     e.message = `Check https://github.com/appium/appium/issues/13802 for throubleshooting. ${e.message}`;
   }
@@ -315,9 +327,15 @@ function decorateWriteSecureSettingsException (e: Error): Error {
  * @throws If there was an error and ignoreError was true while executing 'adb shell settings put global'
  *                 command on the device under test.
  */
-export async function setHiddenApiPolicy (this: ADB, value: number | string, ignoreError = false): Promise<void> {
+export async function setHiddenApiPolicy(
+  this: ADB,
+  value: number | string,
+  ignoreError = false,
+): Promise<void> {
   try {
-    await this.shell(HIDDEN_API_POLICY_KEYS.map((k) => `settings put global ${k} ${value}`).join(';'));
+    await this.shell(
+      HIDDEN_API_POLICY_KEYS.map((k) => `settings put global ${k} ${value}`).join(';'),
+    );
   } catch (e) {
     const err = e as Error;
     if (!ignoreError) {
@@ -325,7 +343,7 @@ export async function setHiddenApiPolicy (this: ADB, value: number | string, ign
     }
     log.info(
       `Failed to set setting keys '${HIDDEN_API_POLICY_KEYS}' to '${value}'. ` +
-      `Original error: ${err.message}`
+        `Original error: ${err.message}`,
     );
   }
 }
@@ -338,7 +356,7 @@ export async function setHiddenApiPolicy (this: ADB, value: number | string, ign
  * @throws If there was an error and ignoreError was true while executing 'adb shell settings delete global'
  *                 command on the device under test.
  */
-export async function setDefaultHiddenApiPolicy (this: ADB, ignoreError = false): Promise<void> {
+export async function setDefaultHiddenApiPolicy(this: ADB, ignoreError = false): Promise<void> {
   try {
     await this.shell(HIDDEN_API_POLICY_KEYS.map((k) => `settings delete global ${k}`).join(';'));
   } catch (e) {
@@ -350,15 +368,14 @@ export async function setDefaultHiddenApiPolicy (this: ADB, ignoreError = false)
   }
 }
 
-
 /**
  * Get the language name of the device under test.
  *
  * @returns The name of device language.
  */
-export async function getDeviceLanguage (this: ADB): Promise<string> {
-  return await this.getApiLevel() < 23
-    ? (await this.getDeviceSysLanguage() || await this.getDeviceProductLanguage())
+export async function getDeviceLanguage(this: ADB): Promise<string> {
+  return (await this.getApiLevel()) < 23
+    ? (await this.getDeviceSysLanguage()) || (await this.getDeviceProductLanguage())
     : (await this.getDeviceLocale()).split('-')[0];
 }
 
@@ -368,8 +385,8 @@ export async function getDeviceLanguage (this: ADB): Promise<string> {
  * @summary Could only be used for Android API < 23
  * @returns The name of device country.
  */
-export async function getDeviceCountry (this: ADB): Promise<string> {
-  return await this.getDeviceSysCountry() || await this.getDeviceProductCountry();
+export async function getDeviceCountry(this: ADB): Promise<string> {
+  return (await this.getDeviceSysCountry()) || (await this.getDeviceProductCountry());
 }
 
 /**
@@ -378,8 +395,8 @@ export async function getDeviceCountry (this: ADB): Promise<string> {
  * @summary Could only be used for Android API >= 23
  * @returns The name of device locale.
  */
-export async function getDeviceLocale (this: ADB): Promise<string> {
-  return await this.getDeviceSysLocale() || await this.getDeviceProductLocale();
+export async function getDeviceLocale(this: ADB): Promise<string> {
+  return (await this.getDeviceSysLocale()) || (await this.getDeviceProductLocale());
 }
 
 /**
@@ -392,7 +409,12 @@ export async function getDeviceLocale (this: ADB): Promise<string> {
  *
  * @returns If current locale is language and country as arguments, return true.
  */
-export async function ensureCurrentLocale (this: ADB, language?: string, country?: string, script?: string): Promise<boolean> {
+export async function ensureCurrentLocale(
+  this: ADB,
+  language?: string,
+  country?: string,
+  script?: string,
+): Promise<boolean> {
   const hasLanguage = _.isString(language);
   const hasCountry = _.isString(country);
   if (!hasLanguage && !hasCountry) {
@@ -403,44 +425,46 @@ export async function ensureCurrentLocale (this: ADB, language?: string, country
   const lcLanguage = (language || '').toLowerCase();
   const lcCountry = (country || '').toLowerCase();
   const apiLevel = await this.getApiLevel();
-  return (await retryInterval(5, 1000, async () => {
-    if (apiLevel < 23) {
-      log.debug(`Requested locale: ${lcLanguage}-${lcCountry}`);
-      let actualLanguage: string | undefined;
-      if (hasLanguage) {
-        actualLanguage = (await this.getDeviceLanguage()).toLowerCase();
-        log.debug(`Actual language: ${actualLanguage}`);
-        if (!hasCountry && lcLanguage === actualLanguage) {
-          return true;
+  return (
+    (await retryInterval(5, 1000, async () => {
+      if (apiLevel < 23) {
+        log.debug(`Requested locale: ${lcLanguage}-${lcCountry}`);
+        let actualLanguage: string | undefined;
+        if (hasLanguage) {
+          actualLanguage = (await this.getDeviceLanguage()).toLowerCase();
+          log.debug(`Actual language: ${actualLanguage}`);
+          if (!hasCountry && lcLanguage === actualLanguage) {
+            return true;
+          }
         }
-      }
-      let actualCountry: string | undefined;
-      if (hasCountry) {
-        actualCountry = (await this.getDeviceCountry()).toLowerCase();
-        log.debug(`Actual country: ${actualCountry}`);
-        if (!hasLanguage && lcCountry === actualCountry) {
-          return true;
+        let actualCountry: string | undefined;
+        if (hasCountry) {
+          actualCountry = (await this.getDeviceCountry()).toLowerCase();
+          log.debug(`Actual country: ${actualCountry}`);
+          if (!hasLanguage && lcCountry === actualCountry) {
+            return true;
+          }
         }
+        return lcLanguage === actualLanguage && lcCountry === actualCountry;
       }
-      return lcLanguage === actualLanguage && lcCountry === actualCountry;
-    }
-    const actualLocale = (await this.getDeviceLocale()).toLowerCase();
-    // zh-hans-cn : zh-cn
-    const expectedLocale = script
-      ? `${lcLanguage}-${script.toLowerCase()}-${lcCountry}`
-      : `${lcLanguage}-${lcCountry}`;
-    log.debug(`Requested locale: ${expectedLocale}. Actual locale: '${actualLocale}'`);
-    const languagePattern = `^${_.escapeRegExp(lcLanguage)}-${script ? (_.escapeRegExp(script) + '-') : ''}`;
-    const checkLocalePattern = (p: string) => new RegExp(p, 'i').test(actualLocale);
-    if (hasLanguage && !hasCountry) {
-      return checkLocalePattern(languagePattern);
-    }
-    const countryPattern = `${script ? ('-' + _.escapeRegExp(script)) : ''}-${_.escapeRegExp(lcCountry)}$`;
-    if (!hasLanguage && hasCountry) {
-      return checkLocalePattern(countryPattern);
-    }
-    return [languagePattern, countryPattern].every(checkLocalePattern);
-  })) ?? false;
+      const actualLocale = (await this.getDeviceLocale()).toLowerCase();
+      // zh-hans-cn : zh-cn
+      const expectedLocale = script
+        ? `${lcLanguage}-${script.toLowerCase()}-${lcCountry}`
+        : `${lcLanguage}-${lcCountry}`;
+      log.debug(`Requested locale: ${expectedLocale}. Actual locale: '${actualLocale}'`);
+      const languagePattern = `^${_.escapeRegExp(lcLanguage)}-${script ? _.escapeRegExp(script) + '-' : ''}`;
+      const checkLocalePattern = (p: string) => new RegExp(p, 'i').test(actualLocale);
+      if (hasLanguage && !hasCountry) {
+        return checkLocalePattern(languagePattern);
+      }
+      const countryPattern = `${script ? '-' + _.escapeRegExp(script) : ''}-${_.escapeRegExp(lcCountry)}$`;
+      if (!hasLanguage && hasCountry) {
+        return checkLocalePattern(countryPattern);
+      }
+      return [languagePattern, countryPattern].every(checkLocalePattern);
+    })) ?? false
+  );
 }
 
 /**
@@ -451,11 +475,11 @@ export async function ensureCurrentLocale (this: ADB, language?: string, country
  * @param isEmulator - Set it to true if the device under test
  *                                       is an emulator rather than a real device.
  */
-export async function setWifiState (this: ADB, on: boolean, isEmulator = false): Promise<void> {
+export async function setWifiState(this: ADB, on: boolean, isEmulator = false): Promise<void> {
   if (isEmulator) {
     // The svc command does not require to be root since API 26
     await this.shell(['svc', 'wifi', on ? 'enable' : 'disable'], {
-      privileged: await this.getApiLevel() < 26,
+      privileged: (await this.getApiLevel()) < 26,
     });
     return;
   }
@@ -471,18 +495,17 @@ export async function setWifiState (this: ADB, on: boolean, isEmulator = false):
  * @param isEmulator - Set it to true if the device under test
  *                                       is an emulator rather than a real device.
  */
-export async function setDataState (this: ADB, on: boolean, isEmulator = false): Promise<void> {
+export async function setDataState(this: ADB, on: boolean, isEmulator = false): Promise<void> {
   if (isEmulator) {
     // The svc command does not require to be root since API 26
     await this.shell(['svc', 'data', on ? 'enable' : 'disable'], {
-      privileged: await this.getApiLevel() < 26,
+      privileged: (await this.getApiLevel()) < 26,
     });
     return;
   }
 
   await this.shell(['cmd', 'phone', 'data', on ? 'enable' : 'disable']);
 }
-
 
 /**
  * Retrieves the list of packages from Doze whitelist on Android 8+
@@ -492,15 +515,16 @@ export async function setDataState (this: ADB, on: boolean, isEmulator = false):
  * system,com.google.android.cellbroadcastreceiver,10143
  * user,io.appium.settings,10157
  */
-export async function getDeviceIdleWhitelist (this: ADB): Promise<string[]> {
-  if (await this.getApiLevel() < 23) {
+export async function getDeviceIdleWhitelist(this: ADB): Promise<string[]> {
+  if ((await this.getApiLevel()) < 23) {
     // Doze mode has only been added since Android 6
     return [];
   }
 
   log.info('Listing packages in Doze whitelist');
   const output = await this.shell(['dumpsys', 'deviceidle', 'whitelist']);
-  return _.trim(output).split(/\n/)
+  return _.trim(output)
+    .split(/\n/)
     .map((line) => _.trim(line))
     .filter(Boolean);
 }
@@ -514,24 +538,25 @@ export async function getDeviceIdleWhitelist (this: ADB): Promise<string[]> {
  * will be thrown.
  * @returns `true` if the command to add package(s) has been executed
  */
-export async function addToDeviceIdleWhitelist (this: ADB, ...packages: string[]): Promise<boolean> {
-  if (_.isEmpty(packages) || await this.getApiLevel() < 23) {
+export async function addToDeviceIdleWhitelist(this: ADB, ...packages: string[]): Promise<boolean> {
+  if (_.isEmpty(packages) || (await this.getApiLevel()) < 23) {
     // Doze mode has only been added since Android 6
     return false;
   }
 
-  log.info(`Adding ${util.pluralize('package', packages.length)} ${JSON.stringify(packages)} to Doze whitelist`);
+  log.info(
+    `Adding ${util.pluralize('package', packages.length)} ${JSON.stringify(packages)} to Doze whitelist`,
+  );
   await this.shellChunks((pkg) => ['dumpsys', 'deviceidle', 'whitelist', `+${pkg}`], packages);
   return true;
 }
-
 
 /**
  * Check the state of Airplane mode on the device under test.
  *
  * @returns True if Airplane mode is enabled.
  */
-export async function isAirplaneModeOn (this: ADB): Promise<boolean> {
+export async function isAirplaneModeOn(this: ADB): Promise<boolean> {
   const stdout = await this.getSetting('global', 'airplane_mode_on');
   return parseInt(stdout, 10) !== 0;
   // Alternatively for Android 11+:
@@ -543,8 +568,8 @@ export async function isAirplaneModeOn (this: ADB): Promise<boolean> {
  *
  * @param on - True to enable the Airplane mode in Settings and false to disable it.
  */
-export async function setAirplaneMode (this: ADB, on: boolean): Promise<void> {
-  if (await this.getApiLevel() < 30) {
+export async function setAirplaneMode(this: ADB, on: boolean): Promise<void> {
+  if ((await this.getApiLevel()) < 30) {
     // This requires to call broadcastAirplaneMode afterwards to apply
     await this.setSetting('global', 'airplane_mode_on', on ? 1 : 0);
     return;
@@ -558,8 +583,8 @@ export async function setAirplaneMode (this: ADB, on: boolean): Promise<void> {
  *
  * @param on - True to enable bluetooth service and false to disable it.
  */
-export async function setBluetoothOn (this: ADB, on: boolean): Promise<void> {
-  if (await this.getApiLevel() < 30) {
+export async function setBluetoothOn(this: ADB, on: boolean): Promise<void> {
+  if ((await this.getApiLevel()) < 30) {
     throw new Error('Changing of the bluetooth state is not supported on your device');
   }
 
@@ -572,15 +597,15 @@ export async function setBluetoothOn (this: ADB, on: boolean): Promise<void> {
  * @param on - True to enable NFC service and false to disable it.
  * @throws If there was an error while changing the service state
  */
-export async function setNfcOn (this: ADB, on: boolean): Promise<void> {
-  const {stdout, stderr} = await this.shell(['svc', 'nfc', on ? 'enable' : 'disable'], {
-    outputFormat: 'full'
-  }) as {stdout: string; stderr: string};
+export async function setNfcOn(this: ADB, on: boolean): Promise<void> {
+  const {stdout, stderr} = (await this.shell(['svc', 'nfc', on ? 'enable' : 'disable'], {
+    outputFormat: 'full',
+  })) as {stdout: string; stderr: string};
   const output = stderr || stdout;
   log.debug(output);
   if (output.includes('null NfcAdapter')) {
     throw new Error(
-      `Cannot turn ${on ? 'on' : 'off'} the NFC adapter. Does the device under test have it?`
+      `Cannot turn ${on ? 'on' : 'off'} the NFC adapter. Does the device under test have it?`,
     );
   }
 }
@@ -595,11 +620,15 @@ export async function setNfcOn (this: ADB, on: boolean): Promise<void> {
  *
  * @param on - True to broadcast enable and false to broadcast disable.
  */
-export async function broadcastAirplaneMode (this: ADB, on: boolean): Promise<void> {
+export async function broadcastAirplaneMode(this: ADB, on: boolean): Promise<void> {
   const args = [
-    'am', 'broadcast',
-    '-a', 'android.intent.action.AIRPLANE_MODE',
-    '--ez', 'state', on ? 'true' : 'false',
+    'am',
+    'broadcast',
+    '-a',
+    'android.intent.action.AIRPLANE_MODE',
+    '--ez',
+    'state',
+    on ? 'true' : 'false',
   ];
   try {
     await this.shell(args);
@@ -621,9 +650,9 @@ export async function broadcastAirplaneMode (this: ADB, on: boolean): Promise<vo
  *
  * @returns True if WiFi is enabled.
  */
-export async function isWifiOn (this: ADB): Promise<boolean> {
+export async function isWifiOn(this: ADB): Promise<boolean> {
   const stdout = await this.getSetting('global', 'wifi_on');
-  return (parseInt(stdout, 10) !== 0);
+  return parseInt(stdout, 10) !== 0;
   // Alternative for Android 11+:
   // return (await this.shell(['cmd', 'wifi', 'status']).stdout.includes('Wifi is enabled'));
 }
@@ -633,9 +662,9 @@ export async function isWifiOn (this: ADB): Promise<boolean> {
  *
  * @returns True if Data transfer is enabled.
  */
-export async function isDataOn (this: ADB): Promise<boolean> {
+export async function isDataOn(this: ADB): Promise<boolean> {
   const stdout = await this.getSetting('global', 'mobile_data');
-  return (parseInt(stdout, 10) !== 0);
+  return parseInt(stdout, 10) !== 0;
 }
 
 /**
@@ -647,9 +676,11 @@ export async function isDataOn (this: ADB): Promise<boolean> {
  * @returns True if at least one of animation scale settings
  *                   is not equal to '0.0'.
  */
-export async function isAnimationOn (this: ADB): Promise<boolean> {
-  return (await B.all(ANIMATION_SCALE_KEYS.map(
-    async (k) => (await this.getSetting('global', k)) !== '0.0'))
+export async function isAnimationOn(this: ADB): Promise<boolean> {
+  return (
+    await B.all(
+      ANIMATION_SCALE_KEYS.map(async (k) => (await this.getSetting('global', k)) !== '0.0'),
+    )
   ).includes(true);
 }
 
@@ -668,7 +699,7 @@ export async function isAnimationOn (this: ADB): Promise<boolean> {
  *                       '1' is the system default animation scale.
  * @throws If the adb setting command raises an exception.
  */
-export async function setAnimationScale (this: ADB, value: number): Promise<void> {
+export async function setAnimationScale(this: ADB, value: number): Promise<void> {
   await B.all(ANIMATION_SCALE_KEYS.map((k) => this.setSetting('global', k, value)));
 }
 
@@ -677,7 +708,7 @@ export async function setAnimationScale (this: ADB, value: number): Promise<void
  *
  * @returns The current orientation encoded as an integer number.
  */
-export async function getScreenOrientation (this: ADB): Promise<number | null> {
+export async function getScreenOrientation(this: ADB): Promise<number | null> {
   const stdout = await this.shell(['dumpsys', 'input']);
   return getSurfaceOrientation(stdout);
 }
@@ -689,10 +720,9 @@ export async function getScreenOrientation (this: ADB): Promise<number | null> {
  *
  * @param dumpsys
  */
-function getSurfaceOrientation (dumpsys: string): number | null {
+function getSurfaceOrientation(dumpsys: string): number | null {
   const m = /SurfaceOrientation: \d/gi.exec(dumpsys);
   return m ? parseInt(m[0].split(':')[1], 10) : null;
 }
 
 // #endregion
-

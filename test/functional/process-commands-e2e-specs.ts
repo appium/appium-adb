@@ -6,8 +6,8 @@ import {
   getApiDemosPath,
   ensureRootAccess,
 } from './setup';
-import { waitForCondition } from 'asyncbox';
-import chai, { expect } from 'chai';
+import {waitForCondition} from 'asyncbox';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -20,7 +20,7 @@ describe('process commands', function () {
   const androidInstallTimeout = 90000;
 
   before(async function () {
-    adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    adb = await ADB.createADB({adbExecTimeout: 60000});
     apiDemosPath = await getApiDemosPath();
   });
 
@@ -41,7 +41,11 @@ describe('process commands', function () {
   });
 
   it('should be able to kill processes by name', async function () {
-    await ensureRootAccess(adb, this, 'Device does not have root access, which is required for killing processes');
+    await ensureRootAccess(
+      adb,
+      this,
+      'Device does not have root access, which is required for killing processes',
+    );
 
     // Install and start the test app
     await adb.install(apiDemosPath, {
@@ -65,7 +69,11 @@ describe('process commands', function () {
   });
 
   it('should be able to kill process by PID', async function () {
-    await ensureRootAccess(adb, this, 'Device does not have root access, which is required for killing processes');
+    await ensureRootAccess(
+      adb,
+      this,
+      'Device does not have root access, which is required for killing processes',
+    );
 
     // Install and start the test app
     await adb.install(apiDemosPath, {

@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -9,13 +9,13 @@ describe('Lock Management', function () {
 
   before(async function () {
     adb = await ADB.createADB();
-    if (!await adb.isLockManagementSupported()) {
+    if (!(await adb.isLockManagementSupported())) {
       return this.skip();
     }
   });
 
   it('lock credential cleanup should work', async function () {
-    if (await adb.getApiLevel() < 27) {
+    if ((await adb.getApiLevel()) < 27) {
       return this.skip();
     }
     await adb.clearLockCredential();

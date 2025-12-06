@@ -1,10 +1,10 @@
 import {ADB} from '../../lib/adb';
-import { MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT } from './setup';
+import {MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT} from './setup';
 import path from 'path';
-import { getResourcePath } from '../../lib/helpers.js';
-import { fs } from '@appium/support';
+import {getResourcePath} from '../../lib/helpers.js';
+import {fs} from '@appium/support';
 import _ from 'lodash';
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -44,13 +44,19 @@ describe('system calls', function () {
   it('shell should return stderr from adb with full output', async function () {
     const apiLevel = await adb.getApiLevel();
     const minStderrApiLevel = 24;
-    const fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
-    const outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
+    const fullShellOutput = await adb.shell(
+      ['content', 'read', '--uri', 'content://doesnotexist'],
+      {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL},
+    );
+    const outputWithError =
+      apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
     expect(outputWithError).to.contain('Error while accessing provider');
   });
   it('shell should return stdout from adb shell with full output', async function () {
     const apiLevel = await adb.getApiLevel();
-    const fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL});
+    const fullShellOutput = await adb.shell(['getprop', 'ro.build.version.sdk'], {
+      outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL,
+    });
     expect(fullShellOutput.stderr).to.equal('');
     expect(fullShellOutput.stdout).to.equal(`${apiLevel}`);
   });
