@@ -42,6 +42,7 @@ export const DEFAULT_OPTS = {
   remoteAppsCacheLimit: 10,
   allowOfflineDevices: false,
   allowDelayAdb: true,
+  listenAllNetwork: false,
 } as const;
 
 export class ADB implements ADBOptions {
@@ -80,6 +81,7 @@ export class ADB implements ADBOptions {
   remoteAdbHost?: string;
   remoteAdbPort?: number;
   clearDeviceLogsOnStart?: boolean;
+  listenAllNetwork?: boolean;
 
   constructor(opts: ADBOptions = ({} as ADBOptions)) {
     const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
@@ -97,6 +99,14 @@ export class ADB implements ADBOptions {
     if (options.remoteAdbPort) {
       this.adbPort = options.remoteAdbPort;
     }
+
+    // do not add -a option twice if the defualtArgs already had it.
+    if (options.listenAllNetwork && !this.executable.defaultArgs.includes('-a')) {
+      this.executable.defaultArgs.push('-a');
+    } else if (this.executable.defaultArgs.includes('-a')) {
+      this.listenAllNetwork = true;
+    }
+
     this.executable.defaultArgs.push('-P', String(this.adbPort));
     if (options.udid) {
       this.setDeviceId(options.udid);
