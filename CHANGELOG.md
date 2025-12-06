@@ -1,3 +1,9 @@
+## [14.0.7](https://github.com/appium/appium-adb/compare/v14.0.6...v14.0.7) (2025-12-06)
+
+### Miscellaneous Chores
+
+* Migrate apk-signing and emulator-commands to typescript ([#845](https://github.com/appium/appium-adb/issues/845)) ([ce45f6c](https://github.com/appium/appium-adb/commit/ce45f6c90ed5b2d3e2ac814bbfa84894e8275b24))
+
 ## [14.0.6](https://github.com/appium/appium-adb/compare/v14.0.5...v14.0.6) (2025-12-05)
 
 ### Miscellaneous Chores
