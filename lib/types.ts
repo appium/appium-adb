@@ -26,6 +26,7 @@ export interface ADBOptions {
   remoteAdbHost?: string;
   remoteAdbPort?: number;
   clearDeviceLogsOnStart?: boolean;
+  listenAllNetwork?: boolean;
 }
 
 export interface ADBExecutable {
