@@ -1,3 +1,9 @@
+## [14.1.2](https://github.com/appium/appium-adb/compare/v14.1.1...v14.1.2) (2025-12-07)
+
+### Miscellaneous Chores
+
+* Ditch usage of @appium/test-support ([#848](https://github.com/appium/appium-adb/issues/848)) ([54454b0](https://github.com/appium/appium-adb/commit/54454b08931b465942f549f5ab11acb34580e6ea))
+
 ## [14.1.1](https://github.com/appium/appium-adb/compare/v14.1.0...v14.1.1) (2025-12-07)
 
 ### Miscellaneous Chores
