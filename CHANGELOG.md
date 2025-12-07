@@ -1,3 +1,9 @@
+## [14.1.1](https://github.com/appium/appium-adb/compare/v14.1.0...v14.1.1) (2025-12-07)
+
+### Miscellaneous Chores
+
+* apply npm run format ([#847](https://github.com/appium/appium-adb/issues/847)) ([c6244da](https://github.com/appium/appium-adb/commit/c6244da8364bb0bcdd14cf3618f6bb93e099a49b))
+
 ## [14.1.0](https://github.com/appium/appium-adb/compare/v14.0.7...v14.1.0) (2025-12-06)
 
 ### Features
