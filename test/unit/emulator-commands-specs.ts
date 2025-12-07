@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import {withMocks} from '@appium/test-support';
+import sinon from 'sinon';
 import _ from 'lodash';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -14,17 +14,26 @@ const fingerprintId = 1111;
 
 const adb = new ADB();
 
-describe(
-  'emulator commands',
-  withMocks({adb}, function (mocks) {
-    afterEach(function () {
-      (mocks as any).verify();
-    });
+describe('emulator commands', function () {
+  let sandbox: sinon.SinonSandbox;
+  let mocks: {adb: any};
+
+  beforeEach(function () {
+    sandbox = sinon.createSandbox();
+    mocks = {
+      adb: sandbox.mock(adb),
+    };
+  });
+
+  afterEach(function () {
+    sandbox.verify();
+    sandbox.restore();
+  });
 
     describe('emu', function () {
       describe('isEmulatorConnected', function () {
         it('should verify emulators state', async function () {
-          (mocks as any).adb.expects('getConnectedEmulators').atLeast(3).returns(emulators);
+          mocks.adb.expects('getConnectedEmulators').atLeast(3).returns(emulators);
           adb.curDeviceId = 'emulator-5554';
           expect(await adb.isEmulatorConnected()).to.equal(true);
           adb.curDeviceId = 'emulator-5556';
@@ -36,7 +45,7 @@ describe(
       describe('verifyEmulatorConnected', function () {
         it('should throw an exception on emulator not connected', async function () {
           adb.curDeviceId = 'emulator-5558';
-          (mocks as any).adb.expects('isEmulatorConnected').once().returns(false);
+          mocks.adb.expects('isEmulatorConnected').once().returns(false);
           await expect(adb.verifyEmulatorConnected()).to.eventually.be.rejected;
         });
       });
@@ -45,14 +54,14 @@ describe(
           await expect(adb.fingerprint(undefined as any)).to.eventually.be.rejected;
         });
         it('should throw exception on apiLevel lower than 23', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().withExactArgs().returns(21);
+          mocks.adb.expects('getApiLevel').once().withExactArgs().returns(21);
           await expect(adb.fingerprint(String(fingerprintId))).to.eventually.be.rejected;
         });
         it('should call adbExec with the correct args', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().withExactArgs().returns(23);
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().withExactArgs().returns(23);
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'finger', 'touch', String(fingerprintId)])
@@ -62,9 +71,9 @@ describe(
       });
       describe('rotate', function () {
         it('should call adbExec with the correct args', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb.expects('adbExec').once().withExactArgs(['emu', 'rotate']).returns();
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb.expects('adbExec').once().withExactArgs(['emu', 'rotate']).returns();
           await adb.rotate();
         });
       });
@@ -75,9 +84,9 @@ describe(
           );
         });
         it('should set the power ac off', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'power', 'ac', adb.POWER_AC_STATES.POWER_AC_OFF])
@@ -85,9 +94,9 @@ describe(
           await adb.powerAC('off');
         });
         it('should set the power ac on', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'power', 'ac', adb.POWER_AC_STATES.POWER_AC_ON])
@@ -106,9 +115,9 @@ describe(
           );
         });
         it('should set the power capacity', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'power', 'capacity', '0'])
@@ -116,8 +125,8 @@ describe(
           await adb.powerCapacity(0);
         });
         it('should call methods to power off the emulator', async function () {
-          (mocks as any).adb.expects('powerAC').once().withExactArgs('off').returns();
-          (mocks as any).adb.expects('powerCapacity').once().withExactArgs(0).returns();
+          mocks.adb.expects('powerAC').once().withExactArgs('off').returns();
+          mocks.adb.expects('powerCapacity').once().withExactArgs(0).returns();
           await adb.powerOFF();
         });
       });
@@ -131,9 +140,9 @@ describe(
         it('should call adbExec with the correct args', async function () {
           const phoneNumber = 4509;
           const message = ' Hello Appium ';
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'sms', 'send', `${phoneNumber}`, message])
@@ -149,9 +158,9 @@ describe(
         });
         it('should call adbExecEmu with the correct args', async function () {
           const signalStrength = 0;
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'signal-profile', `${signalStrength}`])
@@ -168,9 +177,9 @@ describe(
         });
         it('should set the correct method for making gsm call', async function () {
           const phoneNumber = 4509;
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CALL, `${phoneNumber}`])
@@ -179,9 +188,9 @@ describe(
         });
         it('should set the correct method for accepting gsm call', async function () {
           const phoneNumber = 4509;
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_ACCEPT, `${phoneNumber}`])
@@ -190,9 +199,9 @@ describe(
         });
         it('should set the correct method for refusing gsm call', async function () {
           const phoneNumber = 4509;
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_CANCEL, `${phoneNumber}`])
@@ -201,9 +210,9 @@ describe(
         });
         it('should set the correct method for holding gsm call', async function () {
           const phoneNumber = 4509;
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', adb.GSM_CALL_ACTIONS.GSM_HOLD, `${phoneNumber}`])
@@ -219,9 +228,9 @@ describe(
         });
         for (const [key, value] of _.toPairs(adb.NETWORK_SPEED)) {
           it(`should set network speed(${key}) correctly`, async function () {
-            (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-            (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-            (mocks as any).adb
+            mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+            mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+            mocks.adb
               .expects('adbExec')
               .once()
               .withExactArgs(['emu', 'network', 'speed', value])
@@ -237,9 +246,9 @@ describe(
           );
         });
         it('should set gsm voice to unregistered', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_UNREGISTERED])
@@ -247,9 +256,9 @@ describe(
           await adb.gsmVoice('unregistered');
         });
         it('should set gsm voice to home', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_HOME])
@@ -257,9 +266,9 @@ describe(
           await adb.gsmVoice('home');
         });
         it('should set gsm voice to roaming', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_ROAMING])
@@ -267,9 +276,9 @@ describe(
           await adb.gsmVoice('roaming');
         });
         it('should set gsm voice to searching', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_SEARCHING])
@@ -277,9 +286,9 @@ describe(
           await adb.gsmVoice('searching');
         });
         it('should set gsm voice to denied', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_DENIED])
@@ -287,9 +296,9 @@ describe(
           await adb.gsmVoice('denied');
         });
         it('should set gsm voice to off', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_OFF])
@@ -297,9 +306,9 @@ describe(
           await adb.gsmVoice('off');
         });
         it('should set gsm voice to on', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'gsm', 'voice', adb.GSM_VOICE_STATES.GSM_VOICE_ON])
@@ -315,9 +324,9 @@ describe(
           await expect(adb.sensorSet('light' as any, undefined as any)).to.eventually.be.rejected;
         });
         it('should call adb emu sensor set with the correct values', async function () {
-          (mocks as any).adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
-          (mocks as any).adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          (mocks as any).adb
+          mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
+          mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['emu', 'sensor', 'set', 'humidity', `${100}`])
@@ -326,5 +335,4 @@ describe(
         });
       });
     });
-  }),
-);
+  });

@@ -2,7 +2,7 @@ import {ADB} from '../../lib/adb';
 import net from 'net';
 import {Logcat} from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
-import {withMocks} from '@appium/test-support';
+import sinon from 'sinon';
 import {
   parseLaunchableActivityNames,
   matchComponentName,
@@ -28,16 +28,35 @@ const logcat = new Logcat({
   debugTrace: false,
 });
 
-describe(
-  'app commands',
-  withMocks({adb, logcat, teen_process, net, fs}, function (mocks) {
-    afterEach(function () {
-      mocks.verify();
-    });
+describe('app commands', function () {
+  let sandbox: sinon.SinonSandbox;
+  let mocks: {
+    adb: any;
+    logcat: any;
+    teen_process: any;
+    net: any;
+    fs: any;
+  };
+
+  beforeEach(function () {
+    sandbox = sinon.createSandbox();
+    mocks = {
+      adb: sandbox.mock(adb),
+      logcat: sandbox.mock(logcat),
+      teen_process: sandbox.mock(teen_process),
+      net: sandbox.mock(net),
+      fs: sandbox.mock(fs),
+    };
+  });
+
+  afterEach(function () {
+    sandbox.verify();
+    sandbox.restore();
+  });
 
     describe('isAppRunning', function () {
       it('should call listAppProcessIds and return true when app is running', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('listAppProcessIds')
           .once()
           .withExactArgs(apiDemosPackage)
@@ -45,7 +64,7 @@ describe(
         expect(await adb.isAppRunning(apiDemosPackage)).to.be.true;
       });
       it('should call listAppProcessIds and return false when app is not running', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('listAppProcessIds')
           .once()
           .withExactArgs(apiDemosPackage)
@@ -58,7 +77,7 @@ describe(
       it('should call shell with correct args and parse process IDs', async function () {
         const mockOutput = `ProcessRecord{abc123 123:io.appium.android.apis/u0a123}
 ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['dumpsys', 'activity', 'processes'])
@@ -66,7 +85,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([123, 456]);
       });
       it('should return empty array when no processes found', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['dumpsys', 'activity', 'processes'])
@@ -77,7 +96,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('killPackage', function () {
       it('should call shell with correct args', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['am', 'kill', apiDemosPackage])
@@ -88,7 +107,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('forceStop', function () {
       it('should call shell with correct args', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['am', 'force-stop', apiDemosPackage])
@@ -99,7 +118,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('clear', function () {
       it('should call shell with correct args', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['pm', 'clear', apiDemosPackage])
@@ -110,8 +129,8 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('stopAndClear', function () {
       it('should call forceStop and clear', async function () {
-        (mocks as any).adb.expects('forceStop').once().withExactArgs(apiDemosPackage).returns('');
-        (mocks as any).adb.expects('clear').once().withExactArgs(apiDemosPackage).returns('');
+        mocks.adb.expects('forceStop').once().withExactArgs(apiDemosPackage).returns('');
+        mocks.adb.expects('clear').once().withExactArgs(apiDemosPackage).returns('');
         await adb.stopAndClear(apiDemosPackage);
       });
     });
@@ -119,7 +138,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
     describe('startUri', function () {
       it('should call shell with correct args', async function () {
         const uri = 'https://example.com';
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri])
@@ -128,7 +147,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       });
       it('should call shell with package when provided', async function () {
         const uri = 'https://example.com';
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs([
@@ -148,8 +167,8 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('dumpWindows', function () {
       it('should call shell with correct args', async function () {
-        (mocks as any).adb.expects('getApiLevel').once().returns(25);
-        (mocks as any).adb
+        mocks.adb.expects('getApiLevel').once().returns(25);
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['dumpsys', 'window', 'windows'])
@@ -165,8 +184,8 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         // Format should be: ActivityRecord{... package/activity ...}
         // APIDEMOS_ACTIVITY_SHORT is '.ApiDemos', so we use package/.ApiDemos
         const mockOutput = `mFocusedApp=AppWindowToken{abc123 token=Token{def456 ActivityRecord{ghi789 u0 ${APIDEMOS_PKG}/${APIDEMOS_ACTIVITY_SHORT} t181}}}`;
-        (mocks as any).adb.expects('getApiLevel').once().returns(25);
-        (mocks as any).adb
+        mocks.adb.expects('getApiLevel').once().returns(25);
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['dumpsys', 'window', 'windows'])
@@ -179,7 +198,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('waitForActivity', function () {
       it('should wait for activity to appear', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('getFocusedPackageAndActivity')
           .exactly(2)
           .onCall(0)
@@ -192,7 +211,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('waitForNotActivity', function () {
       it('should wait for activity to disappear', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('getFocusedPackageAndActivity')
           .exactly(2)
           .onCall(0)
@@ -205,7 +224,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('waitForActivityOrNot', function () {
       it('should wait for activity to appear when waitForStop is false', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('getFocusedPackageAndActivity')
           .exactly(2)
           .onCall(0)
@@ -215,7 +234,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         await adb.waitForActivityOrNot(apiDemosPackage, APIDEMOS_ACTIVITY_SHORT, false, 1000);
       });
       it('should wait for activity to disappear when waitForStop is true', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('getFocusedPackageAndActivity')
           .exactly(2)
           .onCall(0)
@@ -341,7 +360,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
     describe('getBuildToolsDirs', function () {
       it('should sort build-tools folder names by semantic version', async function () {
-        (mocks as any).fs
+        mocks.fs
           .expects('glob')
           .once()
           .returns(['/some/path/1.2.3', '/some/path/4.5.6', '/some/path/2.3.1']);
@@ -647,5 +666,4 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         expect(_.isNull(matchComponentName(activity))).to.be.true;
       });
     });
-  }),
-);
+  });
