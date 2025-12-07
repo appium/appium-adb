@@ -1,5 +1,5 @@
 import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
-import {withMocks} from '@appium/test-support';
+import sinon from 'sinon';
 import {fs} from '@appium/support';
 import path from 'path';
 import chai, {expect} from 'chai';
@@ -7,25 +7,34 @@ import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
-describe(
-  'android manifest',
-  withMocks({fs}, function (mocks) {
-    afterEach(function () {
-      mocks.verify();
-    });
+describe('android manifest', function () {
+  let sandbox: sinon.SinonSandbox;
+  let mocks: {fs: any};
+
+  beforeEach(function () {
+    sandbox = sinon.createSandbox();
+    mocks = {
+      fs: sandbox.mock(fs),
+    };
+  });
+
+  afterEach(function () {
+    sandbox.verify();
+    sandbox.restore();
+  });
 
     describe('getAndroidPlatformAndPath', function () {
       it('should get the latest available API', async function () {
         const ANDROID_HOME = '/path/to/android/home';
 
-        (mocks as any).fs
+        mocks.fs
           .expects('glob')
           .returns([
             path.resolve(ANDROID_HOME, 'platforms', 'android-17', 'build.prop'),
             path.resolve(ANDROID_HOME, 'platforms', 'android-25', 'build.prop'),
             path.resolve(ANDROID_HOME, 'platforms', 'android-22', 'build.prop'),
           ]);
-        (mocks as any).fs
+        mocks.fs
           .expects('readFile')
           .exactly(3)
           .onCall(0)
@@ -56,5 +65,4 @@ describe(
         );
       });
     });
-  }),
-);
+  });

@@ -1,16 +1,21 @@
 import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt';
-import {withMocks} from '@appium/test-support';
+import sinon from 'sinon';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
-describe(
-  'lock management',
-  withMocks({}, function (mocks) {
-    afterEach(function () {
-      mocks.verify();
-    });
+describe('lock management', function () {
+  let sandbox: sinon.SinonSandbox;
+
+  beforeEach(function () {
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(function () {
+    sandbox.verify();
+    sandbox.restore();
+  });
 
     describe('isScreenStateOff', function () {
       it('should return true if isScreenStateOff is off', async function () {
@@ -129,5 +134,4 @@ describe(
         expect(await isShowingLockscreen(dumpsys)).to.be.false;
       });
     });
-  }),
-);
+  });

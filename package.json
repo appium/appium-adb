@@ -60,7 +60,6 @@
   },
   "devDependencies": {
     "@appium/eslint-config-appium-ts": "^2.0.0-rc.1",
-    "@appium/test-support": "^4.0.0-rc.1",
     "@appium/tsconfig": "^1.0.0-rc.1",
     "@appium/types": "^1.0.0-rc.1",
     "@semantic-release/changelog": "^6.0.1",
@@ -72,6 +71,7 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "^24.0.0",
     "@types/semver": "^7.5.0",
+    "@types/sinon": "^21.0.0",
     "@types/source-map-support": "^0.5.6",
     "@types/teen_process": "^2.0.0",
     "chai": "^6.0.0",
@@ -80,6 +80,7 @@
     "mocha": "^11.0.1",
     "prettier": "^3.0.0",
     "semantic-release": "^25.0.2",
+    "sinon": "^21.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.2"
   },

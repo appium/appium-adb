@@ -2,7 +2,7 @@ import {ADB} from '../../lib/adb';
 import net from 'net';
 import {Logcat} from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
-import {withMocks} from '@appium/test-support';
+import sinon from 'sinon';
 import {EOL} from 'os';
 import {APIDEMOS_PKG} from '../constants';
 import chai, {expect} from 'chai';
@@ -39,17 +39,34 @@ const logcat = new Logcat({
   debugTrace: false,
 });
 
-describe(
-  'general commands',
-  withMocks({adb, logcat, teen_process, net}, function (mocks) {
-    afterEach(function () {
-      mocks.verify();
-    });
+describe('general commands', function () {
+  let sandbox: sinon.SinonSandbox;
+  let mocks: {
+    adb: any;
+    logcat: any;
+    teen_process: any;
+    net: any;
+  };
+
+  beforeEach(function () {
+    sandbox = sinon.createSandbox();
+    mocks = {
+      adb: sandbox.mock(adb),
+      logcat: sandbox.mock(logcat),
+      teen_process: sandbox.mock(teen_process),
+      net: sandbox.mock(net),
+    };
+  });
+
+  afterEach(function () {
+    sandbox.verify();
+    sandbox.restore();
+  });
 
     describe('shell', function () {
       describe('getApiLevel', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.sdk')
@@ -58,12 +75,12 @@ describe(
         });
         it('should call shell with correct args with Q preview device', async function () {
           adb._apiLevel = undefined;
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.sdk')
             .returns('28');
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.release')
@@ -72,12 +89,12 @@ describe(
         });
         it('should call shell with correct args with R preview device', async function () {
           adb._apiLevel = undefined;
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.sdk')
             .returns('29');
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.release')
@@ -87,7 +104,7 @@ describe(
       });
       describe('getPlatformVersion', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getDeviceProperty')
             .once()
             .withExactArgs('ro.build.version.release')
@@ -97,7 +114,7 @@ describe(
       });
       describe('getDeviceSysLanguage', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'persist.sys.language'])
@@ -107,7 +124,7 @@ describe(
       });
       describe('getDeviceSysCountry', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'persist.sys.country'])
@@ -117,8 +134,8 @@ describe(
       });
       describe('getLocationProviders', function () {
         it('should call shell with correct args and return empty location_providers_allowed', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(27);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(27);
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('secure', 'location_providers_allowed')
@@ -128,8 +145,8 @@ describe(
           expect(providers.length).to.equal(0);
         });
         it('should return one location_providers_allowed', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(27);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(27);
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('secure', 'location_providers_allowed')
@@ -140,8 +157,8 @@ describe(
           expect(providers).to.include('gps');
         });
         it('should return both location_providers_allowed', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(27);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(27);
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('secure', 'location_providers_allowed')
@@ -155,22 +172,22 @@ describe(
       });
       describe('toggleGPSLocationProvider', function () {
         it('should call shell with correct args on gps enabled on API below 31', async function () {
-          (mocks as any).adb.expects('getApiLevel').atLeast(1).returns(27);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').atLeast(1).returns(27);
+          mocks.adb
             .expects('setSetting')
             .withExactArgs('secure', 'location_providers_allowed', '+gps');
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .withExactArgs('secure', 'location_providers_allowed', '-gps');
           await adb.toggleGPSLocationProvider(true);
           await adb.toggleGPSLocationProvider(false);
         });
         it('should call shell with correct args on gps enabled on API above 30', async function () {
-          (mocks as any).adb.expects('getApiLevel').atLeast(1).returns(31);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').atLeast(1).returns(31);
+          mocks.adb
             .expects('shell')
             .withExactArgs(['cmd', 'location', 'set-location-enabled', 'true']);
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .withExactArgs(['cmd', 'location', 'set-location-enabled', 'false']);
           await adb.toggleGPSLocationProvider(true);
@@ -179,7 +196,7 @@ describe(
       });
       describe('getDeviceSysLocale', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'persist.sys.locale'])
@@ -189,7 +206,7 @@ describe(
       });
       describe('getDeviceProductLanguage', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'ro.product.locale.language'])
@@ -199,7 +216,7 @@ describe(
       });
       describe('getDeviceProductCountry', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'ro.product.locale.region'])
@@ -209,7 +226,7 @@ describe(
       });
       describe('getDeviceProductLocale', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['getprop', 'ro.product.locale'])
@@ -219,7 +236,7 @@ describe(
       });
       describe('setDeviceProperty', function () {
         it('should call setprop with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .withExactArgs(['setprop', 'persist.sys.locale', locale], {
               privileged: true,
@@ -230,7 +247,7 @@ describe(
       });
       describe('availableIMEs', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withArgs(['ime', 'list', '-a'])
@@ -240,14 +257,14 @@ describe(
       });
       describe('enabledIMEs', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb.expects('shell').once().withArgs(['ime', 'list']).returns(imeList);
+          mocks.adb.expects('shell').once().withArgs(['ime', 'list']).returns(imeList);
           expect(await adb.enabledIMEs()).to.have.length.above(0);
         });
       });
       describe('defaultIME', function () {
         const defaultIME = 'com.android.inputmethod.latin/.LatinIME';
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('secure', 'default_input_method')
@@ -257,7 +274,7 @@ describe(
       });
       describe('disableIME', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['ime', 'disable', IME])
@@ -267,7 +284,7 @@ describe(
       });
       describe('enableIME', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['ime', 'enable', IME])
@@ -278,7 +295,7 @@ describe(
       describe('keyevent', function () {
         it('should call shell with correct args', async function () {
           const keycode = '29';
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['input', 'keyevent', keycode])
@@ -290,7 +307,7 @@ describe(
         it('should call shell with correct args if spaces are present in the text', async function () {
           const text = 'some text  with spaces';
           const expectedText = '"some%stext%s%swith%sspaces"';
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs([`input text ${expectedText}`])
@@ -300,7 +317,7 @@ describe(
         it('should call shell with correct args if special chars are not present in the text', async function () {
           const text = 'something';
           const expectedText = `something`;
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['input', 'text', expectedText])
@@ -310,7 +327,7 @@ describe(
         it('should call shell with correct args if special chars are present but spaces are not in the text', async function () {
           const text = '&something';
           const expectedText = `"&something"`;
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs([`input text ${expectedText}`])
@@ -320,7 +337,7 @@ describe(
         it('should call shell with correct args and select appropriate quotes', async function () {
           const text = 'some text & with quote$"';
           const expectedText = `'some%stext%s&%swith%squote\\$"'`;
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs([`input text ${expectedText}`])
@@ -330,7 +347,7 @@ describe(
       });
       describe('clearTextField', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs([
@@ -351,7 +368,7 @@ describe(
       });
       describe('lock', function () {
         it('should call isScreenLocked, keyevent', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('isScreenLocked')
             .exactly(3)
             .onCall(0)
@@ -360,31 +377,31 @@ describe(
             .returns(false)
             .onCall(2)
             .returns(true);
-          (mocks as any).adb.expects('keyevent').once().withExactArgs(26).returns('');
+          mocks.adb.expects('keyevent').once().withExactArgs(26).returns('');
           await adb.lock();
         });
       });
       describe('back', function () {
         it('should call keyevent with correct args', async function () {
-          (mocks as any).adb.expects('keyevent').once().withExactArgs(4).returns('');
+          mocks.adb.expects('keyevent').once().withExactArgs(4).returns('');
           await adb.back();
         });
       });
       describe('goToHome', function () {
         it('should call keyevent with correct args', async function () {
-          (mocks as any).adb.expects('keyevent').once().withExactArgs(3).returns('');
+          mocks.adb.expects('keyevent').once().withExactArgs(3).returns('');
           await adb.goToHome();
         });
       });
       describe.skip('isScreenLocked', function () {
         it('should call keyevent with correct args', async function () {
-          (mocks as any).adb.expects('keyevent').once().withExactArgs(3).returns('');
+          mocks.adb.expects('keyevent').once().withExactArgs(3).returns('');
           await adb.goToHome();
         });
       });
       describe('isSoftKeyboardPresent', function () {
         it('should call shell with correct args and should return false', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['dumpsys', 'input_method'])
@@ -394,7 +411,7 @@ describe(
           expect(isKeyboardShown).to.be.false;
         });
         it('should call shell with correct args and should return true', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['dumpsys', 'input_method'])
@@ -406,7 +423,7 @@ describe(
       });
       describe('isAirplaneModeOn', function () {
         it('should call shell with correct args and should be true', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'airplane_mode_on')
@@ -414,7 +431,7 @@ describe(
           expect(await adb.isAirplaneModeOn()).to.be.true;
         });
         it('should call shell with correct args and should be false', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'airplane_mode_on')
@@ -424,8 +441,8 @@ describe(
       });
       describe('setAirplaneMode', function () {
         it('should call shell with correct args API 29', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(29);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(29);
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'airplane_mode_on', 1)
@@ -433,8 +450,8 @@ describe(
           await adb.setAirplaneMode(true);
         });
         it('should call shell with correct args API 30', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(30);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(30);
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['cmd', 'connectivity', 'airplane-mode', 'enable'])
@@ -444,7 +461,7 @@ describe(
       });
       describe('broadcastAirplaneMode', function () {
         it('should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs([
@@ -462,7 +479,7 @@ describe(
       });
       describe('isWifiOn', function () {
         it('should call shell with correct args and should be true', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'wifi_on')
@@ -470,7 +487,7 @@ describe(
           expect(await adb.isWifiOn()).to.be.true;
         });
         it('should call shell with correct args and should be false', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'wifi_on')
@@ -480,7 +497,7 @@ describe(
       });
       describe('setWifiState', function () {
         it('should call shell with correct args for real device', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['cmd', '-w', 'wifi', 'set-wifi-enabled', 'enabled'])
@@ -488,8 +505,8 @@ describe(
           await adb.setWifiState(true);
         });
         it('should call shell with correct args for emulator', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(25);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(25);
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['svc', 'wifi', 'disable'], {
@@ -501,7 +518,7 @@ describe(
       });
       describe('isDataOn', function () {
         it('should call shell with correct args and should be true', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'mobile_data')
@@ -509,7 +526,7 @@ describe(
           expect(await adb.isDataOn()).to.be.true;
         });
         it('should call shell with correct args and should be false', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'mobile_data')
@@ -519,7 +536,7 @@ describe(
       });
       describe('setDataState', function () {
         it('should call shell with correct args for real device', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['cmd', 'phone', 'data', 'disable'])
@@ -527,8 +544,8 @@ describe(
           await adb.setDataState(false);
         });
         it('should call shell with correct args for emulator', async function () {
-          (mocks as any).adb.expects('getApiLevel').once().returns(26);
-          (mocks as any).adb
+          mocks.adb.expects('getApiLevel').once().returns(26);
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['svc', 'data', 'enable'], {
@@ -540,17 +557,17 @@ describe(
       });
       describe('isAnimationOn', function () {
         const mockSetting = function (duration_scale, transition_scale, window_scale) {
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'animator_duration_scale')
             .returns(duration_scale);
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'transition_animation_scale')
             .returns(transition_scale);
-          (mocks as any).adb
+          mocks.adb
             .expects('getSetting')
             .once()
             .withExactArgs('global', 'window_animation_scale')
@@ -575,60 +592,60 @@ describe(
       });
       describe('setAnimation', function () {
         it('should set 1/5 for 11/5', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'animator_duration_scale', 1.5);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'transition_animation_scale', 1.5);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'window_animation_scale', 1.5);
           expect(await adb.setAnimationScale(1.5)).not.throws;
         });
         it('should set 1 for 1', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'animator_duration_scale', 1);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'transition_animation_scale', 1);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'window_animation_scale', 1);
           expect(await adb.setAnimationScale(1)).not.throws;
         });
         it('should set 0 for 0', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'animator_duration_scale', 0);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'transition_animation_scale', 0);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'window_animation_scale', 0);
           expect(await adb.setAnimationScale(0)).not.throws;
         });
         it('should set 0 for negative values', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'animator_duration_scale', -1);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'transition_animation_scale', -1);
-          (mocks as any).adb
+          mocks.adb
             .expects('setSetting')
             .once()
             .withExactArgs('global', 'window_animation_scale', -1);
@@ -639,7 +656,7 @@ describe(
         const sysPort = 12345,
           devicePort = 54321;
         it('forwardPort should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['forward', `tcp:${sysPort}`, `tcp:${devicePort}`])
@@ -647,7 +664,7 @@ describe(
           await adb.forwardPort(sysPort, devicePort);
         });
         it('forwardAbstractPort should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['forward', `tcp:${sysPort}`, `localabstract:${devicePort}`])
@@ -655,7 +672,7 @@ describe(
           await adb.forwardAbstractPort(sysPort, devicePort);
         });
         it('removePortForward should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['forward', `--remove`, `tcp:${sysPort}`])
@@ -667,7 +684,7 @@ describe(
         const sysPort = 12345,
           devicePort = 54321;
         it('reversePort should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['reverse', `tcp:${devicePort}`, `tcp:${sysPort}`])
@@ -675,7 +692,7 @@ describe(
           await adb.reversePort(devicePort, sysPort);
         });
         it('removePortReverse should call shell with correct args', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('adbExec')
             .once()
             .withExactArgs(['reverse', `--remove`, `tcp:${devicePort}`])
@@ -685,7 +702,7 @@ describe(
       });
       describe('ping', function () {
         it('should call shell with correct args and should return true', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['echo', 'ping'])
@@ -695,35 +712,35 @@ describe(
       });
       describe('restart', function () {
         it('should call adb in correct order', async function () {
-          (mocks as any).adb.expects('stopLogcat').once().returns('');
-          (mocks as any).adb.expects('restartAdb').once().returns('');
-          (mocks as any).adb.expects('waitForDevice').once().returns('');
-          (mocks as any).adb.expects('startLogcat').once().returns('');
+          mocks.adb.expects('stopLogcat').once().returns('');
+          mocks.adb.expects('restartAdb').once().returns('');
+          mocks.adb.expects('waitForDevice').once().returns('');
+          mocks.adb.expects('startLogcat').once().returns('');
           await adb.restart();
         });
       });
       describe('stopLogcat', function () {
         it('should call stopCapture', async function () {
           adb.logcat = logcat;
-          (mocks as any).logcat.expects('stopCapture').once().returns('');
+          mocks.logcat.expects('stopCapture').once().returns('');
           await adb.stopLogcat();
         });
       });
       describe('getLogcatLogs', function () {
         it('should call getLogs', async function () {
           adb.logcat = logcat;
-          (mocks as any).logcat.expects('getLogs').once().returns('');
+          mocks.logcat.expects('getLogs').once().returns('');
           await adb.getLogcatLogs();
         });
       });
       describe('broadcast', function () {
         it('should broadcast intent correctly', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('isValidClass')
             .once()
             .withExactArgs('com.test.intent')
             .returns(true);
-          (mocks as any).adb
+          mocks.adb
             .expects('shell')
             .once()
             .withExactArgs(['am', 'broadcast', '-a', 'com.test.intent'])
@@ -731,7 +748,7 @@ describe(
           await adb.broadcast('com.test.intent');
         });
         it('should throw error for invalid intent', async function () {
-          (mocks as any).adb
+          mocks.adb
             .expects('isValidClass')
             .once()
             .withExactArgs('invalid-intent')
@@ -744,7 +761,7 @@ describe(
     });
     describe('device info', function () {
       it('should get device model', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['getprop', 'ro.product.model'])
@@ -752,7 +769,7 @@ describe(
         await adb.getModel();
       });
       it('should get device manufacturer', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['getprop', 'ro.product.manufacturer'])
@@ -760,7 +777,7 @@ describe(
         await adb.getManufacturer();
       });
       it('should get device screen size', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['wm', 'size'])
@@ -768,7 +785,7 @@ describe(
         await adb.getScreenSize();
       });
       it('should get device screen density', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['wm', 'density'])
@@ -777,7 +794,7 @@ describe(
         expect(density).to.equal(420);
       });
       it('should return null for invalid screen density', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['wm', 'density'])
@@ -899,21 +916,21 @@ describe(
         (nothing)`;
 
       it('should grant requested permission', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withArgs(['pm', 'grant', APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE']);
         await adb.grantPermission(APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE');
       });
       it('should revoke requested permission', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withArgs(['pm', 'revoke', APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE']);
         await adb.revokePermission(APIDEMOS_PKG, 'android.permission.READ_EXTERNAL_STORAGE');
       });
       it('should properly list requested permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedOutput);
         const result = await adb.getReqPermissions('io.appium.android');
         for (const perm of [
           'android.permission.ACCESS_NETWORK_STATE',
@@ -936,7 +953,7 @@ describe(
         }
       });
       it('should properly list requested permissions for output without install permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedLimitedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedLimitedOutput);
         const result = await adb.getReqPermissions('io.appium.android');
         for (const perm of [
           'android.permission.ACCESS_NETWORK_STATE',
@@ -959,7 +976,7 @@ describe(
         }
       });
       it('should properly list granted permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedOutput);
         const result = await adb.getGrantedPermissions('io.appium.android');
         for (const perm of [
           'android.permission.MODIFY_AUDIO_SETTINGS',
@@ -983,7 +1000,7 @@ describe(
         }
       });
       it('should properly list granted permissions for output without install permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedLimitedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedLimitedOutput);
         const result = await adb.getGrantedPermissions('io.appium.android');
         for (const perm of [
           'android.permission.ACCESS_FINE_LOCATION',
@@ -999,7 +1016,7 @@ describe(
         }
       });
       it('should properly list denied permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedOutput);
         const result = await adb.getDeniedPermissions('io.appium.android');
         for (const perm of [
           'android.permission.MODIFY_AUDIO_SETTINGS',
@@ -1023,7 +1040,7 @@ describe(
         }
       });
       it('should properly list denied permissions for output without install permissions', async function () {
-        (mocks as any).adb.expects('shell').once().returns(dumpedLimitedOutput);
+        mocks.adb.expects('shell').once().returns(dumpedLimitedOutput);
         const result = await adb.getDeniedPermissions('io.appium.android');
         for (const perm of [
           'android.permission.ACCESS_FINE_LOCATION',
@@ -1058,15 +1075,15 @@ describe(
       it('should call setSetting method with correct args', async function () {
         const proxyHost = 'http://localhost';
         const proxyPort = 4723;
-        (mocks as any).adb
+        mocks.adb
           .expects('setSetting')
           .once()
           .withExactArgs('global', 'http_proxy', `${proxyHost}:${proxyPort}`);
-        (mocks as any).adb
+        mocks.adb
           .expects('setSetting')
           .once()
           .withExactArgs('global', 'global_http_proxy_host', proxyHost);
-        (mocks as any).adb
+        mocks.adb
           .expects('setSetting')
           .once()
           .withExactArgs('global', 'global_http_proxy_port', `${proxyPort}`);
@@ -1075,19 +1092,19 @@ describe(
     });
     describe('deleteHttpProxy', function () {
       it('should call setSetting method with correct args', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['settings', 'delete', 'global', 'http_proxy']);
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_host']);
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_port']);
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['settings', 'delete', 'global', 'global_http_proxy_exclusion_list']);
@@ -1096,7 +1113,7 @@ describe(
     });
     describe('setSetting', function () {
       it('should call shell settings put', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['settings', 'put', 'namespace', 'setting', 'value']);
@@ -1105,7 +1122,7 @@ describe(
     });
     describe('getSetting', function () {
       it('should call shell settings get', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withArgs(['settings', 'get', 'namespace', 'setting'])
@@ -1115,7 +1132,7 @@ describe(
     });
     describe('getCurrentTimeZone', function () {
       it('should call shell with correct args', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(['getprop', 'persist.sys.timezone'])
@@ -1123,13 +1140,13 @@ describe(
         expect(await adb.getTimeZone()).to.equal('Asia/Tokyo');
       });
       it('should raise an error', async function () {
-        (mocks as any).adb.expects('shell').throws();
+        mocks.adb.expects('shell').throws();
         await expect(adb.getTimeZone()).to.eventually.be.rejected;
       });
     });
     describe('setHiddenApiPolicy', function () {
       it('should call setSetting method with correct args for set hidden api policy', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(
@@ -1142,7 +1159,7 @@ describe(
     });
     describe('setDefaultHiddenApiPolicy', function () {
       it('should call setSetting method with correct args for set hidden api policy', async function () {
-        (mocks as any).adb
+        mocks.adb
           .expects('shell')
           .once()
           .withExactArgs(
@@ -1153,5 +1170,4 @@ describe(
         await adb.setDefaultHiddenApiPolicy();
       });
     });
-  }),
-);
+  });
