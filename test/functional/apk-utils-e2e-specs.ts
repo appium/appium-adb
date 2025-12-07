@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
-import { retryInterval } from 'asyncbox';
-import chai, { expect } from 'chai';
+import {retryInterval} from 'asyncbox';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   MOCHA_TIMEOUT,
@@ -29,7 +29,6 @@ describe('apk utils', function () {
   };
 
   before(async function () {
-
     adb = await ADB.createADB({
       adbExecTimeout: process.env.CI ? 60000 : 40000,
     });
@@ -43,7 +42,7 @@ describe('apk utils', function () {
     const apkNameOnDevice = 'ApiDemos-debug.apk';
     expect(await adb.isAppInstalled('foo')).to.be.false;
     await adb.install(apiDemosPath, {
-      grantPermissions: true
+      grantPermissions: true,
     });
     expect(await adb.isAppInstalled(APIDEMOS_PKG)).to.be.true;
     expect(await adb.uninstallApk(APIDEMOS_PKG)).to.be.true;
@@ -83,7 +82,7 @@ describe('apk utils', function () {
   describe('startApp', function () {
     it('should be able to start with normal package and activity', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,
@@ -96,70 +95,74 @@ describe('apk utils', function () {
         // to come to the foreground in machine time.
         await assertPackageAndActivity();
       });
-
-
     });
     it('should be able to start with an intent and no activity', async function () {
-      if (await adb.getApiLevel() < 28 && process.env.CI) {
+      if ((await adb.getApiLevel()) < 28 && process.env.CI) {
         return this.skip();
       }
 
       this.timeout(MOCHA_LONG_TIMEOUT);
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         action: 'android.intent.action.WEB_SEARCH',
         pkg: 'com.google.android.googlequicksearchbox',
         optionalIntentArguments: '-e query foo',
         waitDuration: START_APP_WAIT_DURATION,
-        stopApp: false
+        stopApp: false,
       });
       const {appPackage} = await adb.getFocusedPackageAndActivity();
       const expectedPkgPossibilities = [
         'com.android.browser',
         'org.chromium.webview_shell',
-        'com.google.android.googlequicksearchbox'
+        'com.google.android.googlequicksearchbox',
       ];
       expect(expectedPkgPossibilities).to.include(appPackage);
     });
     it('should throw an error for unknown activity for intent', async function () {
       this.timeout(MOCHA_LONG_TIMEOUT);
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        action: 'android.intent.action.DEFAULT',
-        pkg: 'com.google.android.telephony',
-        optionalIntentArguments: '-d tel:555-5555',
-        waitDuration: START_APP_WAIT_DURATION,
-        stopApp: false
-      })).to.eventually.be.rejectedWith(/Cannot start the .* application/);
+      await expect(
+        adb.startApp({
+          action: 'android.intent.action.DEFAULT',
+          pkg: 'com.google.android.telephony',
+          optionalIntentArguments: '-d tel:555-5555',
+          waitDuration: START_APP_WAIT_DURATION,
+          stopApp: false,
+        }),
+      ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
     });
     it('should throw error for wrong activity', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        pkg: APIDEMOS_PKG,
-        activity: 'ApiDemo',
-        waitDuration: START_APP_WAIT_DURATION_FAIL,
-      })).to.eventually.be.rejectedWith('Activity');
+      await expect(
+        adb.startApp({
+          pkg: APIDEMOS_PKG,
+          activity: 'ApiDemo',
+          waitDuration: START_APP_WAIT_DURATION_FAIL,
+        }),
+      ).to.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        pkg: APIDEMOS_PKG,
-        activity: APIDEMOS_ACTIVITY,
-        waitActivity: 'foo',
-        waitDuration: START_APP_WAIT_DURATION_FAIL,
-      })).to.eventually.be.rejectedWith('foo');
+      await expect(
+        adb.startApp({
+          pkg: APIDEMOS_PKG,
+          activity: APIDEMOS_ACTIVITY,
+          waitActivity: 'foo',
+          waitDuration: START_APP_WAIT_DURATION_FAIL,
+        }),
+      ).to.eventually.be.rejectedWith('foo');
     });
     it('should start activity with wait activity', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,
@@ -171,7 +174,7 @@ describe('apk utils', function () {
     });
     it('should start activity when wait activity is a wildcard', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,
@@ -183,7 +186,7 @@ describe('apk utils', function () {
     });
     it('should start activity when wait activity contains a wildcard', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,
@@ -195,29 +198,33 @@ describe('apk utils', function () {
     });
     it('should throw error for wrong activity when wait activity contains a wildcard', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        pkg: APIDEMOS_PKG,
-        activity: 'SuperManager',
-        waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
-        waitDuration: START_APP_WAIT_DURATION_FAIL,
-      })).to.eventually.be.rejectedWith('Activity');
+      await expect(
+        adb.startApp({
+          pkg: APIDEMOS_PKG,
+          activity: 'SuperManager',
+          waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
+          waitDuration: START_APP_WAIT_DURATION_FAIL,
+        }),
+      ).to.eventually.be.rejectedWith('Activity');
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        pkg: APIDEMOS_PKG,
-        activity: APIDEMOS_ACTIVITY,
-        waitActivity: '*.SuperManager',
-        waitDuration: START_APP_WAIT_DURATION_FAIL,
-      })).to.eventually.be.rejectedWith('SuperManager');
+      await expect(
+        adb.startApp({
+          pkg: APIDEMOS_PKG,
+          activity: APIDEMOS_ACTIVITY,
+          waitActivity: '*.SuperManager',
+          waitDuration: START_APP_WAIT_DURATION_FAIL,
+        }),
+      ).to.eventually.be.rejectedWith('SuperManager');
     });
     it('should start activity with comma separated wait packages list', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,
@@ -230,20 +237,22 @@ describe('apk utils', function () {
     });
     it('should throw error for wrong activity when packages provided as comma separated list', async function () {
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
-      await expect(adb.startApp({
-        pkg: APIDEMOS_PKG,
-        waitPkg: 'com.android.settings, com.example.somethingelse',
-        activity: 'SuperManager',
-        waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
-        waitDuration: START_APP_WAIT_DURATION_FAIL,
-      })).to.eventually.be.rejectedWith('Activity');
+      await expect(
+        adb.startApp({
+          pkg: APIDEMOS_PKG,
+          waitPkg: 'com.android.settings, com.example.somethingelse',
+          activity: 'SuperManager',
+          waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
+          waitDuration: START_APP_WAIT_DURATION_FAIL,
+        }),
+      ).to.eventually.be.rejectedWith('Activity');
     });
   });
   it('should start activity when start activity is an inner class', async function () {
     await adb.install(apiDemosPath, {
-      grantPermissions: true
+      grantPermissions: true,
     });
     await adb.startApp({
       pkg: 'com.android.settings',
@@ -254,15 +263,15 @@ describe('apk utils', function () {
     expect(appPackage).to.equal('com.android.settings');
 
     // The appActivity is different depending on the API level.
-    if (await adb.getApiLevel() > 35) {
+    if ((await adb.getApiLevel()) > 35) {
       expect(appActivity).to.equal('.spa.SpaActivity');
     } else {
       expect(appActivity).to.equal('.Settings$NotificationAppListActivity');
-    };
+    }
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
     await adb.install(apiDemosPath, {
-      grantPermissions: true
+      grantPermissions: true,
     });
     await adb.startApp({
       pkg: APIDEMOS_PKG,
@@ -288,12 +297,12 @@ describe('apk utils', function () {
   });
   describe('activateApp', function () {
     it('should be able to activate with normal package and activity', async function () {
-      if (await adb.getApiLevel() < 23) {
+      if ((await adb.getApiLevel()) < 23) {
         return this.skip();
       }
 
       await adb.install(apiDemosPath, {
-        grantPermissions: true
+        grantPermissions: true,
       });
       await adb.startApp({
         pkg: APIDEMOS_PKG,

@@ -5,4 +5,3 @@
 export const APIDEMOS_PKG = 'io.appium.android.apis';
 export const APIDEMOS_ACTIVITY = 'io.appium.android.apis.ApiDemos';
 export const APIDEMOS_ACTIVITY_SHORT = '.ApiDemos';
-

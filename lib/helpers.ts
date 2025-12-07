@@ -1,10 +1,10 @@
 import path from 'path';
-import { system, fs, zip, util } from '@appium/support';
-import { log } from './logger.js';
+import {system, fs, zip, util} from '@appium/support';
+import {log} from './logger.js';
 import _ from 'lodash';
-import { exec, type ExecError } from 'teen_process';
-import type { ADB } from './adb.js';
-import type { ApkManifest } from './tools/types.js';
+import {exec, type ExecError} from 'teen_process';
+import type {ADB} from './adb.js';
+import type {ApkManifest} from './tools/types.js';
 
 // Declare __filename for CommonJS compatibility
 declare const __filename: string;
@@ -21,12 +21,16 @@ const MODULE_NAME = 'appium-adb';
 /**
  * Calculates the absolute path to the given resource
  */
-export const getResourcePath = _.memoize(async function getResourcePath (relPath: string): Promise<string> {
+export const getResourcePath = _.memoize(async function getResourcePath(
+  relPath: string,
+): Promise<string> {
   const moduleRoot = await getModuleRoot();
   const resultPath = path.resolve(moduleRoot, relPath);
-  if (!await fs.exists(resultPath)) {
-    throw new Error(`Cannot find the resource '${relPath}' under the '${moduleRoot}' ` +
-      `folder of ${MODULE_NAME} Node.js module`);
+  if (!(await fs.exists(resultPath))) {
+    throw new Error(
+      `Cannot find the resource '${relPath}' under the '${moduleRoot}' ` +
+        `folder of ${MODULE_NAME} Node.js module`,
+    );
   }
   return resultPath;
 });
@@ -34,21 +38,26 @@ export const getResourcePath = _.memoize(async function getResourcePath (relPath
 /**
  * Retrieves the actual path to SDK root folder from the system environment
  */
-export function getSdkRootFromEnv (): string | undefined {
+export function getSdkRootFromEnv(): string | undefined {
   return process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT;
 }
 
 /**
  * Retrieves the actual path to SDK root folder
  */
-export async function requireSdkRoot (customRoot: string | null = null): Promise<string> {
+export async function requireSdkRoot(customRoot: string | null = null): Promise<string> {
   const sdkRoot = customRoot || getSdkRootFromEnv();
-  const docMsg = 'Read https://developer.android.com/studio/command-line/variables for more details';
+  const docMsg =
+    'Read https://developer.android.com/studio/command-line/variables for more details';
   if (!sdkRoot || _.isEmpty(sdkRoot)) {
-    throw new Error(`Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`);
+    throw new Error(
+      `Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`,
+    );
   }
-  if (!await fs.exists(sdkRoot)) {
-    throw new Error(`The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`);
+  if (!(await fs.exists(sdkRoot))) {
+    throw new Error(
+      `The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`,
+    );
   }
 
   const stats = await fs.stat(sdkRoot);
@@ -62,19 +71,22 @@ export async function requireSdkRoot (customRoot: string | null = null): Promise
  * @param zipPath
  * @param dstRoot
  */
-export async function unzipFile (zipPath: string, dstRoot: string = path.dirname(zipPath)): Promise<void> {
+export async function unzipFile(
+  zipPath: string,
+  dstRoot: string = path.dirname(zipPath),
+): Promise<void> {
   log.debug(`Unzipping '${zipPath}' to '${dstRoot}'`);
   await zip.assertValidZip(zipPath);
   await zip.extractAllTo(zipPath, dstRoot);
   log.debug('Unzip successful');
 }
 
-export const getJavaHome = _.memoize(async function getJavaHome (): Promise<string> {
+export const getJavaHome = _.memoize(async function getJavaHome(): Promise<string> {
   const result = process.env.JAVA_HOME;
   if (!result) {
     throw new Error('The JAVA_HOME environment variable is not set for the current process');
   }
-  if (!await fs.exists(result)) {
+  if (!(await fs.exists(result))) {
     throw new Error(`The JAVA_HOME location '${result}' must exist`);
   }
   const stats = await fs.stat(result);
@@ -84,7 +96,7 @@ export const getJavaHome = _.memoize(async function getJavaHome (): Promise<stri
   return result;
 });
 
-export const getJavaForOs = _.memoize(async function getJavaForOs (): Promise<string> {
+export const getJavaForOs = _.memoize(async function getJavaForOs(): Promise<string> {
   let javaHome: string | undefined;
   let errMsg: string | undefined;
   try {
@@ -105,16 +117,18 @@ export const getJavaForOs = _.memoize(async function getJavaForOs (): Promise<st
   } catch {
     // Ignore and throw custom error below
   }
-  throw new Error(`The '${executableName}' binary could not be found ` +
-    `neither in PATH nor under JAVA_HOME (${javaHome ? path.resolve(javaHome, 'bin') : errMsg})`);
+  throw new Error(
+    `The '${executableName}' binary could not be found ` +
+      `neither in PATH nor under JAVA_HOME (${javaHome ? path.resolve(javaHome, 'bin') : errMsg})`,
+  );
 });
 
 /**
  * Transforms given options into the list of `adb install.install-multiple` command arguments
  */
-export function buildInstallArgs (
+export function buildInstallArgs(
   apiLevel: number,
-  options: BuildInstallArgsOptions = {}
+  options: BuildInstallArgsOptions = {},
 ): string[] {
   const result: string[] = [];
 
@@ -129,9 +143,11 @@ export function buildInstallArgs (
   }
   if (options.grantPermissions) {
     if (apiLevel < 23) {
-      log.debug(`Skipping permissions grant option, since ` +
-                `the current API level ${apiLevel} does not support applications ` +
-                `permissions customization`);
+      log.debug(
+        `Skipping permissions grant option, since ` +
+          `the current API level ${apiLevel} does not support applications ` +
+          `permissions customization`,
+      );
     } else {
       result.push('-g');
     }
@@ -148,7 +164,7 @@ export function buildInstallArgs (
  * Extracts various package manifest details
  * from the given application file.
  */
-export async function readPackageManifest (this: ADB, apkPath: string): Promise<ApkManifest> {
+export async function readPackageManifest(this: ADB, apkPath: string): Promise<ApkManifest> {
   await this.initAapt2();
   const aapt2Binary = this.binaries?.aapt2;
   if (!aapt2Binary) {
@@ -173,7 +189,7 @@ export async function readPackageManifest (this: ADB, apkPath: string): Promise<
   const extractValue = (
     line: string,
     propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null
+    valueTransformer: ((x: string) => any) | null,
   ): any => {
     const match = propPattern.exec(line);
     if (match) {
@@ -184,7 +200,7 @@ export async function readPackageManifest (this: ADB, apkPath: string): Promise<
   const extractArray = (
     line: string,
     propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null
+    valueTransformer: ((x: string) => any) | null,
   ): any[] => {
     let match: RegExpExecArray | null;
     const resultArray: any[] = [];
@@ -220,11 +236,7 @@ export async function readPackageManifest (this: ADB, apkPath: string): Promise<
         ['compileSdkVersion', /compileSdkVersion='([^']+)'/, toInt],
         ['compileSdkVersionCodename', /compileSdkVersionCodename='([^']+)'/, null],
       ] as const) {
-        const value = extractValue(
-          line,
-          pattern,
-          transformer
-        );
+        const value = extractValue(line, pattern, transformer);
         if (!_.isUndefined(value)) {
           (result as Record<string, any>)[name] = value;
         }
@@ -271,7 +283,7 @@ export async function readPackageManifest (this: ADB, apkPath: string): Promise<
 /**
  * Calculates the absolute path to the current module's root folder
  */
-const getModuleRoot = _.memoize(async function getModuleRoot (): Promise<string> {
+const getModuleRoot = _.memoize(async function getModuleRoot(): Promise<string> {
   let moduleRoot = path.dirname(path.resolve(__filename));
   let isAtFsRoot = false;
   while (!isAtFsRoot) {
@@ -279,7 +291,7 @@ const getModuleRoot = _.memoize(async function getModuleRoot (): Promise<string>
     try {
       if (await fs.exists(manifestPath)) {
         const manifestContent = await fs.readFile(manifestPath, 'utf8');
-        const manifest = JSON.parse(manifestContent) as { name?: string };
+        const manifest = JSON.parse(manifestContent) as {name?: string};
         if (manifest.name === MODULE_NAME) {
           return moduleRoot;
         }

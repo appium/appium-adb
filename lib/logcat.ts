@@ -1,20 +1,26 @@
-import { logger, util } from '@appium/support';
+import {logger, util} from '@appium/support';
 import B from 'bluebird';
 import _ from 'lodash';
-import { EventEmitter } from 'node:events';
-import { SubProcess, exec } from 'teen_process';
-import { LRUCache } from 'lru-cache';
-import type { ExecError } from 'teen_process';
-import type { ADBExecutable } from './types';
-import type {
-  LogEntry,
-  LogcatOpts as StartCaptureOptions,
-} from './tools/types';
+import {EventEmitter} from 'node:events';
+import {SubProcess, exec} from 'teen_process';
+import {LRUCache} from 'lru-cache';
+import type {ExecError} from 'teen_process';
+import type {ADBExecutable} from './types';
+import type {LogEntry, LogcatOpts as StartCaptureOptions} from './tools/types';
 
 const log = logger.getLogger('Logcat');
 const MAX_BUFFER_SIZE = 10000;
 const LOGCAT_PROC_STARTUP_TIMEOUT = 10000;
-const SUPPORTED_FORMATS = ['brief', 'process', 'tag', 'thread', 'raw', 'time', 'threadtime', 'long'] as const;
+const SUPPORTED_FORMATS = [
+  'brief',
+  'process',
+  'tag',
+  'thread',
+  'raw',
+  'time',
+  'threadtime',
+  'long',
+] as const;
 const SUPPORTED_PRIORITIES = ['v', 'd', 'i', 'w', 'e', 'f', 's'] as const;
 const DEFAULT_PRIORITY = 'v';
 const DEFAULT_TAG = '*';
@@ -70,14 +76,12 @@ export class Logcat extends EventEmitter {
         await this.clear();
       }
 
-      const {
-        format = DEFAULT_FORMAT,
-        filterSpecs = [],
-      } = opts;
+      const {format = DEFAULT_FORMAT, filterSpecs = []} = opts;
       const cmd = [
         ...this.adb.defaultArgs,
         'logcat',
-        '-v', requireFormat(format),
+        '-v',
+        requireFormat(format),
         ...formatFilterSpecs(filterSpecs),
       ];
       log.debug(`Starting logs capture with command: ${util.quote([this.adb.path, ...cmd])}`);
@@ -129,8 +133,10 @@ export class Logcat extends EventEmitter {
         continue;
       }
       const [message, timestamp] = value;
-      if (this.logIndexSinceLastRequest && index > this.logIndexSinceLastRequest
-          || !this.logIndexSinceLastRequest) {
+      if (
+        (this.logIndexSinceLastRequest && index > this.logIndexSinceLastRequest) ||
+        !this.logIndexSinceLastRequest
+      ) {
         recentLogIndex = index;
         result.push(toLogEntry(message, timestamp));
       }
@@ -185,7 +191,7 @@ export default Logcat;
 
 // Private entities
 
-type LogFormat = typeof SUPPORTED_FORMATS[number];
+type LogFormat = (typeof SUPPORTED_FORMATS)[number];
 
 function requireFormat(format: string): LogFormat {
   if (!SUPPORTED_FORMATS.includes(format as LogFormat)) {
@@ -213,11 +219,15 @@ function requireSpec(spec: string): string {
     resultTag = DEFAULT_TAG;
   }
   if (!priority) {
-    log.info(`The priority value in spec '${spec}' is empty. Defaulting to Verbose (${DEFAULT_PRIORITY})`);
+    log.info(
+      `The priority value in spec '${spec}' is empty. Defaulting to Verbose (${DEFAULT_PRIORITY})`,
+    );
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }
   if (!SUPPORTED_PRIORITIES.some((p) => _.toLower(priority) === _.toLower(p))) {
-    log.info(`The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`);
+    log.info(
+      `The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`,
+    );
     log.info(`Defaulting to Verbose (${DEFAULT_PRIORITY})`);
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }
@@ -230,5 +240,5 @@ function formatFilterSpecs(filterSpecs: string | string[]): string[] {
   }
   return filterSpecs
     .filter((spec) => spec && _.isString(spec) && !spec.startsWith('-'))
-    .map((spec) => spec.includes(':') ? requireSpec(spec) : spec);
+    .map((spec) => (spec.includes(':') ? requireSpec(spec) : spec));
 }

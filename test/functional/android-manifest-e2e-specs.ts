@@ -1,17 +1,10 @@
 import {ADB} from '../../lib/adb';
 import path from 'path';
-import { fs, tempDir } from '@appium/support';
-import {
-  APIDEMOS_PKG,
-  APIDEMOS_ACTIVITY_SHORT,
-  getApiDemosPath,
-} from './setup';
-import {
-  requireSdkRoot,
-  readPackageManifest,
-} from '../../lib/helpers.js';
-import { getAndroidPlatformAndPath } from '../../lib/tools/android-manifest';
-import chai, { expect } from 'chai';
+import {fs, tempDir} from '@appium/support';
+import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup';
+import {requireSdkRoot, readPackageManifest} from '../../lib/helpers.js';
+import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -120,10 +113,10 @@ describe('Android-manifest', function () {
         'android.permission.RECORD_AUDIO',
         'android.permission.CAMERA',
         `${APIDEMOS_PKG}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`,
-        'android.permission.READ_EXTERNAL_STORAGE'
+        'android.permission.READ_EXTERNAL_STORAGE',
       ],
       launchableActivity: {
-        'name': `${APIDEMOS_PKG}${APIDEMOS_ACTIVITY_SHORT}`,
+        name: `${APIDEMOS_PKG}${APIDEMOS_ACTIVITY_SHORT}`,
       },
       architectures: [],
       locales: [
@@ -212,17 +205,9 @@ describe('Android-manifest', function () {
         'zh-CN',
         'zh-HK',
         'zh-TW',
-        'zu'
+        'zu',
       ],
-      densities: [
-        120,
-        160,
-        240,
-        320,
-        480,
-        640,
-        65535
-      ],
+      densities: [120, 160, 240, 320, 480, 640, 65535],
       versionName: '6.0.0',
       platformBuildVersionName: '13',
       platformBuildVersionCode: 33,

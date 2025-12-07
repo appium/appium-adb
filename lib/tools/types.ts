@@ -81,7 +81,7 @@ export interface LogEntry {
 /**
  * Listener function, which accepts one argument.
  */
-export type LogcatListener = (logEntry: LogEntry) => any
+export type LogcatListener = (logEntry: LogEntry) => any;
 
 export interface SetPropOpts {
   /**
@@ -179,7 +179,7 @@ export interface EmuVersionInfo {
   buildId?: number;
 }
 
-export type GsmSignalStrength = typeof emuConstants.GSM_SIGNAL_STRENGTHS[number];
+export type GsmSignalStrength = (typeof emuConstants.GSM_SIGNAL_STRENGTHS)[number];
 
 export interface EmuInfo {
   /**
@@ -212,7 +212,7 @@ export interface KeystoreHash {
   sha512?: string;
 }
 
-export type SignedAppCacheValue = { output: string; expected: KeystoreHash; keystorePath: string; };
+export type SignedAppCacheValue = {output: string; expected: KeystoreHash; keystorePath: string};
 
 export interface CertCheckOptions {
   /**
@@ -299,7 +299,12 @@ export interface KeyboardState {
   canCloseKeyboard: boolean;
 }
 
-export type InstallState = 'unknown' | 'notInstalled' | 'newerVersionInstalled' | 'sameVersionInstalled' | 'olderVersionInstalled';
+export type InstallState =
+  | 'unknown'
+  | 'notInstalled'
+  | 'newerVersionInstalled'
+  | 'sameVersionInstalled'
+  | 'olderVersionInstalled';
 
 export interface IsAppInstalledOptions {
   /**
@@ -634,7 +639,7 @@ export interface ShellExecOptions {
   outputFormat?: ExecOutputFormat;
 }
 
-export type TFullOutputOption = { outputFormat: 'full'; };
+export type TFullOutputOption = {outputFormat: 'full'};
 
 export interface AvdLaunchOptions {
   /**
@@ -709,11 +714,15 @@ export interface RootResult {
   wasAlreadyRooted: boolean;
 }
 
-export type Sensors = typeof emuConstants.SENSORS[keyof typeof emuConstants.SENSORS];
-export type NetworkSpeed = typeof emuConstants.NETWORK_SPEED[keyof typeof emuConstants.NETWORK_SPEED];
-export type GsmVoiceStates = typeof emuConstants.GSM_VOICE_STATES[keyof typeof emuConstants.GSM_VOICE_STATES];
-export type GsmCallActions = typeof emuConstants.GSM_CALL_ACTIONS[keyof typeof emuConstants.GSM_CALL_ACTIONS];
-export type PowerAcStates = typeof emuConstants.POWER_AC_STATES[keyof typeof emuConstants.POWER_AC_STATES];
+export type Sensors = (typeof emuConstants.SENSORS)[keyof typeof emuConstants.SENSORS];
+export type NetworkSpeed =
+  (typeof emuConstants.NETWORK_SPEED)[keyof typeof emuConstants.NETWORK_SPEED];
+export type GsmVoiceStates =
+  (typeof emuConstants.GSM_VOICE_STATES)[keyof typeof emuConstants.GSM_VOICE_STATES];
+export type GsmCallActions =
+  (typeof emuConstants.GSM_CALL_ACTIONS)[keyof typeof emuConstants.GSM_CALL_ACTIONS];
+export type PowerAcStates =
+  (typeof emuConstants.POWER_AC_STATES)[keyof typeof emuConstants.POWER_AC_STATES];
 
 export interface PlatformInfo {
   /**

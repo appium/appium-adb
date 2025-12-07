@@ -1,12 +1,7 @@
 import {ADB} from '../../lib/adb';
-import {
-  MOCHA_TIMEOUT,
-  APIDEMOS_PKG,
-  APIDEMOS_ACTIVITY,
-  getApiDemosPath,
-} from './setup';
-import { waitForCondition } from 'asyncbox';
-import chai, { expect } from 'chai';
+import {MOCHA_TIMEOUT, APIDEMOS_PKG, APIDEMOS_ACTIVITY, getApiDemosPath} from './setup';
+import {waitForCondition} from 'asyncbox';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
@@ -18,7 +13,7 @@ describe('app commands', function () {
   let apiDemosPath;
   const androidInstallTimeout = 90000;
   before(async function () {
-    adb = await ADB.createADB({ adbExecTimeout: 60000 });
+    adb = await ADB.createADB({adbExecTimeout: 60000});
     apiDemosPath = await getApiDemosPath();
   });
 
@@ -94,7 +89,7 @@ describe('app commands', function () {
     });
 
     it('should get focused package and activity', async function () {
-      if (await adb.getApiLevel() > 30) {
+      if ((await adb.getApiLevel()) > 30) {
         return this.skip();
       }
       await adb.install(apiDemosPath, {
@@ -115,7 +110,7 @@ describe('app commands', function () {
 
   describe('activity waiting', function () {
     it('should wait for activity', async function () {
-      if (await adb.getApiLevel() > 30) {
+      if ((await adb.getApiLevel()) > 30) {
         return this.skip();
       }
       await adb.install(apiDemosPath, {
