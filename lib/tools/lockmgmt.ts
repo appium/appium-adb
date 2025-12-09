@@ -108,7 +108,11 @@ export async function verifyLockCredential(
   } catch (e) {
     throw new Error(
       `Device lock credential verification failed. ` +
-        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
+        `Original error: ${
+          (e as Error & {stderr?: string; stdout?: string}).stderr
+          || (e as Error & {stderr?: string; stdout?: string}).stdout
+          || (e as Error).message
+        }`,
     );
   }
 }
@@ -143,7 +147,11 @@ export async function clearLockCredential(
   } catch (e) {
     throw new Error(
       `Cannot clear device lock credential. ` +
-        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
+        `Original error: ${
+          (e as Error & {stderr?: string; stdout?: string}).stderr
+          || (e as Error & {stderr?: string; stdout?: string}).stdout
+          || (e as Error).message
+        }`,
     );
   }
 }
@@ -220,7 +228,11 @@ export async function setLockCredential(
   } catch (e) {
     throw new Error(
       `Setting of device lock ${credentialType} credential failed. ` +
-        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
+        `Original error: ${
+          (e as Error & {stderr?: string; stdout?: string}).stderr
+          || (e as Error & {stderr?: string; stdout?: string}).stdout
+          || (e as Error).message
+        }`,
     );
   }
 }

@@ -29,11 +29,8 @@ export async function startLogcat(this: ADB, opts: LogcatOpts = {}): Promise<voi
  * The call will be ignored if no logcat process is running.
  */
 export async function stopLogcat(this: ADB): Promise<void> {
-  if (_.isEmpty(this.logcat)) {
-    return;
-  }
   const logcat = this.logcat;
-  if (!logcat) {
+  if (!logcat || _.isEmpty(this.logcat)) {
     return;
   }
   try {
@@ -51,11 +48,8 @@ export async function stopLogcat(this: ADB): Promise<void> {
  * @throws {Error} If logcat process is not running.
  */
 export function getLogcatLogs(this: ADB): LogEntry[] {
-  if (_.isEmpty(this.logcat)) {
-    throw new Error(`Can't get logcat logs since logcat hasn't started`);
-  }
   const logcat = this.logcat;
-  if (!logcat) {
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error(`Can't get logcat logs since logcat hasn't started`);
   }
   return logcat.getLogs();
@@ -68,11 +62,8 @@ export function getLogcatLogs(this: ADB): LogEntry[] {
  * @throws {Error} If logcat process is not running.
  */
 export function setLogcatListener(this: ADB, listener: LogcatListener): void {
-  if (_.isEmpty(this.logcat)) {
-    throw new Error("Logcat process hasn't been started");
-  }
   const logcat = this.logcat;
-  if (!logcat) {
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error("Logcat process hasn't been started");
   }
   logcat.on('output', listener);
@@ -87,11 +78,8 @@ export function setLogcatListener(this: ADB, listener: LogcatListener): void {
  * @throws {Error} If logcat process is not running.
  */
 export function removeLogcatListener(this: ADB, listener: LogcatListener): void {
-  if (_.isEmpty(this.logcat)) {
-    throw new Error("Logcat process hasn't been started");
-  }
   const logcat = this.logcat;
-  if (!logcat) {
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error("Logcat process hasn't been started");
   }
   logcat.removeListener('output', listener);
