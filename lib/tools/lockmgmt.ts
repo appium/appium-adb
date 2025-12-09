@@ -2,6 +2,7 @@ import {log} from '../logger.js';
 import _ from 'lodash';
 import B from 'bluebird';
 import {waitForCondition} from 'asyncbox';
+import type {ADB} from '../adb.js';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
@@ -11,14 +12,14 @@ const KEYCODE_WAKEUP = 224; // works over API Level 20
 const HIDE_KEYBOARD_WAIT_TIME = 100;
 
 /**
- * @param {string} verb
- * @param {string?} [oldCredential=null]
- * @param {...string} args
+ * @param verb
+ * @param oldCredential
+ * @param args
  */
-function buildCommand(verb, oldCredential = null, ...args) {
+function buildCommand(verb: string, oldCredential: string | null = null, ...args: string[]): string[] {
   const cmd = ['locksettings', verb];
-  if (!_.isEmpty(oldCredential)) {
-    cmd.push('--old', /** @type {string} */ (oldCredential));
+  if (oldCredential && !_.isEmpty(oldCredential)) {
+    cmd.push('--old', oldCredential);
   }
   if (!_.isEmpty(args)) {
     cmd.push(...args);
@@ -29,11 +30,10 @@ function buildCommand(verb, oldCredential = null, ...args) {
 /**
  * Performs swipe up gesture on the screen
  *
- * @this {import('../adb.js').ADB}
- * @param {string} windowDumpsys The output of `adb shell dumpsys window` command
+ * @param windowDumpsys The output of `adb shell dumpsys window` command
  * @throws {Error} If the display size cannot be retrieved
  */
-async function swipeUp(windowDumpsys) {
+async function swipeUp(this: ADB, windowDumpsys: string): Promise<void> {
   const dimensionsMatch = /init=(\d+)x(\d+)/.exec(windowDumpsys);
   if (!dimensionsMatch) {
     throw new Error('Cannot retrieve the display size');
@@ -56,10 +56,9 @@ async function swipeUp(windowDumpsys) {
  * Check whether the device supports lock settings management with `locksettings`
  * command line tool. This tool has been added to Android toolset since  API 27 Oreo
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<boolean>} True if the management is supported. The result is cached per ADB instance
+ * @return True if the management is supported. The result is cached per ADB instance
  */
-export async function isLockManagementSupported() {
+export async function isLockManagementSupported(this: ADB): Promise<boolean> {
   if (!_.isBoolean(this._isLockManagementSupported)) {
     const passFlag = '__PASS__';
     let output = '';
@@ -72,23 +71,25 @@ export async function isLockManagementSupported() {
         `${this._isLockManagementSupported ? '' : 'not '}supported`,
     );
   }
-  return this._isLockManagementSupported;
+  return this._isLockManagementSupported as boolean;
 }
 
 /**
  * Check whether the given credential is matches to the currently set one.
  *
- * @this {import('../adb.js').ADB}
- * @param {string?} [credential=null] The credential value. It could be either
+ * @param credential - The credential value. It could be either
  * pin, password or a pattern. A pattern is specified by a non-separated list
  * of numbers that index the cell on the pattern in a 1-based manner in left
  * to right and top to bottom order, i.e. the top-left cell is indexed with 1,
  * whereas the bottom-right cell is indexed with 9. Example: 1234.
  * null/empty value assumes the device has no lock currently set.
- * @return {Promise<boolean>} True if the given credential matches to the device's one
+ * @return True if the given credential matches to the device's one
  * @throws {Error} If the verification faces an unexpected error
  */
-export async function verifyLockCredential(credential = null) {
+export async function verifyLockCredential(
+  this: ADB,
+  credential: string | null = null,
+): Promise<boolean> {
   try {
     const {stdout, stderr} = await this.shell(buildCommand('verify', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
@@ -107,7 +108,7 @@ export async function verifyLockCredential(credential = null) {
   } catch (e) {
     throw new Error(
       `Device lock credential verification failed. ` +
-        `Original error: ${e.stderr || e.stdout || e.message}`,
+        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
     );
   }
 }
@@ -116,8 +117,7 @@ export async function verifyLockCredential(credential = null) {
  * Clears current lock credentials. Usually it takes several seconds for a device to
  * sync the credential state after this method returns.
  *
- * @this {import('../adb.js').ADB}
- * @param {string?} [credential=null] The credential value. It could be either
+ * @param credential - The credential value. It could be either
  * pin, password or a pattern. A pattern is specified by a non-separated list
  * of numbers that index the cell on the pattern in a 1-based manner in left
  * to right and top to bottom order, i.e. the top-left cell is indexed with 1,
@@ -125,7 +125,10 @@ export async function verifyLockCredential(credential = null) {
  * null/empty value assumes the device has no lock currently set.
  * @throws {Error} If operation faces an unexpected error
  */
-export async function clearLockCredential(credential = null) {
+export async function clearLockCredential(
+  this: ADB,
+  credential: string | null = null,
+): Promise<void> {
   try {
     const {stdout, stderr} = await this.shell(buildCommand('clear', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
@@ -140,7 +143,7 @@ export async function clearLockCredential(credential = null) {
   } catch (e) {
     throw new Error(
       `Cannot clear device lock credential. ` +
-        `Original error: ${e.stderr || e.stdout || e.message}`,
+        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
     );
   }
 }
@@ -149,11 +152,10 @@ export async function clearLockCredential(credential = null) {
  * Checks whether the device is locked with a credential (either pin or a password
  * or a pattern).
  *
- * @this {import('../adb.js').ADB}
- * @returns {Promise<boolean>} `true` if the device is locked
+ * @returns `true` if the device is locked
  * @throws {Error} If operation faces an unexpected error
  */
-export async function isLockEnabled() {
+export async function isLockEnabled(this: ADB): Promise<boolean> {
   try {
     const {stdout, stderr} = await this.shell(buildCommand('get-disabled'), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
@@ -171,29 +173,33 @@ export async function isLockEnabled() {
     }
     throw new Error(stderr || stdout);
   } catch (e) {
-    throw new Error(`Cannot check if device lock is enabled. Original error: ${e.message}`);
+    throw new Error(`Cannot check if device lock is enabled. Original error: ${(e as Error).message}`);
   }
 }
 
 /**
  * Sets the device lock.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} credentialType One of: password, pin, pattern.
- * @param {string} credential A non-empty credential value to be set.
+ * @param credentialType - One of: password, pin, pattern.
+ * @param credential - A non-empty credential value to be set.
  * Make sure your new credential matches to the actual system security requirements,
  * e.g. a minimum password length. A pattern is specified by a non-separated list
  * of numbers that index the cell on the pattern in a 1-based manner in left
  * to right and top to bottom order, i.e. the top-left cell is indexed with 1,
  * whereas the bottom-right cell is indexed with 9. Example: 1234.
- * @param {string?} [oldCredential=null] An old credential string.
+ * @param oldCredential - An old credential string.
  * It is only required to be set in case you need to change the current
  * credential rather than to set a new one. Setting it to a wrong value will
  * make this method to fail and throw an exception.
  * @throws {Error} If there was a failure while verifying input arguments or setting
  * the credential
  */
-export async function setLockCredential(credentialType, credential, oldCredential = null) {
+export async function setLockCredential(
+  this: ADB,
+  credentialType: string,
+  credential: string,
+  oldCredential: string | null = null,
+): Promise<void> {
   if (!SUPPORTED_LOCK_CREDENTIAL_TYPES.includes(credentialType)) {
     throw new Error(
       `Device lock credential type '${credentialType}' is unknown. ` +
@@ -214,7 +220,7 @@ export async function setLockCredential(credentialType, credential, oldCredentia
   } catch (e) {
     throw new Error(
       `Setting of device lock ${credentialType} credential failed. ` +
-        `Original error: ${e.stderr || e.stdout || e.message}`,
+        `Original error: ${(e as Error & {stderr?: string; stdout?: string}).stderr || (e as Error & {stderr?: string; stdout?: string}).stdout || (e as Error).message}`,
     );
   }
 }
@@ -222,10 +228,9 @@ export async function setLockCredential(credentialType, credential, oldCredentia
 /**
  * Retrieve the screen lock state of the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<boolean>} True if the device is locked.
+ * @return True if the device is locked.
  */
-export async function isScreenLocked() {
+export async function isScreenLocked(this: ADB): Promise<boolean> {
   const [windowOutput, powerOutput] = await B.all([
     this.shell(['dumpsys', 'window']),
     this.shell(['dumpsys', 'power']),
@@ -241,9 +246,8 @@ export async function isScreenLocked() {
 
 /**
  * Dismisses keyguard overlay.
- * @this {import('../adb.js').ADB}
  */
-export async function dismissKeyguard() {
+export async function dismissKeyguard(this: ADB): Promise<void> {
   log.info('Waking up the device to dismiss the keyguard');
   // Screen off once to force pre-inputted text field clean after wake-up
   // Just screen on if the screen defaults off
@@ -273,18 +277,16 @@ export async function dismissKeyguard() {
 /**
  * Presses the corresponding key combination to make sure the device's screen
  * is not turned off and is locked if the latter is enabled.
- * @this {import('../adb.js').ADB}
  */
-export async function cycleWakeUp() {
+export async function cycleWakeUp(this: ADB): Promise<void> {
   await this.keyevent(KEYCODE_POWER);
   await this.keyevent(KEYCODE_WAKEUP);
 }
 
 /**
  * Send the special keycode to the device under test in order to lock it.
- * @this {import('../adb.js').ADB}
  */
-export async function lock() {
+export async function lock(this: ADB): Promise<void> {
   if (await this.isScreenLocked()) {
     log.debug('Screen is already locked. Doing nothing.');
     return;
@@ -310,10 +312,10 @@ export async function lock() {
  * Default is true.
  * Note: this key
  *
- * @param {string} dumpsys
- * @returns {boolean}
+ * @param dumpsys
+ * @returns
  */
-function isScreenOnFully(dumpsys) {
+function isScreenOnFully(dumpsys: string): boolean {
   const m = /mScreenOnFully=\w+/gi.exec(dumpsys);
   return (
     !m || // if information is missing we assume screen is fully on
@@ -325,10 +327,10 @@ function isScreenOnFully(dumpsys) {
 /**
  * Checks mCurrentFocus in dumpsys output to determine if Keyguard is activated
  *
- * @param {string} dumpsys
- * @returns {boolean}
+ * @param dumpsys
+ * @returns
  */
-function isCurrentFocusOnKeyguard(dumpsys) {
+function isCurrentFocusOnKeyguard(dumpsys: string): boolean {
   const m = /mCurrentFocus.+Keyguard/gi.exec(dumpsys);
   return Boolean(m?.length && m[0]);
 }
@@ -336,10 +338,10 @@ function isCurrentFocusOnKeyguard(dumpsys) {
 /**
  * Check the current device power state to determine if it is locked
  *
- * @param {string} dumpsys The `adb shell dumpsys power` output
- * @returns {boolean} True if lock screen is shown
+ * @param dumpsys The `adb shell dumpsys power` output
+ * @returns True if lock screen is shown
  */
-function isInDozingMode(dumpsys) {
+function isInDozingMode(dumpsys: string): boolean {
   // On some phones/tablets we were observing mWakefulness=Dozing
   // while on others it was getWakefulnessLocked()=Dozing
   return /^[\s\w]+wakefulness[^=]*=Dozing$/im.test(dumpsys);
@@ -358,10 +360,10 @@ function isInDozingMode(dumpsys) {
  * Some devices such as Android TV do not have keyguard, so we should keep
  * screen condition as this primary method.
  *
- * @param {string} dumpsys - The output of dumpsys window command.
- * @return {boolean} True if lock screen is showing.
+ * @param dumpsys - The output of dumpsys window command.
+ * @return True if lock screen is showing.
  */
-export function isShowingLockscreen(dumpsys) {
+export function isShowingLockscreen(dumpsys: string): boolean {
   return (
     _.some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
     // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
@@ -375,11 +377,12 @@ export function isShowingLockscreen(dumpsys) {
  * Checks screenState has SCREEN_STATE_OFF in dumpsys output to determine
  * possible lock screen.
  *
- * @param {string} dumpsys - The output of dumpsys window command.
- * @return {boolean} True if lock screen is showing.
+ * @param dumpsys - The output of dumpsys window command.
+ * @return True if lock screen is showing.
  */
-export function isScreenStateOff(dumpsys) {
+export function isScreenStateOff(dumpsys: string): boolean {
   return /\s+screenState=SCREEN_STATE_OFF/i.test(dumpsys);
 }
 
 // #endregion
+

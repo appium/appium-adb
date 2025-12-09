@@ -4,17 +4,21 @@ import {log} from '../logger.js';
 import {unzipFile, APKS_EXTENSION, readPackageManifest} from '../helpers.js';
 import {fs, zip, tempDir, util} from '@appium/support';
 import path from 'path';
+import type {ADB} from '../adb.js';
+import type {APKInfo, PlatformInfo, StringRecord} from './types.js';
 
 /**
  * Extract package and main activity name from application manifest.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} appPath - The full path to application .apk(s) package
- * @return {Promise<import('./types').APKInfo>} The parsed application info.
+ * @param appPath - The full path to application .apk(s) package
+ * @return The parsed application info.
  * @throws {error} If there was an error while getting the data from the given
  *                 application package.
  */
-export async function packageAndLaunchActivityFromManifest(appPath) {
+export async function packageAndLaunchActivityFromManifest(
+  this: ADB,
+  appPath: string,
+): Promise<APKInfo> {
   if (appPath.endsWith(APKS_EXTENSION)) {
     appPath = await this.extractBaseApk(appPath);
   }
@@ -31,13 +35,12 @@ export async function packageAndLaunchActivityFromManifest(appPath) {
 /**
  * Extract target SDK version from application manifest.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} appPath - The full path to .apk(s) package.
- * @return {Promise<number>} The version of the target SDK.
+ * @param appPath - The full path to .apk(s) package.
+ * @return The version of the target SDK.
  * @throws {error} If there was an error while getting the data from the given
  *                 application package.
  */
-export async function targetSdkVersionFromManifest(appPath) {
+export async function targetSdkVersionFromManifest(this: ADB, appPath: string): Promise<number> {
   log.debug(`Extracting target SDK version of '${appPath}'`);
   const originalAppPath = appPath;
   if (appPath.endsWith(APKS_EXTENSION)) {
@@ -57,13 +60,16 @@ export async function targetSdkVersionFromManifest(appPath) {
 /**
  * Extract target SDK version from package information.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} pkg - The class name of the package installed on the device under test.
- * @param {string?} [cmdOutput=null] - Optional parameter containing the output of
+ * @param pkg - The class name of the package installed on the device under test.
+ * @param cmdOutput - Optional parameter containing the output of
  * _dumpsys package_ command. It may speed up the method execution.
- * @return {Promise<number>} The version of the target SDK.
+ * @return The version of the target SDK.
  */
-export async function targetSdkVersionUsingPKG(pkg, cmdOutput = null) {
+export async function targetSdkVersionUsingPKG(
+  this: ADB,
+  pkg: string,
+  cmdOutput: string | null = null,
+): Promise<number> {
   const stdout = cmdOutput || (await this.shell(['dumpsys', 'package', pkg]));
   const targetSdkVersionMatch = new RegExp(/targetSdk=([^\s\s]+)/g).exec(stdout);
   return targetSdkVersionMatch && targetSdkVersionMatch.length >= 2
@@ -76,14 +82,18 @@ export async function targetSdkVersionUsingPKG(pkg, cmdOutput = null) {
  * `${manifest}.apk` file will be created as the result of this method
  * containing the compiled manifest.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} manifest - Full path to the initial manifest template
- * @param {string} manifestPackage - The name of the manifest package
- * @param {string} targetPackage - The name of the destination package
+ * @param manifest - Full path to the initial manifest template
+ * @param manifestPackage - The name of the manifest package
+ * @param targetPackage - The name of the destination package
  */
-export async function compileManifest(manifest, manifestPackage, targetPackage) {
+export async function compileManifest(
+  this: ADB,
+  manifest: string,
+  manifestPackage: string,
+  targetPackage: string,
+): Promise<void> {
   const {platform, platformPath} = await getAndroidPlatformAndPath(
-    /** @type {string} */ (this.sdkRoot),
+    this.sdkRoot as string,
   );
   if (!platform || !platformPath) {
     throw new Error(
@@ -98,6 +108,7 @@ export async function compileManifest(manifest, manifestPackage, targetPackage) 
   try {
     await this.initAapt2();
     // https://developer.android.com/studio/command-line/aapt2
+    const binaries = this.binaries as StringRecord;
     const args = [
       'link',
       '-o',
@@ -113,18 +124,16 @@ export async function compileManifest(manifest, manifestPackage, targetPackage) 
       '-v',
     ];
     log.debug(
-      `Compiling the manifest using '${util.quote([
-        /** @type {import('./types').StringRecord} */ (this.binaries).aapt2,
-        ...args,
-      ])}'`,
+      `Compiling the manifest using '${util.quote([binaries.aapt2, ...args])}'`,
     );
-    await exec(/** @type {import('./types').StringRecord} */ (this.binaries).aapt2, args);
+    await exec(binaries.aapt2, args);
   } catch (e) {
     log.debug(
       'Cannot compile the manifest using aapt2. Defaulting to aapt. ' +
-        `Original error: ${e.stderr || e.message}`,
+        `Original error: ${(e as Error).message || (e as {stderr?: string}).stderr}`,
     );
     await this.initAapt();
+    const binaries = this.binaries as StringRecord;
     const args = [
       'package',
       '-M',
@@ -140,15 +149,14 @@ export async function compileManifest(manifest, manifestPackage, targetPackage) 
       '-f',
     ];
     log.debug(
-      `Compiling the manifest using '${util.quote([
-        /** @type {import('./types').StringRecord} */ (this.binaries).aapt,
-        ...args,
-      ])}'`,
+      `Compiling the manifest using '${util.quote([binaries.aapt, ...args])}'`,
     );
     try {
-      await exec(/** @type {import('./types').StringRecord} */ (this.binaries).aapt, args);
+      await exec(binaries.aapt, args);
     } catch (e1) {
-      throw new Error(`Cannot compile the manifest. Original error: ${e1.stderr || e1.message}`);
+      throw new Error(
+        `Cannot compile the manifest. Original error: ${(e1 as Error).message || (e1 as {stderr?: string}).stderr}`,
+      );
     }
   }
   log.debug(`Compiled the manifest at '${resultPath}'`);
@@ -158,41 +166,40 @@ export async function compileManifest(manifest, manifestPackage, targetPackage) 
  * Replace/insert the specially precompiled manifest file into the
  * particular package.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} manifest - Full path to the precompiled manifest
+ * @param manifest - Full path to the precompiled manifest
  *                            created by `compileManifest` method call
  *                            without .apk extension
- * @param {string} srcApk - Full path to the existing valid application package, where
+ * @param srcApk - Full path to the existing valid application package, where
  *                          this manifest has to be insetred to. This package
  *                          will NOT be modified.
- * @param {string} dstApk - Full path to the resulting package.
+ * @param dstApk - Full path to the resulting package.
  *                          The file will be overridden if it already exists.
  */
-export async function insertManifest(manifest, srcApk, dstApk) {
+export async function insertManifest(
+  this: ADB,
+  manifest: string,
+  srcApk: string,
+  dstApk: string,
+): Promise<void> {
   log.debug(`Inserting manifest '${manifest}', src: '${srcApk}', dst: '${dstApk}'`);
   await zip.assertValidZip(srcApk);
   await unzipFile(`${manifest}.apk`);
   const manifestName = path.basename(manifest);
   try {
     await this.initAapt();
+    const binaries = this.binaries as StringRecord;
     await fs.copyFile(srcApk, dstApk);
     log.debug('Moving manifest');
     try {
-      await exec(/** @type {import('./types').StringRecord} */ (this.binaries).aapt, [
-        'remove',
-        dstApk,
-        manifestName,
-      ]);
+      await exec(binaries.aapt, ['remove', dstApk, manifestName]);
     } catch {}
-    await exec(
-      /** @type {import('./types').StringRecord} */ (this.binaries).aapt,
-      ['add', dstApk, manifestName],
-      {cwd: path.dirname(manifest)},
-    );
+    await exec(binaries.aapt, ['add', dstApk, manifestName], {
+      cwd: path.dirname(manifest),
+    });
   } catch (e) {
     log.debug(
       'Cannot insert manifest using aapt. Defaulting to zip. ' +
-        `Original error: ${e.stderr || e.message}`,
+        `Original error: ${(e as Error).message || (e as {stderr?: string}).stderr}`,
     );
     const tmpRoot = await tempDir.openDir();
     try {
@@ -217,20 +224,20 @@ export async function insertManifest(manifest, srcApk, dstApk) {
 /**
  * Check whether package manifest contains Internet permissions.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} appPath - The full path to .apk(s) package.
- * @return {Promise<boolean>} True if the manifest requires Internet access permission.
+ * @param appPath - The full path to .apk(s) package.
+ * @return True if the manifest requires Internet access permission.
  */
-export async function hasInternetPermissionFromManifest(appPath) {
+export async function hasInternetPermissionFromManifest(
+  this: ADB,
+  appPath: string,
+): Promise<boolean> {
   log.debug(`Checking if '${appPath}' requires internet access permission in the manifest`);
   if (appPath.endsWith(APKS_EXTENSION)) {
     appPath = await this.extractBaseApk(appPath);
   }
 
   const {usesPermissions} = await readPackageManifest.bind(this)(appPath);
-  return usesPermissions.some(
-    (/** @type {string} */ name) => name === 'android.permission.INTERNET',
-  );
+  return usesPermissions.some((name: string) => name === 'android.permission.INTERNET');
 }
 
 // #region Private functions
@@ -238,16 +245,15 @@ export async function hasInternetPermissionFromManifest(appPath) {
 /**
  * Retrieve the path to the recent installed Android platform.
  *
- * @param {string} sdkRoot
- * @return {Promise<import('./types').PlatformInfo>} The resulting path to the newest installed platform.
+ * @param sdkRoot
+ * @return The resulting path to the newest installed platform.
  */
-export async function getAndroidPlatformAndPath(sdkRoot) {
+export async function getAndroidPlatformAndPath(sdkRoot: string): Promise<PlatformInfo> {
   const propsPaths = await fs.glob('*/build.prop', {
     cwd: path.resolve(sdkRoot, 'platforms'),
     absolute: true,
   });
-  /** @type {Record<string, import('./types').PlatformInfo>} */
-  const platformsMapping = {};
+  const platformsMapping: Record<string, PlatformInfo> = {};
   for (const propsPath of propsPaths) {
     const propsContent = await fs.readFile(propsPath, 'utf-8');
     const platformPath = path.dirname(propsPath);
@@ -280,3 +286,4 @@ export async function getAndroidPlatformAndPath(sdkRoot) {
 }
 
 // #endregion
+
