@@ -2,6 +2,8 @@ import {log} from '../logger.js';
 import _ from 'lodash';
 import {waitForCondition} from 'asyncbox';
 import B from 'bluebird';
+import type {ADB} from '../adb.js';
+import type {KeyboardState} from './types.js';
 
 const KEYCODE_ESC = 111;
 const KEYCODE_BACK = 4;
@@ -10,14 +12,15 @@ const KEYCODE_BACK = 4;
  * Hides software keyboard if it is visible.
  * Noop if the keyboard is already hidden.
  *
- * @this {import('../adb.js').ADB}
- * @param {number} [timeoutMs=1000] For how long to wait (in milliseconds)
+ * @param timeoutMs - For how long to wait (in milliseconds)
  * until the keyboard is actually hidden.
- * @returns {Promise<boolean>} `false` if the keyboard was already hidden
+ * @returns `false` if the keyboard was already hidden
  * @throws {Error} If the keyboard cannot be hidden.
  */
-export async function hideKeyboard(timeoutMs = 1000) {
-  let {isKeyboardShown, canCloseKeyboard} = await this.isSoftKeyboardPresent();
+export async function hideKeyboard(this: ADB, timeoutMs: number = 1000): Promise<boolean> {
+  const keyboardState = await this.isSoftKeyboardPresent();
+  let {isKeyboardShown} = keyboardState;
+  const {canCloseKeyboard} = keyboardState;
   if (!isKeyboardShown) {
     log.info('Keyboard has no UI; no closing necessary');
     return false;
@@ -43,10 +46,9 @@ export async function hideKeyboard(timeoutMs = 1000) {
 /**
  * Retrieve the state of the software keyboard on the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<import('./types').KeyboardState>} The keyboard state.
+ * @return The keyboard state.
  */
-export async function isSoftKeyboardPresent() {
+export async function isSoftKeyboardPresent(this: ADB): Promise<KeyboardState> {
   try {
     const stdout = await this.shell(['dumpsys', 'input_method']);
     const inputShownMatch = /mInputShown=(\w+)/.exec(stdout);
@@ -56,17 +58,16 @@ export async function isSoftKeyboardPresent() {
       canCloseKeyboard: !!(inputViewShownMatch && inputViewShownMatch[1] === 'true'),
     };
   } catch (e) {
-    throw new Error(`Error finding softkeyboard. Original error: ${e.message}`);
+    throw new Error(`Error finding softkeyboard. Original error: ${(e as Error).message}`);
   }
 }
 
 /**
  * Send the particular keycode to the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @param {string|number} keycode - The actual key code to be sent.
+ * @param keycode - The actual key code to be sent.
  */
-export async function keyevent(keycode) {
+export async function keyevent(this: ADB, keycode: string | number): Promise<void> {
   // keycode must be an int.
   const code = parseInt(`${keycode}`, 10);
   await this.shell(['input', 'keyevent', `${code}`]);
@@ -75,14 +76,13 @@ export async function keyevent(keycode) {
 /**
  * Retrieve the list of available input methods (IMEs) for the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<string[]>} The list of IME names or an empty list.
+ * @return The list of IME names or an empty list.
  */
-export async function availableIMEs() {
+export async function availableIMEs(this: ADB): Promise<string[]> {
   try {
     return getIMEListFromOutput(await this.shell(['ime', 'list', '-a']));
   } catch (e) {
-    const err = /** @type {Error} */ (e);
+    const err = e as Error;
     throw new Error(`Error getting available IME's. Original error: ${err.message}`);
   }
 }
@@ -90,14 +90,13 @@ export async function availableIMEs() {
 /**
  * Retrieve the list of enabled input methods (IMEs) for the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<string[]>} The list of enabled IME names or an empty list.
+ * @return The list of enabled IME names or an empty list.
  */
-export async function enabledIMEs() {
+export async function enabledIMEs(this: ADB): Promise<string[]> {
   try {
     return getIMEListFromOutput(await this.shell(['ime', 'list']));
   } catch (e) {
-    const err = /** @type {Error} */ (e);
+    const err = e as Error;
     throw new Error(`Error getting enabled IME's. Original error: ${err.message}`);
   }
 }
@@ -105,48 +104,44 @@ export async function enabledIMEs() {
 /**
  * Enable the particular input method on the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} imeId - One of existing IME ids.
+ * @param imeId - One of existing IME ids.
  */
-export async function enableIME(imeId) {
+export async function enableIME(this: ADB, imeId: string): Promise<void> {
   await this.shell(['ime', 'enable', imeId]);
 }
 
 /**
  * Disable the particular input method on the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} imeId - One of existing IME ids.
+ * @param imeId - One of existing IME ids.
  */
-export async function disableIME(imeId) {
+export async function disableIME(this: ADB, imeId: string): Promise<void> {
   await this.shell(['ime', 'disable', imeId]);
 }
 
 /**
  * Set the particular input method on the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} imeId - One of existing IME ids.
+ * @param imeId - One of existing IME ids.
  */
-export async function setIME(imeId) {
+export async function setIME(this: ADB, imeId: string): Promise<void> {
   await this.shell(['ime', 'set', imeId]);
 }
 
 /**
  * Get the default input method on the device under test.
  *
- * @this {import('../adb.js').ADB}
- * @return {Promise<string|null>} The name of the default input method
+ * @return The name of the default input method
  */
-export async function defaultIME() {
+export async function defaultIME(this: ADB): Promise<string | null> {
   try {
-    let engine = await this.getSetting('secure', 'default_input_method');
+    const engine = await this.getSetting('secure', 'default_input_method');
     if (engine === 'null') {
       return null;
     }
     return engine.trim();
   } catch (e) {
-    const err = /** @type {Error} */ (e);
+    const err = e as Error;
     throw new Error(`Error getting default IME. Original error: ${err.message}`);
   }
 }
@@ -156,18 +151,17 @@ export async function defaultIME() {
  * The text gets properly escaped before being passed to ADB.
  * Noop if the text is empty.
  *
- * @this {import('../adb.js').ADB}
- * @param {string|number} text - The actual text to be sent.
+ * @param text - The actual text to be sent.
  * @throws {Error} If it is impossible to escape the given string
  */
-export async function inputText(text) {
+export async function inputText(this: ADB, text: string | number): Promise<void> {
   if (text === '') {
     return;
   }
 
   const originalStr = `${text}`;
   const escapedText = originalStr.replace(/\$/g, '\\$').replace(/ /g, '%s');
-  let args = ['input', 'text', originalStr];
+  let args: string[] = ['input', 'text', originalStr];
   // https://stackoverflow.com/questions/25791423/adb-shell-input-text-does-not-take-ampersand-character/25791498
   const adbInputEscapePattern = /[()<>|;&*\\~^"']/g;
   if (escapedText !== originalStr || adbInputEscapePattern.test(originalStr)) {
@@ -186,14 +180,13 @@ export async function inputText(text) {
  * Executes the given function with the given input method context
  * and then restores the IME to the original value
  *
- * @this {import('../adb.js').ADB}
- * @param {string} ime - Valid IME identifier
- * @param {Function} fn - Function to execute
- * @returns {Promise<any>} The result of the given function
+ * @param ime - Valid IME identifier
+ * @param fn - Function to execute
+ * @returns The result of the given function
  */
-export async function runInImeContext(ime, fn) {
+export async function runInImeContext<T>(this: ADB, ime: string, fn: () => Promise<T>): Promise<T> {
   // This is needed to properly apply new IME on some devices
-  const cycleImeState = async (/** @type {string} */ name) => {
+  const cycleImeState = async (name: string) => {
     try {
       await this.disableIME(name);
       await this.enableIME(name);
@@ -225,12 +218,11 @@ export async function runInImeContext(ime, fn) {
 // #region Private function
 
 /**
- * @param {string} stdout
- * @returns {string[]}
+ * @param stdout
+ * @returns
  */
-function getIMEListFromOutput(stdout) {
-  /** @type {string[]} */
-  const engines = [];
+function getIMEListFromOutput(stdout: string): string[] {
+  const engines: string[] = [];
   for (const line of stdout.split('\n')) {
     if (line.length > 0 && line[0] !== ' ') {
       // remove newline and trailing colon, and add to the list
@@ -241,3 +233,4 @@ function getIMEListFromOutput(stdout) {
 }
 
 // #endregion
+

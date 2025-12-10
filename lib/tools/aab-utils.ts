@@ -6,11 +6,12 @@ import {unzipFile} from '../helpers.js';
 import AsyncLock from 'async-lock';
 import B from 'bluebird';
 import crypto from 'crypto';
+import type {ADB} from '../adb.js';
+import type {ApkCreationOptions, StringRecord} from './types.js';
 
-/** @type {LRUCache<string, string>} */
-const AAB_CACHE = new LRUCache({
+const AAB_CACHE = new LRUCache<string, string>({
   max: 10,
-  dispose: (extractedFilesRoot) => fs.rimraf(/** @type {string} */ (extractedFilesRoot)),
+  dispose: (extractedFilesRoot) => fs.rimraf(extractedFilesRoot),
 });
 const AAB_CACHE_GUARD = new AsyncLock();
 const UNIVERSAL_APK = 'universal.apk';
@@ -20,7 +21,7 @@ process.on('exit', () => {
     return;
   }
 
-  const paths = /** @type {string[]} */ ([...AAB_CACHE.values()]);
+  const paths = [...AAB_CACHE.values()];
   log.debug(
     `Performing cleanup of ${paths.length} cached .aab ` + util.pluralize('package', paths.length),
   );
@@ -29,7 +30,7 @@ process.on('exit', () => {
       // Asynchronous calls are not supported in onExit handler
       fs.rimrafSync(appPath);
     } catch (e) {
-      log.warn(/** @type {Error} */ (e).message);
+      log.warn((e as Error).message);
     }
   }
 });
@@ -39,14 +40,17 @@ process.on('exit', () => {
  * https://developer.android.com/studio/command-line/bundletool#generate_apks
  * for more details.
  *
- * @this {import('../adb.js').ADB}
- * @param {string} aabPath Full path to the source .aab package
- * @param {import('./types').ApkCreationOptions} [opts={}]
+ * @param aabPath Full path to the source .aab package
+ * @param opts Options for APK creation
  * @returns The path to the resulting universal .apk. The .apk is stored in the internal cache
  * by default.
  * @throws {Error} If there was an error while creating the universal .apk
  */
-export async function extractUniversalApk(aabPath, opts = {}) {
+export async function extractUniversalApk(
+  this: ADB,
+  aabPath: string,
+  opts: ApkCreationOptions = {},
+): Promise<string> {
   if (!(await fs.exists(aabPath))) {
     throw new Error(`The file at '${aabPath}' either does not exist or is not accessible`);
   }
@@ -79,18 +83,22 @@ export async function extractUniversalApk(aabPath, opts = {}) {
       }
       log.debug(`Calculated the cache key for '${aabPath}': ${cacheHash}`);
       if (AAB_CACHE.has(cacheHash)) {
-        const resultPath = path.resolve(/** @type {string} */ (AAB_CACHE.get(cacheHash)), apkName);
-        if (await fs.exists(resultPath)) {
-          return resultPath;
+        const cachedRoot = AAB_CACHE.get(cacheHash);
+        if (cachedRoot) {
+          const resultPath = path.resolve(cachedRoot, apkName);
+          if (await fs.exists(resultPath)) {
+            return resultPath;
+          }
         }
         AAB_CACHE.delete(cacheHash);
       }
 
       await this.initAapt2();
+      const binaries = this.binaries as StringRecord;
       const args = [
         'build-apks',
         '--aapt2',
-        /** @type {import('./types').StringRecord} */ (this.binaries).aapt2,
+        binaries.aapt2,
         '--bundle',
         aabPath,
         '--output',
@@ -114,8 +122,8 @@ export async function extractUniversalApk(aabPath, opts = {}) {
 
       log.debug(`Unpacking universal application bundle at '${tmpApksPath}' to '${tmpRoot}'`);
       await unzipFile(tmpApksPath, tmpRoot);
-      let universalApkPath;
-      const fileDeletionPromises = [];
+      let universalApkPath: string | undefined;
+      const fileDeletionPromises: Promise<void>[] = [];
       const allFileNames = await fs.readdir(tmpRoot);
       for (const fileName of allFileNames) {
         const fullPath = path.join(tmpRoot, fileName);
@@ -146,3 +154,4 @@ export async function extractUniversalApk(aabPath, opts = {}) {
     throw e;
   }
 }
+

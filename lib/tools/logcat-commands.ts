@@ -1,14 +1,15 @@
 import _ from 'lodash';
 import {Logcat} from '../logcat';
+import type {ADB} from '../adb.js';
+import type {LogcatOpts, LogEntry, LogcatListener} from './types.js';
 
 /**
  * Start the logcat process to gather logs.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').LogcatOpts} [opts={}]
+ * @param opts - Logcat options
  * @throws {Error} If restart fails.
  */
-export async function startLogcat(opts = {}) {
+export async function startLogcat(this: ADB, opts: LogcatOpts = {}): Promise<void> {
   if (!_.isEmpty(this.logcat)) {
     throw new Error("Trying to start logcat capture but it's already started!");
   }
@@ -26,14 +27,14 @@ export async function startLogcat(opts = {}) {
 /**
  * Stop the active logcat process which gathers logs.
  * The call will be ignored if no logcat process is running.
- * @this {import('../adb.js').ADB}
  */
-export async function stopLogcat() {
-  if (_.isEmpty(this.logcat)) {
+export async function stopLogcat(this: ADB): Promise<void> {
+  const logcat = this.logcat;
+  if (!logcat || _.isEmpty(this.logcat)) {
     return;
   }
   try {
-    await this.logcat.stopCapture();
+    await logcat.stopCapture();
   } finally {
     this.logcat = undefined;
   }
@@ -43,43 +44,44 @@ export async function stopLogcat() {
  * Retrieve the output from the currently running logcat process.
  * The logcat process should be executed by {2link #startLogcat} method.
  *
- * @this {import('../adb.js').ADB}
- * @return {import('./types').LogEntry[]} The collected logcat output.
+ * @return The collected logcat output.
  * @throws {Error} If logcat process is not running.
  */
-export function getLogcatLogs() {
-  if (_.isEmpty(this.logcat)) {
+export function getLogcatLogs(this: ADB): LogEntry[] {
+  const logcat = this.logcat;
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error(`Can't get logcat logs since logcat hasn't started`);
   }
-  return this.logcat.getLogs();
+  return logcat.getLogs();
 }
 
 /**
  * Set the callback for the logcat output event.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').LogcatListener} listener - Listener function
+ * @param listener - Listener function
  * @throws {Error} If logcat process is not running.
  */
-export function setLogcatListener(listener) {
-  if (_.isEmpty(this.logcat)) {
+export function setLogcatListener(this: ADB, listener: LogcatListener): void {
+  const logcat = this.logcat;
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error("Logcat process hasn't been started");
   }
-  this.logcat.on('output', listener);
+  logcat.on('output', listener);
 }
 
 /**
  * Removes the previously set callback for the logcat output event.
  *
- * @this {import('../adb.js').ADB}
- * @param {import('./types').LogcatListener} listener
+ * @param listener
  * The listener function, which has been previously
  * passed to `setLogcatListener`
  * @throws {Error} If logcat process is not running.
  */
-export function removeLogcatListener(listener) {
-  if (_.isEmpty(this.logcat)) {
+export function removeLogcatListener(this: ADB, listener: LogcatListener): void {
+  const logcat = this.logcat;
+  if (!logcat || _.isEmpty(this.logcat)) {
     throw new Error("Logcat process hasn't been started");
   }
-  this.logcat.removeListener('output', listener);
+  logcat.removeListener('output', listener);
 }
+
