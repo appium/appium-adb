@@ -1,3 +1,9 @@
+## [14.1.3](https://github.com/appium/appium-adb/compare/v14.1.2...v14.1.3) (2025-12-10)
+
+### Miscellaneous Chores
+
+* Migrate the rest of tools into typescript ([#849](https://github.com/appium/appium-adb/issues/849)) ([2d8ff00](https://github.com/appium/appium-adb/commit/2d8ff00d1117fa63d03e23f7e4f1cbda7289111a))
+
 ## [14.1.2](https://github.com/appium/appium-adb/compare/v14.1.1...v14.1.2) (2025-12-07)
 
 ### Miscellaneous Chores
