@@ -1,3 +1,9 @@
+## [14.1.4](https://github.com/appium/appium-adb/compare/v14.1.3...v14.1.4) (2025-12-11)
+
+### Miscellaneous Chores
+
+* Bump @types/node from 24.10.3 to 25.0.0 ([#850](https://github.com/appium/appium-adb/issues/850)) ([f44b33e](https://github.com/appium/appium-adb/commit/f44b33e010d93a3878ee6e72379a37c5e64ae6fb))
+
 ## [14.1.3](https://github.com/appium/appium-adb/compare/v14.1.2...v14.1.3) (2025-12-10)
 
 ### Miscellaneous Chores
