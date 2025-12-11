@@ -348,8 +348,9 @@ export async function execEmuConsoleCommand(
       );
     });
 
-    client.on('data', (chunk) => {
-      serverResponse.push(chunk);
+    client.on('data', (chunk: Buffer | string) => {
+      const buf = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+      serverResponse.push(buf);
       const output = Buffer.concat(serverResponse).toString('utf8').trim();
       if (okFlag.test(output)) {
         // The initial incoming data chunk confirms the interface is ready for input
