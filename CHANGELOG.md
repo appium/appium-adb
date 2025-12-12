@@ -1,3 +1,9 @@
+## [14.1.5](https://github.com/appium/appium-adb/compare/v14.1.4...v14.1.5) (2025-12-12)
+
+### Miscellaneous Chores
+
+* **deps:** remove `source-map-support` ([#851](https://github.com/appium/appium-adb/issues/851)) ([9c43c75](https://github.com/appium/appium-adb/commit/9c43c7595c053fab9176d330851ed6a2d19bfb26))
+
 ## [14.1.4](https://github.com/appium/appium-adb/compare/v14.1.3...v14.1.4) (2025-12-11)
 
 ### Miscellaneous Chores
