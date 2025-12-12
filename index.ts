@@ -1,6 +1,3 @@
-import {install} from 'source-map-support';
-install();
-
 export * from './lib/adb';
 export {getAndroidBinaryPath} from './lib/tools/system-calls';
 export {getSdkRootFromEnv} from './lib/helpers';
