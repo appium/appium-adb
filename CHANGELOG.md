@@ -1,3 +1,9 @@
+## [14.1.6](https://github.com/appium/appium-adb/compare/v14.1.5...v14.1.6) (2025-12-17)
+
+### Miscellaneous Chores
+
+* **deps:** Bump actions/cache from 4 to 5 ([#852](https://github.com/appium/appium-adb/issues/852)) ([a77371c](https://github.com/appium/appium-adb/commit/a77371cbe96a551769b463027019e914388f103d))
+
 ## [14.1.5](https://github.com/appium/appium-adb/compare/v14.1.4...v14.1.5) (2025-12-12)
 
 ### Miscellaneous Chores
