@@ -14,24 +14,9 @@ const proxy = proxyquire.noCallThru();
 const avdName = 'AVD_NAME';
 
 function makeAdbWithTeenMock(sandbox: sinon.SinonSandbox) {
-  class FakeSubProcess {
-    public cmd: string;
-    public args: string[];
-    constructor(cmd: string, args: string[]) {
-      this.cmd = cmd;
-      this.args = args;
-    }
-    start() {
-      return Promise.resolve();
-    }
-    stop() {
-      return Promise.resolve();
-    }
-  }
-
   const teen = {
     exec: sandbox.stub(),
-    SubProcess: FakeSubProcess,
+    SubProcess: sandbox.stub(),
   };
 
   // Proxyquire the nested system-calls module to inject teen_process there,
