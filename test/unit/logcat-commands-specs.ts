@@ -28,7 +28,7 @@ describe('logcat commands', function () {
     sandbox.stub(teen_process, 'SubProcess').callsFake((cmd: string, args: string[]) => {
       return new FakeSubProcess(cmd, args);
     });
-    sandbox.stub(teen_process, 'exec').resolves({stdout: '', stderr: ''});
+    sandbox.stub(teen_process, 'exec').resolves({stdout: '', stderr: '', code: null});
     const adb = {
       path: 'dummyPath',
       defaultArgs: ['-P', '5037'],
