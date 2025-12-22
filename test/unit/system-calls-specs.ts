@@ -158,7 +158,7 @@ describe('system calls', function () {
     it('should get all connected devices', async function () {
       sandbox.stub(teen_process, 'exec').get(() =>
         sandbox.stub()
-          .withArgs((adb.executable.path, ['-P', '5037', 'devices']))
+          .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
           .onFirstCall()
           .returns({stdout: 'List of devices attached \n emulator-5554	device'})
       );

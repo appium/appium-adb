@@ -114,6 +114,7 @@ describe('signing', function () {
   });
 
   describe('signWithCustomCert', function () {
+    let innerExecStub: sinon.SinonStub;
     it('should call exec with correct args', async function () {
       adb.useKeystore = true;
 
@@ -141,31 +142,28 @@ describe('signing', function () {
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
       mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .throws(new Error('apksigner failed'))
-          .withArgs(jarsigner,
-            [
-              '-sigalg',
-              'MD5withRSA',
-              '-digestalg',
-              'SHA1',
-              '-keystore',
-              keystorePath,
-              '-storepass',
-              password,
-              '-keypass',
-              password,
-              apiDemosPath,
-              keyAlias,
-            ],
-            {windowsVerbatimArguments: appiumSupport.system.isWindows()},
-          )
-          .onFirstCall()
-          .returns({})
-      );
+      mocks.helpers.expects('getJavaHome').once().returns(javaHome);
+      innerExecStub = sandbox.stub();
+      innerExecStub.withArgs(javaDummyPath)
+        .throws(new Error('apksigner failed'));
+      innerExecStub.withArgs(jarsigner,
+          [
+            '-sigalg',
+            'MD5withRSA',
+            '-digestalg',
+            'SHA1',
+            '-keystore',
+            keystorePath,
+            '-storepass',
+            password,
+            '-keypass',
+            password,
+            apiDemosPath,
+            keyAlias,
+          ],
+          {windowsVerbatimArguments: appiumSupport.system.isWindows()},
+        ).returns({});
+      sandbox.stub(teen_process, 'exec').get(() => innerExecStub);
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
       // We need to stub the actual zip object since it's imported as a named import
       const originalReadEntries = zip.readEntries;
@@ -182,6 +180,7 @@ describe('signing', function () {
         // eslint-disable-next-line import/namespace
         zip.readEntries = originalReadEntries;
       }
+      expect(innerExecStub.callCount).to.eql(2)
     });
   });
 
