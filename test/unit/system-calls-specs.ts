@@ -14,13 +14,9 @@ const avdName = 'AVD_NAME';
 
 describe('system calls', function () {
   let sandbox: sinon.SinonSandbox;
-  let mocks: {teen_process: any};
 
   beforeEach(function () {
     sandbox = sinon.createSandbox();
-    mocks = {
-      teen_process: sandbox.mock(teen_process),
-    };
   });
 
   afterEach(function () {
@@ -28,186 +24,223 @@ describe('system calls', function () {
     sandbox.restore();
   });
 
-    describe('getConnectedDevices', function () {
-      it('should get all connected devices', async function () {
-        sandbox.stub(teen_process, 'exec').get(() =>
-          sandbox.stub()
-            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-            .onFirstCall()
-            .returns({stdout: 'List of devices attached \n emulator-5554	device'})
-        );
-        const devices = await adb.getConnectedDevices();
-        expect(devices).to.have.length.above(0);
-        expect(devices).to.deep.equal([{udid: 'emulator-5554', state: 'device'}]);
-      });
-      it('should get all connected devices which have valid udid', async function () {
-        const stdoutValue =
-          'List of devices attached \n' +
-          "adb server version (32) doesn't match this client (36); killing...\n" +
-          '* daemon started successfully *\n' +
-          'emulator-5554	device';
-        sandbox.stub(teen_process, 'exec').get(() =>
-          sandbox.stub()
-            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-            .onFirstCall()
-            .returns({stdout: stdoutValue})
-        );
-        const devices = await adb.getConnectedDevices();
-        expect(devices).to.have.length.above(0);
-      });
-      it('should fail when adb devices returns unexpected output', async function () {
-        sandbox.stub(teen_process, 'exec').get(() =>
-          sandbox.stub()
-            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-            .onFirstCall()
-            .returns({stdout: 'foobar'})
-        );
-        await expect(adb.getConnectedDevices()).to.eventually.be.rejectedWith(
-          'Unexpected output while trying to get devices',
-        );
-      });
-      it('should get all connected devices with verbose output', async function () {
-        sandbox.stub(teen_process, 'exec').get(() =>
-          sandbox.stub()
-            .withArgs(adb.executable.path, ['-P', '5037', 'devices', '-l'])
-            .onFirstCall()
-            .returns({
-              stdout:
-                'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo',
-            })
-        );
-        const devices = await adb.getConnectedDevices({verbose: true});
-        expect(devices).to.have.length.above(0);
-        expect(devices).to.deep.equal([
-          {
-            udid: 'emulator-5556',
-            state: 'device',
-            product: 'sdk_google_phone_x86_64',
-            model: 'Android_SDK_built_for_x86_64',
-            device: 'generic_x86_64',
-          },
-          {
-            udid: '0a388e93',
-            state: 'device',
-            usb: '1-1',
-            product: 'razor',
-            model: 'Nexus_7',
-            device: 'flo',
-          },
-        ]);
-      });
-    });
-    describe('getDevicesWithRetry', function () {
-      // FIXME
-      it('should fail when there are no connected devices', async function () {
-        this.timeout(20000);
-        const execStub = sandbox.stub(teen_process, 'exec');
-        const innerStubOne = execStub
+  describe('getConnectedDevices', function () {
+    it('should get all connected devices', async function () {
+      sandbox.stub(teen_process, 'exec').get(() =>
+        sandbox.stub()
           .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .resolves({stdout: 'List of devices attached', stderr: '', code: null});
-        const innerStubTwo = execStub
-          .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
-          .resolves();
-        const innerStubThree = execStub
-          .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object)
-          .resolves();
-        // sandbox.stub(teen_process, 'exec').get(() => innerStubOne);
-        // sandbox.stub(teen_process, 'exec').get(() => innerStubTwo);
-        // sandbox.stub(teen_process, 'exec').get(() => innerStubThree);
-        await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
-          /Could not find a connected Android device/,
-        );
-        // expect(innerStubOne.callCount).to.be.at.least(2);
-        // expect(innerStubTwo.callCount).to.be.at.least(2);
-        expect(innerStubThree.callCount).to.be.at.least(2);
-      });
-      it('should fail when adb devices returns unexpected output', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'foobar'});
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object);
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object);
-        await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
-          /Could not find a connected Android device/,
-        );
-      });
-      it('should get all connected devices', async function () {
-        sandbox.stub(teen_process, 'exec').get(() =>
-          sandbox.stub()
-            .withArgs((adb.executable.path, ['-P', '5037', 'devices']))
-            .onFirstCall()
-            .returns({stdout: 'List of devices attached \n emulator-5554	device'})
-        );
-        const devices = await adb.getDevicesWithRetry(1000);
-        expect(devices).to.have.length.above(0);
-      });
-      it('should get all connected devices second time', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
           .onFirstCall()
-          .returns({stdout: 'Foobar'});
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
-          .throws(new Error('reconnect failed'));
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object);
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'List of devices attached \n emulator-5554	device'});
-        const devices = await adb.getDevicesWithRetry(2000);
-        expect(devices).to.have.length.above(0);
-      });
-      it('should fail when exec throws an error', async function () {
-        const innerStub = sandbox.stub().throws(new Error('Error foobar'));
-        sandbox.stub(teen_process, 'exec').get(() => innerStub);
-
-        await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
-          /Could not find a connected Android device/,
-        );
-
-        expect(innerStub.callCount).to.be.at.least(2);
-      });
+          .returns({stdout: 'List of devices attached \n emulator-5554	device'})
+      );
+      const devices = await adb.getConnectedDevices();
+      expect(devices).to.have.length.above(0);
+      expect(devices).to.deep.equal([{udid: 'emulator-5554', state: 'device'}]);
     });
-    describe('setDeviceId', function () {
-      it('should set the device id', function () {
-        adb.setDeviceId('foobar');
-        expect(adb.curDeviceId).to.equal('foobar');
-        expect(adb.executable.defaultArgs).to.include('foobar');
-      });
-      it('should set the device id and emu port from obj', function () {
-        adb.setDevice({udid: 'emulator-1234'} as any);
-        expect(adb.curDeviceId).to.equal('emulator-1234');
-        expect(adb.executable.defaultArgs).to.include('emulator-1234');
-        expect(adb.emulatorPort).to.equal(1234);
-      });
+    it('should get all connected devices which have valid udid', async function () {
+      const stdoutValue =
+        'List of devices attached \n' +
+        "adb server version (32) doesn't match this client (36); killing...\n" +
+        '* daemon started successfully *\n' +
+        'emulator-5554	device';
+      sandbox.stub(teen_process, 'exec').get(() =>
+        sandbox.stub()
+          .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+          .onFirstCall()
+          .returns({stdout: stdoutValue})
+      );
+      const devices = await adb.getConnectedDevices();
+      expect(devices).to.have.length.above(0);
     });
-    describe('setEmulatorPort', function () {
-      it('should change emulator port', function () {
-        adb.setEmulatorPort(5554);
-        expect(adb.emulatorPort).to.equal(5554);
-      });
+    it('should fail when adb devices returns unexpected output', async function () {
+      sandbox.stub(teen_process, 'exec').get(() =>
+        sandbox.stub()
+          .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+          .onFirstCall()
+          .returns({stdout: 'foobar'})
+      );
+      await expect(adb.getConnectedDevices()).to.eventually.be.rejectedWith(
+        'Unexpected output while trying to get devices',
+      );
     });
-    describe('createSubProcess', function () {
-      it('should return an instance of SubProcess', function () {
-        expect(adb.createSubProcess([])).to.be.an.instanceof(teen_process.SubProcess);
-      });
+    it('should get all connected devices with verbose output', async function () {
+      sandbox.stub(teen_process, 'exec').get(() =>
+        sandbox.stub()
+          .withArgs(adb.executable.path, ['-P', '5037', 'devices', '-l'])
+          .onFirstCall()
+          .returns({
+            stdout:
+              'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo',
+          })
+      );
+      const devices = await adb.getConnectedDevices({verbose: true});
+      expect(devices).to.have.length.above(0);
+      expect(devices).to.deep.equal([
+        {
+          udid: 'emulator-5556',
+          state: 'device',
+          product: 'sdk_google_phone_x86_64',
+          model: 'Android_SDK_built_for_x86_64',
+          device: 'generic_x86_64',
+        },
+        {
+          udid: '0a388e93',
+          state: 'device',
+          usb: '1-1',
+          product: 'razor',
+          model: 'Nexus_7',
+          device: 'flo',
+        },
+      ]);
     });
   });
+  describe('getDevicesWithRetry', function () {
+    it('should fail when there are no connected devices', async function () {
+      this.timeout(20000);
+      let stubCurrent = 0;
+      const execStub = sandbox.stub(teen_process, 'exec');
+      const innerStubOne = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+        .resolves({stdout: 'List of devices attached', stderr: '', code: null});
+      const innerStubTwo = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
+        .resolves();
+      const innerStubThree = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object)
+        .resolves();
+      sandbox.stub(teen_process, 'exec').get(() => {
+        if (stubCurrent === 0) {
+          stubCurrent++;
+          return innerStubOne;
+        } else if (stubCurrent === 1) {
+          stubCurrent++;
+          return innerStubTwo;
+        }
+        stubCurrent = 0;
+        return innerStubThree;
+      });
+      await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
+        /Could not find a connected Android device/,
+      );
+      expect(innerStubOne.callCount).to.be.at.least(2);
+      expect(innerStubTwo.callCount).to.be.at.least(2);
+      expect(innerStubThree.callCount).to.be.at.least(2);
+    });
+    it('should fail when adb devices returns unexpected output', async function () {
+      let stubCurrent = 0;
+      const execStub = sandbox.stub(teen_process, 'exec');
+      const innerStubOne = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+        .resolves({stdout: 'foobar', stderr: '', code: null});
+      const innerStubTwo = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
+        .resolves();
+      const innerStubThree = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object)
+        .resolves();
+      sandbox.stub(teen_process, 'exec').get(() => {
+        if (stubCurrent === 0) {
+          stubCurrent++;
+          return innerStubOne;
+        } else if (stubCurrent === 1) {
+          stubCurrent++;
+          return innerStubTwo;
+        }
+        stubCurrent = 0;
+        return innerStubThree;
+      });
+      await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
+        /Could not find a connected Android device/,
+      );
+      expect(innerStubOne.callCount).to.be.at.least(2);
+      expect(innerStubTwo.callCount).to.be.at.least(2);
+      expect(innerStubThree.callCount).to.be.at.least(2);
+    });
+    it('should get all connected devices', async function () {
+      sandbox.stub(teen_process, 'exec').get(() =>
+        sandbox.stub()
+          .withArgs((adb.executable.path, ['-P', '5037', 'devices']))
+          .onFirstCall()
+          .returns({stdout: 'List of devices attached \n emulator-5554	device'})
+      );
+      const devices = await adb.getDevicesWithRetry(1000);
+      expect(devices).to.have.length.above(0);
+    });
+    it('should get all connected devices second time', async function () {
+      let stubCurrent = 0;
+      const execStub = sandbox.stub(teen_process, 'exec');
+      const innerStubOne = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+        .onFirstCall()
+        .resolves({stdout: 'Foobar', stderr: '', code: null});
+      const innerStubTwo = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
+        .onFirstCall()
+        .throws(new Error('reconnect failed'));
+      const innerStubThree = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object)
+        .onFirstCall()
+        .resolves();
+      const innerStubFour = execStub
+        .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+        .resolves({stdout: 'List of devices attached \n emulator-5554	device', stderr: '', code: null});
+      sandbox.stub(teen_process, 'exec').get(() => {
+        if (stubCurrent === 0) {
+          stubCurrent++;
+          return innerStubOne;
+        } else if (stubCurrent === 1) {
+          stubCurrent++;
+          return innerStubTwo;
+        } else if (stubCurrent === 2) {
+          stubCurrent++;
+          return innerStubThree;
+        }
+        stubCurrent = 3;
+        return innerStubFour;
+      });
+      const devices = await adb.getDevicesWithRetry(2000);
+      expect(devices).to.have.length.above(0);
+      // '.withArgs(adb.executable.path, ['-P', '5037', 'devices'])' was called twice in total
+      expect(innerStubOne.callCount).to.eql(2);
+      expect(innerStubFour.callCount).to.eql(2);
+      expect(innerStubTwo.callCount).to.eql(1);
+      expect(innerStubThree.callCount).to.eql(1);
+    });
+    it('should fail when exec throws an error', async function () {
+      const innerStub = sandbox.stub().throws(new Error('Error foobar'));
+      sandbox.stub(teen_process, 'exec').get(() => innerStub);
+
+      await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
+        /Could not find a connected Android device/,
+      );
+
+      expect(innerStub.callCount).to.be.at.least(2);
+    });
+  });
+  describe('setDeviceId', function () {
+    it('should set the device id', function () {
+      adb.setDeviceId('foobar');
+      expect(adb.curDeviceId).to.equal('foobar');
+      expect(adb.executable.defaultArgs).to.include('foobar');
+    });
+    it('should set the device id and emu port from obj', function () {
+      adb.setDevice({udid: 'emulator-1234'} as any);
+      expect(adb.curDeviceId).to.equal('emulator-1234');
+      expect(adb.executable.defaultArgs).to.include('emulator-1234');
+      expect(adb.emulatorPort).to.equal(1234);
+    });
+  });
+  describe('setEmulatorPort', function () {
+    it('should change emulator port', function () {
+      adb.setEmulatorPort(5554);
+      expect(adb.emulatorPort).to.equal(5554);
+    });
+  });
+  describe('createSubProcess', function () {
+    it('should return an instance of SubProcess', function () {
+      expect(adb.createSubProcess([])).to.be.an.instanceof(teen_process.SubProcess);
+    });
+  });
+});
 
 describe('System calls 2', function () {
   let sandbox: sinon.SinonSandbox;
