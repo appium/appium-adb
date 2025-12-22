@@ -180,7 +180,7 @@ describe('signing', function () {
         // eslint-disable-next-line import/namespace
         zip.readEntries = originalReadEntries;
       }
-      expect(innerExecStub.callCount).to.eql(2)
+      expect(innerExecStub.callCount).to.eql(2);
     });
   });
 
