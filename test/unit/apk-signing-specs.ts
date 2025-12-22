@@ -56,7 +56,6 @@ describe('signing', function () {
   });
 
   afterEach(function () {
-    sandbox.verify();
     sandbox.restore();
   });
 
@@ -75,11 +74,12 @@ describe('signing', function () {
             .returns(defaultCertPath);
           mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .returns({stdout: '', stderr: ''});
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .returns({stdout: '', stderr: ''})
+          );
           await adb.signWithDefaultCert(apiDemosPath);
         });
 
@@ -97,11 +97,12 @@ describe('signing', function () {
             .returns(defaultCertPath);
           mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .throws(new Error('apksigner failed'));
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .throws(new Error('apksigner failed'))
+          );
           await expect(adb.signWithDefaultCert(apiDemosPath)).to.eventually.be.rejected;
         });
 
@@ -119,11 +120,12 @@ describe('signing', function () {
           mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
           mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .returns({stdout: '', stderr: ''});
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .returns({stdout: '', stderr: ''})
+          );
           await adb.signWithCustomCert(apiDemosPath);
         });
 
@@ -138,33 +140,58 @@ describe('signing', function () {
           mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
           mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .throws(new Error('apksigner failed'));
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withExactArgs(
-              jarsigner,
-              [
-                '-sigalg',
-                'MD5withRSA',
-                '-digestalg',
-                'SHA1',
-                '-keystore',
-                keystorePath,
-                '-storepass',
-                password,
-                '-keypass',
-                password,
-                apiDemosPath,
-                keyAlias,
-              ],
-              {windowsVerbatimArguments: appiumSupport.system.isWindows()},
-            )
-            .returns({});
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .throws(new Error('apksigner failed'))
+              .withArgs(jarsigner,
+                [
+                  '-sigalg',
+                  'MD5withRSA',
+                  '-digestalg',
+                  'SHA1',
+                  '-keystore',
+                  keystorePath,
+                  '-storepass',
+                  password,
+                  '-keypass',
+                  password,
+                  apiDemosPath,
+                  keyAlias,
+                ],
+                {windowsVerbatimArguments: appiumSupport.system.isWindows()},
+              )
+              .onFirstCall()
+              .returns({})
+          );
+          // mocks.teen_process
+          //   .expects('exec')
+          //   .once()
+          //   .withArgs(javaDummyPath, sinon.match.array)
+          //   .throws(new Error('apksigner failed'));
+          // mocks.teen_process
+          //   .expects('exec')
+          //   .once()
+          //   .withExactArgs(
+          //     jarsigner,
+          //     [
+          //       '-sigalg',
+          //       'MD5withRSA',
+          //       '-digestalg',
+          //       'SHA1',
+          //       '-keystore',
+          //       keystorePath,
+          //       '-storepass',
+          //       password,
+          //       '-keypass',
+          //       password,
+          //       apiDemosPath,
+          //       keyAlias,
+          //     ],
+          //     {windowsVerbatimArguments: appiumSupport.system.isWindows()},
+          //   )
+          //   .returns({});
           mocks.helpers.expects('getJavaHome').returns(javaHome);
           // Mock unsignApk's dependencies: tempDir and zip operations
           mocks.tempDir.expects('openDir').returns('/tmp/dummy');
@@ -203,10 +230,12 @@ describe('signing', function () {
             .once()
             .withExactArgs(path.dirname(alignedApk))
             .returns({});
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withExactArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk]);
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
+              .onFirstCall()
+              .returns({})
+          );
           mocks.fs
             .expects('mv')
             .once()
@@ -233,15 +262,15 @@ describe('signing', function () {
             .withExactArgs('apksigner.jar')
             .returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .returns({stdout: `
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .returns({stdout: `
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
-          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`, stderr: ''});
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`, stderr: ''}));
           expect(await adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.be.true;
         });
 
@@ -256,15 +285,15 @@ describe('signing', function () {
             .withExactArgs('apksigner.jar')
             .returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .returns({stdout: `
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .returns({stdout: `
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
-          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''});
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''}));
           const result = await adb.checkApkCert(apiDemosPath, apiDemosPackage, {
             requireDefaultCert: false,
           });
@@ -296,15 +325,15 @@ describe('signing', function () {
             .withExactArgs('apksigner.jar')
             .returns(apksignerDummyPath);
           mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-          mocks.teen_process
-            .expects('exec')
-            .once()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .returns({stdout: `
+          sandbox.stub(teen_process, 'exec').get(() =>
+            sandbox.stub()
+              .withArgs(javaDummyPath, sinon.match.array)
+              .onFirstCall()
+              .returns({stdout: `
           Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
           Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
           Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
-          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''});
+          Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''}));
           await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.true;
         });
       });

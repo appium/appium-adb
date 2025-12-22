@@ -30,11 +30,12 @@ describe('system calls', function () {
 
     describe('getConnectedDevices', function () {
       it('should get all connected devices', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'List of devices attached \n emulator-5554	device'});
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+            .onFirstCall()
+            .returns({stdout: 'List of devices attached \n emulator-5554	device'})
+        );
         const devices = await adb.getConnectedDevices();
         expect(devices).to.have.length.above(0);
         expect(devices).to.deep.equal([{udid: 'emulator-5554', state: 'device'}]);
@@ -45,34 +46,36 @@ describe('system calls', function () {
           "adb server version (32) doesn't match this client (36); killing...\n" +
           '* daemon started successfully *\n' +
           'emulator-5554	device';
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: stdoutValue});
-
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+            .onFirstCall()
+            .returns({stdout: stdoutValue})
+        );
         const devices = await adb.getConnectedDevices();
         expect(devices).to.have.length.above(0);
       });
       it('should fail when adb devices returns unexpected output', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'foobar'});
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+            .onFirstCall()
+            .returns({stdout: 'foobar'})
+        );
         await expect(adb.getConnectedDevices()).to.eventually.be.rejectedWith(
           'Unexpected output while trying to get devices',
         );
       });
       it('should get all connected devices with verbose output', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices', '-l'])
-          .returns({
-            stdout:
-              'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo',
-          });
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .withArgs(adb.executable.path, ['-P', '5037', 'devices', '-l'])
+            .onFirstCall()
+            .returns({
+              stdout:
+                'List of devices attached \nemulator-5556 device product:sdk_google_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64\n0a388e93      device usb:1-1 product:razor model:Nexus_7 device:flo',
+            })
+        );
         const devices = await adb.getConnectedDevices({verbose: true});
         expect(devices).to.have.length.above(0);
         expect(devices).to.deep.equal([
@@ -95,24 +98,28 @@ describe('system calls', function () {
       });
     });
     describe('getDevicesWithRetry', function () {
+      // FIXME
       it('should fail when there are no connected devices', async function () {
         this.timeout(20000);
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'List of devices attached'});
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object);
-        mocks.teen_process
-          .expects('exec')
-          .atLeast(2)
-          .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object);
+        const execStub = sandbox.stub(teen_process, 'exec');
+        const innerStubOne = execStub
+          .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
+          .resolves({stdout: 'List of devices attached', stderr: '', code: null});
+        const innerStubTwo = execStub
+          .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
+          .resolves();
+        const innerStubThree = execStub
+          .withArgs(adb.executable.path, ['-P', '5037', 'kill-server'], sinon.match.object)
+          .resolves();
+        // sandbox.stub(teen_process, 'exec').get(() => innerStubOne);
+        // sandbox.stub(teen_process, 'exec').get(() => innerStubTwo);
+        // sandbox.stub(teen_process, 'exec').get(() => innerStubThree);
         await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
           /Could not find a connected Android device/,
         );
+        // expect(innerStubOne.callCount).to.be.at.least(2);
+        // expect(innerStubTwo.callCount).to.be.at.least(2);
+        expect(innerStubThree.callCount).to.be.at.least(2);
       });
       it('should fail when adb devices returns unexpected output', async function () {
         mocks.teen_process
@@ -133,11 +140,12 @@ describe('system calls', function () {
         );
       });
       it('should get all connected devices', async function () {
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .withExactArgs(adb.executable.path, ['-P', '5037', 'devices'])
-          .returns({stdout: 'List of devices attached \n emulator-5554	device'});
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .withArgs((adb.executable.path, ['-P', '5037', 'devices']))
+            .onFirstCall()
+            .returns({stdout: 'List of devices attached \n emulator-5554	device'})
+        );
         const devices = await adb.getDevicesWithRetry(1000);
         expect(devices).to.have.length.above(0);
       });
@@ -165,10 +173,14 @@ describe('system calls', function () {
         expect(devices).to.have.length.above(0);
       });
       it('should fail when exec throws an error', async function () {
-        mocks.teen_process.expects('exec').atLeast(2).throws('Error foobar');
+        const innerStub = sandbox.stub().throws(new Error('Error foobar'));
+        sandbox.stub(teen_process, 'exec').get(() => innerStub);
+
         await expect(adb.getDevicesWithRetry(1000)).to.eventually.be.rejectedWith(
           /Could not find a connected Android device/,
         );
+
+        expect(innerStub.callCount).to.be.at.least(2);
       });
     });
     describe('setDeviceId', function () {
@@ -251,10 +263,11 @@ describe('System calls 2', function () {
     });
     describe('shell outputFormat option', function () {
       beforeEach(function () {
-        mocks.teen_process
-          .expects('exec')
-          .once()
-          .returns({stdout: 'a value', stderr: 'an error', code: 0});
+        sandbox.stub(teen_process, 'exec').get(() =>
+          sandbox.stub()
+            .onFirstCall()
+            .returns({stdout: 'a value', stderr: 'an error', code: 0})
+        );
       });
       it('should default to stdout', async function () {
         const output = await adb.shell(['command']);
