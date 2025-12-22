@@ -97,7 +97,8 @@ describe('system calls', function () {
     it('should fail when there are no connected devices', async function () {
       this.timeout(20000);
       let stubCurrent = 0;
-      const execStub = sandbox.stub(teen_process, 'exec');
+      // Here wants to test out the exact call count for each, so here doesn't use stub chain.
+      const execStub = sandbox.stub();
       const innerStubOne = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .resolves({stdout: 'List of devices attached', stderr: '', code: null});
@@ -127,7 +128,8 @@ describe('system calls', function () {
     });
     it('should fail when adb devices returns unexpected output', async function () {
       let stubCurrent = 0;
-      const execStub = sandbox.stub(teen_process, 'exec');
+      // Here wants to test out the exact call count for each, so here doesn't use stub chain.
+      const execStub = sandbox.stub();
       const innerStubOne = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .resolves({stdout: 'foobar', stderr: '', code: null});
