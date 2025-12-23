@@ -1,3 +1,9 @@
+## [14.1.8](https://github.com/appium/appium-adb/compare/v14.1.7...v14.1.8) (2025-12-23)
+
+### Miscellaneous Chores
+
+* bump teen_process ([#856](https://github.com/appium/appium-adb/issues/856)) ([9cfefd7](https://github.com/appium/appium-adb/commit/9cfefd7e3e857689470f29b91a81234e2e57166b))
+
 ## [14.1.7](https://github.com/appium/appium-adb/compare/v14.1.6...v14.1.7) (2025-12-18)
 
 ### Miscellaneous Chores
