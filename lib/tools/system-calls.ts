@@ -3,7 +3,8 @@ import {log} from '../logger.js';
 import B from 'bluebird';
 import {system, fs, util, tempDir, timing} from '@appium/support';
 import {DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv} from '../helpers.js';
-import {exec, SubProcess, type ExecError} from 'teen_process';
+import {exec, SubProcess} from 'teen_process';
+import type {ExecError, TeenProcessExecResult} from 'teen_process';
 import {retry, retryInterval, waitForCondition} from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
@@ -472,7 +473,7 @@ export async function adbExec<
           (args.find((arg) => /\s+/.test(arg)) ? util.quote(args) : args.join(' ')) +
           `'`,
       );
-      const {stdout: rawStdout, stderr} = await exec(this.executable.path, args, optsCopy);
+      const {stdout: rawStdout, stderr} = await exec(this.executable.path, args, optsCopy) as TeenProcessExecResult<string>;
       // sometimes ADB prints out weird stdout warnings that we don't want
       // to include in any of the response data, so let's strip it out
       const stdout = rawStdout.replace(LINKER_WARNING_REGEXP, '').trim();
