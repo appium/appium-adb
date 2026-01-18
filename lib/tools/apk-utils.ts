@@ -232,64 +232,9 @@ export async function install(
     timeoutCapName: options.timeoutCapName,
   };
   const installCmd = ['install', ...installArgs, appPath];
-  let performAppInstall = async () => await this.adbExec(installCmd, installOpts);
-  // this.remoteAppsCacheLimit <= 0 means no caching should be applied
-  let shouldCacheApp = (this.remoteAppsCacheLimit as number) > 0;
-  if (shouldCacheApp) {
-    shouldCacheApp = !(await this.isStreamedInstallSupported());
-    if (!shouldCacheApp) {
-      log.info(
-        `The application at '${appPath}' will not be cached, because the device under test has ` +
-          `confirmed the support of streamed installs`,
-      );
-    }
-  }
-  if (shouldCacheApp) {
-    const clearCache = async () => {
-      log.info(`Clearing the cache at '${REMOTE_CACHE_ROOT}'`);
-      await this.shell(['rm', '-rf', `${REMOTE_CACHE_ROOT}/*`]);
-    };
-    const cacheApp = async () =>
-      await this.cacheApk(appPath, {
-        timeout: options.timeout,
-      });
-    try {
-      const cachedAppPath = await cacheApp();
-      performAppInstall = async () => {
-        const pmInstallCmdByRemotePath = (remotePath: string) => [
-          'pm',
-          'install',
-          ...installArgs,
-          remotePath,
-        ];
-        const output = await this.shell(pmInstallCmdByRemotePath(cachedAppPath), installOpts);
-        // https://github.com/appium/appium/issues/13970
-        if (/\bINSTALL_FAILED_INSUFFICIENT_STORAGE\b/.test(output)) {
-          log.warn(
-            `There was a failure while installing '${appPath}' ` +
-              `because of the insufficient device storage space`,
-          );
-          await clearCache();
-          log.info(
-            `Consider decreasing the maximum amount of cached apps ` +
-              `(currently ${this.remoteAppsCacheLimit}) to avoid such issues in the future`,
-          );
-          const newCachedAppPath = await cacheApp();
-          return await this.shell(pmInstallCmdByRemotePath(newCachedAppPath), installOpts);
-        }
-        return output;
-      };
-    } catch (e) {
-      const err = e as Error;
-      log.debug(err);
-      log.warn(`There was a failure while caching '${appPath}': ${err.message}`);
-      log.warn('Falling back to the default installation procedure');
-      await clearCache();
-    }
-  }
   try {
     const timer = new timing.Timer().start();
-    const output = await performAppInstall();
+    const output = await this.adbExec(installCmd, installOpts);
     log.info(
       `The installation of '${path.basename(appPath)}' took ${timer.getDuration().asMilliSeconds.toFixed(0)}ms`,
     );
