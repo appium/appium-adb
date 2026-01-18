@@ -101,7 +101,7 @@ describe('system calls', function () {
       const execStub = sandbox.stub();
       const innerStubOne = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-        .resolves({stdout: 'List of devices attached', stderr: '', code: null});
+        .resolves({stdout: 'List of devices attached', stderr: '', code: 0});
       const innerStubTwo = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
         .resolves();
@@ -132,7 +132,7 @@ describe('system calls', function () {
       const execStub = sandbox.stub();
       const innerStubOne = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-        .resolves({stdout: 'foobar', stderr: '', code: null});
+        .resolves({stdout: 'foobar', stderr: '', code: 0});
       const innerStubTwo = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
         .resolves();
@@ -169,11 +169,11 @@ describe('system calls', function () {
     });
     it('should get all connected devices second time', async function () {
       let stubCurrent = 0;
-      const execStub = sandbox.stub(teen_process, 'exec');
+      const execStub = sandbox.stub();
       const innerStubOne = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .onFirstCall()
-        .resolves({stdout: 'Foobar', stderr: '', code: null});
+        .resolves({stdout: 'Foobar', stderr: '', code: 0});
       const innerStubTwo = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'reconnect', 'offline'], sinon.match.object)
         .onFirstCall()
@@ -184,7 +184,7 @@ describe('system calls', function () {
         .resolves();
       const innerStubFour = execStub
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
-        .resolves({stdout: 'List of devices attached \n emulator-5554	device', stderr: '', code: null});
+        .resolves({stdout: 'List of devices attached \n emulator-5554	device', stderr: '', code: 0});
       sandbox.stub(teen_process, 'exec').get(() => {
         if (stubCurrent === 0) {
           stubCurrent++;
