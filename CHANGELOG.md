@@ -1,3 +1,9 @@
+## [14.1.9](https://github.com/appium/appium-adb/compare/v14.1.8...v14.1.9) (2026-01-19)
+
+### Miscellaneous Chores
+
+* Remove apk caching upon install ([#857](https://github.com/appium/appium-adb/issues/857)) ([cbba9cf](https://github.com/appium/appium-adb/commit/cbba9cf65bd912475e8005144d86d99737d00308))
+
 ## [14.1.8](https://github.com/appium/appium-adb/compare/v14.1.7...v14.1.8) (2025-12-23)
 
 ### Miscellaneous Chores
