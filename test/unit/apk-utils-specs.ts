@@ -590,30 +590,8 @@ describe('Apk-utils', function () {
       });
     });
     describe('install', function () {
-      it('should call shell with correct arguments', async function () {
-        mocks.adb.expects('isStreamedInstallSupported').once().returns(false);
+      it('should call adbExec with correct arguments', async function () {
         mocks.adb.expects('getApiLevel').once().returns(23);
-        mocks.adb
-          .expects('cacheApk')
-          .once()
-          .withExactArgs('foo', {
-            timeout: 60000,
-          })
-          .returns('bar');
-        mocks.adb
-          .expects('shell')
-          .once()
-          .withExactArgs(['pm', 'install', '-r', 'bar'], {
-            timeout: 60000,
-            timeoutCapName: 'androidInstallTimeout',
-          })
-          .returns('');
-        await adb.install('foo');
-      });
-      it('should not cache apk if streamed install is supported', async function () {
-        mocks.adb.expects('isStreamedInstallSupported').once().returns(true);
-        mocks.adb.expects('getApiLevel').once().returns(23);
-        mocks.adb.expects('cacheApk').never();
         mocks.adb
           .expects('adbExec')
           .once()
@@ -624,20 +602,12 @@ describe('Apk-utils', function () {
           .returns('');
         await adb.install('foo');
       });
-      it('should call shell with correct arguments when not replacing', async function () {
-        mocks.adb.expects('isStreamedInstallSupported').once().returns(false);
+      it('should call adbExec with correct arguments when not replacing', async function () {
         mocks.adb.expects('getApiLevel').once().returns(23);
         mocks.adb
-          .expects('cacheApk')
+          .expects('adbExec')
           .once()
-          .withExactArgs('foo', {
-            timeout: 60000,
-          })
-          .returns('bar');
-        mocks.adb
-          .expects('shell')
-          .once()
-          .withExactArgs(['pm', 'install', 'bar'], {
+          .withExactArgs(['install', 'foo'], {
             timeout: 60000,
             timeoutCapName: 'androidInstallTimeout',
           })
