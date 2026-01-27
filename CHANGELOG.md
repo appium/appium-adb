@@ -1,3 +1,9 @@
+## [14.1.10](https://github.com/appium/appium-adb/compare/v14.1.9...v14.1.10) (2026-01-27)
+
+### Miscellaneous Chores
+
+* **deps:** Bump asyncbox from 4.1.1 to 6.0.1 ([#860](https://github.com/appium/appium-adb/issues/860)) ([7d83bfe](https://github.com/appium/appium-adb/commit/7d83bfeb64f4b20db7a267ca2546b65d60a9b0e9))
+
 ## [14.1.9](https://github.com/appium/appium-adb/compare/v14.1.8...v14.1.9) (2026-01-19)
 
 ### Miscellaneous Chores
