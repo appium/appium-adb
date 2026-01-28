@@ -1,3 +1,9 @@
+## [14.1.11](https://github.com/appium/appium-adb/compare/v14.1.10...v14.1.11) (2026-01-28)
+
+### Miscellaneous Chores
+
+* **deps-dev:** Bump @appium/eslint-config-appium-ts from 2.0.5 to 3.0.0 ([#861](https://github.com/appium/appium-adb/issues/861)) ([1457220](https://github.com/appium/appium-adb/commit/14572205fbc7c6f3272d91fb5e9e4213aee4341d))
+
 ## [14.1.10](https://github.com/appium/appium-adb/compare/v14.1.9...v14.1.10) (2026-01-27)
 
 ### Miscellaneous Chores
