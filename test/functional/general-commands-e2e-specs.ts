@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import path from 'path';
+import path from 'node:path';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {MOCHA_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';

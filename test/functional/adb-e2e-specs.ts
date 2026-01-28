@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {ADB} from '../../lib/adb';
 import {fs} from '@appium/support';
-import path from 'path';
+import path from 'node:path';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 

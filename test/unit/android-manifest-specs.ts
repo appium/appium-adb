@@ -1,7 +1,7 @@
 import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
 import sinon from 'sinon';
 import {fs} from '@appium/support';
-import path from 'path';
+import path from 'node:path';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 

@@ -1,11 +1,11 @@
 import {log} from '../logger.js';
-import path from 'path';
+import path from 'node:path';
 import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
 import {unzipFile} from '../helpers.js';
 import AsyncLock from 'async-lock';
 import B from 'bluebird';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import type {ADB} from '../adb.js';
 import type {ApkCreationOptions, StringRecord} from './types.js';
 

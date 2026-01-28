@@ -1,9 +1,9 @@
 import {log} from '../logger.js';
 import _ from 'lodash';
-import net from 'net';
+import net from 'node:net';
 import {util, fs} from '@appium/support';
 import B from 'bluebird';
-import path from 'path';
+import path from 'node:path';
 import * as ini from 'ini';
 import type {ADB} from '../adb.js';
 import type {
