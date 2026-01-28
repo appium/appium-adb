@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import {log} from '../logger.js';
 import B from 'bluebird';
 import {system, fs, util, tempDir, timing} from '@appium/support';

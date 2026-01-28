@@ -7,11 +7,11 @@ import {
 } from '../helpers.js';
 import {exec, type ExecError} from 'teen_process';
 import {log} from '../logger.js';
-import path from 'path';
+import path from 'node:path';
 import _ from 'lodash';
 import {fs, util, mkdirp, timing} from '@appium/support';
 import * as semver from 'semver';
-import os from 'os';
+import os from 'node:os';
 import {LRUCache} from 'lru-cache';
 import type {ADB} from '../adb.js';
 import type {

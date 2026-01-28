@@ -3,7 +3,7 @@ import {exec} from 'teen_process';
 import {log} from '../logger.js';
 import {unzipFile, APKS_EXTENSION, readPackageManifest} from '../helpers.js';
 import {fs, zip, tempDir, util} from '@appium/support';
-import path from 'path';
+import path from 'node:path';
 import type {ADB} from '../adb.js';
 import type {APKInfo, PlatformInfo, StringRecord} from './types.js';
 

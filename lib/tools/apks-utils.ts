@@ -1,6 +1,6 @@
 import {exec} from 'teen_process';
 import {log} from '../logger.js';
-import path from 'path';
+import path from 'node:path';
 import _ from 'lodash';
 import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';

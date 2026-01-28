@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import _fs from 'fs';
+import _fs from 'node:fs';
 import {exec, type ExecError} from 'teen_process';
-import path from 'path';
+import path from 'node:path';
 import {log} from '../logger.js';
 import {tempDir, system, mkdirp, fs, util, zip} from '@appium/support';
 import {LRUCache} from 'lru-cache';

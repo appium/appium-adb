@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
 import * as helpers from '../../lib/helpers.js';
-import path from 'path';
+import path from 'node:path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
@@ -167,7 +167,7 @@ describe('signing', function () {
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
       // We need to stub the actual zip object since it's imported as a named import
       const originalReadEntries = zip.readEntries;
-      // eslint-disable-next-line import/namespace, promise/prefer-await-to-callbacks
+      // eslint-disable-next-line promise/prefer-await-to-callbacks
       zip.readEntries = async (apkPath, callback) => {
         // Call callback with a non-META-INF entry so hasMetaInf stays false
         // eslint-disable-next-line promise/prefer-await-to-callbacks
@@ -177,7 +177,6 @@ describe('signing', function () {
         await adb.signWithCustomCert(apiDemosPath);
       } finally {
         // Restore original function
-        // eslint-disable-next-line import/namespace
         zip.readEntries = originalReadEntries;
       }
       expect(innerExecStub.callCount).to.eql(2);

@@ -1,4 +1,4 @@
-import {EOL} from 'os';
+import {EOL} from 'node:os';
 import _ from 'lodash';
 import {log} from '../logger.js';
 import type {ADB} from '../adb.js';

@@ -1,5 +1,5 @@
 import * as teen_process from 'teen_process';
-import events from 'events';
+import events from 'node:events';
 import {Logcat} from '../../lib/logcat';
 import sinon from 'sinon';
 import chai, {expect} from 'chai';

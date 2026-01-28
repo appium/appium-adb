@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import path from 'path';
+import path from 'node:path';
 import {fs, tempDir} from '@appium/support';
 import {unsignApk} from '../../lib/tools/apk-signing';
 import {APIDEMOS_PKG, getApiDemosPath} from './setup';
