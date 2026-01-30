@@ -160,7 +160,7 @@ export async function inputText(this: ADB, text: string | number): Promise<void>
 
   const originalStr = `${text}`;
   // https://stackoverflow.com/questions/25791423/adb-shell-input-text-does-not-take-ampersand-character/25791498
-  const adbInputEscapePattern = /[()<>|;&*\\~^"'$]/g;
+  const adbInputEscapePattern = /[()<>|;&*\\~^"'$`]/g;
   const escapedText = originalStr.replace(adbInputEscapePattern, '\\$&').replace(/ /g, '%s');
   // https://stackoverflow.com/questions/44338191/android-adb-shell-input-text-apostrophe-signal
   const q = "''";
