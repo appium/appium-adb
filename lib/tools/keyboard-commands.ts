@@ -151,7 +151,6 @@ export async function defaultIME(this: ADB): Promise<string | null> {
  * Noop if the text is empty.
  *
  * @param text - The actual text to be sent.
- * @throws {Error} If it is impossible to escape the given string
  */
 export async function inputText(this: ADB, text: string | number): Promise<void> {
   if (text === '') {
