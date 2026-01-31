@@ -164,9 +164,8 @@ export async function inputText(this: ADB, text: string | number): Promise<void>
   const escapedText = originalStr.replace(adbInputEscapePattern, '\\$&').replace(/ /g, '%s');
   // https://stackoverflow.com/questions/44338191/android-adb-shell-input-text-apostrophe-signal
   const q = "''";
-  const args = ['set -x;', 'input', 'text', `${q}${escapedText}${q}`];
-  const result = await this.shell(args, {outputFormat: "full"});
-  log.debug(`Interpreted as '${result.stderr}'`);
+  const args = ['input', 'text', `${q}${escapedText}${q}`];
+  await this.shell(args);
 }
 
 /**
