@@ -1,3 +1,9 @@
+## [14.2.0](https://github.com/appium/appium-adb/compare/v14.1.11...v14.2.0) (2026-02-01)
+
+### Features
+
+* allow single quotes and double quotes to coexist in inputText value ([#862](https://github.com/appium/appium-adb/issues/862)) ([2c8f3d2](https://github.com/appium/appium-adb/commit/2c8f3d2db8eb0f0bfc9e637c41fbe9c6e5719e9d))
+
 ## [14.1.11](https://github.com/appium/appium-adb/compare/v14.1.10...v14.1.11) (2026-01-28)
 
 ### Miscellaneous Chores
