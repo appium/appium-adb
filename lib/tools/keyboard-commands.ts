@@ -1,5 +1,4 @@
 import {log} from '../logger.js';
-import _ from 'lodash';
 import {waitForCondition} from 'asyncbox';
 import B from 'bluebird';
 import type {ADB} from '../adb.js';
@@ -152,7 +151,6 @@ export async function defaultIME(this: ADB): Promise<string | null> {
  * Noop if the text is empty.
  *
  * @param text - The actual text to be sent.
- * @throws {Error} If it is impossible to escape the given string
  */
 export async function inputText(this: ADB, text: string | number): Promise<void> {
   if (text === '') {
@@ -160,19 +158,12 @@ export async function inputText(this: ADB, text: string | number): Promise<void>
   }
 
   const originalStr = `${text}`;
-  const escapedText = originalStr.replace(/\$/g, '\\$').replace(/ /g, '%s');
-  let args: string[] = ['input', 'text', originalStr];
   // https://stackoverflow.com/questions/25791423/adb-shell-input-text-does-not-take-ampersand-character/25791498
-  const adbInputEscapePattern = /[()<>|;&*\\~^"']/g;
-  if (escapedText !== originalStr || adbInputEscapePattern.test(originalStr)) {
-    if (_.every(['"', `'`], (c) => originalStr.includes(c))) {
-      throw new Error(
-        `Did not know how to escape a string that contains both types of quotes (" and ')`,
-      );
-    }
-    const q = originalStr.includes('"') ? `'` : '"';
-    args = [`input text ${q}${escapedText}${q}`];
-  }
+  const adbInputEscapePattern = /[()<>|;&*\\~^"'$`]/g;
+  const escapedText = originalStr.replace(adbInputEscapePattern, '\\$&').replace(/ /g, '%s');
+  // https://stackoverflow.com/questions/44338191/android-adb-shell-input-text-apostrophe-signal
+  const q = "''";
+  const args = ['input', 'text', `${q}${escapedText}${q}`];
   await this.shell(args);
 }
 
@@ -233,4 +224,3 @@ function getIMEListFromOutput(stdout: string): string[] {
 }
 
 // #endregion
-

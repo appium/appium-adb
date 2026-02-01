@@ -1,5 +1,6 @@
 import {ADB} from '../../lib/adb';
 import path from 'node:path';
+import {randomUUID} from 'node:crypto';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {MOCHA_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
@@ -305,6 +306,42 @@ describe('general commands', function () {
       const ports1 = await adb.listPorts();
       const ports2 = await adb.listPorts('6');
       expect(_.isEmpty(ports1) && _.isEmpty(ports2)).to.be.false;
+    });
+  });
+
+  describe('inputText', function () {
+    beforeEach(async function () {
+      await adb.startApp({pkg: APIDEMOS_PKG, activity: '.view.TextFields'});
+    });
+
+    const dumpPath = '/sdcard/window_dump_e2e.xml';
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+    const cases: Array<{name: string; textSuffix: string}> = [
+      {name: 'should input text without special characters', textSuffix: 'text'},
+      {name: 'should input text with special characters', textSuffix: "special ()<>|;&*\\~^\"'$`"},
+    ];
+
+    cases.forEach(({ name, textSuffix }) => {
+      it(name, async function () {
+        // Focus the text input field
+        await adb.keyevent(['KEYCODE_BUTTON_START']);
+
+        const randomPrefix = randomUUID().split('-')[0];
+        const text = `${randomPrefix}${textSuffix}`;
+        await adb.inputText(text);
+
+        // Wait a while for the text to be reflected in the UI
+        await sleep(500);
+        await adb.shell(['uiautomator', 'dump', dumpPath]);
+        const xml = await adb.shell(['cat', dumpPath]);
+
+        const expectedXmlText = text
+          .replace(/&/g, '&amp;')
+          .replace(/'/g, '&apos;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        expect(xml).to.include(expectedXmlText);
+      });
     });
   });
 });

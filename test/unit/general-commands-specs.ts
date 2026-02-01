@@ -304,19 +304,9 @@ describe('general commands', function () {
         });
       });
       describe('inputText', function () {
-        it('should call shell with correct args if spaces are present in the text', async function () {
-          const text = 'some text  with spaces';
-          const expectedText = '"some%stext%s%swith%sspaces"';
-          mocks.adb
-            .expects('shell')
-            .once()
-            .withExactArgs([`input text ${expectedText}`])
-            .returns('');
-          await adb.inputText(text);
-        });
-        it('should call shell with correct args if special chars are not present in the text', async function () {
-          const text = 'something';
-          const expectedText = `something`;
+        it('should call shell with correct args and set appropriate quotes', async function () {
+          const text = 'text';
+          const expectedText = `''text''`;
           mocks.adb
             .expects('shell')
             .once()
@@ -324,23 +314,53 @@ describe('general commands', function () {
             .returns('');
           await adb.inputText(text);
         });
-        it('should call shell with correct args if special chars are present but spaces are not in the text', async function () {
-          const text = '&something';
-          const expectedText = `"&something"`;
+        it('should call shell with correct args if spaces are present in the text', async function () {
+          const text = 'some text  with spaces';
+          const expectedText = `''some%stext%s%swith%sspaces''`;
           mocks.adb
             .expects('shell')
             .once()
-            .withExactArgs([`input text ${expectedText}`])
+            .withExactArgs(['input', 'text', expectedText])
             .returns('');
           await adb.inputText(text);
         });
-        it('should call shell with correct args and select appropriate quotes', async function () {
-          const text = 'some text & with quote$"';
-          const expectedText = `'some%stext%s&%swith%squote\\$"'`;
+        it('should call shell with correct args and single quotes and double quotes are escaped', async function () {
+          const text = `'"text'`;
+          const expectedText = `''\\'\\"text\\'''`;
           mocks.adb
             .expects('shell')
             .once()
-            .withExactArgs([`input text ${expectedText}`])
+            .withExactArgs(['input', 'text', expectedText])
+            .returns('');
+          await adb.inputText(text);
+        });
+        it('should call shell with correct args and backticks are escaped', async function () {
+          const text = 'text`tex``t';
+          const expectedText = "''text\\`tex\\`\\`t''";
+          mocks.adb
+            .expects('shell')
+            .once()
+            .withExactArgs(['input', 'text', expectedText])
+            .returns('');
+          await adb.inputText(text);
+        });
+        it('should call shell with correct args and special chars are escaped', async function () {
+          const text = '()<>|;&*\\~^"\'$`';
+          const expectedText = `''\\(\\)\\<\\>\\|\\;\\&\\*\\\\\\~\\^\\"\\'\\$\\\`''`;
+          mocks.adb
+            .expects('shell')
+            .once()
+            .withExactArgs(['input', 'text', expectedText])
+            .returns('');
+          await adb.inputText(text);
+        });
+        it('should call shell with correct args and normal chars are not escaped', async function () {
+          const text = '\'some text\' -& wi`th $pecial+chars"';
+          const expectedText = `''\\'some%stext\\'%s-\\&%swi\\\`th%s\\$pecial+chars\\"''`;
+          mocks.adb
+            .expects('shell')
+            .once()
+            .withExactArgs(['input', 'text', expectedText])
             .returns('');
           await adb.inputText(text);
         });
