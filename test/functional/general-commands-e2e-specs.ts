@@ -236,7 +236,7 @@ describe('general commands', function () {
     ]) {
       it(`should push file to a valid location ${remotePath}`, async function () {
         await adb.push(localFile, remotePath);
-        await expect(adb.fileExists(remotePath)).to.be.true;
+        expect(await adb.fileExists(remotePath)).to.be.true;
         // get the file and its contents, to check
         await adb.pull(remotePath, tempFile);
         const remoteData = await fs.readFile(tempFile);
