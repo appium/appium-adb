@@ -1,3 +1,9 @@
+## [14.2.1](https://github.com/appium/appium-adb/compare/v14.2.0...v14.2.1) (2026-02-06)
+
+### Miscellaneous Chores
+
+* extract the single quote logic and simplify a bit + added tests ([#863](https://github.com/appium/appium-adb/issues/863)) ([7ffc1ce](https://github.com/appium/appium-adb/commit/7ffc1ce80f7ab01850db1e876921d55fafbdb37f))
+
 ## [14.2.0](https://github.com/appium/appium-adb/compare/v14.1.11...v14.2.0) (2026-02-01)
 
 ### Features
