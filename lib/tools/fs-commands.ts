@@ -11,7 +11,7 @@ import type {TeenProcessExecOptions} from 'teen_process';
  */
 export async function fileExists(this: ADB, remotePath: string): Promise<boolean> {
   const passFlag = '__PASS__';
-  const checkCmd = `[ -e '${remotePath.replace(/'/g, `\\'`)}' ] && echo ${passFlag}`;
+  const checkCmd = `[ -e '${remotePath.replace(/'/g, "'\\''")}' ] && echo ${passFlag}`;
   try {
     return _.includes(await this.shell([checkCmd]), passFlag);
   } catch {
@@ -126,8 +126,5 @@ export async function pull(
  * @return mkdir command output.
  */
 export async function mkdir(this: ADB, remotePath: string): Promise<string> {
-  return /\s+/.test(remotePath)
-    ? await this.shell([`mkdir -p '${remotePath.replace(/'/g, `\\'`)}'`])
-    : await this.shell(['mkdir', '-p', remotePath]);
+  return await this.shell([`mkdir -p '${remotePath.replace(/'/g, "'\\''")}'`]);
 }
-
