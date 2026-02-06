@@ -126,5 +126,5 @@ export async function pull(
  * @return mkdir command output.
  */
 export async function mkdir(this: ADB, remotePath: string): Promise<string> {
-  return await this.shell(['mkdir', '-p', '--', remotePath]);
+  return await this.shell([`mkdir -p -- '${remotePath.replace(/'/g, "'\\''")}'`]);
 }
