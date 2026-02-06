@@ -231,11 +231,12 @@ describe('general commands', function () {
       "/data/local/tmp/it's file.txt",
       '/data/local/tmp/$VAR-file.txt',
       '/data/local/tmp/brace{1}.txt',
-      '/data/local/tmp/semicolon;and&and.txt'
+      '/data/local/tmp/semicolon;and&and.txt',
+      '/data/local/tmp/-dashfile.txt'
     ]) {
       it(`should push file to a valid location ${remotePath}`, async function () {
         await adb.push(localFile, remotePath);
-
+        expect(adb.fileExists(remotePath)).to.be.true;
         // get the file and its contents, to check
         await adb.pull(remotePath, tempFile);
         const remoteData = await fs.readFile(tempFile);
