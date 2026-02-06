@@ -223,10 +223,20 @@ describe('general commands', function () {
     for (const remotePath of [
       `${getRandomDir()}/remote.txt`,
       '/data/local/tmp/one two/remote file.txt',
+      '/data/local/tmp/one two/remote;file.txt',
+      '/data/local/tmp/foo&bar.txt',
+      '/data/local/tmp/foo|bar.txt',
+      '/data/local/tmp/(paren name).txt',
+      '/data/local/tmp/space and glob?.txt',
+      "/data/local/tmp/it's file.txt",
+      '/data/local/tmp/$VAR-file.txt',
+      '/data/local/tmp/brace{1}.txt',
+      '/data/local/tmp/semicolon;and&and.txt',
+      '/data/local/tmp/-dashfile.txt'
     ]) {
       it(`should push file to a valid location ${remotePath}`, async function () {
         await adb.push(localFile, remotePath);
-
+        expect(await adb.fileExists(remotePath)).to.be.true;
         // get the file and its contents, to check
         await adb.pull(remotePath, tempFile);
         const remoteData = await fs.readFile(tempFile);
