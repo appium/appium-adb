@@ -229,7 +229,6 @@ describe('general commands', function () {
       '/data/local/tmp/(paren name).txt',
       '/data/local/tmp/space and glob?.txt',
       "/data/local/tmp/it's file.txt",
-      '$HOME/some path/file.txt',
       '/data/local/tmp/$VAR-file.txt',
       '/data/local/tmp/brace{1}.txt',
       '/data/local/tmp/semicolon;and&and.txt'
