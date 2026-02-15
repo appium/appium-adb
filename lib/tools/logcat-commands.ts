@@ -84,4 +84,3 @@ export function removeLogcatListener(this: ADB, listener: LogcatListener): void 
   }
   logcat.removeListener('output', listener);
 }
-
