@@ -473,7 +473,11 @@ export async function adbExec<
           (args.find((arg) => /\s+/.test(arg)) ? util.quote(args) : args.join(' ')) +
           `'`,
       );
-      const {stdout: rawStdout, stderr} = await exec(this.executable.path, args, optsCopy) as TeenProcessExecResult<string>;
+      const {stdout: rawStdout, stderr} = (await exec(
+        this.executable.path,
+        args,
+        optsCopy,
+      )) as TeenProcessExecResult<string>;
       // sometimes ADB prints out weird stdout warnings that we don't want
       // to include in any of the response data, so let's strip it out
       const stdout = rawStdout.replace(LINKER_WARNING_REGEXP, '').trim();

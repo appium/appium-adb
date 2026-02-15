@@ -78,10 +78,7 @@ export async function reversePort(
  * @param devicePort - The number of the remote device port
  *                                     to remove forwarding on.
  */
-export async function removePortReverse(
-  this: ADB,
-  devicePort: string | number,
-): Promise<void> {
+export async function removePortReverse(this: ADB, devicePort: string | number): Promise<void> {
   log.debug(`Removing reverse forwarded port socket connection: ${devicePort} `);
   await this.adbExec(['reverse', `--remove`, `tcp:${devicePort}`]);
 }
@@ -158,4 +155,3 @@ export async function listPorts(this: ADB, family: PortFamily = '4'): Promise<Po
   }
   return result;
 }
-

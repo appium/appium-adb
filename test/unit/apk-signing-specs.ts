@@ -73,14 +73,21 @@ describe('signing', function () {
         .once()
         .withExactArgs(path.join('keys', 'testkey.x509.pem'))
         .returns(defaultCertPath);
-      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
+      mocks.adb
+        .expects('getBinaryFromSdkRoot')
+        .once()
+        .withExactArgs('apksigner.jar')
+        .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .returns({stdout: '', stderr: ''})
-      );
+      sandbox
+        .stub(teen_process, 'exec')
+        .get(() =>
+          sandbox
+            .stub()
+            .withArgs(javaDummyPath, sinon.match.array)
+            .onFirstCall()
+            .returns({stdout: '', stderr: ''}),
+        );
       await adb.signWithDefaultCert(apiDemosPath);
     });
 
@@ -96,14 +103,21 @@ describe('signing', function () {
         .once()
         .withExactArgs(path.join('keys', 'testkey.x509.pem'))
         .returns(defaultCertPath);
-      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
+      mocks.adb
+        .expects('getBinaryFromSdkRoot')
+        .once()
+        .withExactArgs('apksigner.jar')
+        .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .throws(new Error('apksigner failed'))
-      );
+      sandbox
+        .stub(teen_process, 'exec')
+        .get(() =>
+          sandbox
+            .stub()
+            .withArgs(javaDummyPath, sinon.match.array)
+            .onFirstCall()
+            .throws(new Error('apksigner failed')),
+        );
       await expect(adb.signWithDefaultCert(apiDemosPath)).to.eventually.be.rejected;
     });
 
@@ -120,14 +134,21 @@ describe('signing', function () {
 
       mocks.fs.expects('exists').once().withExactArgs(keystorePath).returns(true);
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
+      mocks.adb
+        .expects('getBinaryFromSdkRoot')
+        .once()
+        .withExactArgs('apksigner.jar')
+        .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .returns({stdout: '', stderr: ''})
-      );
+      sandbox
+        .stub(teen_process, 'exec')
+        .get(() =>
+          sandbox
+            .stub()
+            .withArgs(javaDummyPath, sinon.match.array)
+            .onFirstCall()
+            .returns({stdout: '', stderr: ''}),
+        );
       await adb.signWithCustomCert(apiDemosPath);
     });
 
@@ -140,13 +161,18 @@ describe('signing', function () {
 
       mocks.fs.expects('exists').once().withExactArgs(keystorePath).returns(true);
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
+      mocks.adb
+        .expects('getBinaryFromSdkRoot')
+        .once()
+        .withExactArgs('apksigner.jar')
+        .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
       mocks.helpers.expects('getJavaHome').once().returns(javaHome);
       innerExecStub = sandbox.stub();
-      innerExecStub.withArgs(javaDummyPath)
-        .throws(new Error('apksigner failed'));
-      innerExecStub.withArgs(jarsigner,
+      innerExecStub.withArgs(javaDummyPath).throws(new Error('apksigner failed'));
+      innerExecStub
+        .withArgs(
+          jarsigner,
           [
             '-sigalg',
             'MD5withRSA',
@@ -162,7 +188,8 @@ describe('signing', function () {
             keyAlias,
           ],
           {windowsVerbatimArguments: appiumSupport.system.isWindows()},
-        ).returns({});
+        )
+        .returns({});
       sandbox.stub(teen_process, 'exec').get(() => innerExecStub);
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
       // We need to stub the actual zip object since it's imported as a named import
@@ -199,12 +226,15 @@ describe('signing', function () {
         .once()
         .withExactArgs(path.dirname(alignedApk))
         .returns({});
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
-          .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
-          .onFirstCall()
-          .returns({})
-      );
+      sandbox
+        .stub(teen_process, 'exec')
+        .get(() =>
+          sandbox
+            .stub()
+            .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
+            .onFirstCall()
+            .returns({}),
+        );
       mocks.fs
         .expects('mv')
         .once()
@@ -224,7 +254,11 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
+      mocks.fs
+        .expects('hash')
+        .once()
+        .withExactArgs(apiDemosPath)
+        .returns(Math.random().toString(36));
       mocks.adb
         .expects('getBinaryFromSdkRoot')
         .twice()
@@ -232,14 +266,19 @@ describe('signing', function () {
         .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
       sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
+        sandbox
+          .stub()
           .withArgs(javaDummyPath, sinon.match.array)
           .onFirstCall()
-          .returns({stdout: `
+          .returns({
+            stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
-      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`, stderr: ''}));
+      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`,
+            stderr: '',
+          }),
+      );
       expect(await adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.be.true;
     });
 
@@ -247,7 +286,11 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
+      mocks.fs
+        .expects('hash')
+        .once()
+        .withExactArgs(apiDemosPath)
+        .returns(Math.random().toString(36));
       mocks.adb
         .expects('getBinaryFromSdkRoot')
         .twice()
@@ -255,14 +298,19 @@ describe('signing', function () {
         .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
       sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
+        sandbox
+          .stub()
           .withArgs(javaDummyPath, sinon.match.array)
           .onFirstCall()
-          .returns({stdout: `
+          .returns({
+            stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
-      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''}));
+      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`,
+            stderr: '',
+          }),
+      );
       const result = await adb.checkApkCert(apiDemosPath, apiDemosPackage, {
         requireDefaultCert: false,
       });
@@ -273,8 +321,16 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
-      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').throws(new Error('apksigner not found'));
+      mocks.fs
+        .expects('hash')
+        .once()
+        .withExactArgs(apiDemosPath)
+        .returns(Math.random().toString(36));
+      mocks.adb
+        .expects('getBinaryFromSdkRoot')
+        .once()
+        .withExactArgs('apksigner.jar')
+        .throws(new Error('apksigner not found'));
       await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.rejected;
     });
 
@@ -282,7 +338,11 @@ describe('signing', function () {
       adb.useKeystore = true;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
+      mocks.fs
+        .expects('hash')
+        .once()
+        .withExactArgs(apiDemosPath)
+        .returns(Math.random().toString(36));
       mocks.adb.expects('getKeystoreHash').once().returns({
         md5: 'e89b158e4bcf988ebd09eb83f53ccccc',
         sha1: '61ed377e85d386a8dfee6b864bdcccccfaa5af81',
@@ -295,14 +355,19 @@ describe('signing', function () {
         .returns(apksignerDummyPath);
       mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
       sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox.stub()
+        sandbox
+          .stub()
           .withArgs(javaDummyPath, sinon.match.array)
           .onFirstCall()
-          .returns({stdout: `
+          .returns({
+            stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
-      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`, stderr: ''}));
+      Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`,
+            stderr: '',
+          }),
+      );
       await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.true;
     });
   });

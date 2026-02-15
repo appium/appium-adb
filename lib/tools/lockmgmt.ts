@@ -16,7 +16,11 @@ const HIDE_KEYBOARD_WAIT_TIME = 100;
  * @param oldCredential
  * @param args
  */
-function buildCommand(verb: string, oldCredential: string | null = null, ...args: string[]): string[] {
+function buildCommand(
+  verb: string,
+  oldCredential: string | null = null,
+  ...args: string[]
+): string[] {
   const cmd = ['locksettings', verb];
   if (oldCredential && !_.isEmpty(oldCredential)) {
     cmd.push('--old', oldCredential);
@@ -109,9 +113,9 @@ export async function verifyLockCredential(
     throw new Error(
       `Device lock credential verification failed. ` +
         `Original error: ${
-          (e as Error & {stderr?: string; stdout?: string}).stderr
-          || (e as Error & {stderr?: string; stdout?: string}).stdout
-          || (e as Error).message
+          (e as Error & {stderr?: string; stdout?: string}).stderr ||
+          (e as Error & {stderr?: string; stdout?: string}).stdout ||
+          (e as Error).message
         }`,
     );
   }
@@ -148,9 +152,9 @@ export async function clearLockCredential(
     throw new Error(
       `Cannot clear device lock credential. ` +
         `Original error: ${
-          (e as Error & {stderr?: string; stdout?: string}).stderr
-          || (e as Error & {stderr?: string; stdout?: string}).stdout
-          || (e as Error).message
+          (e as Error & {stderr?: string; stdout?: string}).stderr ||
+          (e as Error & {stderr?: string; stdout?: string}).stdout ||
+          (e as Error).message
         }`,
     );
   }
@@ -181,7 +185,9 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
     }
     throw new Error(stderr || stdout);
   } catch (e) {
-    throw new Error(`Cannot check if device lock is enabled. Original error: ${(e as Error).message}`);
+    throw new Error(
+      `Cannot check if device lock is enabled. Original error: ${(e as Error).message}`,
+    );
   }
 }
 
@@ -229,9 +235,9 @@ export async function setLockCredential(
     throw new Error(
       `Setting of device lock ${credentialType} credential failed. ` +
         `Original error: ${
-          (e as Error & {stderr?: string; stdout?: string}).stderr
-          || (e as Error & {stderr?: string; stdout?: string}).stdout
-          || (e as Error).message
+          (e as Error & {stderr?: string; stdout?: string}).stderr ||
+          (e as Error & {stderr?: string; stdout?: string}).stdout ||
+          (e as Error).message
         }`,
     );
   }
@@ -397,4 +403,3 @@ export function isScreenStateOff(dumpsys: string): boolean {
 }
 
 // #endregion
-

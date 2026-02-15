@@ -17,9 +17,9 @@ describe('lock management', function () {
     sandbox.restore();
   });
 
-    describe('isScreenStateOff', function () {
-      it('should return true if isScreenStateOff is off', async function () {
-        const dumpsys = `
+  describe('isScreenStateOff', function () {
+    it('should return true if isScreenStateOff is off', async function () {
+      const dumpsys = `
     KeyguardServiceDelegate
       showing=false
       showingAndNotOccluded=true
@@ -43,10 +43,10 @@ describe('lock management', function () {
         mCurrentUserId=0
         ...
       `;
-        expect(isScreenStateOff(dumpsys)).to.be.true;
-      });
-      it('should return true if isScreenStateOff is on', async function () {
-        const dumpsys = `
+      expect(isScreenStateOff(dumpsys)).to.be.true;
+    });
+    it('should return true if isScreenStateOff is on', async function () {
+      const dumpsys = `
     KeyguardServiceDelegate
       showing=false
       showingAndNotOccluded=true
@@ -70,23 +70,23 @@ describe('lock management', function () {
         mCurrentUserId=0
         ...
       `;
-        expect(isScreenStateOff(dumpsys)).to.be.false;
-      });
+      expect(isScreenStateOff(dumpsys)).to.be.false;
     });
+  });
 
-    describe('isShowingLockscreen', function () {
-      it('should return true if mShowingLockscreen is true', async function () {
-        const dumpsys =
-          'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
-        expect(await isShowingLockscreen(dumpsys)).to.be.true;
-      });
-      it('should return true if mDreamingLockscreen is true', async function () {
-        const dumpsys =
-          'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
-        expect(await isShowingLockscreen(dumpsys)).to.be.true;
-      });
-      it('should assume that screen is unlocked if keyguard is shown, but mInputRestricted is false', async function () {
-        const dumpsys = `
+  describe('isShowingLockscreen', function () {
+    it('should return true if mShowingLockscreen is true', async function () {
+      const dumpsys =
+        'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      expect(await isShowingLockscreen(dumpsys)).to.be.true;
+    });
+    it('should return true if mDreamingLockscreen is true', async function () {
+      const dumpsys =
+        'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
+      expect(await isShowingLockscreen(dumpsys)).to.be.true;
+    });
+    it('should assume that screen is unlocked if keyguard is shown, but mInputRestricted is false', async function () {
+      const dumpsys = `
       KeyguardServiceDelegate
       ....
         KeyguardStateMonitor
@@ -96,19 +96,19 @@ describe('lock management', function () {
           mCurrentUserId=0
           ...
       `;
-        expect(await isShowingLockscreen(dumpsys)).to.be.false;
-      });
-      it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
-        const dumpsys =
-          'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
-        expect(await isShowingLockscreen(dumpsys)).to.be.false;
-      });
-      it('should assume that screen is unlocked if can not determine lock state', async function () {
-        const dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
-        expect(await isShowingLockscreen(dumpsys)).to.be.false;
-      });
-      it('should assume that screen is locked if mInputRestricted and mIsShowing were true', async function () {
-        const dumpsys = `
+      expect(await isShowingLockscreen(dumpsys)).to.be.false;
+    });
+    it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
+      const dumpsys =
+        'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      expect(await isShowingLockscreen(dumpsys)).to.be.false;
+    });
+    it('should assume that screen is unlocked if can not determine lock state', async function () {
+      const dumpsys = 'mShowingDream=false mTopIsFullscreen=false';
+      expect(await isShowingLockscreen(dumpsys)).to.be.false;
+    });
+    it('should assume that screen is locked if mInputRestricted and mIsShowing were true', async function () {
+      const dumpsys = `
       KeyguardServiceDelegate
       ....
         KeyguardStateMonitor
@@ -118,10 +118,10 @@ describe('lock management', function () {
           mCurrentUserId=0
           ...
       `;
-        expect(await isShowingLockscreen(dumpsys)).to.be.true;
-      });
-      it('should assume that screen is unlocked if mIsShowing was false', async function () {
-        const dumpsys = `
+      expect(await isShowingLockscreen(dumpsys)).to.be.true;
+    });
+    it('should assume that screen is unlocked if mIsShowing was false', async function () {
+      const dumpsys = `
       KeyguardServiceDelegate
       ....
         KeyguardStateMonitor
@@ -131,7 +131,7 @@ describe('lock management', function () {
           mCurrentUserId=0
           ...
       `;
-        expect(await isShowingLockscreen(dumpsys)).to.be.false;
-      });
+      expect(await isShowingLockscreen(dumpsys)).to.be.false;
     });
   });
+});

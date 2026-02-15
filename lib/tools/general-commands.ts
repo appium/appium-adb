@@ -87,9 +87,7 @@ export async function getApiLevel(this: ADB): Promise<number> {
         throw new Error(`The actual output '${strOutput}' cannot be converted to an integer`);
       }
     } catch (e) {
-      throw new Error(
-        `Error getting device API level. Original error: ${(e as Error).message}`,
-      );
+      throw new Error(`Error getting device API level. Original error: ${(e as Error).message}`);
     }
   }
   return this._apiLevel as number;
@@ -305,10 +303,7 @@ export async function isIncrementalInstallSupported(this: ADB): Promise<boolean>
  * Note that only recent Android APIs provide multi-screen support.
  * @returns PNG screenshot payload
  */
-export async function takeScreenshot(
-  this: ADB,
-  displayId?: number | string,
-): Promise<Buffer> {
+export async function takeScreenshot(this: ADB, displayId?: number | string): Promise<Buffer> {
   const args = [...this.executable.defaultArgs, 'exec-out', 'screencap', '-p'];
   // @ts-ignore This validation works as expected
   const displayIdStr = isNaN(Number(displayId)) ? null : `${displayId}`;
@@ -339,4 +334,3 @@ export async function takeScreenshot(
   }
   return stdout;
 }
-

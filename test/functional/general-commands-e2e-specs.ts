@@ -232,7 +232,7 @@ describe('general commands', function () {
       '/data/local/tmp/$VAR-file.txt',
       '/data/local/tmp/brace{1}.txt',
       '/data/local/tmp/semicolon;and&and.txt',
-      '/data/local/tmp/-dashfile.txt'
+      '/data/local/tmp/-dashfile.txt',
     ]) {
       it(`should push file to a valid location ${remotePath}`, async function () {
         await adb.push(localFile, remotePath);
@@ -328,10 +328,10 @@ describe('general commands', function () {
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     const cases: Array<{name: string; textSuffix: string}> = [
       {name: 'should input text without special characters', textSuffix: 'text'},
-      {name: 'should input text with special characters', textSuffix: "special ()<>|;&*\\~^\"'$`"},
+      {name: 'should input text with special characters', textSuffix: 'special ()<>|;&*\\~^"\'$`'},
     ];
 
-    cases.forEach(({ name, textSuffix }) => {
+    cases.forEach(({name, textSuffix}) => {
       it(name, async function () {
         // Focus the text input field
         await adb.keyevent(['KEYCODE_BUTTON_START']);
