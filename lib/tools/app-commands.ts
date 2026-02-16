@@ -14,6 +14,8 @@ import type {
   StartAppOptions,
   AppInfo,
   PackageActivityInfo,
+  installedPackagesOptions,
+  installedPackagesResult,
 } from './types.js';
 
 // Constants
@@ -493,29 +495,70 @@ export async function isAppInstalled(
       isInstalled = false;
     }
   } else {
-    const cmd = ['cmd', 'package', 'list', 'packages'];
-    if (util.hasValue(user)) {
-      cmd.push('--user', user);
-    }
-    let stdout: string;
-    try {
-      stdout = await this.shell(cmd);
-    } catch (e) {
-      const error = e as ExecError;
-      // https://github.com/appium/appium-uiautomator2-driver/issues/810
-      if (
-        _.includes(error.stderr || error.stdout || error.message, 'access user') &&
-        _.isEmpty(user)
-      ) {
-        stdout = await this.shell([...cmd, '--user', '0']);
-      } else {
-        throw e;
-      }
-    }
-    isInstalled = new RegExp(`^package:${_.escapeRegExp(pkg)}$`, 'm').test(stdout);
+    const installedPAckages = await this.installedPackages(opts);
+    isInstalled = installedPAckages.some((p) => p.appPackage === pkg);
   }
   log.debug(`'${pkg}' is${!isInstalled ? ' not' : ''} installed`);
   return isInstalled;
+}
+
+/**
+ * Retrieves a list of installed packages on the device.
+ *
+ * @param this - The ADB instance
+ * @param opts - Options for retrieving installed packages
+ * @returns A promise that resolves to an array of installed package information,
+ *          including package name and optional version code (for API level 28+)
+ * @throws {Error} If there is an error while retrieving the package list
+ *
+ */
+export async function installedPackages(
+  this: ADB,
+  opts: installedPackagesOptions = {},
+): Promise<installedPackagesResult[]> {
+  const apiLevel = await this.getApiLevel();
+  if (apiLevel < 26) {
+    log.info(`Getting installed app requires Android API Level 26 and older`);
+    return [];
+  }
+
+  const {user} = opts;
+  const cmd = ['cmd', 'package', 'list', 'packages'];
+
+  if (apiLevel >= 28) {
+    cmd.push('--show-versioncode');
+  }
+
+  if (util.hasValue(user)) {
+    cmd.push('--user', user);
+  }
+
+  let stdout: string;
+  try {
+    stdout = await this.shell(cmd);
+  } catch (e) {
+    const error = e as ExecError;
+    // https://github.com/appium/appium-uiautomator2-driver/issues/810
+    if (
+      _.includes(error.stderr || error.stdout || error.message, 'access user') &&
+      _.isEmpty(user)
+    ) {
+      stdout = await this.shell([...cmd, '--user', '0']);
+    } else {
+      throw e;
+    }
+  }
+
+  // Parse the output: "package:com.example.app" or "package:com.example.app versionCode:123"
+  const packageRegex = /^package:(\S+)(?:\s+versionCode:(\d+))?/gm;
+  const result: installedPackagesResult[] = [];
+  for (const match of stdout.matchAll(packageRegex)) {
+    result.push({
+      appPackage: match[1],
+      versionCode: match[2] ? match[2] : null,
+    });
+  }
+  return result;
 }
 
 /**

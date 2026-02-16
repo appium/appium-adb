@@ -313,6 +313,25 @@ export interface IsAppInstalledOptions {
   user?: string;
 }
 
+export interface installedPackagesOptions {
+  /**
+   * The user id
+   */
+  user?: string;
+}
+
+export interface installedPackagesResult {
+  /**
+   * The app package name
+   */
+  appPackage: string;
+  /**
+   * The app package version code for API level 28+,
+   * otherwise null.
+   */
+  versionCode: string | null;
+}
+
 export interface StartUriOptions {
   /**
    * If `false` then adb won't wait

@@ -205,6 +205,7 @@ export class ADB implements ADBOptions {
   clear = appCommands.clear;
   readonly APP_INSTALL_STATE = appCommands.APP_INSTALL_STATE;
   isAppInstalled = appCommands.isAppInstalled;
+  installedPackages = appCommands.installedPackages;
   startUri = appCommands.startUri;
   startApp = appCommands.startApp;
   dumpWindows = appCommands.dumpWindows;

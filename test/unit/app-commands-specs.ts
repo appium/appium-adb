@@ -123,6 +123,70 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
     });
   });
 
+  describe('installedPackages', function () {
+    it('should parse package names and version codes from shell output', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(28);
+      const mockOutput = `package:com.android.managedprovisioning versionCode:35
+package:com.google.android.apps.wallpaper.nexus versionCode:170000000
+package:com.android.chrome versionCode:636771932`;
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode'])
+        .returns(mockOutput);
+      const result = await adb.installedPackages();
+      expect(result).to.eql([
+        {appPackage: 'com.android.managedprovisioning', versionCode: '35'},
+        {appPackage: 'com.google.android.apps.wallpaper.nexus', versionCode: '170000000'},
+        {appPackage: 'com.android.chrome', versionCode: '636771932'},
+      ]);
+    });
+    it('should parse package names without version code', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(27);
+      const mockOutput = `package:com.android.managedprovisioning
+package:com.google.android.apps.wallpaper.nexus
+package:com.android.chrome`;
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages'])
+        .returns(mockOutput);
+      const result = await adb.installedPackages();
+      expect(result).to.eql([
+        {appPackage: 'com.android.managedprovisioning', versionCode: null},
+        {appPackage: 'com.google.android.apps.wallpaper.nexus', versionCode: null},
+        {appPackage: 'com.android.chrome', versionCode: null},
+      ]);
+    });
+    it('should return an array', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(25);
+      const result = await adb.installedPackages();
+      expect(result).to.eql([]);
+    });
+    it('should handle user option with api level 26', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(26);
+      const mockOutput = `package:com.android.chrome`;
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--user', '10'])
+        .returns(mockOutput);
+      const result = await adb.installedPackages({user: '10'});
+      expect(result).to.eql([{appPackage: 'com.android.chrome', versionCode: null}]);
+    });
+    it('should handle user option with api level 28', async function () {
+      mocks.adb.expects('getApiLevel').once().returns(28);
+      const mockOutput = `package:com.android.chrome versionCode:636771932`;
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode', '--user', '10'])
+        .returns(mockOutput);
+      const result = await adb.installedPackages({user: '10'});
+      expect(result).to.eql([{appPackage: 'com.android.chrome', versionCode: '636771932'}]);
+    });
+  });
+
   describe('startUri', function () {
     it('should call shell with correct args', async function () {
       const uri = 'https://example.com';
