@@ -92,9 +92,7 @@ export async function compileManifest(
   manifestPackage: string,
   targetPackage: string,
 ): Promise<void> {
-  const {platform, platformPath} = await getAndroidPlatformAndPath(
-    this.sdkRoot as string,
-  );
+  const {platform, platformPath} = await getAndroidPlatformAndPath(this.sdkRoot as string);
   if (!platform || !platformPath) {
     throw new Error(
       'Cannot compile the manifest. The required platform does not exist (API level >= 17)',
@@ -123,9 +121,7 @@ export async function compileManifest(
       androidJarPath,
       '-v',
     ];
-    log.debug(
-      `Compiling the manifest using '${util.quote([binaries.aapt2, ...args])}'`,
-    );
+    log.debug(`Compiling the manifest using '${util.quote([binaries.aapt2, ...args])}'`);
     await exec(binaries.aapt2, args);
   } catch (e) {
     log.debug(
@@ -148,9 +144,7 @@ export async function compileManifest(
       resultPath,
       '-f',
     ];
-    log.debug(
-      `Compiling the manifest using '${util.quote([binaries.aapt, ...args])}'`,
-    );
+    log.debug(`Compiling the manifest using '${util.quote([binaries.aapt, ...args])}'`);
     try {
       await exec(binaries.aapt, args);
     } catch (e1) {
@@ -286,4 +280,3 @@ export async function getAndroidPlatformAndPath(sdkRoot: string): Promise<Platfo
 }
 
 // #endregion
-

@@ -97,11 +97,7 @@ async function extractFromApks(apks: string, dstPath: string | string[]): Promis
  * @throws {Error} If bundletool jar does not exist in PATH or there was an error while
  * executing it
  */
-export async function execBundletool(
-  this: ADB,
-  args: string[],
-  errorMsg: string,
-): Promise<string> {
+export async function execBundletool(this: ADB, args: string[], errorMsg: string): Promise<string> {
   await this.initBundletool();
   const binaries = this.binaries as StringRecord;
   args = ['-jar', binaries.bundletool, ...args];
@@ -279,4 +275,3 @@ export async function extractLanguageApk(
 export function isTestPackageOnlyError(output: string): boolean {
   return /\[INSTALL_FAILED_TEST_ONLY\]/.test(output);
 }
-
