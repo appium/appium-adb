@@ -1,3 +1,9 @@
+## [14.2.2](https://github.com/appium/appium-adb/compare/v14.2.1...v14.2.2) (2026-02-16)
+
+### Bug Fixes
+
+* format ([#864](https://github.com/appium/appium-adb/issues/864)) ([32fcecd](https://github.com/appium/appium-adb/commit/32fcecd77eef1e1469b984ab84eab58be2f5055c))
+
 ## [14.2.1](https://github.com/appium/appium-adb/compare/v14.2.0...v14.2.1) (2026-02-06)
 
 ### Miscellaneous Chores
