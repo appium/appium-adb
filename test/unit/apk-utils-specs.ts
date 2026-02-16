@@ -86,9 +86,9 @@ describe('Apk-utils', function () {
       mocks.adb.expects('shell').once().withExactArgs(['pm', 'path', pkg]).throws();
       expect(await adb.isAppInstalled(pkg)).to.be.false;
     });
-    it('should parse correctly and return true for newer versions', async function () {
+    it('should parse correctly and return true for api level 26-27', async function () {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel').returns(26);
+      mocks.adb.expects('getApiLevel').twice().returns(26);
       mocks.adb
         .expects('shell')
         .once()
@@ -96,14 +96,34 @@ describe('Apk-utils', function () {
         .returns(`package:dummy.package\npackage:other.package\n`);
       expect(await adb.isAppInstalled(pkg)).to.be.true;
     });
-    it('should parse correctly and return false for newer versions', async function () {
+    it('should parse correctly and return false for api level 26-27', async function () {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel').returns(26);
+      mocks.adb.expects('getApiLevel').twice().returns(26);
       mocks.adb
         .expects('shell')
         .once()
         .withExactArgs(['cmd', 'package', 'list', 'packages'])
         .returns(`package:dummy.package1`);
+      expect(await adb.isAppInstalled(pkg)).to.be.false;
+    });
+    it('should parse correctly and return true for api level 28+', async function () {
+      const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel').twice().returns(28);
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode'])
+        .returns(`package:dummy.package versionCode:1\npackage:other.package versionCode:2\n`);
+      expect(await adb.isAppInstalled(pkg)).to.be.true;
+    });
+    it('should parse correctly and return false for api level 28+', async function () {
+      const pkg = 'dummy.package';
+      mocks.adb.expects('getApiLevel').twice().returns(28);
+      mocks.adb
+        .expects('shell')
+        .once()
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode'])
+        .returns(`package:dummy.package1 versionCode:1`);
       expect(await adb.isAppInstalled(pkg)).to.be.false;
     });
     it('should parse correctly and return true for older versions with user', async function () {
@@ -125,22 +145,22 @@ describe('Apk-utils', function () {
 
     it('should parse correctly and return true for newer versions with user', async function () {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel').returns(26);
+      mocks.adb.expects('getApiLevel').twice().returns(28);
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['cmd', 'package', 'list', 'packages', '--user', '1'])
-        .returns(`package:dummy.package\npackage:other.package\n`);
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode', '--user', '1'])
+        .returns(`package:dummy.package versionCode:1\npackage:other.package versionCode:2\n`);
       expect(await adb.isAppInstalled(pkg, {user: '1'})).to.be.true;
     });
     it('should parse correctly and return false for newer versions with user', async function () {
       const pkg = 'dummy.package';
-      mocks.adb.expects('getApiLevel').returns(26);
+      mocks.adb.expects('getApiLevel').twice().returns(28);
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['cmd', 'package', 'list', 'packages', '--user', '1'])
-        .returns(`package:dummy.package1`);
+        .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode', '--user', '1'])
+        .returns(`package:dummy.package1 versionCode:1`);
       expect(await adb.isAppInstalled(pkg, {user: '1'})).to.be.false;
     });
   });
