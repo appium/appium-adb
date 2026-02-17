@@ -518,7 +518,7 @@ export async function installedPackages(
 ): Promise<installedPackagesResult[]> {
   const apiLevel = await this.getApiLevel();
   if (apiLevel < 26) {
-    log.info(`Getting installed app requires Android API Level 26 and older`);
+    log.info(`Getting installed appPackages requires Android API Level 26 and older`);
     return [];
   }
 
