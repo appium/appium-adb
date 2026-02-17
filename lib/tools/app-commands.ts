@@ -14,8 +14,8 @@ import type {
   StartAppOptions,
   AppInfo,
   PackageActivityInfo,
-  installedPackagesOptions,
-  installedPackagesResult,
+  ListInstalledPackagesOptions,
+  ListInstalledPackagesResult,
 } from './types.js';
 
 // Constants
@@ -495,7 +495,7 @@ export async function isAppInstalled(
       isInstalled = false;
     }
   } else {
-    const installedPAckages = await this.installedPackages(opts);
+    const installedPAckages = await this.listInstalledPackages(opts);
     isInstalled = installedPAckages.some((p) => p.appPackage === pkg);
   }
   log.debug(`'${pkg}' is${!isInstalled ? ' not' : ''} installed`);
@@ -505,17 +505,16 @@ export async function isAppInstalled(
 /**
  * Retrieves a list of installed packages on the device.
  *
- * @param this - The ADB instance
  * @param opts - Options for retrieving installed packages
  * @returns A promise that resolves to an array of installed package information,
  *          including package name and optional version code (for API level 28+)
  * @throws {Error} If there is an error while retrieving the package list
  *
  */
-export async function installedPackages(
+export async function listInstalledPackages(
   this: ADB,
-  opts: installedPackagesOptions = {},
-): Promise<installedPackagesResult[]> {
+  opts: ListInstalledPackagesOptions = {},
+): Promise<ListInstalledPackagesResult[]> {
   const apiLevel = await this.getApiLevel();
   if (apiLevel < 26) {
     log.info(`Getting installed appPackages requires Android API Level 26 and older`);
@@ -551,7 +550,7 @@ export async function installedPackages(
 
   // Parse the output: "package:com.example.app" or "package:com.example.app versionCode:123"
   const packageRegex = /^package:(\S+)(?:\s+versionCode:(\d+))?/gm;
-  const result: installedPackagesResult[] = [];
+  const result: ListInstalledPackagesResult[] = [];
   for (const match of stdout.matchAll(packageRegex)) {
     result.push({
       appPackage: match[1],

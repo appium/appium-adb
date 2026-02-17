@@ -313,14 +313,14 @@ export interface IsAppInstalledOptions {
   user?: string;
 }
 
-export interface installedPackagesOptions {
+export interface ListInstalledPackagesOptions {
   /**
    * The user id
    */
   user?: string;
 }
 
-export interface installedPackagesResult {
+export interface ListInstalledPackagesResult {
   /**
    * The app package name
    */
