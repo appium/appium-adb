@@ -507,7 +507,8 @@ export async function isAppInstalled(
  *
  * @param opts - Options for retrieving installed packages
  * @returns A promise that resolves to an array of installed package information,
- *          including package name and optional version code (for API level 28+)
+ *          including package name (for API level 26+) and optional version code (for API level 28+).
+ *          Otherwise it returns an empty array.
  * @throws {Error} If there is an error while retrieving the package list
  *
  */
