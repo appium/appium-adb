@@ -158,11 +158,6 @@ package:com.android.chrome`;
         {appPackage: 'com.android.chrome', versionCode: null},
       ]);
     });
-    it('should return an array', async function () {
-      mocks.adb.expects('getApiLevel').once().returns(25);
-      const result = await adb.listInstalledPackages();
-      expect(result).to.eql([]);
-    });
     it('should handle user option with api level 26', async function () {
       mocks.adb.expects('getApiLevel').once().returns(26);
       const mockOutput = `package:com.android.chrome`;

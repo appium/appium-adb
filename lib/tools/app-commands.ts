@@ -516,15 +516,10 @@ export async function listInstalledPackages(
   this: ADB,
   opts: ListInstalledPackagesOptions = {},
 ): Promise<ListInstalledPackagesResult[]> {
-  const apiLevel = await this.getApiLevel();
-  if (apiLevel < 26) {
-    return [];
-  }
-
   const {user} = opts;
   const cmd = ['cmd', 'package', 'list', 'packages'];
 
-  if (apiLevel >= 28) {
+  if ((await this.getApiLevel()) >= 28) {
     cmd.push('--show-versioncode');
   }
 
@@ -551,13 +546,10 @@ export async function listInstalledPackages(
   // Parse the output: "package:com.example.app" or "package:com.example.app versionCode:123"
   const packageRegex = /^package:(\S+)(?:\s+versionCode:(\d+))?/gm;
   const result: ListInstalledPackagesResult[] = [];
-  for (const match of stdout.matchAll(packageRegex)) {
-    result.push({
-      appPackage: match[1],
-      versionCode: match[2] ? match[2] : null,
-    });
-  }
-  return result;
+  return Array.from(stdout.matchAll(packageRegex), (match) => ({
+    appPackage: match[1],
+    versionCode: match[2] || null,
+  }));
 }
 
 /**
