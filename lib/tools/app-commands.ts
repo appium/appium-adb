@@ -504,11 +504,11 @@ export async function isAppInstalled(
 
 /**
  * Retrieves a list of installed packages on the device.
+ * Lower than API Level 26 would raise an exception.
  *
  * @param opts - Options for retrieving installed packages
  * @returns A promise that resolves to an array of installed package information,
  *          including package name (for API level 26+) and optional version code (for API level 28+).
- *          Otherwise it returns an empty array.
  * @throws {Error} If there is an error while retrieving the package list
  *
  */
