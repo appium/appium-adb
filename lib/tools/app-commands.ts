@@ -545,7 +545,6 @@ export async function listInstalledPackages(
 
   // Parse the output: "package:com.example.app" or "package:com.example.app versionCode:123"
   const packageRegex = /^package:(\S+)(?:\s+versionCode:(\d+))?/gm;
-  const result: ListInstalledPackagesResult[] = [];
   return Array.from(stdout.matchAll(packageRegex), (match) => ({
     appPackage: match[1],
     versionCode: match[2] || null,
