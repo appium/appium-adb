@@ -1,3 +1,9 @@
+## [14.3.0](https://github.com/appium/appium-adb/compare/v14.2.2...v14.3.0) (2026-02-18)
+
+### Features
+
+* add installedPackages ([#865](https://github.com/appium/appium-adb/issues/865)) ([a9f5eb3](https://github.com/appium/appium-adb/commit/a9f5eb362619188f072dd9f05715e536f51f71ed))
+
 ## [14.2.2](https://github.com/appium/appium-adb/compare/v14.2.1...v14.2.2) (2026-02-16)
 
 ### Bug Fixes
