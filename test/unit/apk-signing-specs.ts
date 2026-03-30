@@ -4,6 +4,7 @@ import path from 'node:path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
+import type {ZipEntry} from '@appium/support';
 import sinon from 'sinon';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 import {APIDEMOS_PKG} from '../constants';
@@ -191,7 +192,10 @@ describe('signing', function () {
       /* eslint-disable promise/prefer-await-to-callbacks -- zip.readEntries is callback-based */
       sandbox.stub(zip, 'readEntries').callsFake(async (apkPath, callback) => {
         // Call callback with a non-META-INF entry so hasMetaInf stays false
-        callback({entry: {fileName: 'AndroidManifest.xml'}});
+        callback({
+          entry: {fileName: 'AndroidManifest.xml'},
+          extractEntryTo: async () => {},
+        } as ZipEntry);
       });
       /* eslint-enable promise/prefer-await-to-callbacks */
       await adb.signWithCustomCert(apiDemosPath);
