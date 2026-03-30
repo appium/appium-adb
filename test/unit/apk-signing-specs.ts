@@ -171,41 +171,30 @@ describe('signing', function () {
       innerExecStub = sandbox.stub();
       innerExecStub.withArgs(javaDummyPath).throws(new Error('apksigner failed'));
       innerExecStub
-        .withArgs(
-          jarsigner,
-          [
-            '-sigalg',
-            'MD5withRSA',
-            '-digestalg',
-            'SHA1',
-            '-keystore',
-            keystorePath,
-            '-storepass',
-            password,
-            '-keypass',
-            password,
-            apiDemosPath,
-            keyAlias,
-          ],
-          {windowsVerbatimArguments: appiumSupport.system.isWindows()},
-        )
+        .withArgs(jarsigner, [
+          '-sigalg',
+          'MD5withRSA',
+          '-digestalg',
+          'SHA1',
+          '-keystore',
+          keystorePath,
+          '-storepass',
+          password,
+          '-keypass',
+          password,
+          apiDemosPath,
+          keyAlias,
+        ])
         .returns({});
       sandbox.stub(teen_process, 'exec').get(() => innerExecStub);
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
-      // We need to stub the actual zip object since it's imported as a named import
-      const originalReadEntries = zip.readEntries;
-      // eslint-disable-next-line promise/prefer-await-to-callbacks
-      zip.readEntries = async (apkPath, callback) => {
+      /* eslint-disable promise/prefer-await-to-callbacks -- zip.readEntries is callback-based */
+      sandbox.stub(zip, 'readEntries').callsFake(async (apkPath, callback) => {
         // Call callback with a non-META-INF entry so hasMetaInf stays false
-        // eslint-disable-next-line promise/prefer-await-to-callbacks
         callback({entry: {fileName: 'AndroidManifest.xml'}});
-      };
-      try {
-        await adb.signWithCustomCert(apiDemosPath);
-      } finally {
-        // Restore original function
-        zip.readEntries = originalReadEntries;
-      }
+      });
+      /* eslint-enable promise/prefer-await-to-callbacks */
+      await adb.signWithCustomCert(apiDemosPath);
       expect(innerExecStub.callCount).to.eql(2);
     });
   });
