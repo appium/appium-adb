@@ -55,7 +55,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
     - run: npm install --no-package-lock
       name: Install dev dependencies
     - name: AVD cache
