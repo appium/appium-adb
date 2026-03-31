@@ -1,3 +1,9 @@
+## [14.3.1](https://github.com/appium/appium-adb/compare/v14.3.0...v14.3.1) (2026-03-31)
+
+### Bug Fixes
+
+* Windows APK signature verification when Java/SDK paths contain spaces ([#868](https://github.com/appium/appium-adb/issues/868)) ([ca8b31e](https://github.com/appium/appium-adb/commit/ca8b31e4d92c9c1f0079241f8bed0424a48dd37a))
+
 ## [14.3.0](https://github.com/appium/appium-adb/compare/v14.2.2...v14.3.0) (2026-02-18)
 
 ### Features
