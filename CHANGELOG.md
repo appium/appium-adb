@@ -1,3 +1,10 @@
+## [14.3.2](https://github.com/appium/appium-adb/compare/v14.3.1...v14.3.2) (2026-04-10)
+
+### Miscellaneous Chores
+
+* **deps-dev:** Bump typescript from 5.9.3 to 6.0.2 ([#866](https://github.com/appium/appium-adb/issues/866)) ([cd35032](https://github.com/appium/appium-adb/commit/cd350321b5a75612d35f5367f76675e175fb69a5))
+* **deps:** Bump android-actions/setup-android from 3 to 4 ([#869](https://github.com/appium/appium-adb/issues/869)) ([f454e28](https://github.com/appium/appium-adb/commit/f454e28e5ae971e094d8e0747914d7d805ee4a47))
+
 ## [14.3.1](https://github.com/appium/appium-adb/compare/v14.3.0...v14.3.1) (2026-03-31)
 
 ### Bug Fixes
