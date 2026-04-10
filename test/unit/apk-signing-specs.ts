@@ -198,7 +198,10 @@ describe('signing', function () {
       zip.readEntries = async (apkPath, callback) => {
         // Call callback with a non-META-INF entry so hasMetaInf stays false
         // eslint-disable-next-line promise/prefer-await-to-callbacks
-        callback({entry: {fileName: 'AndroidManifest.xml'}});
+        callback({
+          entry: {fileName: 'AndroidManifest.xml'} as any,
+          extractEntryTo: async () => {},
+        });
       };
       try {
         await adb.signWithCustomCert(apiDemosPath);
