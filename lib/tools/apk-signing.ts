@@ -40,8 +40,6 @@ export async function executeApksigner(this: ADB, args: string[]): Promise<strin
   // It is necessary to specify CWD explicitly; see https://github.com/appium/appium/issues/14724#issuecomment-737446715
   const {stdout, stderr} = await exec(fullCmd[0], fullCmd.slice(1), {
     cwd: path.dirname(apkSignerJar),
-    // @ts-ignore This works
-    windowsVerbatimArguments: system.isWindows(),
   });
   for (const [name, stream] of [
     ['stdout', stdout],
@@ -157,10 +155,7 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
         this.keyAlias as string,
       ];
       log.debug(`Starting jarsigner: ${util.quote(fullCmd)}`);
-      await exec(fullCmd[0], fullCmd.slice(1), {
-        // @ts-ignore This works
-        windowsVerbatimArguments: system.isWindows(),
-      });
+      await exec(fullCmd[0], fullCmd.slice(1));
     } catch (e) {
       const execErr = e as ExecError;
       throw new Error(
@@ -378,10 +373,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
   ];
   log.info(`Running '${keytool}' with arguments: ${util.quote(args)}`);
   try {
-    const {stdout} = await exec(keytool, args, {
-      // @ts-ignore This property is ok
-      windowsVerbatimArguments: system.isWindows(),
-    });
+    const {stdout} = await exec(keytool, args);
     const result: KeystoreHash = {};
     for (const hashName of [SHA512, SHA256, SHA1, MD5]) {
       const hashRe = new RegExp(`^\\s*${hashName}:\\s*([a-f0-9:]+)`, 'mi');
