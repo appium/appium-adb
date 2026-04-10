@@ -2,7 +2,7 @@
   "name": "appium-adb",
   "version": "14.3.1",
   "description": "Android Debug Bridge interface",
-  "main": "./build/index.js",
+  "main": "./build/lib/index.js",
   "scripts": {
     "build": "tsc -b",
     "clean": "npm run build -- --clean",
@@ -39,10 +39,8 @@
     "singleQuote": true
   },
   "files": [
-    "index.ts",
     "keys",
     "lib",
-    "build/index.*",
     "build/lib",
     "CHANGELOG.md"
   ],
@@ -80,7 +78,7 @@
     "semantic-release": "^25.0.2",
     "sinon": "^21.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.4.2"
+    "typescript": "^6.0.2"
   },
-  "types": "./build/index.d.ts"
+  "types": "./build/lib/index.d.ts"
 }

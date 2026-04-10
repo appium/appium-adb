@@ -1,8 +1,8 @@
-import {log} from '../logger.js';
+import {log} from '../logger';
 import {waitForCondition} from 'asyncbox';
 import B from 'bluebird';
-import type {ADB} from '../adb.js';
-import type {KeyboardState} from './types.js';
+import type {ADB} from '../adb';
+import type {KeyboardState} from './types';
 
 const KEYCODE_ESC = 111;
 const KEYCODE_BACK = 4;

@@ -1,14 +1,14 @@
 import path from 'node:path';
-import {log} from '../logger.js';
+import {log} from '../logger';
 import B from 'bluebird';
 import {system, fs, util, tempDir, timing} from '@appium/support';
-import {DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv} from '../helpers.js';
+import {DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv} from '../helpers';
 import {exec, SubProcess} from 'teen_process';
 import type {ExecError, TeenProcessExecResult} from 'teen_process';
 import {retry, retryInterval, waitForCondition} from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 import type {
   ConnectedDevicesOptions,
   Device,
@@ -19,7 +19,7 @@ import type {
   SpecialAdbExecOptions,
   TFullOutputOption,
   ExecResult,
-} from './types.js';
+} from './types';
 
 const DEFAULT_ADB_REBOOT_RETRIES = 90;
 const LINKER_WARNING_REGEXP = /^WARNING: linker.+$/m;

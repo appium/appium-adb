@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import {log} from '../logger.js';
+import {log} from '../logger';
 import B from 'bluebird';
 import type {ExecError} from 'teen_process';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 
 const PID_COLUMN_TITLE: string = 'PID';
 const PROCESS_NAME_COLUMN_TITLE: string = 'NAME';

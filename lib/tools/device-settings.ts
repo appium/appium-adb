@@ -1,10 +1,10 @@
-import {log} from '../logger.js';
+import {log} from '../logger';
 import _ from 'lodash';
 import {retryInterval} from 'asyncbox';
 import {util} from '@appium/support';
 import B from 'bluebird';
-import type {ADB} from '../adb.js';
-import type {SetPropOpts} from './types.js';
+import type {ADB} from '../adb';
+import type {SetPropOpts} from './types';
 import type {ExecError} from 'teen_process';
 
 const ANIMATION_SCALE_KEYS = [

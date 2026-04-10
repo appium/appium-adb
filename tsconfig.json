@@ -8,5 +8,11 @@
     "types": ["node", "mocha"],
     "strict": false
   },
-  "include": ["index.ts", "lib", "test"]
+  "ts-node": {
+    "transpileOnly": true,
+    "compilerOptions": {
+      "rootDir": "."
+    }
+  },
+  "include": ["lib", "test"]
 }

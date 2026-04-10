@@ -1,7 +1,7 @@
 import {ADB} from '../../lib/adb';
 import {MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT} from './setup';
 import path from 'node:path';
-import {getResourcePath} from '../../lib/helpers.js';
+import {getResourcePath} from '../../lib/helpers';
 import {fs} from '@appium/support';
 import _ from 'lodash';
 import chai, {expect} from 'chai';

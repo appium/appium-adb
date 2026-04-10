@@ -1,5 +1,5 @@
 import {ADB} from '../../lib/adb';
-import * as helpers from '../../lib/helpers.js';
+import * as helpers from '../../lib/helpers';
 import path from 'node:path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';

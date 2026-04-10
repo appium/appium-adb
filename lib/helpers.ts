@@ -1,10 +1,10 @@
 import path from 'node:path';
 import {system, fs, zip, util} from '@appium/support';
-import {log} from './logger.js';
+import {log} from './logger';
 import _ from 'lodash';
 import {exec, type ExecError} from 'teen_process';
-import type {ADB} from './adb.js';
-import type {ApkManifest} from './tools/types.js';
+import type {ADB} from './adb';
+import type {ApkManifest} from './tools/types';
 
 // Declare __filename for CommonJS compatibility
 declare const __filename: string;

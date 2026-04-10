@@ -1,11 +1,11 @@
-import {log} from '../logger.js';
+import {log} from '../logger';
 import _ from 'lodash';
 import net from 'node:net';
 import {util, fs} from '@appium/support';
 import B from 'bluebird';
 import path from 'node:path';
 import * as ini from 'ini';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 import type {
   EmuInfo,
   EmuVersionInfo,
@@ -17,7 +17,7 @@ import type {
   GsmVoiceStates,
   NetworkSpeed,
   ExecTelnetOptions,
-} from './types.js';
+} from './types';
 
 /**
  * Retrieves the list of available Android emulators
