@@ -2,7 +2,7 @@ import {ADB} from '../../lib/adb';
 import path from 'node:path';
 import {fs, tempDir} from '@appium/support';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup';
-import {requireSdkRoot, readPackageManifest} from '../../lib/helpers.js';
+import {requireSdkRoot, readPackageManifest} from '../../lib/helpers';
 import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';

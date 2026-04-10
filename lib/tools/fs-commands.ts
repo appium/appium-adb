@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import path from 'node:path';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 import type {TeenProcessExecOptions} from 'teen_process';
 
 function shellEscapeSingleQuotes(str: string): string {

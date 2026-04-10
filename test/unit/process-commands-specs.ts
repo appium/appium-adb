@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
 import net from 'node:net';
-import {Logcat} from '../../lib/logcat.js';
+import {Logcat} from '../../lib/logcat';
 import * as teen_process from 'teen_process';
 import sinon from 'sinon';
 import {APIDEMOS_PKG} from '../constants';

@@ -4,16 +4,16 @@ import {
   APK_INSTALL_TIMEOUT,
   DEFAULT_ADB_EXEC_TIMEOUT,
   readPackageManifest,
-} from '../helpers.js';
+} from '../helpers';
 import {exec, type ExecError} from 'teen_process';
-import {log} from '../logger.js';
+import {log} from '../logger';
 import path from 'node:path';
 import _ from 'lodash';
 import {fs, util, mkdirp, timing} from '@appium/support';
 import * as semver from 'semver';
 import os from 'node:os';
 import {LRUCache} from 'lru-cache';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 import type {
   UninstallOptions,
   ShellExecOptions,
@@ -25,7 +25,7 @@ import type {
   AppInfo,
   InstallState,
   StringRecord,
-} from './types.js';
+} from './types';
 
 export const REMOTE_CACHE_ROOT = '/data/local/tmp/appium_cache';
 

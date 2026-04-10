@@ -1,8 +1,8 @@
-import {log} from '../logger.js';
+import {log} from '../logger';
 import _ from 'lodash';
 import B from 'bluebird';
 import {waitForCondition} from 'asyncbox';
-import type {ADB} from '../adb.js';
+import type {ADB} from '../adb';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
