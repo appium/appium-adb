@@ -78,75 +78,6 @@ export class ADB implements ADBOptions {
   clearDeviceLogsOnStart?: boolean;
   listenAllNetwork?: boolean;
 
-  constructor(opts: ADBOptions = {} as ADBOptions) {
-    const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
-    _.defaultsDeep(this, options);
-
-    // The above defaultsDeep call guarantees the 'executable' field to be always assigned
-    this.executable = options.executable as ADBExecutable;
-
-    // do not add -a option twice if the defualtArgs already had it.
-    if (options.listenAllNetwork && !this.executable.defaultArgs.includes('-a')) {
-      this.executable.defaultArgs.push('-a');
-    } else if (this.executable.defaultArgs.includes('-a')) {
-      this.listenAllNetwork = true;
-    }
-
-    if (options.remoteAdbHost) {
-      this.executable.defaultArgs.push('-H', options.remoteAdbHost);
-      this.adbHost = options.remoteAdbHost;
-    }
-
-    // TODO figure out why we have this option as it does not appear to be
-    // used anywhere. Probably deprecate in favor of simple opts.adbPort
-    if (options.remoteAdbPort) {
-      this.adbPort = options.remoteAdbPort;
-    }
-
-    this.executable.defaultArgs.push('-P', String(this.adbPort));
-    if (options.udid) {
-      this.setDeviceId(options.udid);
-    }
-  }
-
-  /**
-   * Create a new instance of `ADB` that inherits configuration from this `ADB` instance.
-   * This avoids the need to call `ADB.createADB()` multiple times.
-   * @param opts - Additional options mapping to pass to the `ADB` constructor.
-   * @returns The resulting class instance.
-   */
-  clone(opts: ADBOptions = {} as ADBOptions): ADB {
-    const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
-    const cloneOptions = _.defaultsDeep(opts, originalOptions);
-
-    // Reset default arguments created in the constructor.
-    // Without this code, -H and -P can be injected into defaultArgs multiple times.
-    const defaultArgs = cloneOptions.executable.defaultArgs;
-    if (cloneOptions.remoteAdbHost && defaultArgs.includes('-H')) {
-      defaultArgs.splice(defaultArgs.indexOf('-H'), 2);
-    }
-    if (defaultArgs.includes('-P')) {
-      defaultArgs.splice(defaultArgs.indexOf('-P'), 2);
-    }
-
-    return new ADB(cloneOptions);
-  }
-
-  static async createADB(opts: ADBOptions = {} as ADBOptions) {
-    const adb = new ADB(opts);
-    adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
-    await adb.getAdbWithCorrectAdbPath();
-    if (!opts?.suppressKillServer) {
-      try {
-        await adb.adbExec(['start-server']);
-      } catch (e) {
-        const err = e as ExecError;
-        log.warn(err.stderr || err.message);
-      }
-    }
-    return adb;
-  }
-
   getAdbWithCorrectAdbPath = generalCommands.getAdbWithCorrectAdbPath;
   initAapt = generalCommands.initAapt;
   initAapt2 = generalCommands.initAapt2;
@@ -387,4 +318,73 @@ export class ADB implements ADBOptions {
   isAnimationOn = deviceSettingsCommands.isAnimationOn;
   setAnimationScale = deviceSettingsCommands.setAnimationScale;
   getScreenOrientation = deviceSettingsCommands.getScreenOrientation;
+
+  constructor(opts: ADBOptions = {} as ADBOptions) {
+    const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
+    _.defaultsDeep(this, options);
+
+    // The above defaultsDeep call guarantees the 'executable' field to be always assigned
+    this.executable = options.executable as ADBExecutable;
+
+    // do not add -a option twice if the defualtArgs already had it.
+    if (options.listenAllNetwork && !this.executable.defaultArgs.includes('-a')) {
+      this.executable.defaultArgs.push('-a');
+    } else if (this.executable.defaultArgs.includes('-a')) {
+      this.listenAllNetwork = true;
+    }
+
+    if (options.remoteAdbHost) {
+      this.executable.defaultArgs.push('-H', options.remoteAdbHost);
+      this.adbHost = options.remoteAdbHost;
+    }
+
+    // TODO figure out why we have this option as it does not appear to be
+    // used anywhere. Probably deprecate in favor of simple opts.adbPort
+    if (options.remoteAdbPort) {
+      this.adbPort = options.remoteAdbPort;
+    }
+
+    this.executable.defaultArgs.push('-P', String(this.adbPort));
+    if (options.udid) {
+      this.setDeviceId(options.udid);
+    }
+  }
+
+  static async createADB(opts: ADBOptions = {} as ADBOptions) {
+    const adb = new ADB(opts);
+    adb.sdkRoot = await requireSdkRoot(adb.sdkRoot);
+    await adb.getAdbWithCorrectAdbPath();
+    if (!opts?.suppressKillServer) {
+      try {
+        await adb.adbExec(['start-server']);
+      } catch (e) {
+        const err = e as ExecError;
+        log.warn(err.stderr || err.message);
+      }
+    }
+    return adb;
+  }
+
+  /**
+   * Create a new instance of `ADB` that inherits configuration from this `ADB` instance.
+   * This avoids the need to call `ADB.createADB()` multiple times.
+   * @param opts - Additional options mapping to pass to the `ADB` constructor.
+   * @returns The resulting class instance.
+   */
+  clone(opts: ADBOptions = {} as ADBOptions): ADB {
+    const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
+    const cloneOptions = _.defaultsDeep(opts, originalOptions);
+
+    // Reset default arguments created in the constructor.
+    // Without this code, -H and -P can be injected into defaultArgs multiple times.
+    const defaultArgs = cloneOptions.executable.defaultArgs;
+    if (cloneOptions.remoteAdbHost && defaultArgs.includes('-H')) {
+      defaultArgs.splice(defaultArgs.indexOf('-H'), 2);
+    }
+    if (defaultArgs.includes('-P')) {
+      defaultArgs.splice(defaultArgs.indexOf('-P'), 2);
+    }
+
+    return new ADB(cloneOptions);
+  }
 }

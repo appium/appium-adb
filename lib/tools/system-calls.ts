@@ -43,7 +43,15 @@ const MIN_DELAY_ADB_API_LEVEL = 28;
 const REQUIRED_SERVICES = ['activity', 'package', 'window'] as const;
 const MAX_SHELL_BUFFER_LENGTH = 1000;
 
-// Private methods (defined early as they're used by public methods)
+/**
+ * Retrieve full path to the given binary.
+ *
+ * @param binaryName - The name of the binary
+ * @returns The full path to the binary
+ */
+export async function getSdkBinaryPath(this: ADB, binaryName: string): Promise<string> {
+  return await this.getBinaryFromSdkRoot(binaryName);
+}
 
 /**
  * Retrieve full binary name for the current operating system.
@@ -91,18 +99,6 @@ async function getOpenSslForOs(): Promise<string> {
   } catch {
     throw new Error('The openssl tool must be installed on the system and available on the path');
   }
-}
-
-// Public methods
-
-/**
- * Retrieve full path to the given binary.
- *
- * @param binaryName - The name of the binary
- * @returns The full path to the binary
- */
-export async function getSdkBinaryPath(this: ADB, binaryName: string): Promise<string> {
-  return await this.getBinaryFromSdkRoot(binaryName);
 }
 
 export const getBinaryNameForOS = _.memoize(_getBinaryNameForOS);

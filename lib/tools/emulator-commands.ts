@@ -20,56 +20,6 @@ import type {
 } from './types';
 
 /**
- * Retrieves the list of available Android emulators
- *
- * @returns
- */
-async function listEmulators(): Promise<EmuInfo[]> {
-  let avdsRoot = process.env.ANDROID_AVD_HOME;
-  if (await dirExists(avdsRoot ?? '')) {
-    return await getAvdConfigPaths(avdsRoot as string);
-  }
-
-  if (avdsRoot) {
-    log.warn(
-      `The value of the ANDROID_AVD_HOME environment variable '${avdsRoot}' is not an existing directory`,
-    );
-  }
-
-  const prefsRoot = await getAndroidPrefsRoot();
-  if (!prefsRoot) {
-    return [];
-  }
-
-  avdsRoot = path.resolve(prefsRoot, 'avd');
-  if (!(await dirExists(avdsRoot))) {
-    log.debug(`Virtual devices config root '${avdsRoot}' is not an existing directory`);
-    return [];
-  }
-
-  return await getAvdConfigPaths(avdsRoot);
-}
-
-/**
- * Get configuration paths of all virtual devices
- *
- * @param avdsRoot Path to the directory that contains the AVD .ini files
- * @returns
- */
-async function getAvdConfigPaths(avdsRoot: string): Promise<EmuInfo[]> {
-  const configs = await fs.glob('*.ini', {
-    cwd: avdsRoot,
-    absolute: true,
-  });
-  return configs
-    .map((confPath) => {
-      const avdName = path.basename(confPath).split('.').slice(0, -1).join('.');
-      return {name: avdName, config: confPath};
-    })
-    .filter(({name}) => _.trim(name));
-}
-
-/**
  * Check the emulator state.
  *
  * @returns True if Emulator is visible to adb.
@@ -479,6 +429,56 @@ export async function sendTelnetCommand(this: ADB, command: string): Promise<str
 }
 
 // #region Private functions
+
+/**
+ * Retrieves the list of available Android emulators
+ *
+ * @returns
+ */
+async function listEmulators(): Promise<EmuInfo[]> {
+  let avdsRoot = process.env.ANDROID_AVD_HOME;
+  if (await dirExists(avdsRoot ?? '')) {
+    return await getAvdConfigPaths(avdsRoot as string);
+  }
+
+  if (avdsRoot) {
+    log.warn(
+      `The value of the ANDROID_AVD_HOME environment variable '${avdsRoot}' is not an existing directory`,
+    );
+  }
+
+  const prefsRoot = await getAndroidPrefsRoot();
+  if (!prefsRoot) {
+    return [];
+  }
+
+  avdsRoot = path.resolve(prefsRoot, 'avd');
+  if (!(await dirExists(avdsRoot))) {
+    log.debug(`Virtual devices config root '${avdsRoot}' is not an existing directory`);
+    return [];
+  }
+
+  return await getAvdConfigPaths(avdsRoot);
+}
+
+/**
+ * Get configuration paths of all virtual devices
+ *
+ * @param avdsRoot Path to the directory that contains the AVD .ini files
+ * @returns
+ */
+async function getAvdConfigPaths(avdsRoot: string): Promise<EmuInfo[]> {
+  const configs = await fs.glob('*.ini', {
+    cwd: avdsRoot,
+    absolute: true,
+  });
+  return configs
+    .map((confPath) => {
+      const avdName = path.basename(confPath).split('.').slice(0, -1).join('.');
+      return {name: avdName, config: confPath};
+    })
+    .filter(({name}) => _.trim(name));
+}
 
 /**
  * Retrieves the full path to the Android preferences root

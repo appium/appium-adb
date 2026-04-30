@@ -35,6 +35,18 @@ const LAUNCHER_CATEGORY = 'android.intent.category.LAUNCHER';
 
 // Public methods
 
+export interface StartCmdOptions {
+  user?: number | string;
+  waitForLaunch?: boolean;
+  pkg?: string;
+  activity?: string;
+  action?: string;
+  category?: string;
+  stopApp?: boolean;
+  flags?: string;
+  optionalIntentArguments?: string;
+}
+
 /**
  * Verify whether the given argument is a
  * valid class name.
@@ -1159,8 +1171,6 @@ export async function isAppRunning(this: ADB, pkg: string): Promise<boolean> {
   return !_.isEmpty(await this.listAppProcessIds(pkg));
 }
 
-// Private methods
-
 /**
  * Parses optional intent arguments from a string.
  *
@@ -1234,18 +1244,4 @@ function escapeShellArg(arg: string): string {
     return /[&|^\s]/.test(arg) ? `"${arg.replace(/"/g, '""')}"` : arg;
   }
   return arg.replace(/&/g, '\\&');
-}
-
-// Type definitions
-
-export interface StartCmdOptions {
-  user?: number | string;
-  waitForLaunch?: boolean;
-  pkg?: string;
-  activity?: string;
-  action?: string;
-  category?: string;
-  stopApp?: boolean;
-  flags?: string;
-  optionalIntentArguments?: string;
 }

@@ -3,10 +3,6 @@ import path from 'node:path';
 import type {ADB} from '../adb';
 import type {TeenProcessExecOptions} from 'teen_process';
 
-function shellEscapeSingleQuotes(str: string): string {
-  return str.replace(/'/g, "'\\''");
-}
-
 /**
  * Verify whether a remote path exists on the device under test.
  *
@@ -131,4 +127,8 @@ export async function pull(
  */
 export async function mkdir(this: ADB, remotePath: string): Promise<string> {
   return await this.shell([`mkdir -p -- '${shellEscapeSingleQuotes(remotePath)}'`]);
+}
+
+function shellEscapeSingleQuotes(str: string): string {
+  return str.replace(/'/g, "'\\''");
 }

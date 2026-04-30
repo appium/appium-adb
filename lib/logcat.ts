@@ -36,6 +36,8 @@ export interface LogcatOptions {
   maxBufferSize?: number;
 }
 
+type LogFormat = (typeof SUPPORTED_FORMATS)[number];
+
 export class Logcat extends EventEmitter {
   private readonly adb: ADBExecutable;
   private readonly clearLogs: boolean;
@@ -187,12 +189,6 @@ export class Logcat extends EventEmitter {
   }
 }
 
-export default Logcat;
-
-// Private entities
-
-type LogFormat = (typeof SUPPORTED_FORMATS)[number];
-
 function requireFormat(format: string): LogFormat {
   if (!SUPPORTED_FORMATS.includes(format as LogFormat)) {
     log.info(`The format value '${format}' is unknown. Supported values are: ${SUPPORTED_FORMATS}`);
@@ -242,3 +238,5 @@ function formatFilterSpecs(filterSpecs: string | string[]): string[] {
     .filter((spec) => spec && _.isString(spec) && !spec.startsWith('-'))
     .map((spec) => (spec.includes(':') ? requireSpec(spec) : spec));
 }
+
+export default Logcat;
