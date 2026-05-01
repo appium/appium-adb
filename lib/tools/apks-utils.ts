@@ -40,55 +40,6 @@ process.on('exit', () => {
 });
 
 /**
- * Extracts the particular apks package into a temporary folder,
- * finds and returns the full path to the file contained in this apk.
- * The resulting temporary path, where the .apks file has been extracted,
- * will be stored into the internal LRU cache for better performance.
- *
- * @param apks - The full path to the .apks file
- * @param dstPath - The relative path to the destination file,
- * which is going to be extracted, where each path component is an array item
- * @returns Full path to the extracted file
- * @throws {Error} If the requested item does not exist in the extracted archive or the provides
- * apks file is not a valid bundle
- */
-async function extractFromApks(apks: string, dstPath: string | string[]): Promise<string> {
-  const normalizedDstPath = _.isArray(dstPath) ? dstPath : [dstPath];
-
-  return await APKS_CACHE_GUARD.acquire(apks, async () => {
-    // It might be that the original file has been replaced,
-    // so we need to keep the hash sums instead of the actual file paths
-    // as caching keys
-    const apksHash = await fs.hash(apks);
-    log.debug(`Calculated '${apks}' hash: ${apksHash}`);
-
-    if (APKS_CACHE.has(apksHash)) {
-      const cachedRoot = APKS_CACHE.get(apksHash);
-      if (cachedRoot) {
-        const resultPath = path.resolve(cachedRoot, ...normalizedDstPath);
-        if (await fs.exists(resultPath)) {
-          return resultPath;
-        }
-      }
-      APKS_CACHE.delete(apksHash);
-    }
-
-    const tmpRoot = await tempDir.openDir();
-    log.debug(`Unpacking application bundle at '${apks}' to '${tmpRoot}'`);
-    await unzipFile(apks, tmpRoot);
-    const resultPath = path.resolve(tmpRoot, ...normalizedDstPath);
-    if (!(await fs.exists(resultPath))) {
-      throw new Error(
-        `${normalizedDstPath.join(path.sep)} cannot be found in '${apks}' bundle. ` +
-          `Does the archive contain a valid application bundle?`,
-      );
-    }
-    APKS_CACHE.set(apksHash, tmpRoot);
-    return resultPath;
-  });
-}
-
-/**
  * Executes bundletool utility with given arguments and returns the actual stdout
  *
  * @param args - the list of bundletool arguments
@@ -274,4 +225,53 @@ export async function extractLanguageApk(
  */
 export function isTestPackageOnlyError(output: string): boolean {
   return /\[INSTALL_FAILED_TEST_ONLY\]/.test(output);
+}
+
+/**
+ * Extracts the particular apks package into a temporary folder,
+ * finds and returns the full path to the file contained in this apk.
+ * The resulting temporary path, where the .apks file has been extracted,
+ * will be stored into the internal LRU cache for better performance.
+ *
+ * @param apks - The full path to the .apks file
+ * @param dstPath - The relative path to the destination file,
+ * which is going to be extracted, where each path component is an array item
+ * @returns Full path to the extracted file
+ * @throws {Error} If the requested item does not exist in the extracted archive or the provides
+ * apks file is not a valid bundle
+ */
+async function extractFromApks(apks: string, dstPath: string | string[]): Promise<string> {
+  const normalizedDstPath = _.isArray(dstPath) ? dstPath : [dstPath];
+
+  return await APKS_CACHE_GUARD.acquire(apks, async () => {
+    // It might be that the original file has been replaced,
+    // so we need to keep the hash sums instead of the actual file paths
+    // as caching keys
+    const apksHash = await fs.hash(apks);
+    log.debug(`Calculated '${apks}' hash: ${apksHash}`);
+
+    if (APKS_CACHE.has(apksHash)) {
+      const cachedRoot = APKS_CACHE.get(apksHash);
+      if (cachedRoot) {
+        const resultPath = path.resolve(cachedRoot, ...normalizedDstPath);
+        if (await fs.exists(resultPath)) {
+          return resultPath;
+        }
+      }
+      APKS_CACHE.delete(apksHash);
+    }
+
+    const tmpRoot = await tempDir.openDir();
+    log.debug(`Unpacking application bundle at '${apks}' to '${tmpRoot}'`);
+    await unzipFile(apks, tmpRoot);
+    const resultPath = path.resolve(tmpRoot, ...normalizedDstPath);
+    if (!(await fs.exists(resultPath))) {
+      throw new Error(
+        `${normalizedDstPath.join(path.sep)} cannot be found in '${apks}' bundle. ` +
+          `Does the archive contain a valid application bundle?`,
+      );
+    }
+    APKS_CACHE.set(apksHash, tmpRoot);
+    return resultPath;
+  });
 }

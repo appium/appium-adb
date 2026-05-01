@@ -12,51 +12,6 @@ const KEYCODE_WAKEUP = 224; // works over API Level 20
 const HIDE_KEYBOARD_WAIT_TIME = 100;
 
 /**
- * @param verb
- * @param oldCredential
- * @param args
- */
-function buildCommand(
-  verb: string,
-  oldCredential: string | null = null,
-  ...args: string[]
-): string[] {
-  const cmd = ['locksettings', verb];
-  if (oldCredential && !_.isEmpty(oldCredential)) {
-    cmd.push('--old', oldCredential);
-  }
-  if (!_.isEmpty(args)) {
-    cmd.push(...args);
-  }
-  return cmd;
-}
-
-/**
- * Performs swipe up gesture on the screen
- *
- * @param windowDumpsys The output of `adb shell dumpsys window` command
- * @throws {Error} If the display size cannot be retrieved
- */
-async function swipeUp(this: ADB, windowDumpsys: string): Promise<void> {
-  const dimensionsMatch = /init=(\d+)x(\d+)/.exec(windowDumpsys);
-  if (!dimensionsMatch) {
-    throw new Error('Cannot retrieve the display size');
-  }
-  const displayWidth = parseInt(dimensionsMatch[1], 10);
-  const displayHeight = parseInt(dimensionsMatch[2], 10);
-  const x0 = displayWidth / 2;
-  const y0 = (displayHeight / 5) * 4;
-  const x1 = x0;
-  const y1 = displayHeight / 5;
-  await this.shell([
-    'input',
-    'touchscreen',
-    'swipe',
-    ...[x0, y0, x1, y1].map((c) => `${Math.trunc(c)}`),
-  ]);
-}
-
-/**
  * Check whether the device supports lock settings management with `locksettings`
  * command line tool. This tool has been added to Android toolset since  API 27 Oreo
  *
@@ -323,7 +278,89 @@ export async function lock(this: ADB): Promise<void> {
   }
 }
 
+/**
+ * Checks mShowingLockscreen or mDreamingLockscreen in dumpsys output to determine
+ * if lock screen is showing
+ *
+ * A note: `adb shell dumpsys trust` performs better while detecting the locked screen state
+ * in comparison to `adb dumpsys window` output parsing.
+ * But the trust command does not work for `Swipe` unlock pattern.
+ *
+ * In some Android devices (Probably around Android 10+), `mShowingLockscreen` and `mDreamingLockscreen`
+ * do not work to detect lock status. Instead, keyguard preferences helps to detect the lock condition.
+ * Some devices such as Android TV do not have keyguard, so we should keep
+ * screen condition as this primary method.
+ *
+ * @param dumpsys - The output of dumpsys window command.
+ * @return True if lock screen is showing.
+ */
+export function isShowingLockscreen(dumpsys: string): boolean {
+  return (
+    _.some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
+    // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
+    _.every([/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/], (x) =>
+      x.test(dumpsys),
+    )
+  );
+}
+
+/**
+ * Checks screenState has SCREEN_STATE_OFF in dumpsys output to determine
+ * possible lock screen.
+ *
+ * @param dumpsys - The output of dumpsys window command.
+ * @return True if lock screen is showing.
+ */
+export function isScreenStateOff(dumpsys: string): boolean {
+  return /\s+screenState=SCREEN_STATE_OFF/i.test(dumpsys);
+}
+
 // #region Private functions
+
+/**
+ * @param verb
+ * @param oldCredential
+ * @param args
+ */
+function buildCommand(
+  verb: string,
+  oldCredential: string | null = null,
+  ...args: string[]
+): string[] {
+  const cmd = ['locksettings', verb];
+  if (oldCredential && !_.isEmpty(oldCredential)) {
+    cmd.push('--old', oldCredential);
+  }
+  if (!_.isEmpty(args)) {
+    cmd.push(...args);
+  }
+  return cmd;
+}
+
+/**
+ * Performs swipe up gesture on the screen
+ *
+ * @param windowDumpsys The output of `adb shell dumpsys window` command
+ * @throws {Error} If the display size cannot be retrieved
+ */
+async function swipeUp(this: ADB, windowDumpsys: string): Promise<void> {
+  const dimensionsMatch = /init=(\d+)x(\d+)/.exec(windowDumpsys);
+  if (!dimensionsMatch) {
+    throw new Error('Cannot retrieve the display size');
+  }
+  const displayWidth = parseInt(dimensionsMatch[1], 10);
+  const displayHeight = parseInt(dimensionsMatch[2], 10);
+  const x0 = displayWidth / 2;
+  const y0 = (displayHeight / 5) * 4;
+  const x1 = x0;
+  const y1 = displayHeight / 5;
+  await this.shell([
+    'input',
+    'touchscreen',
+    'swipe',
+    ...[x0, y0, x1, y1].map((c) => `${Math.trunc(c)}`),
+  ]);
+}
 
 /**
  * Checks mScreenOnFully in dumpsys output to determine if screen is showing
@@ -363,43 +400,6 @@ function isInDozingMode(dumpsys: string): boolean {
   // On some phones/tablets we were observing mWakefulness=Dozing
   // while on others it was getWakefulnessLocked()=Dozing
   return /^[\s\w]+wakefulness[^=]*=Dozing$/im.test(dumpsys);
-}
-
-/**
- * Checks mShowingLockscreen or mDreamingLockscreen in dumpsys output to determine
- * if lock screen is showing
- *
- * A note: `adb shell dumpsys trust` performs better while detecting the locked screen state
- * in comparison to `adb dumpsys window` output parsing.
- * But the trust command does not work for `Swipe` unlock pattern.
- *
- * In some Android devices (Probably around Android 10+), `mShowingLockscreen` and `mDreamingLockscreen`
- * do not work to detect lock status. Instead, keyguard preferences helps to detect the lock condition.
- * Some devices such as Android TV do not have keyguard, so we should keep
- * screen condition as this primary method.
- *
- * @param dumpsys - The output of dumpsys window command.
- * @return True if lock screen is showing.
- */
-export function isShowingLockscreen(dumpsys: string): boolean {
-  return (
-    _.some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
-    // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
-    _.every([/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/], (x) =>
-      x.test(dumpsys),
-    )
-  );
-}
-
-/**
- * Checks screenState has SCREEN_STATE_OFF in dumpsys output to determine
- * possible lock screen.
- *
- * @param dumpsys - The output of dumpsys window command.
- * @return True if lock screen is showing.
- */
-export function isScreenStateOff(dumpsys: string): boolean {
-  return /\s+screenState=SCREEN_STATE_OFF/i.test(dumpsys);
 }
 
 // #endregion

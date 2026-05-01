@@ -289,19 +289,6 @@ export async function toggleGPSLocationProvider(this: ADB, enabled: boolean): Pr
 }
 
 /**
- * Decorates an exception message with a solution link
- *
- * @param e The error object to be decorated
- * @returns Either the same error or the decorated one
- */
-function decorateWriteSecureSettingsException(e: Error): Error {
-  if (_.includes(e.message, 'requires:android.permission.WRITE_SECURE_SETTINGS')) {
-    e.message = `Check https://github.com/appium/appium/issues/13802 for throubleshooting. ${e.message}`;
-  }
-  return e;
-}
-
-/**
  * Set hidden api policy to manage access to non-SDK APIs.
  * https://developer.android.com/preview/restrictions-non-sdk-interfaces
  *
@@ -714,6 +701,19 @@ export async function getScreenOrientation(this: ADB): Promise<number | null> {
 }
 
 // #region Private functions
+
+/**
+ * Decorates an exception message with a solution link
+ *
+ * @param e The error object to be decorated
+ * @returns Either the same error or the decorated one
+ */
+function decorateWriteSecureSettingsException(e: Error): Error {
+  if (_.includes(e.message, 'requires:android.permission.WRITE_SECURE_SETTINGS')) {
+    e.message = `Check https://github.com/appium/appium/issues/13802 for throubleshooting. ${e.message}`;
+  }
+  return e;
+}
 
 /**
  * Reads SurfaceOrientation in dumpsys output
