@@ -1,3 +1,9 @@
+## [14.3.3](https://github.com/appium/appium-adb/compare/v14.3.2...v14.3.3) (2026-05-01)
+
+### Bug Fixes
+
+* linter warnings ([#870](https://github.com/appium/appium-adb/issues/870)) ([bf5ca71](https://github.com/appium/appium-adb/commit/bf5ca71f7276e25beeb0c75e2b824c075cfe5bc0))
+
 ## [14.3.2](https://github.com/appium/appium-adb/compare/v14.3.1...v14.3.2) (2026-04-10)
 
 ### Miscellaneous Chores
