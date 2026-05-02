@@ -4,7 +4,7 @@ import {system, fs, util, tempDir, timing} from '@appium/support';
 import {DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv} from '../helpers';
 import {exec, SubProcess} from 'teen_process';
 import type {ExecError, TeenProcessExecResult} from 'teen_process';
-import {retry, retryInterval, sleep, waitForCondition} from 'asyncbox';
+import {asyncmap, retry, retryInterval, sleep, waitForCondition} from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
 import type {ADB} from '../adb';
@@ -1438,11 +1438,10 @@ export const getBuildToolsDirs = _.memoize(async function getBuildToolsDirs(
         `by semantic version names.`,
     );
     log.warn(`Falling back to sorting by modification date. Original error: ${error.message}`);
-    const pairs = await Promise.all(
-      buildToolsDirs.map(
-        async (dir) => [(await fs.stat(dir)).mtime.valueOf(), dir] as [number, string],
-      ),
-    );
+    const pairs = await asyncmap(buildToolsDirs, async (dir) => [
+      (await fs.stat(dir)).mtime.valueOf(),
+      dir,
+    ] as [number, string]);
     buildToolsDirs = pairs.sort((a, b) => (a[0] < b[0] ? 1 : -1)).map((pair) => pair[1]);
   }
   log.info(
