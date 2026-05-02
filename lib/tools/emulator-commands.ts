@@ -2,7 +2,6 @@ import {log} from '../logger';
 import _ from 'lodash';
 import net from 'node:net';
 import {util, fs} from '@appium/support';
-import B from 'bluebird';
 import path from 'node:path';
 import * as ini from 'ini';
 import type {ADB} from '../adb';
@@ -259,7 +258,7 @@ export async function execEmuConsoleCommand(
     port,
   });
 
-  return await new B((resolve, reject) => {
+  return await new Promise<string>((resolve, reject) => {
     const connTimeoutObj = setTimeout(
       () =>
         reject(

@@ -1,6 +1,5 @@
 import {log} from '../logger';
-import {waitForCondition} from 'asyncbox';
-import B from 'bluebird';
+import {sleep, waitForCondition} from 'asyncbox';
 import type {ADB} from '../adb';
 import type {KeyboardState} from './types';
 
@@ -194,7 +193,7 @@ export async function runInImeContext<T>(this: ADB, ime: string, fn: () => Promi
       await cycleImeState(originalIme);
     }
     // https://github.com/appium/appium/issues/15943
-    await B.delay(500);
+    await sleep(500);
   }
   try {
     return await fn();

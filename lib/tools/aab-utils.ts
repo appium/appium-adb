@@ -4,7 +4,6 @@ import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
 import {unzipFile} from '../helpers';
 import AsyncLock from 'async-lock';
-import B from 'bluebird';
 import crypto from 'node:crypto';
 import type {ADB} from '../adb';
 import type {ApkCreationOptions, StringRecord} from './types';
@@ -134,7 +133,7 @@ export async function extractUniversalApk(
         }
       }
       try {
-        await B.all(fileDeletionPromises);
+        await Promise.all(fileDeletionPromises);
       } catch {}
       if (!universalApkPath) {
         log.debug(`The following items were extracted from the .aab bundle: ${allFileNames}`);

@@ -2,7 +2,6 @@ import {log} from '../logger';
 import _ from 'lodash';
 import {retryInterval} from 'asyncbox';
 import {util} from '@appium/support';
-import B from 'bluebird';
 import type {ADB} from '../adb';
 import type {SetPropOpts} from './types';
 import type {ExecError} from 'teen_process';
@@ -665,7 +664,7 @@ export async function isDataOn(this: ADB): Promise<boolean> {
  */
 export async function isAnimationOn(this: ADB): Promise<boolean> {
   return (
-    await B.all(
+    await Promise.all(
       ANIMATION_SCALE_KEYS.map(async (k) => (await this.getSetting('global', k)) !== '0.0'),
     )
   ).includes(true);
@@ -687,7 +686,7 @@ export async function isAnimationOn(this: ADB): Promise<boolean> {
  * @throws If the adb setting command raises an exception.
  */
 export async function setAnimationScale(this: ADB, value: number): Promise<void> {
-  await B.all(ANIMATION_SCALE_KEYS.map((k) => this.setSetting('global', k, value)));
+  await Promise.all(ANIMATION_SCALE_KEYS.map((k) => this.setSetting('global', k, value)));
 }
 
 /**
