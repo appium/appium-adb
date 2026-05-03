@@ -1,7 +1,6 @@
 import {ADB} from '../../lib/adb';
 import * as teen_process from 'teen_process';
 import sinon from 'sinon';
-import B from 'bluebird';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as asyncbox from 'asyncbox';
@@ -259,14 +258,15 @@ describe('system calls', function () {
 
 describe('System calls 2', function () {
   let sandbox: sinon.SinonSandbox;
-  let mocks: {adb: any; B: any; teen_process: any};
+  let mocks: {adb: any; teen_process: any};
+  let sleepStub: sinon.SinonStub;
 
   beforeEach(function () {
     sandbox = sinon.createSandbox();
     sandbox.stub(asyncbox, 'retryInterval').callsFake(async (retries, interval, fn) => fn());
+    sleepStub = sandbox.stub(asyncbox, 'sleep').resolves();
     mocks = {
       adb: sandbox.mock(adb),
-      B: sandbox.mock(B),
       teen_process: sandbox.mock(teen_process),
     };
   });
@@ -344,14 +344,13 @@ describe('System calls 2', function () {
         .atLeast(1)
         .withExactArgs('sys.boot_completed')
         .returns('1');
-      mocks.B.expects('delay').once().withExactArgs(2000);
       await expect(adb.reboot()).to.eventually.not.be.rejected;
+      sinon.assert.calledOnceWithExactly(sleepStub, 2000);
     });
     it('should restart adbd as root if necessary', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
       mocks.adb.expects('adbExec').once().withExactArgs(['root']).returns({stdout: ''});
       mocks.adb.expects('shell').once().withExactArgs(['stop']).returns();
-      mocks.B.expects('delay').once().withExactArgs(2000);
       mocks.adb
         .expects('setDeviceProperty')
         .once()
@@ -365,6 +364,7 @@ describe('System calls 2', function () {
         .returns('1');
       mocks.adb.expects('unroot').once().returns({isSuccessful: true, wasAlreadyRooted: false});
       await expect(adb.reboot()).to.eventually.not.be.rejected;
+      sinon.assert.calledOnceWithExactly(sleepStub, 2000);
     });
     it('should error with helpful message if cause of error is no root access', async function () {
       mocks.adb.expects('isRoot').once().returns(false);

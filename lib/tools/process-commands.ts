@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import {log} from '../logger';
-import B from 'bluebird';
 import type {ExecError} from 'teen_process';
 import type {ADB} from '../adb';
 
@@ -130,7 +129,7 @@ export async function killProcessesByName(
     if (_.isEmpty(pids)) {
       log.info(`No '${name}' process has been found`);
     } else {
-      await B.all(pids.map((p: number) => this.killProcessByPID(p, signal)));
+      await Promise.all(pids.map((p: number) => this.killProcessByPID(p, signal)));
     }
   } catch (e: unknown) {
     const err: Error = e as Error;

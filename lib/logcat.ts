@@ -1,5 +1,4 @@
 import {logger, util} from '@appium/support';
-import B from 'bluebird';
 import _ from 'lodash';
 import {EventEmitter} from 'node:events';
 import {SubProcess, exec} from 'teen_process';
@@ -64,7 +63,7 @@ export class Logcat extends EventEmitter {
 
   async startCapture(opts: StartCaptureOptions = {}): Promise<void> {
     let started = false;
-    return await new B(async (_resolve, _reject) => {
+    return await new Promise<void>((_resolve, _reject) => {
       const resolve = function (...args: any[]) {
         started = true;
         _resolve(...args);
@@ -74,43 +73,49 @@ export class Logcat extends EventEmitter {
         _reject(...args);
       };
 
-      if (this.clearLogs) {
-        await this.clear();
-      }
+      void (async () => {
+        try {
+          if (this.clearLogs) {
+            await this.clear();
+          }
 
-      const {format = DEFAULT_FORMAT, filterSpecs = []} = opts;
-      const cmd = [
-        ...this.adb.defaultArgs,
-        'logcat',
-        '-v',
-        requireFormat(format),
-        ...formatFilterSpecs(filterSpecs),
-      ];
-      log.debug(`Starting logs capture with command: ${util.quote([this.adb.path, ...cmd])}`);
-      this.proc = new SubProcess(this.adb.path, cmd);
-      this.proc.on('exit', (code, signal) => {
-        log.error(`Logcat terminated with code ${code}, signal ${signal}`);
-        this.proc = null;
-        if (!started) {
-          log.warn('Logcat not started. Continuing');
-          resolve();
+          const {format = DEFAULT_FORMAT, filterSpecs = []} = opts;
+          const cmd = [
+            ...this.adb.defaultArgs,
+            'logcat',
+            '-v',
+            requireFormat(format),
+            ...formatFilterSpecs(filterSpecs),
+          ];
+          log.debug(`Starting logs capture with command: ${util.quote([this.adb.path, ...cmd])}`);
+          this.proc = new SubProcess(this.adb.path, cmd);
+          this.proc.on('exit', (code, signal) => {
+            log.error(`Logcat terminated with code ${code}, signal ${signal}`);
+            this.proc = null;
+            if (!started) {
+              log.warn('Logcat not started. Continuing');
+              resolve();
+            }
+          });
+          this.proc.on('line-stderr', (line) => {
+            if (!started && EXECVP_ERR_PATTERN.test(line)) {
+              log.error('Logcat process failed to start');
+              return reject(new Error(`Logcat process failed to start. stderr: ${line}`));
+            }
+            this.outputHandler(line, 'STDERR: ');
+            resolve();
+          });
+          this.proc.on('line-stdout', (line) => {
+            this.outputHandler(line);
+            resolve();
+          });
+          await this.proc.start(0);
+          // resolve after a timeout, even if no output was recorded
+          setTimeout(resolve, LOGCAT_PROC_STARTUP_TIMEOUT);
+        } catch (e) {
+          reject(e);
         }
-      });
-      this.proc.on('line-stderr', (line) => {
-        if (!started && EXECVP_ERR_PATTERN.test(line)) {
-          log.error('Logcat process failed to start');
-          return reject(new Error(`Logcat process failed to start. stderr: ${line}`));
-        }
-        this.outputHandler(line, 'STDERR: ');
-        resolve();
-      });
-      this.proc.on('line-stdout', (line) => {
-        this.outputHandler(line);
-        resolve();
-      });
-      await this.proc.start(0);
-      // resolve after a timeout, even if no output was recorded
-      setTimeout(resolve, LOGCAT_PROC_STARTUP_TIMEOUT);
+      })();
     });
   }
 

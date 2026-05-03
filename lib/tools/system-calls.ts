@@ -1,11 +1,10 @@
 import path from 'node:path';
 import {log} from '../logger';
-import B from 'bluebird';
 import {system, fs, util, tempDir, timing} from '@appium/support';
 import {DEFAULT_ADB_EXEC_TIMEOUT, getSdkRootFromEnv} from '../helpers';
 import {exec, SubProcess} from 'teen_process';
 import type {ExecError, TeenProcessExecResult} from 'teen_process';
-import {retry, retryInterval, waitForCondition} from 'asyncbox';
+import {asyncmap, retry, retryInterval, sleep, waitForCondition} from 'asyncbox';
 import _ from 'lodash';
 import * as semver from 'semver';
 import type {ADB} from '../adb';
@@ -1120,7 +1119,7 @@ export async function reboot(
   try {
     // Stop and re-start the device
     await this.shell(['stop']);
-    await B.delay(2000); // let the emu finish stopping;
+    await sleep(2000); // let the emu finish stopping;
     await this.setDeviceProperty('sys.boot_completed', '0', {
       privileged: false, // no need to set privileged true because device already rooted
     });
@@ -1439,7 +1438,7 @@ export const getBuildToolsDirs = _.memoize(async function getBuildToolsDirs(
         `by semantic version names.`,
     );
     log.warn(`Falling back to sorting by modification date. Original error: ${error.message}`);
-    const pairs = await B.map(
+    const pairs = await asyncmap(
       buildToolsDirs,
       async (dir) => [(await fs.stat(dir)).mtime.valueOf(), dir] as [number, string],
     );

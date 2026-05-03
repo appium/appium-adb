@@ -1,7 +1,6 @@
 import {log} from '../logger';
 import _ from 'lodash';
-import B from 'bluebird';
-import {waitForCondition} from 'asyncbox';
+import {sleep, waitForCondition} from 'asyncbox';
 import type {ADB} from '../adb';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
@@ -204,7 +203,7 @@ export async function setLockCredential(
  * @return True if the device is locked.
  */
 export async function isScreenLocked(this: ADB): Promise<boolean> {
-  const [windowOutput, powerOutput] = await B.all([
+  const [windowOutput, powerOutput] = await Promise.all([
     this.shell(['dumpsys', 'window']),
     this.shell(['dumpsys', 'power']),
   ]);
@@ -239,7 +238,7 @@ export async function dismissKeyguard(this: ADB): Promise<void> {
 
   log.debug('Swiping up to dismiss the keyguard');
   if (await this.hideKeyboard()) {
-    await B.delay(HIDE_KEYBOARD_WAIT_TIME);
+    await sleep(HIDE_KEYBOARD_WAIT_TIME);
   }
   log.debug('Dismissing notifications from the unlock view');
   await this.shell(['service', 'call', 'notification', '1']);

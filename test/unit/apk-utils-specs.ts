@@ -3,7 +3,6 @@ import {fs} from '@appium/support';
 import {ADB} from '../../lib/adb';
 import sinon from 'sinon';
 import _ from 'lodash';
-import B from 'bluebird';
 import {REMOTE_CACHE_ROOT} from '../../lib/tools/apk-utils';
 import * as apksUtilsMethods from '../../lib/tools/apks-utils';
 import chai, {expect} from 'chai';
@@ -563,7 +562,7 @@ describe('Apk-utils', function () {
         .expects('shell')
         .once()
         .withExactArgs(['touch', '-am', '/data/local/tmp/appium_cache/1.apk'])
-        .returns(B.resolve());
+        .returns(Promise.resolve());
       mocks.fs.expects('hash').withExactArgs(apkPath).returns('1');
       mocks.adb
         .expects('shell')
