@@ -1,3 +1,9 @@
+## [14.3.4](https://github.com/appium/appium-adb/compare/v14.3.3...v14.3.4) (2026-05-03)
+
+### Miscellaneous Chores
+
+* Ditch bluebird ([#871](https://github.com/appium/appium-adb/issues/871)) ([750b624](https://github.com/appium/appium-adb/commit/750b624556ac386d206860505675af42a7ba3b81))
+
 ## [14.3.3](https://github.com/appium/appium-adb/compare/v14.3.2...v14.3.3) (2026-05-01)
 
 ### Bug Fixes
