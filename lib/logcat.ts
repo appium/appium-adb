@@ -178,12 +178,8 @@ export class Logcat extends EventEmitter {
 
   private outputHandler(logLine: string, prefix: string = ''): void {
     const timestamp = Date.now();
-    let recentIndex = -1;
-    for (const key of this.logs.keys()) {
-      recentIndex = key;
-      break;
-    }
-    this.logs.set(++recentIndex, [logLine, timestamp]);
+    const recentIndex = this.logs.keys().next().value ?? -1;
+    this.logs.set(recentIndex + 1, [logLine, timestamp]);
     if (this.listenerCount('output')) {
       this.emit('output', toLogEntry(logLine, timestamp));
     }

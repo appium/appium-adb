@@ -230,7 +230,7 @@ export async function getTimeZone(this: ADB): Promise<string> {
     return await this.getDeviceProperty('persist.sys.timezone');
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting timezone. Original error: ${err.message}`);
+    throw new Error(`Error getting timezone. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -246,7 +246,9 @@ export async function getPlatformVersion(this: ADB): Promise<string> {
     return await this.getDeviceProperty('ro.build.version.release');
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`);
+    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`, {
+      cause: e,
+    });
   }
 }
 

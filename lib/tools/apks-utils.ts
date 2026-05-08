@@ -74,7 +74,7 @@ export async function execBundletool(this: ADB, args: string[], errorMsg: string
     if (err.stderr) {
       log.debug(`Command stderr: ${err.stderr}`);
     }
-    throw new Error(`${errorMsg}. Original error: ${err.message}`);
+    throw new Error(`${errorMsg}. Original error: ${err.message}`, {cause: e});
   }
 }
 

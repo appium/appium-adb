@@ -1,23 +1,33 @@
-import {fs, system} from '@appium/support';
+import {fs, system, util} from '@appium/support';
 import path from 'node:path';
-import {util} from '@appium/support';
 
+/**
+ * Gets Android SDK root from environment variables.
+ *
+ * @returns SDK root path if present
+ */
 export function getSdkRootFromEnv(): string | undefined {
   return process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT;
 }
 
+/**
+ * Resolves and validates Android SDK root path.
+ *
+ * @param customRoot - Optional explicit SDK root path override
+ * @returns Absolute path to a valid SDK root directory
+ */
 export async function requireSdkRoot(customRoot: string | null = null): Promise<string> {
   const sdkRoot = customRoot || getSdkRootFromEnv();
   const docMsg =
     'Read https://developer.android.com/studio/command-line/variables for more details';
   if (!sdkRoot || util.isEmpty(sdkRoot)) {
     throw new Error(
-      `Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`
+      `Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`,
     );
   }
   if (!(await fs.exists(sdkRoot))) {
     throw new Error(
-      `The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`
+      `The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`,
     );
   }
 
@@ -66,6 +76,6 @@ export const getJavaForOs = util.memoize(async function getJavaForOs(): Promise<
   }
   throw new Error(
     `The '${executableName}' binary could not be found ` +
-      `neither in PATH nor under JAVA_HOME (${javaHome ? path.resolve(javaHome, 'bin') : errMsg})`
+      `neither in PATH nor under JAVA_HOME (${javaHome ? path.resolve(javaHome, 'bin') : errMsg})`,
   );
 });

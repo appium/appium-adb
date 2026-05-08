@@ -9,7 +9,17 @@ export interface BuildInstallArgsOptions {
   partialInstall?: boolean;
 }
 
-export function buildInstallArgs(apiLevel: number, options: BuildInstallArgsOptions = {}): string[] {
+/**
+ * Builds command-line arguments for `adb install`.
+ *
+ * @param apiLevel - Android API level of the target device
+ * @param options - Install options mapped to adb flags
+ * @returns A list of install flags
+ */
+export function buildInstallArgs(
+  apiLevel: number,
+  options: BuildInstallArgsOptions = {},
+): string[] {
   const result: string[] = [];
 
   if (!util.hasValue(options.replace) || options.replace) {
@@ -26,7 +36,7 @@ export function buildInstallArgs(apiLevel: number, options: BuildInstallArgsOpti
       log.debug(
         `Skipping permissions grant option, since ` +
           `the current API level ${apiLevel} does not support applications ` +
-          `permissions customization`
+          `permissions customization`,
       );
     } else {
       result.push('-g');

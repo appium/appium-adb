@@ -45,11 +45,11 @@ const _defaultsDeep = (target: AnyObject, ...sources: AnyObject[]): AnyObject =>
 export const intersectionWith = <T>(
   first: T[],
   second: T[],
-  comparator: (left: T, right: T) => boolean
+  comparator: (left: T, right: T) => boolean,
 ): T[] => first.filter((item) => second.some((other) => comparator(item, other)));
 export const zip = <A, B>(
   arrA: readonly A[],
-  arrB: readonly B[]
+  arrB: readonly B[],
 ): Array<[A | undefined, B | undefined]> => {
   const length = Math.max(arrA.length, arrB.length);
   return Array.from({length}, (_, idx) => [arrA[idx], arrB[idx]]);

@@ -91,7 +91,9 @@ export async function getApiLevel(this: ADB): Promise<number> {
     }
     return this._apiLevel;
   } catch (e) {
-    throw new Error(`Error getting device API level. Original error: ${(e as Error).message}`);
+    throw new Error(`Error getting device API level. Original error: ${(e as Error).message}`, {
+      cause: e,
+    });
   }
 }
 
@@ -166,7 +168,7 @@ export async function restart(this: ADB): Promise<void> {
     await this.startLogcat(this._logcatStartupParams);
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Restart failed. Original error: ${err.message}`);
+    throw new Error(`Restart failed. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -329,6 +331,7 @@ export async function takeScreenshot(this: ADB, displayId?: number | string): Pr
     throw new Error(
       `Screenshot of the ${displayDescr} failed. ` +
         `Code: '${err.code ?? 'unknown'}', output: '${outputStr}'`,
+      {cause: e},
     );
   }
   if (stdout.length === 0) {

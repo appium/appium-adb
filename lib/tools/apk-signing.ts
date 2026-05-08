@@ -89,6 +89,7 @@ export async function signWithDefaultCert(this: ADB, apk: string): Promise<void>
     throw new Error(
       `Could not sign '${apk}' with the default certificate. ` +
         `Original error: ${err.stderr || err.stdout || err.message}`,
+      {cause: e},
     );
   }
 }
@@ -160,6 +161,7 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
       throw new Error(
         `Could not sign with custom certificate. ` +
           `Original error: ${execErr.stderr || execErr.message}`,
+        {cause: e},
       );
     }
   }
@@ -239,6 +241,7 @@ export async function zipAlignApk(this: ADB, apk: string): Promise<boolean> {
     }
     throw new Error(
       `zipAlignApk failed. Original error: ${err.message || (err as ExecError).stderr}`,
+      {cause: e},
     );
   }
 }
@@ -340,6 +343,7 @@ export async function checkApkCert(
     }
     throw new Error(
       `Cannot verify the signature of '${actualAppPath}'. ` + `Original error: ${errMsg}`,
+      {cause: err},
     );
   }
 }
@@ -393,6 +397,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
     throw new Error(
       `Cannot get the hash of '${this.keystorePath}' keystore. ` +
         `Original error: ${err.stderr || err.message}`,
+      {cause: e},
     );
   }
 }

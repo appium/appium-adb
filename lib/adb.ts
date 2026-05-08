@@ -23,7 +23,14 @@ import * as appCommands from './tools/app-commands';
 import * as networkCommands from './tools/network-commands';
 import * as logcatCommands from './tools/logcat-commands';
 import * as processCommands from './tools/process-commands';
-import {DEFAULT_ADB_EXEC_TIMEOUT, cloneDeep, defaultsDeep, getSdkRootFromEnv, pick, requireSdkRoot} from './utils';
+import {
+  DEFAULT_ADB_EXEC_TIMEOUT,
+  cloneDeep,
+  defaultsDeep,
+  getSdkRootFromEnv,
+  pick,
+  requireSdkRoot,
+} from './utils';
 
 export const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {

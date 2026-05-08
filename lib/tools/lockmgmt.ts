@@ -1,7 +1,7 @@
 import {log} from '../logger';
 import {sleep, waitForCondition} from 'asyncbox';
 import type {ADB} from '../adb';
-import { util } from '@appium/support';
+import {util} from '@appium/support';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
@@ -71,6 +71,7 @@ export async function verifyLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }
@@ -110,6 +111,7 @@ export async function clearLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }
@@ -141,6 +143,7 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
   } catch (e) {
     throw new Error(
       `Cannot check if device lock is enabled. Original error: ${(e as Error).message}`,
+      {cause: e},
     );
   }
 }
@@ -193,6 +196,7 @@ export async function setLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }

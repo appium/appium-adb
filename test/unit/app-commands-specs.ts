@@ -325,10 +325,7 @@ package:com.android.chrome`;
       expect(cmd[cmd.length - 1]).to.eql('key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
-      const cmd = buildStartCmd(
-        {...startOptions, optionalIntentArguments: '-d key value'},
-        20,
-      );
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value'}, 20);
       expect(cmd[cmd.length - 3]).to.eql('-d');
       expect(cmd[cmd.length - 2]).to.eql('key');
       expect(cmd[cmd.length - 1]).to.eql('value');
@@ -343,10 +340,7 @@ package:com.android.chrome`;
       expect(cmd[cmd.length - 1]).to.eql('value value2');
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
-      const cmd = buildStartCmd(
-        {...startOptions, optionalIntentArguments: '-d key1 -e key2'},
-        20,
-      );
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 -e key2'}, 20);
       expect(cmd[cmd.length - 4]).to.eql('-d');
       expect(cmd[cmd.length - 3]).to.eql('key1');
       expect(cmd[cmd.length - 2]).to.eql('-e');
@@ -366,10 +360,7 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with hyphens', function () {
       const arg = 'http://some-url-with-hyphens.com/';
-      const cmd = buildStartCmd(
-        {...startOptions, optionalIntentArguments: `-d ${arg}`},
-        20,
-      );
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: `-d ${arg}`}, 20);
       expect(cmd[cmd.length - 2]).to.eql('-d');
       expect(cmd[cmd.length - 1]).to.eql(arg);
     });

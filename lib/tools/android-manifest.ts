@@ -149,6 +149,7 @@ export async function compileManifest(
     } catch (e1) {
       throw new Error(
         `Cannot compile the manifest. Original error: ${(e1 as Error).message || (e1 as {stderr?: string}).stderr}`,
+        {cause: e1},
       );
     }
   }

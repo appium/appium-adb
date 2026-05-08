@@ -77,7 +77,7 @@ describe('general commands', function () {
     } catch {
       // If timeout, the IME couldn't be disabled (system IME that can't be disabled)
       // This is acceptable behavior on some Android versions
-      enabledAfterDisable = await adb.enabledIMEs();
+      await adb.enabledIMEs();
     }
     // Re-enable the IME to restore state (or ensure it's enabled if disable didn't work)
     await adb.enableIME(ime);

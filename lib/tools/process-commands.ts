@@ -133,7 +133,9 @@ export async function killProcessesByName(
     }
   } catch (e: unknown) {
     const err: Error = e as Error;
-    throw new Error(`Unable to kill ${name} processes. Original error: ${err.message}`);
+    throw new Error(`Unable to kill ${name} processes. Original error: ${err.message}`, {
+      cause: e,
+    });
   }
 }
 

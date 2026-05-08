@@ -64,7 +64,9 @@ export async function fileSize(this: ADB, remotePath: string): Promise<number> {
     }
     return parseInt(match[1], 10);
   } catch (err) {
-    throw new Error(`Unable to get file size for '${remotePath}': ${(err as Error).message}`);
+    throw new Error(`Unable to get file size for '${remotePath}': ${(err as Error).message}`, {
+      cause: err,
+    });
   }
 }
 

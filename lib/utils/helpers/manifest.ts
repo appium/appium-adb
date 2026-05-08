@@ -4,6 +4,12 @@ import {log} from '../../logger';
 import type {ADB} from '../../adb';
 import type {ApkManifest} from '../../tools/types';
 
+/**
+ * Reads and parses Android manifest metadata from an APK via `aapt2`.
+ *
+ * @param apkPath - Local path to the APK file
+ * @returns Parsed manifest data
+ */
 export async function readPackageManifest(this: ADB, apkPath: string): Promise<ApkManifest> {
   await this.initAapt2();
   const aapt2Binary = this.binaries?.aapt2;
@@ -21,15 +27,17 @@ export async function readPackageManifest(this: ADB, apkPath: string): Promise<A
     const prefix = `Cannot read the manifest from '${apkPath}'`;
     const suffix = `Original error: ${error.stderr || error.message}`;
     if (error.stderr && error.stderr.includes(`Unable to open 'badging'`)) {
-      throw new Error(`${prefix}. Update build tools to use a newer aapt2 version. ${suffix}`);
+      throw new Error(`${prefix}. Update build tools to use a newer aapt2 version. ${suffix}`, {
+        cause: e,
+      });
     }
-    throw new Error(`${prefix}. ${suffix}`);
+    throw new Error(`${prefix}. ${suffix}`, {cause: e});
   }
 
   const extractValue = (
     line: string,
     propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null
+    valueTransformer: ((x: string) => any) | null,
   ): any => {
     const match = propPattern.exec(line);
     if (match) {
@@ -40,7 +48,7 @@ export async function readPackageManifest(this: ADB, apkPath: string): Promise<A
   const extractArray = (
     line: string,
     propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null
+    valueTransformer: ((x: string) => any) | null,
   ): any[] => {
     let match: RegExpExecArray | null;
     const resultArray: any[] = [];

@@ -1,27 +1,35 @@
 import path from 'node:path';
-import {fs, zip} from '@appium/support';
+import {fs, zip, util} from '@appium/support';
 import {log} from '../../logger';
 import {MODULE_NAME} from './constants';
-import {util} from '@appium/support';
 
 // Declare __filename for CommonJS compatibility
 declare const __filename: string;
 
 export const getResourcePath = util.memoize(async function getResourcePath(
-  relPath: string
+  relPath: string,
 ): Promise<string> {
   const moduleRoot = await getModuleRoot();
   const resultPath = path.resolve(moduleRoot, relPath);
   if (!(await fs.exists(resultPath))) {
     throw new Error(
       `Cannot find the resource '${relPath}' under the '${moduleRoot}' ` +
-        `folder of ${MODULE_NAME} Node.js module`
+        `folder of ${MODULE_NAME} Node.js module`,
     );
   }
   return resultPath;
 });
 
-export async function unzipFile(zipPath: string, dstRoot: string = path.dirname(zipPath)): Promise<void> {
+/**
+ * Unzips an archive into the target destination directory.
+ *
+ * @param zipPath - Source zip file path
+ * @param dstRoot - Destination directory. Defaults to zip parent directory
+ */
+export async function unzipFile(
+  zipPath: string,
+  dstRoot: string = path.dirname(zipPath),
+): Promise<void> {
   log.debug(`Unzipping '${zipPath}' to '${dstRoot}'`);
   await zip.assertValidZip(zipPath);
   await zip.extractAllTo(zipPath, dstRoot);

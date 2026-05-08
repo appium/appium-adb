@@ -231,7 +231,9 @@ export async function getConnectedDevices(
     ({stdout} = await exec(this.executable.path, args));
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`Error while getting connected devices. Original error: ${error.message}`);
+    throw new Error(`Error while getting connected devices. Original error: ${error.message}`, {
+      cause: e,
+    });
   }
   const listHeader = 'List of devices';
   // expecting adb devices to return output as
@@ -318,7 +320,9 @@ export async function getDevicesWithRetry(this: ADB, timeoutMs: number = 20000):
   } catch (e: unknown) {
     const error = e as Error;
     if (/Condition unmet/.test(error.message)) {
-      throw new Error(`Could not find a connected Android device in ${timeoutMs}ms`);
+      throw new Error(`Could not find a connected Android device in ${timeoutMs}ms`, {
+        cause: e,
+      });
     } else {
       throw e;
     }
@@ -342,7 +346,9 @@ export async function reconnect(this: ADB, target: string | null = 'offline'): P
     await this.adbExec(args);
   } catch (e: unknown) {
     const error = e as ExecError;
-    throw new Error(`Cannot reconnect adb. Original error: ${error.stderr || error.message}`);
+    throw new Error(`Cannot reconnect adb. Original error: ${error.stderr || error.message}`, {
+      cause: e,
+    });
   }
 }
 
@@ -449,8 +455,7 @@ export async function adbExec<
 
   const optsCopy = cloneDeep(opts ?? {}) as TExecOpts;
   // setting default timeout for each command to prevent infinite wait.
-  optsCopy.timeout =
-    optsCopy.timeout || this.adbExecTimeout || DEFAULT_ADB_EXEC_TIMEOUT;
+  optsCopy.timeout = optsCopy.timeout || this.adbExecTimeout || DEFAULT_ADB_EXEC_TIMEOUT;
   optsCopy.timeoutCapName = optsCopy.timeoutCapName || 'adbExecTimeout'; // For error message
 
   const {outputFormat = this.EXEC_OUTPUT_FORMAT.STDOUT} = optsCopy;
@@ -602,7 +607,7 @@ export async function getEmulatorPort(this: ADB): Promise<number> {
     }
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`No devices connected. Original error: ${error.message}`);
+    throw new Error(`No devices connected. Original error: ${error.message}`, {cause: e});
   }
 }
 
@@ -644,7 +649,7 @@ export async function getConnectedEmulators(
     return emulators;
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`Error getting emulators. Original error: ${error.message}`);
+    throw new Error(`Error getting emulators. Original error: ${error.message}`, {cause: e});
   }
 }
 
@@ -720,7 +725,7 @@ export async function getRunningAVD(this: ADB, avdName: string): Promise<Device 
     return null;
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`Error getting AVD. Original error: ${error.message}`);
+    throw new Error(`Error getting AVD. Original error: ${error.message}`, {cause: e});
   }
 }
 
@@ -755,7 +760,9 @@ export async function getRunningAVDWithRetry(
     )) as Device | null;
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`Error getting AVD with retry. Original error: ${error.message}`);
+    throw new Error(`Error getting AVD with retry. Original error: ${error.message}`, {
+      cause: e,
+    });
   }
 }
 
@@ -778,7 +785,7 @@ export async function killAllEmulators(this: ADB): Promise<void> {
     await exec(cmd, args);
   } catch (e: unknown) {
     const error = e as Error;
-    throw new Error(`Error killing emulators. Original error: ${error.message}`);
+    throw new Error(`Error killing emulators. Original error: ${error.message}`, {cause: e});
   }
 }
 
@@ -936,6 +943,7 @@ export async function launchAVD(
       const error = e as ExecError;
       throw new Error(
         `'${processedAvdName}' Emulator has failed to boot: ${error.stderr || error.message}`,
+        {cause: e},
       );
     }
   }
@@ -955,7 +963,7 @@ export const getVersion = memoize(async function getVersion(this: ADB): Promise<
     stdout = await this.adbExec('version');
   } catch (e: unknown) {
     const error = e as ExecError;
-    throw new Error(`Error getting adb version: ${error.stderr || error.message}`);
+    throw new Error(`Error getting adb version: ${error.stderr || error.message}`, {cause: e});
   }
 
   const result: Partial<Version> = {};
@@ -1130,6 +1138,7 @@ export async function reboot(
       throw new Error(
         `Could not reboot device. Rebooting requires root access and ` +
           `attempt to get root access on device failed with error: '${message}'`,
+        {cause: e},
       );
     }
     throw error;
@@ -1290,6 +1299,7 @@ export async function installMitmCertificate(this: ADB, cert: Buffer | string): 
         `Is the certificate properly encoded into base64-string? ` +
         `Do you have root permissions on the device? ` +
         `Original error: ${error.message}`,
+      {cause: err},
     );
   } finally {
     await fs.rimraf(tmpRoot);
@@ -1322,6 +1332,7 @@ export async function isMitmCertificateInstalled(
       `Cannot retrieve the certificate hash. ` +
         `Is the certificate properly encoded into base64-string? ` +
         `Original error: ${error.message}`,
+      {cause: err},
     );
   } finally {
     await fs.rimraf(tmpRoot);

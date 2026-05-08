@@ -6,7 +6,15 @@ import * as semver from 'semver';
 import os from 'node:os';
 import {LRUCache} from 'lru-cache';
 import type {ADB} from '../adb';
-import {APKS_EXTENSION, APK_INSTALL_TIMEOUT, DEFAULT_ADB_EXEC_TIMEOUT, buildInstallArgs, cloneDeep, defaults, readPackageManifest} from '../utils';
+import {
+  APKS_EXTENSION,
+  APK_INSTALL_TIMEOUT,
+  DEFAULT_ADB_EXEC_TIMEOUT,
+  buildInstallArgs,
+  cloneDeep,
+  defaults,
+  readPackageManifest,
+} from '../utils';
 import type {
   UninstallOptions,
   ShellExecOptions,
@@ -53,7 +61,7 @@ export async function uninstallApk(
     stdout = (await this.adbExec(cmd, {timeout: options.timeout})).trim();
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Unable to uninstall APK. Original error: ${err.message}`);
+    throw new Error(`Unable to uninstall APK. Original error: ${err.message}`, {cause: e});
   }
   log.debug(`'adb ${cmd.join(' ')}' command output: ${stdout}`);
   if (stdout.includes('Success')) {
@@ -211,9 +219,7 @@ export async function install(
   defaults(options, {
     replace: true,
     timeout:
-      this.adbExecTimeout === DEFAULT_ADB_EXEC_TIMEOUT
-        ? APK_INSTALL_TIMEOUT
-        : this.adbExecTimeout,
+      this.adbExecTimeout === DEFAULT_ADB_EXEC_TIMEOUT ? APK_INSTALL_TIMEOUT : this.adbExecTimeout,
     timeoutCapName: 'androidInstallTimeout',
   });
 
@@ -459,7 +465,7 @@ export async function extractStringsFromApk(
     appPath = await this.extractLanguageApk(appPath, language);
   }
 
-  let apkStrings: StringRecord = {};
+  let apkStrings: StringRecord;
   let configMarker: string;
   try {
     await this.initAapt();
@@ -517,6 +523,7 @@ export async function extractStringsFromApk(
       const error = e as Error;
       throw new Error(
         `Cannot extract resources from '${originalAppPath}'. ` + `Original error: ${error.message}`,
+        {cause: e},
       );
     }
   }

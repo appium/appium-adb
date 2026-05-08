@@ -355,7 +355,7 @@ export async function stopAndClear(this: ADB, pkg: string): Promise<void> {
     await this.clear(pkg);
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Cannot stop and clear ${pkg}. Original error: ${err.message}`);
+    throw new Error(`Cannot stop and clear ${pkg}. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -378,7 +378,10 @@ export async function getPackageInfo(this: ADB, pkg: string): Promise<AppInfo> {
     return result;
   }
 
-  const installedPattern = new RegExp(`^\\s*Package\\s+\\[${util.escapeRegExp(pkg)}\\][^:]+:$`, 'm');
+  const installedPattern = new RegExp(
+    `^\\s*Package\\s+\\[${util.escapeRegExp(pkg)}\\][^:]+:$`,
+    'm',
+  );
   result.isInstalled = installedPattern.test(stdout);
   if (!result.isInstalled) {
     return result;
@@ -433,7 +436,7 @@ export async function activateApp(this: ADB, appId: string): Promise<void> {
     // The monkey command could raise an issue as https://stackoverflow.com/questions/44860475/how-to-use-the-monkey-command-with-an-android-system-that-doesnt-have-physical
     // but '--pct-syskeys 0' could cause another background process issue. https://github.com/appium/appium/issues/16941#issuecomment-1129837285
     const cmd = ['monkey', '-p', appId, '-c', 'android.intent.category.LAUNCHER', '1'];
-    let output = '';
+    let output: string;
     try {
       output = await this.shell(cmd);
       log.debug(`Command stdout: ${output}`);
@@ -597,7 +600,8 @@ export async function startUri(
       throw new Error(res);
     }
   } catch (e) {
-    throw new Error(`Error attempting to start URI. Original error: ${e}`);
+    const err = e instanceof Error ? e : new Error(String(e));
+    throw new Error(`Error attempting to start URI. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -683,6 +687,7 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
       `Cannot start the '${appDescriptor}' application. ` +
         `Consider checking the driver's troubleshooting documentation. ` +
         `Original error: ${error.message}`,
+      {cause: e},
     );
   }
 }
@@ -717,6 +722,7 @@ export async function getFocusedPackageAndActivity(this: ADB): Promise<PackageAc
     const error = e as Error;
     throw new Error(
       `Could not retrieve the currently focused package and activity. Original error: ${error.message}`,
+      {cause: e},
     );
   }
 
