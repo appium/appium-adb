@@ -6,7 +6,7 @@ import {LRUCache} from 'lru-cache';
 import AsyncLock from 'async-lock';
 import type {ADB} from '../adb';
 import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types';
-import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, isArray, truncate, unzipFile} from '../utils';
+import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, unzipFile} from '../utils';
 
 const BASE_APK = 'base-master.apk';
 const LANGUAGE_APK = (lang: string) => `base-${lang}.apk`;
@@ -64,7 +64,7 @@ export async function execBundletool(this: ADB, args: string[], errorMsg: string
       env,
       timeout: BUNDLETOOL_TIMEOUT_MS,
     }));
-    log.debug(`Command stdout: ${truncate(stdout, {length: 300})}`);
+    log.debug(`Command stdout: ${util.truncateString(stdout, {length: 300})}`);
     return stdout;
   } catch (e) {
     const err = e as Error & {stdout?: string; stderr?: string};
@@ -239,7 +239,7 @@ export function isTestPackageOnlyError(output: string): boolean {
  * apks file is not a valid bundle
  */
 async function extractFromApks(apks: string, dstPath: string | string[]): Promise<string> {
-  const normalizedDstPath = isArray(dstPath) ? dstPath : [dstPath];
+  const normalizedDstPath = Array.isArray(dstPath) ? dstPath : [dstPath];
 
   return await APKS_CACHE_GUARD.acquire(apks, async () => {
     // It might be that the original file has been replaced,

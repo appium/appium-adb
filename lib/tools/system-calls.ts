@@ -6,7 +6,7 @@ import type {ExecError, TeenProcessExecResult} from 'teen_process';
 import {asyncmap, retry, retryInterval, sleep, waitForCondition} from 'asyncbox';
 import * as semver from 'semver';
 import type {ADB} from '../adb';
-import {DEFAULT_ADB_EXEC_TIMEOUT, cloneDeep, flatten, getSdkRootFromEnv, isArray, isEmpty, isNil, isNull, isNumber, isString, last, memoize, toLower, trim, zip} from '../utils';
+import {DEFAULT_ADB_EXEC_TIMEOUT, cloneDeep, getSdkRootFromEnv, memoize, zip} from '../utils';
 import type {
   ConnectedDevicesOptions,
   Device,
@@ -80,7 +80,7 @@ function _getBinaryNameForOS(binaryName: string): string {
  */
 function getSdkBinaryLocationCandidates(sdkRoot: string, fullBinaryName: string): string[] {
   return SDK_BINARY_ROOTS.map((x) =>
-    path.resolve(sdkRoot, ...(isArray(x) ? x : [x]), fullBinaryName),
+    path.resolve(sdkRoot, ...(Array.isArray(x) ? x : [x]), fullBinaryName),
   );
 }
 
@@ -123,19 +123,16 @@ export async function getBinaryFromSdkRoot(this: ADB, binaryName: string): Promi
   let buildToolsDirs = await getBuildToolsDirs(this.sdkRoot);
   if (this.buildToolsVersion) {
     buildToolsDirs = buildToolsDirs.filter((x) => path.basename(x) === this.buildToolsVersion);
-    if (isEmpty(buildToolsDirs)) {
+    if (util.isEmpty(buildToolsDirs)) {
       log.info(`Found no build tools whose version matches to '${this.buildToolsVersion}'`);
     } else {
       log.info(`Using build tools at '${buildToolsDirs}'`);
     }
   }
   binaryLocs.push(
-    ...flatten(
-      buildToolsDirs.map((dir) => [
-        path.resolve(dir, fullBinaryName),
-        path.resolve(dir, 'lib', fullBinaryName),
-      ]),
-    ),
+    ...buildToolsDirs
+      .map((dir) => [path.resolve(dir, fullBinaryName), path.resolve(dir, 'lib', fullBinaryName)])
+      .flat(),
   );
 
   let binaryLoc: string | null = null;
@@ -145,7 +142,7 @@ export async function getBinaryFromSdkRoot(this: ADB, binaryName: string): Promi
       break;
     }
   }
-  if (isNull(binaryLoc)) {
+  if (binaryLoc === null) {
     throw new Error(
       `Could not find '${fullBinaryName}' in ${JSON.stringify(binaryLocs)}. ` +
         `Do you have Android Build Tools ${this.buildToolsVersion ? `v ${this.buildToolsVersion} ` : ''}` +
@@ -252,7 +249,7 @@ export async function getConnectedDevices(
   }
   const devices = stdout
     .split('\n')
-    .map(trim)
+    .map((x) => x.trim())
     .filter((line) => line && !excludedLines.some((x) => line.includes(x)))
     .map((line) => {
       // state is "device", afaic
@@ -270,7 +267,7 @@ export async function getConnectedDevices(
       }
       return device;
     });
-  if (isEmpty(devices)) {
+  if (util.isEmpty(devices)) {
     log.debug('No connected devices have been detected');
   } else {
     log.debug(`Connected devices: ${JSON.stringify(devices)}`);
@@ -458,7 +455,7 @@ export async function adbExec<
 
   const {outputFormat = this.EXEC_OUTPUT_FORMAT.STDOUT} = optsCopy;
 
-  cmd = isArray(cmd) ? cmd : [cmd];
+  cmd = Array.isArray(cmd) ? cmd : [cmd];
   let adbRetried = false;
   const execFunc = async (): Promise<string | ExecResult> => {
     try {
@@ -495,7 +492,7 @@ export async function adbExec<
         return error.stdout.replace(LINKER_WARNING_REGEXP, '').trim();
       }
 
-      if (isNull(error.code)) {
+      if (error.code === null) {
         error.message =
           `Error executing adbExec. Original error: '${error.message}'. ` +
           `Try to increase the ${optsCopy.timeout}ms adb execution timeout ` +
@@ -544,7 +541,7 @@ export async function shell<TShellExecOpts extends ShellExecOptions = ShellExecO
 ): Promise<TShellExecOpts extends TFullOutputOption ? ExecResult : string> {
   const {privileged} = opts ?? ({} as TShellExecOpts);
 
-  const cmdArr = isArray(cmd) ? cmd : [cmd];
+  const cmdArr = Array.isArray(cmd) ? cmd : [cmd];
   const fullCmd: string[] = ['shell'];
   if (privileged) {
     log.info(`'adb shell ${util.quote(cmdArr)}' requires root access`);
@@ -592,7 +589,7 @@ export function getAdbServerPort(this: ADB): number {
  */
 export async function getEmulatorPort(this: ADB): Promise<number> {
   log.debug('Getting running emulator port');
-  if (!isNil(this.emulatorPort)) {
+  if (this.emulatorPort != null) {
     return this.emulatorPort;
   }
   try {
@@ -684,7 +681,7 @@ export function setDeviceId(this: ADB, deviceId: string): void {
 export function setDevice(this: ADB, deviceObj: Device): void {
   const deviceId = deviceObj.udid;
   const emPort = this.getPortFromEmulatorString(deviceId);
-  if (isNumber(emPort)) {
+  if (typeof emPort === 'number' && !Number.isNaN(emPort)) {
     this.setEmulatorPort(emPort);
   }
   this.setDeviceId(deviceId);
@@ -705,7 +702,7 @@ export async function getRunningAVD(this: ADB, avdName: string): Promise<Device 
   try {
     const emulators = await this.getConnectedEmulators();
     for (const emulator of emulators) {
-      if (isNumber(emulator.port)) {
+      if (typeof emulator.port === 'number' && !Number.isNaN(emulator.port)) {
         this.setEmulatorPort(emulator.port);
       }
       const runningAVDName = await this.execEmuConsoleCommand(['avd', 'name'], {
@@ -713,7 +710,7 @@ export async function getRunningAVD(this: ADB, avdName: string): Promise<Device 
         execTimeout: 5000,
         connTimeout: 1000,
       });
-      if (toLower(avdName) === toLower(runningAVDName.trim())) {
+      if (avdName.toLowerCase() === runningAVDName.trim().toLowerCase()) {
         log.debug(`Found emulator '${avdName}' on port ${emulator.port}`);
         this.setDeviceId(emulator.udid);
         return emulator;
@@ -906,12 +903,12 @@ export async function launchAVD(
     log.info('The -delay-adb emulator startup detection feature has been explicitly disabled');
   }
 
-  if (!isEmpty(args)) {
-    launchArgs.push(...(isArray(args) ? args : util.shellParse(`${args}`)));
+  if (!util.isEmpty(args)) {
+    launchArgs.push(...(Array.isArray(args) ? args : util.shellParse(`${args}`)));
   }
 
   log.debug(`Running '${emulatorBinaryPath}' with args: ${util.quote(launchArgs)}`);
-  if (!isEmpty(env)) {
+  if (!util.isEmpty(env)) {
     log.debug(`Customized emulator environment: ${JSON.stringify(env)}`);
   }
   const proc = new SubProcess(emulatorBinaryPath, launchArgs, {
@@ -1353,10 +1350,10 @@ export async function shellChunks(
   let cmdChunk: string[] = [];
   for (const arg of args) {
     const nextCmd = argTransformer(arg);
-    if (!isArray(nextCmd)) {
+    if (!Array.isArray(nextCmd)) {
       throw new Error('Argument transformer must result in an array');
     }
-    if (last(nextCmd) !== ';') {
+    if (nextCmd.at(-1) !== ';') {
       nextCmd.push(';');
     }
     if (nextCmd.join(' ').length + cmdChunk.join(' ').length >= MAX_SHELL_BUFFER_LENGTH) {
@@ -1365,7 +1362,7 @@ export async function shellChunks(
     }
     cmdChunk = [...cmdChunk, ...nextCmd];
   }
-  if (!isEmpty(cmdChunk)) {
+  if (!util.isEmpty(cmdChunk)) {
     commands.push(cmdChunk);
   }
   log.debug(`Got the following command chunks to execute: ${JSON.stringify(commands)}`);
@@ -1392,18 +1389,18 @@ export async function shellChunks(
  */
 export function toAvdLocaleArgs(language: string | null, country: string | null): string[] {
   const result: string[] = [];
-  if (language && isString(language)) {
+  if (language && typeof language === 'string') {
     result.push('-prop', `persist.sys.language=${language.toLowerCase()}`);
   }
-  if (country && isString(country)) {
+  if (country && typeof country === 'string') {
     result.push('-prop', `persist.sys.country=${country.toUpperCase()}`);
   }
   let locale: string | undefined;
-  if (isString(language) && isString(country) && language && country) {
+  if (typeof language === 'string' && typeof country === 'string' && language && country) {
     locale = language.toLowerCase() + '-' + country.toUpperCase();
-  } else if (language && isString(language)) {
+  } else if (language && typeof language === 'string') {
     locale = language.toLowerCase();
-  } else if (country && isString(country)) {
+  } else if (country && typeof country === 'string') {
     locale = country;
   }
   if (locale) {

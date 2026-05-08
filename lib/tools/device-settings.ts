@@ -4,7 +4,6 @@ import {util} from '@appium/support';
 import type {ADB} from '../adb';
 import type {SetPropOpts} from './types';
 import type {ExecError} from 'teen_process';
-import {escapeRegExp, includes, isEmpty, isString, isUndefined, trim} from '../utils';
 
 const ANIMATION_SCALE_KEYS = [
   'animator_duration_scale',
@@ -155,10 +154,10 @@ export async function setHttpProxy(
   proxyPort: string | number,
 ): Promise<void> {
   const proxy = `${proxyHost}:${proxyPort}`;
-  if (isUndefined(proxyHost)) {
+  if (typeof proxyHost === 'undefined') {
     throw new Error(`Call to setHttpProxy method with undefined proxy_host: ${proxy}`);
   }
-  if (isUndefined(proxyPort)) {
+  if (typeof proxyPort === 'undefined') {
     throw new Error(`Call to setHttpProxy method with undefined proxy_port ${proxy}`);
   }
 
@@ -268,7 +267,7 @@ export async function getLocationProviders(this: ADB): Promise<string[]> {
   }
 
   // To emulate the legacy behavior
-  return includes(await this.shell(['cmd', 'location', 'is-location-enabled']), 'true')
+  return (await this.shell(['cmd', 'location', 'is-location-enabled'])).includes('true')
     ? ['gps']
     : [];
 }
@@ -401,8 +400,8 @@ export async function ensureCurrentLocale(
   country?: string,
   script?: string,
 ): Promise<boolean> {
-  const hasLanguage = isString(language);
-  const hasCountry = isString(country);
+  const hasLanguage = typeof language === 'string';
+  const hasCountry = typeof country === 'string';
   if (!hasLanguage && !hasCountry) {
     log.warn('ensureCurrentLocale requires language or country');
     return false;
@@ -439,12 +438,12 @@ export async function ensureCurrentLocale(
         ? `${lcLanguage}-${script.toLowerCase()}-${lcCountry}`
         : `${lcLanguage}-${lcCountry}`;
       log.debug(`Requested locale: ${expectedLocale}. Actual locale: '${actualLocale}'`);
-      const languagePattern = `^${escapeRegExp(lcLanguage)}-${script ? escapeRegExp(script) + '-' : ''}`;
+      const languagePattern = `^${util.escapeRegExp(lcLanguage)}-${script ? util.escapeRegExp(script) + '-' : ''}`;
       const checkLocalePattern = (p: string) => new RegExp(p, 'i').test(actualLocale);
       if (hasLanguage && !hasCountry) {
         return checkLocalePattern(languagePattern);
       }
-      const countryPattern = `${script ? '-' + escapeRegExp(script) : ''}-${escapeRegExp(lcCountry)}$`;
+      const countryPattern = `${script ? '-' + util.escapeRegExp(script) : ''}-${util.escapeRegExp(lcCountry)}$`;
       if (!hasLanguage && hasCountry) {
         return checkLocalePattern(countryPattern);
       }
@@ -509,9 +508,10 @@ export async function getDeviceIdleWhitelist(this: ADB): Promise<string[]> {
 
   log.info('Listing packages in Doze whitelist');
   const output = await this.shell(['dumpsys', 'deviceidle', 'whitelist']);
-  return trim(output)
+  return output
+    .trim()
     .split(/\n/)
-    .map((line) => trim(line))
+    .map((line) => line.trim())
     .filter(Boolean);
 }
 
@@ -525,7 +525,7 @@ export async function getDeviceIdleWhitelist(this: ADB): Promise<string[]> {
  * @returns `true` if the command to add package(s) has been executed
  */
 export async function addToDeviceIdleWhitelist(this: ADB, ...packages: string[]): Promise<boolean> {
-  if (isEmpty(packages) || (await this.getApiLevel()) < 23) {
+  if (util.isEmpty(packages) || (await this.getApiLevel()) < 23) {
     // Doze mode has only been added since Android 6
     return false;
   }
@@ -621,7 +621,7 @@ export async function broadcastAirplaneMode(this: ADB, on: boolean): Promise<voi
   } catch (e) {
     const err = e as ExecError;
     // https://github.com/appium/appium/issues/17422
-    if (includes(err.stderr, 'SecurityException')) {
+    if ((err.stderr ?? '').includes('SecurityException')) {
       try {
         await this.shell(args, {privileged: true});
         return;
@@ -708,7 +708,7 @@ export async function getScreenOrientation(this: ADB): Promise<number | null> {
  * @returns Either the same error or the decorated one
  */
 function decorateWriteSecureSettingsException(e: Error): Error {
-  if (includes(e.message, 'requires:android.permission.WRITE_SECURE_SETTINGS')) {
+  if (e.message?.includes('requires:android.permission.WRITE_SECURE_SETTINGS')) {
     e.message = `Check https://github.com/appium/appium/issues/13802 for throubleshooting. ${e.message}`;
   }
   return e;

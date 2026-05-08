@@ -15,7 +15,6 @@ import {fs} from '@appium/support';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT} from '../constants';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {defaults, isNull} from '../../lib/utils';
 
 chai.use(chaiAsPromised);
 
@@ -321,13 +320,13 @@ package:com.android.chrome`;
       expect(cmd.includes(`${startOptions.pkg}/${startOptions.activity}`)).to.be.true;
     });
     it('should parse optionalIntentArguments with single key', function () {
-      const cmd = buildStartCmd(defaults({optionalIntentArguments: '-d key'}, startOptions), 20);
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key'}, 20);
       expect(cmd[cmd.length - 2]).to.eql('-d');
       expect(cmd[cmd.length - 1]).to.eql('key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
       const cmd = buildStartCmd(
-        defaults({optionalIntentArguments: '-d key value'}, startOptions),
+        {...startOptions, optionalIntentArguments: '-d key value'},
         20,
       );
       expect(cmd[cmd.length - 3]).to.eql('-d');
@@ -336,7 +335,7 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       const cmd = buildStartCmd(
-        defaults({optionalIntentArguments: '-d key value value2'}, startOptions),
+        {...startOptions, optionalIntentArguments: '-d key value value2'},
         20,
       );
       expect(cmd[cmd.length - 3]).to.eql('-d');
@@ -345,7 +344,7 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
       const cmd = buildStartCmd(
-        defaults({optionalIntentArguments: '-d key1 -e key2'}, startOptions),
+        {...startOptions, optionalIntentArguments: '-d key1 -e key2'},
         20,
       );
       expect(cmd[cmd.length - 4]).to.eql('-d');
@@ -355,7 +354,7 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
       const cmd = buildStartCmd(
-        defaults({optionalIntentArguments: '-d key1 value1 -e key2 value2'}, startOptions),
+        {...startOptions, optionalIntentArguments: '-d key1 value1 -e key2 value2'},
         20,
       );
       expect(cmd[cmd.length - 6]).to.eql('-d');
@@ -368,7 +367,7 @@ package:com.android.chrome`;
     it('should parse optionalIntentArguments with hyphens', function () {
       const arg = 'http://some-url-with-hyphens.com/';
       const cmd = buildStartCmd(
-        defaults({optionalIntentArguments: `-d ${arg}`}, startOptions),
+        {...startOptions, optionalIntentArguments: `-d ${arg}`},
         20,
       );
       expect(cmd[cmd.length - 2]).to.eql('-d');
@@ -378,12 +377,10 @@ package:com.android.chrome`;
       const arg1 = 'http://some-url-with-hyphens.com/';
       const arg2 = 'http://some-other-url-with-hyphens.com/';
       const cmd = buildStartCmd(
-        defaults(
-          {
-            optionalIntentArguments: `-d ${arg1} -e key ${arg2}`,
-          },
-          startOptions,
-        ),
+        {
+          ...startOptions,
+          optionalIntentArguments: `-d ${arg1} -e key ${arg2}`,
+        },
         20,
       );
       expect(cmd[cmd.length - 5]).to.eql('-d');
@@ -393,11 +390,11 @@ package:com.android.chrome`;
       expect(cmd[cmd.length - 1]).to.eql(arg2);
     });
     it('should have -S option when stopApp is set', function () {
-      const cmd = buildStartCmd(defaults({stopApp: true}, startOptions), 20);
+      const cmd = buildStartCmd({...startOptions, stopApp: true}, 20);
       expect(cmd[cmd.length - 1]).to.eql('-S');
     });
     it('should not have -S option when stopApp is not set', function () {
-      const cmd = buildStartCmd(defaults({stopApp: false}, startOptions), 20);
+      const cmd = buildStartCmd({...startOptions, stopApp: false}, 20);
       expect(cmd[cmd.length - 1]).to.not.eql('-S');
     });
   });
@@ -707,7 +704,7 @@ package:com.android.chrome`;
     });
     it('test invalid activity name', function () {
       const activity = 'User@123';
-      expect(isNull(matchComponentName(activity))).to.be.true;
+      expect(matchComponentName(activity)).to.be.null;
     });
   });
 });

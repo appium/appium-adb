@@ -3,7 +3,6 @@ import {fs} from '@appium/support';
 import path from 'node:path';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {first} from '../../lib/utils';
 
 chai.use(chaiAsPromised);
 
@@ -26,7 +25,7 @@ describe('ADB', function () {
   });
   it('should initialize aapt using the enforced build tools path', async function () {
     const buildToolsRoot = path.resolve(process.env.ANDROID_HOME!, 'build-tools');
-    const buildToolsVersion = first(await fs.readdir(buildToolsRoot));
+    const buildToolsVersion = (await fs.readdir(buildToolsRoot))[0];
     const adb = new ADB({buildToolsVersion: buildToolsVersion || undefined});
     await adb.initAapt();
     expect(adb.binaries!.aapt).to.contain('aapt');

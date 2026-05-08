@@ -3,7 +3,7 @@ import {fs, util} from '@appium/support';
 import {SubProcess, exec, type ExecError} from 'teen_process';
 import type {ADB} from '../adb';
 import type {ScreenrecordOptions, StringRecord} from './types';
-import {includes, isInteger, memoize} from '../utils';
+import {memoize} from '../utils';
 
 /**
  * Get the path to adb executable amd assign it
@@ -64,33 +64,35 @@ export async function initBundletool(this: ADB): Promise<void> {
  * calls return the same value as the first one.
  */
 export async function getApiLevel(this: ADB): Promise<number> {
-  if (!isInteger(this._apiLevel)) {
-    try {
-      const strOutput = await this.getDeviceProperty('ro.build.version.sdk');
-      let apiLevel = parseInt(strOutput.trim(), 10);
-
-      // Workaround for preview/beta platform API level
-      const charCodeQ = 'q'.charCodeAt(0);
-      // 28 is the first API Level, where Android SDK started returning letters in response to getPlatformVersion
-      const apiLevelDiff = apiLevel - 28;
-      const codename = String.fromCharCode(charCodeQ + apiLevelDiff);
-      if (apiLevelDiff >= 0 && (await this.getPlatformVersion()).toLowerCase() === codename) {
-        log.debug(
-          `Release version is ${codename.toUpperCase()} but found API Level ${apiLevel}. Setting API Level to ${apiLevel + 1}`,
-        );
-        apiLevel++;
-      }
-
-      this._apiLevel = apiLevel;
-      log.debug(`Device API level: ${this._apiLevel}`);
-      if (isNaN(this._apiLevel)) {
-        throw new Error(`The actual output '${strOutput}' cannot be converted to an integer`);
-      }
-    } catch (e) {
-      throw new Error(`Error getting device API level. Original error: ${(e as Error).message}`);
-    }
+  if (Number.isInteger(this._apiLevel)) {
+    return this._apiLevel as number;
   }
-  return this._apiLevel as number;
+
+  try {
+    const strOutput = await this.getDeviceProperty('ro.build.version.sdk');
+    let apiLevel = parseInt(strOutput.trim(), 10);
+
+    // Workaround for preview/beta platform API level
+    const charCodeQ = 'q'.charCodeAt(0);
+    // 28 is the first API Level, where Android SDK started returning letters in response to getPlatformVersion
+    const apiLevelDiff = apiLevel - 28;
+    const codename = String.fromCharCode(charCodeQ + apiLevelDiff);
+    if (apiLevelDiff >= 0 && (await this.getPlatformVersion()).toLowerCase() === codename) {
+      log.debug(
+        `Release version is ${codename.toUpperCase()} but found API Level ${apiLevel}. Setting API Level to ${apiLevel + 1}`,
+      );
+      apiLevel++;
+    }
+
+    this._apiLevel = apiLevel;
+    log.debug(`Device API level: ${this._apiLevel}`);
+    if (isNaN(this._apiLevel)) {
+      throw new Error(`The actual output '${strOutput}' cannot be converted to an integer`);
+    }
+    return this._apiLevel;
+  } catch (e) {
+    throw new Error(`Error getting device API level. Original error: ${(e as Error).message}`);
+  }
 }
 
 /**
@@ -250,7 +252,7 @@ export async function listFeatures(this: ADB): Promise<string[]> {
       .filter(Boolean);
   } catch (e) {
     const err = e as ExecError;
-    if (includes(err.stderr, 'unknown command')) {
+    if ((err.stderr ?? '').includes('unknown command')) {
       return [];
     }
     throw err;

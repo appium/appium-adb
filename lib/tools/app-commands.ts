@@ -4,7 +4,7 @@ import {waitForCondition} from 'asyncbox';
 import path from 'node:path';
 import type {ADB} from '../adb';
 import type {ExecError} from 'teen_process';
-import {clone, defaults, difference, escapeRegExp, includes, intersectionWith, isBoolean, isEmpty, isEqual, isInteger, isNil, startsWith, trim, trimEnd, trimStart, uniq} from '../utils';
+import {defaults, intersectionWith} from '../utils';
 import type {
   StringRecord,
   InstallState,
@@ -79,7 +79,7 @@ export async function resolveLaunchableActivity(
   if (!preferCmd || (await this.getApiLevel()) < 24) {
     const stdout = await this.shell(['dumpsys', 'package', pkg]);
     const names = parseLaunchableActivityNames(stdout);
-    if (isEmpty(names)) {
+    if (util.isEmpty(names)) {
       log.debug(stdout);
       throw new Error(
         `Unable to resolve the launchable activity of '${pkg}'. Is it installed on the device?`,
@@ -113,7 +113,7 @@ export async function resolveLaunchableActivity(
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     },
   );
-  for (const line of (stdout || '').split('\n').map(trim)) {
+  for (const line of (stdout || '').split('\n').map((x) => x.trim())) {
     if (this.isValidClass(line)) {
       return line;
     }
@@ -204,8 +204,8 @@ export async function grantAllPermissions(this: ADB, pkg: string, apk?: string):
     dumpsysOutput = dumpsysOutput || (await this.shell(['dumpsys', 'package', pkg]));
     const requestedPermissions = await this.getReqPermissions(pkg, dumpsysOutput);
     const grantedPermissions = await this.getGrantedPermissions(pkg, dumpsysOutput);
-    const permissionsToGrant = difference(requestedPermissions, grantedPermissions);
-    if (isEmpty(permissionsToGrant)) {
+    const permissionsToGrant = requestedPermissions.filter((x) => !grantedPermissions.includes(x));
+    if (util.isEmpty(permissionsToGrant)) {
       log.info(`${pkg} contains no permissions available for granting`);
     } else {
       await this.grantPermissions(pkg, permissionsToGrant);
@@ -378,7 +378,7 @@ export async function getPackageInfo(this: ADB, pkg: string): Promise<AppInfo> {
     return result;
   }
 
-  const installedPattern = new RegExp(`^\\s*Package\\s+\\[${escapeRegExp(pkg)}\\][^:]+:$`, 'm');
+  const installedPattern = new RegExp(`^\\s*Package\\s+\\[${util.escapeRegExp(pkg)}\\][^:]+:$`, 'm');
   result.isInstalled = installedPattern.test(stdout);
   if (!result.isInstalled) {
     return result;
@@ -404,9 +404,9 @@ export async function getPackageInfo(this: ADB, pkg: string): Promise<AppInfo> {
  * @throws {Error} If there was an error while fetching the .apk
  */
 export async function pullApk(this: ADB, pkg: string, tmpDir: string): Promise<string> {
-  const stdout = trim(await this.shell(['pm', 'path', pkg]));
+  const stdout = (await this.shell(['pm', 'path', pkg])).trim();
   const packageMarker = 'package:';
-  if (!startsWith(stdout, packageMarker)) {
+  if (!stdout.startsWith(packageMarker)) {
     throw new Error(`Cannot pull the .apk package for '${pkg}'. Original error: ${stdout}`);
   }
 
@@ -546,8 +546,8 @@ export async function listInstalledPackages(
     const error = e as ExecError;
     // https://github.com/appium/appium-uiautomator2-driver/issues/810
     if (
-      includes(error.stderr || error.stdout || error.message, 'access user') &&
-      isEmpty(user)
+      (error.stderr || error.stdout || error.message)?.includes('access user') &&
+      util.isEmpty(user)
     ) {
       stdout = await this.shell([...cmd, '--user', '0']);
     } else {
@@ -613,7 +613,7 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
     throw new Error('pkg, and activity or intent action, are required to start an application');
   }
 
-  const options = clone(startAppOptions);
+  const options = {...startAppOptions};
   if (options.activity) {
     options.activity = options.activity.replace('$', '\\$');
   }
@@ -637,7 +637,7 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
     const shellOpts: {timeout?: number} = {};
     if (
       options.waitDuration !== undefined &&
-      isInteger(options.waitDuration) &&
+      Number.isInteger(options.waitDuration) &&
       options.waitDuration >= 0
     ) {
       shellOpts.timeout = options.waitDuration;
@@ -751,14 +751,14 @@ export async function getFocusedPackageAndActivity(this: ADB): Promise<PackageAc
     // https://github.com/appium/appium/issues/17106
     return (
       intersectionWith(focusedAppCandidates, currentFocusAppCandidates, (value, other) => {
-        if (!isEqual(value.appPackage, other.appPackage)) {
+        if (value.appPackage !== other.appPackage) {
           return false;
         }
         // https://github.com/appium/appium-adb/issues/797
         const [thisActivity, otherActivity] = [value.appActivity, other.appActivity].map((name) =>
           name?.replace(value.appPackage || '', ''),
         );
-        return Boolean(thisActivity && otherActivity && isEqual(thisActivity, otherActivity));
+        return Boolean(thisActivity && otherActivity && thisActivity === otherActivity);
       })[0] ?? focusedAppCandidates[0]
     );
   }
@@ -801,7 +801,7 @@ export async function waitForActivityOrNot(
     throw new Error('Package and activity required.');
   }
 
-  const splitNames = (names: string) => names.split(',').map(trim);
+  const splitNames = (names: string) => names.split(',').map((x) => x.trim());
   const allPackages = splitNames(pkg);
   const allActivities = splitNames(activity);
 
@@ -860,7 +860,7 @@ export async function waitForActivityOrNot(
       );
       log.debug(`Focused fully qualified activity name: ${fullyQualifiedActivity}`);
       const isFound =
-        includes(allPackages, appPackage) &&
+        allPackages.includes(appPackage) &&
         possibleActivityPatterns.some((p) => p.test(fullyQualifiedActivity));
       if ((!waitForStop && isFound) || (waitForStop && !isFound)) {
         return true;
@@ -984,36 +984,36 @@ export function buildStartCmd(startAppOptions: StartCmdOptions, apiLevel: number
  * in order to determine category names for these.
  */
 export function parseLaunchableActivityNames(dumpsys: string): string[] {
-  const mainActivityNameRe = new RegExp(`^\\s*${escapeRegExp(MAIN_ACTION)}:$`);
+  const mainActivityNameRe = new RegExp(`^\\s*${util.escapeRegExp(MAIN_ACTION)}:$`);
   const categoryNameRe = /^\s*Category:\s+"([a-zA-Z0-9._/-]+)"$/;
   const blocks: string[][] = [];
   let blockStartIndent: number | null | undefined;
   let block: string[] = [];
-  for (const line of dumpsys.split('\n').map(trimEnd)) {
-    const currentIndent = line.length - trimStart(line).length;
+  for (const line of dumpsys.split('\n').map((x) => x.trimEnd())) {
+    const currentIndent = line.length - line.trimStart().length;
     if (mainActivityNameRe.test(line)) {
       blockStartIndent = currentIndent;
-      if (!isEmpty(block)) {
+      if (!util.isEmpty(block)) {
         blocks.push(block);
         block = [];
       }
       continue;
     }
-    if (isNil(blockStartIndent)) {
+    if (blockStartIndent == null) {
       continue;
     }
 
     if (currentIndent > blockStartIndent) {
       block.push(line);
     } else {
-      if (!isEmpty(block)) {
+      if (!util.isEmpty(block)) {
         blocks.push(block);
         block = [];
       }
       blockStartIndent = null;
     }
   }
-  if (!isEmpty(block)) {
+  if (!util.isEmpty(block)) {
     blocks.push(block);
   }
 
@@ -1038,7 +1038,7 @@ export function parseLaunchableActivityNames(dumpsys: string): string[] {
       continue;
     }
 
-    for (const activityNameStr of item.map(trim).filter(Boolean)) {
+    for (const activityNameStr of item.map((x) => x.trim()).filter(Boolean)) {
       const fqActivityName = activityNameStr.split(/\s+/)[1];
       if (!matchComponentName(fqActivityName)) {
         continue;
@@ -1080,7 +1080,7 @@ export function extractMatchingPermissions(
   grantedState: boolean | null = null,
 ): string[] {
   const groupPatternByName = (groupName: string) =>
-    new RegExp(`^(\\s*${escapeRegExp(groupName)} permissions:[\\s\\S]+)`, 'm');
+    new RegExp(`^(\\s*${util.escapeRegExp(groupName)} permissions:[\\s\\S]+)`, 'm');
   const indentPattern = /\S|$/;
   const permissionNamePattern = /android\.\w*\.?permission\.\w+/;
   const grantedStatePattern = /\bgranted=(\w+)/;
@@ -1119,7 +1119,7 @@ export function extractMatchingPermissions(
   }
 
   const filteredResult = result
-    .filter((item) => !isBoolean(grantedState) || item.granted === grantedState)
+    .filter((item) => typeof grantedState !== 'boolean' || item.granted === grantedState)
     .map((item) => item.permission);
   log.debug(
     `Retrieved ${util.pluralize('permission', filteredResult.length, true)} ` +
@@ -1150,14 +1150,14 @@ export async function broadcast(this: ADB, intent: string): Promise<void> {
  */
 export async function listAppProcessIds(this: ADB, pkg: string): Promise<number[]> {
   log.debug(`Getting IDs of all '${pkg}' package`);
-  const pidRegex = new RegExp(`ProcessRecord\\{[\\w]+\\s+(\\d+):${escapeRegExp(pkg)}\\/`);
+  const pidRegex = new RegExp(`ProcessRecord\\{[\\w]+\\s+(\\d+):${util.escapeRegExp(pkg)}\\/`);
   const processesInfo = await this.shell(['dumpsys', 'activity', 'processes']);
   const pids = processesInfo
     .split('\n')
     .map((line) => line.match(pidRegex))
     .filter((match) => !!match)
     .map(([, pidStr]) => parseInt(pidStr, 10));
-  return uniq(pids);
+  return util.uniq(pids);
 }
 
 /**
@@ -1168,7 +1168,7 @@ export async function listAppProcessIds(this: ADB, pkg: string): Promise<number[
  * @returns True if the given package is running.
  */
 export async function isAppRunning(this: ADB, pkg: string): Promise<boolean> {
-  return !isEmpty(await this.listAppProcessIds(pkg));
+  return !util.isEmpty(await this.listAppProcessIds(pkg));
 }
 
 /**

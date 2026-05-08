@@ -6,7 +6,7 @@ import * as semver from 'semver';
 import os from 'node:os';
 import {LRUCache} from 'lru-cache';
 import type {ADB} from '../adb';
-import {APKS_EXTENSION, APK_INSTALL_TIMEOUT, DEFAULT_ADB_EXEC_TIMEOUT, buildInstallArgs, cloneDeep, defaults, difference, isBoolean, isEmpty, isInteger, isString, keys, readPackageManifest, trimStart, uniq} from '../utils';
+import {APKS_EXTENSION, APK_INSTALL_TIMEOUT, DEFAULT_ADB_EXEC_TIMEOUT, buildInstallArgs, cloneDeep, defaults, readPackageManifest} from '../utils';
 import type {
   UninstallOptions,
   ShellExecOptions,
@@ -104,15 +104,15 @@ export async function cacheApk(
     let lsOutput: string | null = null;
     if (
       this._areExtendedLsOptionsSupported === true ||
-      !isBoolean(this._areExtendedLsOptionsSupported)
+      typeof this._areExtendedLsOptionsSupported !== 'boolean'
     ) {
       lsOutput = await this.shell([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
     }
     if (
-      !isString(lsOutput) ||
+      typeof lsOutput !== 'string' ||
       (lsOutput.includes(errorMarker) && !lsOutput.includes(REMOTE_CACHE_ROOT))
     ) {
-      if (!isBoolean(this._areExtendedLsOptionsSupported)) {
+      if (typeof this._areExtendedLsOptionsSupported !== 'boolean') {
         log.debug(
           'The current Android API does not support extended ls options. ' +
             'Defaulting to no-options call',
@@ -165,9 +165,10 @@ export async function cacheApk(
     });
   }
   // Cleanup the invalid entries from the cache
-  difference([...this.remoteAppsCache.keys()], remoteCachedFiles.map(toHash)).forEach((hash) =>
-    (this.remoteAppsCache as LRUCache<string, string>).delete(hash),
-  );
+  const remoteCachedHashes = new Set(remoteCachedFiles.map(toHash));
+  [...this.remoteAppsCache.keys()]
+    .filter((cacheKey) => !remoteCachedHashes.has(cacheKey))
+    .forEach((hash) => (this.remoteAppsCache as LRUCache<string, string>).delete(hash));
   // Bump the cache record for the recently cached item
   this.remoteAppsCache.set(appHash, remotePath);
   // If the remote cache exceeds this.remoteAppsCacheLimit, remove the least recently used entries
@@ -175,7 +176,7 @@ export async function cacheApk(
     .map((x) => path.posix.join(REMOTE_CACHE_ROOT, x))
     .filter((x) => !(this.remoteAppsCache as LRUCache<string, string>).has(toHash(x)))
     .slice((this.remoteAppsCacheLimit as number) - [...this.remoteAppsCache.keys()].length);
-  if (!isEmpty(entriesToCleanup)) {
+  if (!util.isEmpty(entriesToCleanup)) {
     try {
       await this.shell(['rm', '-f', ...entriesToCleanup]);
       log.debug(`Deleted ${entriesToCleanup.length} expired application cache entries`);
@@ -233,11 +234,7 @@ export async function install(
     log.info(
       `The installation of '${path.basename(appPath)}' took ${timer.getDuration().asMilliSeconds.toFixed(0)}ms`,
     );
-    const truncatedOutput =
-      !isString(output) || output.length <= 300
-        ? output
-        : `${output.substring(0, 150)}...${output.substring(output.length - 150)}`;
-    log.debug(`Install command stdout: ${truncatedOutput}`);
+    log.debug(`Install command stdout: ${util.truncateString(output, {length: 300})}`);
     if (/\[INSTALL[A-Z_]+FAILED[A-Z_]+\]/.test(output)) {
       if (this.isTestPackageOnlyError(output)) {
         const msg = `Set 'allowTestPackages' capability to true in order to allow test packages installation.`;
@@ -297,14 +294,14 @@ export async function getApplicationInstallState(
   const {versionCode: apkVersionCode, versionName: apkVersionNameStr} = apkInfo || {};
   const apkVersionName = semver.valid(semver.coerce(apkVersionNameStr));
 
-  if (!isInteger(apkVersionCode) || !isInteger(pkgVersionCode)) {
+  if (!Number.isInteger(apkVersionCode) || !Number.isInteger(pkgVersionCode)) {
     log.warn(`Cannot read version codes of '${appPath}' and/or '${pkg}'`);
-    if (!isString(apkVersionName) || !isString(pkgVersionName)) {
+    if (typeof apkVersionName !== 'string' || typeof pkgVersionName !== 'string') {
       log.warn(`Cannot read version names of '${appPath}' and/or '${pkg}'`);
       return this.APP_INSTALL_STATE.UNKNOWN;
     }
   }
-  if (isInteger(apkVersionCode) && isInteger(pkgVersionCode)) {
+  if (Number.isInteger(apkVersionCode) && Number.isInteger(pkgVersionCode)) {
     if ((pkgVersionCode as number) > (apkVersionCode as number)) {
       log.debug(
         `The version code of the installed '${pkg}' is greater than the application version code (${pkgVersionCode} > ${apkVersionCode})`,
@@ -314,8 +311,8 @@ export async function getApplicationInstallState(
     // Version codes might not be maintained. Check version names.
     if (pkgVersionCode === apkVersionCode) {
       if (
-        isString(apkVersionName) &&
-        isString(pkgVersionName) &&
+        typeof apkVersionName === 'string' &&
+        typeof pkgVersionName === 'string' &&
         semver.satisfies(pkgVersionName, `>=${apkVersionName}`)
       ) {
         log.debug(
@@ -325,7 +322,7 @@ export async function getApplicationInstallState(
           ? this.APP_INSTALL_STATE.NEWER_VERSION_INSTALLED
           : this.APP_INSTALL_STATE.SAME_VERSION_INSTALLED;
       }
-      if (!isString(apkVersionName) || !isString(pkgVersionName)) {
+      if (typeof apkVersionName !== 'string' || typeof pkgVersionName !== 'string') {
         log.debug(
           `The version name of the installed '${pkg}' is equal to application version name (${pkgVersionCode} === ${apkVersionCode})`,
         );
@@ -333,8 +330,8 @@ export async function getApplicationInstallState(
       }
     }
   } else if (
-    isString(apkVersionName) &&
-    isString(pkgVersionName) &&
+    typeof apkVersionName === 'string' &&
+    typeof pkgVersionName === 'string' &&
     semver.satisfies(pkgVersionName, `>=${apkVersionName}`)
   ) {
     log.debug(
@@ -474,7 +471,7 @@ export async function extractStringsFromApk(
           'configurations',
           appPath,
         ]);
-        return uniq(stdout.split(os.EOL));
+        return util.uniq(stdout.split(os.EOL));
       },
       language,
       '(default)',
@@ -503,7 +500,7 @@ export async function extractStringsFromApk(
           'configurations',
           appPath,
         ]);
-        return uniq(stdout.split(os.EOL));
+        return util.uniq(stdout.split(os.EOL));
       },
       language,
       '',
@@ -524,14 +521,14 @@ export async function extractStringsFromApk(
     }
   }
 
-  if (isEmpty(apkStrings)) {
+  if (util.isEmpty(apkStrings)) {
     log.warn(
       `No strings have been found in '${originalAppPath}' resources ` +
         `for '${configMarker || 'default'}' configuration`,
     );
   } else {
     log.info(
-      `Successfully extracted ${keys(apkStrings).length} strings from ` +
+      `Successfully extracted ${Object.keys(apkStrings).length} strings from ` +
         `'${originalAppPath}' resources for '${configMarker || 'default'}' configuration`,
     );
   }
@@ -604,10 +601,10 @@ export function parseAapt2Strings(rawOutput: string, configMarker: string): Stri
         if (startIdx === idx) {
           return [allLines[idx].substring(startCharPos + 1, terminationCharPos), idx];
         }
-        return [`${result}\\n${trimStart(allLines[idx].substring(0, terminationCharPos))}`, idx];
+        return [`${result}\\n${allLines[idx].substring(0, terminationCharPos).trimStart()}`, idx];
       }
       if (idx > startIdx) {
-        result += `\\n${trimStart(allLines[idx])}`;
+        result += `\\n${allLines[idx].trimStart()}`;
       } else {
         result += allLines[idx].substring(startCharPos + 1);
       }
@@ -623,7 +620,7 @@ export function parseAapt2Strings(rawOutput: string, configMarker: string): Stri
   let lineIndex = 0;
   while (lineIndex < allLines.length) {
     const trimmedLine = allLines[lineIndex].trim();
-    if (isEmpty(trimmedLine)) {
+    if (util.isEmpty(trimmedLine)) {
       ++lineIndex;
       continue;
     }
@@ -667,7 +664,7 @@ export function parseAapt2Strings(rawOutput: string, configMarker: string): Stri
         if (isInCurrentConfig) {
           const [content, idx] = extractContent(lineIndex);
           lineIndex = idx;
-          if (isString(content)) {
+          if (typeof content === 'string') {
             apkStrings[currentResourceId] = [
               ...(Array.isArray(apkStrings[currentResourceId])
                 ? apkStrings[currentResourceId]
@@ -679,7 +676,7 @@ export function parseAapt2Strings(rawOutput: string, configMarker: string): Stri
       } else if (trimmedLine.startsWith(`(${configMarker})`)) {
         const [content, idx] = extractContent(lineIndex);
         lineIndex = idx;
-        if (isString(content)) {
+        if (typeof content === 'string') {
           apkStrings[currentResourceId] = content;
         }
         currentResourceId = null;
@@ -713,7 +710,7 @@ export function parseAaptStrings(rawOutput: string, configMarker: string): Strin
   const quotedStringPattern = /"[^"\\]*(?:\\.[^"\\]*)*"/;
   for (const line of rawOutput.split(os.EOL)) {
     const trimmedLine = line.trim();
-    if (isEmpty(trimmedLine)) {
+    if (util.isEmpty(trimmedLine)) {
       continue;
     }
 

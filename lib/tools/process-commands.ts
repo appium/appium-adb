@@ -1,7 +1,7 @@
 import {log} from '../logger';
+import {util} from '@appium/support';
 import type {ExecError} from 'teen_process';
 import type {ADB} from '../adb';
-import {includes, isBoolean, isEmpty, uniq} from '../utils';
 
 const PID_COLUMN_TITLE: string = 'PID';
 const PROCESS_NAME_COLUMN_TITLE: string = 'NAME';
@@ -19,7 +19,7 @@ const PS_TITLE_PATTERN: RegExp = new RegExp(
  * @returns the output of `ps` command where all processes are included
  */
 export async function listProcessStatus(this: ADB): Promise<string> {
-  if (!isBoolean(this._doesPsSupportAOption)) {
+  if (typeof this._doesPsSupportAOption !== 'boolean') {
     try {
       this._doesPsSupportAOption = /^-A\b/m.test(await this.shell(['ps', '--help']));
     } catch (e: unknown) {
@@ -108,7 +108,7 @@ export async function getProcessIdsByName(this: ADB, name: string): Promise<numb
     }
   }
 
-  return uniq(pids);
+  return util.uniq(pids);
 }
 
 /**
@@ -126,7 +126,7 @@ export async function killProcessesByName(
   try {
     log.debug(`Attempting to kill all ${name} processes`);
     const pids: number[] = await this.getProcessIdsByName(name);
-    if (isEmpty(pids)) {
+    if (pids.length === 0) {
       log.info(`No '${name}' process has been found`);
     } else {
       await Promise.all(pids.map((p: number) => this.killProcessByPID(p, signal)));
@@ -158,10 +158,10 @@ export async function killProcessByPID(
     await this.shell(['kill', `-${signal}`, `${pid}`]);
   } catch (e: unknown) {
     const err: ExecError = e as ExecError;
-    if (includes(err.stderr, noProcessFlag)) {
+    if ((err.stderr ?? '').includes(noProcessFlag)) {
       return;
     }
-    if (!includes(err.stderr, 'Operation not permitted')) {
+    if (!(err.stderr ?? '').includes('Operation not permitted')) {
       throw err;
     }
     log.info(`Cannot kill PID ${pid} due to insufficient permissions. Retrying as root`);
@@ -171,7 +171,7 @@ export async function killProcessByPID(
       });
     } catch (e1: unknown) {
       const err1: ExecError = e1 as ExecError;
-      if (includes(err1.stderr, noProcessFlag)) {
+      if ((err1.stderr ?? '').includes(noProcessFlag)) {
         return;
       }
       throw err1;
@@ -188,5 +188,5 @@ export async function killProcessByPID(
  * @throws {Error} If the given process name is not a valid class name.
  */
 export async function processExists(this: ADB, processName: string): Promise<boolean> {
-  return !isEmpty(await this.getProcessIdsByName(processName));
+  return (await this.getProcessIdsByName(processName)).length > 0;
 }

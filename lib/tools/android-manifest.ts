@@ -4,7 +4,7 @@ import {fs, zip, tempDir, util} from '@appium/support';
 import path from 'node:path';
 import type {ADB} from '../adb';
 import type {APKInfo, PlatformInfo, StringRecord} from './types';
-import {APKS_EXTENSION, isEmpty, keys, readPackageManifest, unzipFile} from '../utils';
+import {APKS_EXTENSION, readPackageManifest, unzipFile} from '../utils';
 
 /**
  * Extract package and main activity name from application manifest.
@@ -261,7 +261,7 @@ export async function getAndroidPlatformAndPath(sdkRoot: string): Promise<Platfo
       platformPath,
     };
   }
-  if (isEmpty(platformsMapping)) {
+  if (util.isEmpty(platformsMapping)) {
     log.warn(
       `Found zero platform folders at '${path.resolve(sdkRoot, 'platforms')}'. ` +
         `Do you have any Android SDKs installed?`,
@@ -272,7 +272,7 @@ export async function getAndroidPlatformAndPath(sdkRoot: string): Promise<Platfo
     };
   }
 
-  const recentSdkVersion = keys(platformsMapping).sort().reverse()[0];
+  const recentSdkVersion = Object.keys(platformsMapping).sort().reverse()[0];
   const result = platformsMapping[recentSdkVersion];
   log.debug(`Found the most recent Android platform: ${JSON.stringify(result)}`);
   return result;

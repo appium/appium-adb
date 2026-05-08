@@ -4,7 +4,7 @@ import path from 'node:path';
 import {fs} from '@appium/support';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {getResourcePath, has} from '../../lib/utils';
+import {getResourcePath} from '../../lib/utils';
 
 chai.use(chaiAsPromised);
 
@@ -110,9 +110,9 @@ describe('system calls', function () {
   it('should return version', async function () {
     const {binary, bridge} = await adb.getVersion();
     if (binary) {
-      expect(has(binary, 'version')).to.be.true;
-      expect(has(binary, 'build')).to.be.true;
+      expect(binary).to.have.property('version');
+      expect(binary).to.have.property('build');
     }
-    expect(has(bridge, 'version')).to.be.true;
+    expect(bridge).to.have.property('version');
   });
 });
