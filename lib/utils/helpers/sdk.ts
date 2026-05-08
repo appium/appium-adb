@@ -1,6 +1,6 @@
 import {fs, system} from '@appium/support';
 import path from 'node:path';
-import {isEmpty, memoize} from '../lodash';
+import {util} from '@appium/support';
 
 export function getSdkRootFromEnv(): string | undefined {
   return process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT;
@@ -10,7 +10,7 @@ export async function requireSdkRoot(customRoot: string | null = null): Promise<
   const sdkRoot = customRoot || getSdkRootFromEnv();
   const docMsg =
     'Read https://developer.android.com/studio/command-line/variables for more details';
-  if (!sdkRoot || isEmpty(sdkRoot)) {
+  if (!sdkRoot || util.isEmpty(sdkRoot)) {
     throw new Error(
       `Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`
     );
@@ -28,7 +28,7 @@ export async function requireSdkRoot(customRoot: string | null = null): Promise<
   return sdkRoot;
 }
 
-export const getJavaHome = memoize(async function getJavaHome(): Promise<string> {
+export const getJavaHome = util.memoize(async function getJavaHome(): Promise<string> {
   const result = process.env.JAVA_HOME;
   if (!result) {
     throw new Error('The JAVA_HOME environment variable is not set for the current process');
@@ -43,7 +43,7 @@ export const getJavaHome = memoize(async function getJavaHome(): Promise<string>
   return result;
 });
 
-export const getJavaForOs = memoize(async function getJavaForOs(): Promise<string> {
+export const getJavaForOs = util.memoize(async function getJavaForOs(): Promise<string> {
   let javaHome: string | undefined;
   let errMsg: string | undefined;
   try {

@@ -3,7 +3,6 @@ import {exec, type ExecError} from 'teen_process';
 import {log} from '../../logger';
 import type {ADB} from '../../adb';
 import type {ApkManifest} from '../../tools/types';
-import {includes, isUndefined} from '../lodash';
 
 export async function readPackageManifest(this: ADB, apkPath: string): Promise<ApkManifest> {
   await this.initAapt2();
@@ -21,7 +20,7 @@ export async function readPackageManifest(this: ADB, apkPath: string): Promise<A
     const error = e as ExecError;
     const prefix = `Cannot read the manifest from '${apkPath}'`;
     const suffix = `Original error: ${error.stderr || error.message}`;
-    if (error.stderr && includes(error.stderr, `Unable to open 'badging'`)) {
+    if (error.stderr && error.stderr.includes(`Unable to open 'badging'`)) {
       throw new Error(`${prefix}. Update build tools to use a newer aapt2 version. ${suffix}`);
     }
     throw new Error(`${prefix}. ${suffix}`);
@@ -78,7 +77,7 @@ export async function readPackageManifest(this: ADB, apkPath: string): Promise<A
         ['compileSdkVersionCodename', /compileSdkVersionCodename='([^']+)'/, null],
       ] as const) {
         const value = extractValue(line, pattern, transformer);
-        if (!isUndefined(value)) {
+        if (value !== undefined) {
           (result as Record<string, any>)[name] = value;
         }
       }

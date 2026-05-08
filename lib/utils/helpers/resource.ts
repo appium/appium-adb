@@ -2,12 +2,12 @@ import path from 'node:path';
 import {fs, zip} from '@appium/support';
 import {log} from '../../logger';
 import {MODULE_NAME} from './constants';
-import {memoize} from '../lodash';
+import {util} from '@appium/support';
 
 // Declare __filename for CommonJS compatibility
 declare const __filename: string;
 
-export const getResourcePath = memoize(async function getResourcePath(
+export const getResourcePath = util.memoize(async function getResourcePath(
   relPath: string
 ): Promise<string> {
   const moduleRoot = await getModuleRoot();
@@ -28,7 +28,7 @@ export async function unzipFile(zipPath: string, dstRoot: string = path.dirname(
   log.debug('Unzip successful');
 }
 
-const getModuleRoot = memoize(async function getModuleRoot(): Promise<string> {
+const getModuleRoot = util.memoize(async function getModuleRoot(): Promise<string> {
   let moduleRoot = path.dirname(path.resolve(__filename));
   let isAtFsRoot = false;
   while (!isAtFsRoot) {

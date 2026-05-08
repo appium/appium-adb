@@ -1,5 +1,7 @@
 import * as helpers from './helpers';
 import * as lodash from './lodash';
+import {util} from '@appium/support';
+import {isDeepStrictEqual} from 'node:util';
 
 export const APKS_EXTENSION = helpers.APKS_EXTENSION;
 export const APK_EXTENSION = helpers.APK_EXTENSION;
@@ -14,45 +16,69 @@ export const requireSdkRoot = helpers.requireSdkRoot;
 export const getJavaHome = helpers.getJavaHome;
 export const getJavaForOs = helpers.getJavaForOs;
 
-export const memoize = lodash.memoize;
-export const isArray = lodash.isArray;
-export const isEmpty = lodash.isEmpty;
-export const flatten = lodash.flatten;
-export const isNull = lodash.isNull;
+export const memoize = util.memoize;
+export const isArray = Array.isArray;
+export const isEmpty = util.isEmpty;
+export const flatten = <T>(value: T[][]) => value.flat();
+export const isNull = (value: unknown): value is null => value === null;
 export const cloneDeep = lodash.cloneDeep;
-export const isNil = lodash.isNil;
-export const isNumber = lodash.isNumber;
-export const toLower = lodash.toLower;
-export const last = lodash.last;
-export const trim = lodash.trim;
-export const isBoolean = lodash.isBoolean;
-export const uniq = lodash.uniq;
-export const includes = lodash.includes;
-export const some = lodash.some;
-export const every = lodash.every;
-export const find = lodash.find;
-export const values = lodash.values;
-export const isInteger = lodash.isInteger;
-export const isUndefined = lodash.isUndefined;
-export const escapeRegExp = lodash.escapeRegExp;
-export const truncate = lodash.truncate;
-export const difference = lodash.difference;
-export const startsWith = lodash.startsWith;
-export const clone = lodash.clone;
+export const isNil = (value: unknown): value is null | undefined => value == null;
+export const isNumber = (value: unknown): value is number =>
+  typeof value === 'number' && !Number.isNaN(value);
+export const toLower = (value: string) => value.toLowerCase();
+export const last = <T>(value: ArrayLike<T>): T | undefined => value[value.length - 1];
+export const trim = (value: string) => value.trim();
+export const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean';
+export const uniq = util.uniq;
+export const includes = <T>(
+  collection: string | ArrayLike<T> | Record<string, T>,
+  value: T | string
+) => {
+  if (typeof collection === 'string') {
+    return collection.includes(String(value));
+  }
+  if (Array.isArray(collection)) {
+    return collection.includes(value as T);
+  }
+  return Object.values(collection).includes(value as T);
+};
+export const some = <T>(collection: T[], predicate: (item: T) => boolean) =>
+  collection.some(predicate);
+export const every = <T>(collection: T[], predicate: (item: T) => boolean) =>
+  collection.every(predicate);
+export const find = <T>(collection: T[], predicate: (item: T) => boolean) =>
+  collection.find(predicate);
+export const values = <T extends Record<string, any>>(obj: T): Array<T[keyof T]> =>
+  Object.values(obj);
+export const isInteger = Number.isInteger;
+export const isUndefined = (value: unknown): value is undefined => value === undefined;
+export const escapeRegExp = util.escapeRegExp;
+export const truncate = (value: string, opts?: {length?: number; omission?: string}) =>
+  util.truncateString(value, opts);
+export const difference = <T>(arr: T[], valuesArg: T[]) =>
+  arr.filter((item) => !valuesArg.includes(item));
+export const startsWith = (value: string, search: string) => value.startsWith(search);
+export const clone = <T>(value: T): T =>
+  Array.isArray(value)
+    ? ([...value] as T)
+    : util.isPlainObject(value)
+      ? ({...value} as T)
+      : value;
 export const defaults = lodash.defaults;
 export const intersectionWith = lodash.intersectionWith;
-export const isEqual = lodash.isEqual;
-export const trimEnd = lodash.trimEnd;
-export const trimStart = lodash.trimStart;
-export const keys = lodash.keys;
+export const isEqual = (left: unknown, right: unknown) => isDeepStrictEqual(left, right);
+export const trimEnd = (value: string) => value.trimEnd();
+export const trimStart = (value: string) => value.trimStart();
+export const keys = Object.keys;
 export const zip = lodash.zip;
-export const toPairs = lodash.toPairs;
-export const first = lodash.first;
-export const has = lodash.has;
+export const toPairs = <T extends Record<string, any>>(obj: T): [string, T[keyof T]][] =>
+  Object.entries(obj);
+export const first = <T>(arr: T[]) => arr[0];
+export const has = (obj: Record<string, any>, path: string) => path in obj;
 export const pick = lodash.pick;
 export const defaultsDeep = lodash.defaultsDeep;
-export const isNaN = lodash.isNaN;
-export const isString = lodash.isString;
-export const range = lodash.range;
+export const isNaN = Number.isNaN;
+export const isString = (value: unknown): value is string => typeof value === 'string';
+export const range = (length: number) => Array.from({length}, (_, idx) => idx);
 
 export type {BuildInstallArgsOptions} from './helpers';

@@ -5,7 +5,6 @@ import {LRUCache} from 'lru-cache';
 import type {ExecError} from 'teen_process';
 import type {ADBExecutable} from './types';
 import type {LogEntry, LogcatOpts as StartCaptureOptions} from './tools/types';
-import {isArray, isInteger, isString, toLower} from './utils';
 
 const log = logger.getLogger('Logcat');
 const MAX_BUFFER_SIZE = 10000;
@@ -148,7 +147,7 @@ export class Logcat extends EventEmitter {
         result.push(toLogEntry(message, timestamp));
       }
     }
-    if (isInteger(recentLogIndex)) {
+    if (Number.isInteger(recentLogIndex)) {
       this.logIndexSinceLastRequest = recentLogIndex;
     }
     return result;
@@ -225,7 +224,7 @@ function requireSpec(spec: string): string {
     );
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }
-  if (!SUPPORTED_PRIORITIES.some((p) => toLower(priority) === toLower(p))) {
+  if (!SUPPORTED_PRIORITIES.some((p) => priority.toLowerCase() === p.toLowerCase())) {
     log.info(
       `The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`,
     );
@@ -236,11 +235,11 @@ function requireSpec(spec: string): string {
 }
 
 function formatFilterSpecs(filterSpecs: string | string[]): string[] {
-  if (!isArray(filterSpecs)) {
+  if (!Array.isArray(filterSpecs)) {
     filterSpecs = [filterSpecs];
   }
   return filterSpecs
-    .filter((spec) => spec && isString(spec) && !spec.startsWith('-'))
+    .filter((spec) => spec && typeof spec === 'string' && !spec.startsWith('-'))
     .map((spec) => (spec.includes(':') ? requireSpec(spec) : spec));
 }
 
