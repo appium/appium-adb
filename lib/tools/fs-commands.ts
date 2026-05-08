@@ -1,7 +1,7 @@
-import _ from 'lodash';
 import path from 'node:path';
 import type {ADB} from '../adb';
 import type {TeenProcessExecOptions} from 'teen_process';
+import {includes, isNaN} from '../utils';
 
 /**
  * Verify whether a remote path exists on the device under test.
@@ -13,7 +13,7 @@ export async function fileExists(this: ADB, remotePath: string): Promise<boolean
   const passFlag = '__PASS__';
   const checkCmd = `[ -e '${shellEscapeSingleQuotes(remotePath)}' ] && echo ${passFlag}`;
   try {
-    return _.includes(await this.shell([checkCmd]), passFlag);
+    return includes(await this.shell([checkCmd]), passFlag);
   } catch {
     return false;
   }
@@ -60,7 +60,7 @@ export async function fileSize(this: ADB, remotePath: string): Promise<number> {
     }
     // https://regex101.com/r/fOs4P4/8
     const match = /[rwxsStT\-+]{10}[\s\d]*\s[^\s]+\s+[^\s]+\s+(\d+)/.exec(files[0]);
-    if (!match || _.isNaN(parseInt(match[1], 10))) {
+    if (!match || isNaN(parseInt(match[1], 10))) {
       throw new Error(`Unable to parse size from list output: '${files[0]}'`);
     }
     return parseInt(match[1], 10);

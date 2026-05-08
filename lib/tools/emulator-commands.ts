@@ -1,10 +1,10 @@
 import {log} from '../logger';
-import _ from 'lodash';
 import net from 'node:net';
 import {util, fs} from '@appium/support';
 import path from 'node:path';
 import * as ini from 'ini';
 import type {ADB} from '../adb';
+import {find, includes, isArray, isEmpty, isInteger, isNil, last, trim, values} from '../utils';
 import type {
   EmuInfo,
   EmuVersionInfo,
@@ -25,7 +25,7 @@ import type {
  */
 export async function isEmulatorConnected(this: ADB): Promise<boolean> {
   const emulators = await this.getConnectedEmulators();
-  return !!_.find(emulators, (x) => x && x.udid === this.curDeviceId);
+  return !!find(emulators, (x) => x && x.udid === this.curDeviceId);
 }
 
 /**
@@ -71,10 +71,10 @@ export async function rotate(this: ADB): Promise<void> {
  * @param state - Either 'on' or 'off'.
  */
 export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<void> {
-  if (_.values(this.POWER_AC_STATES).indexOf(state) === -1) {
+  if (values(this.POWER_AC_STATES).indexOf(state) === -1) {
     throw new TypeError(
       `Wrong power AC state sent '${state}'. ` +
-        `Supported values: ${_.values(this.POWER_AC_STATES)}]`,
+        `Supported values: ${values(this.POWER_AC_STATES)}]`,
     );
   }
   await this.adbExecEmu(['power', 'ac', state]);
@@ -88,12 +88,12 @@ export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<v
  * @throws - If sensor type or sensor value is not defined
  */
 export async function sensorSet(this: ADB, sensor: string, value: Sensors): Promise<void> {
-  if (!_.includes(this.SENSORS, sensor)) {
+  if (!includes(this.SENSORS, sensor)) {
     throw new TypeError(
-      `Unsupported sensor sent '${sensor}'. ` + `Supported values: ${_.values(this.SENSORS)}]`,
+      `Unsupported sensor sent '${sensor}'. ` + `Supported values: ${values(this.SENSORS)}]`,
     );
   }
-  if (_.isNil(value)) {
+  if (isNil(value)) {
     throw new TypeError(
       `Missing/invalid sensor value argument. ` +
         `You need to provide a valid value to set to the sensor in ` +
@@ -136,10 +136,10 @@ export async function sendSMS(
   phoneNumber: string | number,
   message = '',
 ): Promise<void> {
-  if (_.isEmpty(message)) {
+  if (isEmpty(message)) {
     throw new TypeError('SMS message must not be empty');
   }
-  if (!_.isInteger(phoneNumber) && _.isEmpty(phoneNumber)) {
+  if (!isInteger(phoneNumber) && isEmpty(phoneNumber)) {
     throw new TypeError('Phone number most not be empty');
   }
   await this.adbExecEmu(['sms', 'send', `${phoneNumber}`, message]);
@@ -158,12 +158,12 @@ export async function gsmCall(
   phoneNumber: string | number,
   action: GsmCallActions,
 ): Promise<void> {
-  if (!_.values(this.GSM_CALL_ACTIONS).includes(action)) {
+  if (!values(this.GSM_CALL_ACTIONS).includes(action)) {
     throw new TypeError(
-      `Invalid gsm action param ${action}. Supported values: ${_.values(this.GSM_CALL_ACTIONS)}`,
+      `Invalid gsm action param ${action}. Supported values: ${values(this.GSM_CALL_ACTIONS)}`,
     );
   }
-  if (!_.isInteger(phoneNumber) && _.isEmpty(phoneNumber)) {
+  if (!isInteger(phoneNumber) && isEmpty(phoneNumber)) {
     throw new TypeError('Phone number most not be empty');
   }
   await this.adbExecEmu(['gsm', action, `${phoneNumber}`]);
@@ -177,9 +177,9 @@ export async function gsmCall(
  */
 export async function gsmSignal(this: ADB, strength: GsmSignalStrength = 4): Promise<void> {
   const strengthInt = parseInt(`${strength}`, 10);
-  if (!_.includes(this.GSM_SIGNAL_STRENGTHS, strengthInt)) {
+  if (!includes(this.GSM_SIGNAL_STRENGTHS, strengthInt)) {
     throw new TypeError(
-      `Invalid signal strength param ${strength}. Supported values: ${_.values(this.GSM_SIGNAL_STRENGTHS)}`,
+      `Invalid signal strength param ${strength}. Supported values: ${values(this.GSM_SIGNAL_STRENGTHS)}`,
     );
   }
   log.info('gsm signal-profile <strength> changes the reported strength on next (15s) update.');
@@ -194,9 +194,9 @@ export async function gsmSignal(this: ADB, strength: GsmSignalStrength = 4): Pro
  */
 export async function gsmVoice(this: ADB, state: GsmVoiceStates = 'on'): Promise<void> {
   // gsm voice <state> allows you to change the state of your GPRS connection
-  if (!_.values(this.GSM_VOICE_STATES).includes(state)) {
+  if (!values(this.GSM_VOICE_STATES).includes(state)) {
     throw new TypeError(
-      `Invalid gsm voice state param ${state}. Supported values: ${_.values(this.GSM_VOICE_STATES)}`,
+      `Invalid gsm voice state param ${state}. Supported values: ${values(this.GSM_VOICE_STATES)}`,
     );
   }
   await this.adbExecEmu(['gsm', 'voice', state]);
@@ -211,9 +211,9 @@ export async function gsmVoice(this: ADB, state: GsmVoiceStates = 'on'): Promise
  */
 export async function networkSpeed(this: ADB, speed: NetworkSpeed = 'full'): Promise<void> {
   // network speed <speed> allows you to set the network speed emulation.
-  if (!_.values(this.NETWORK_SPEED).includes(speed)) {
+  if (!values(this.NETWORK_SPEED).includes(speed)) {
     throw new Error(
-      `Invalid network speed param ${speed}. Supported values: ${_.values(this.NETWORK_SPEED)}`,
+      `Invalid network speed param ${speed}. Supported values: ${values(this.NETWORK_SPEED)}`,
     );
   }
   await this.adbExecEmu(['network', 'speed', speed]);
@@ -306,7 +306,7 @@ export async function execEmuConsoleCommand(
         if (!isCommandSent) {
           clearTimeout(initTimeoutObj);
           serverResponse = [];
-          const cmdStr = _.isArray(cmd) ? util.quote(cmd) : `${cmd}`;
+          const cmdStr = isArray(cmd) ? util.quote(cmd) : `${cmd}`;
           log.debug(`Executing Emulator console command: ${cmdStr}`);
           client.write(cmdStr);
           client.write(eol);
@@ -338,7 +338,7 @@ export async function execEmuConsoleCommand(
         clearTimeout(execTimeoutObj);
         client.end();
         const outputArr = output.split(eol);
-        return reject(_.trim(_.last(outputArr) || ''));
+        return reject(trim(last(outputArr) || ''));
       }
     });
   });
@@ -386,7 +386,7 @@ export async function getEmuImageProperties(this: ADB, avdName: string): Promise
   const avd = avds.find(({name}) => name === avdName);
   if (!avd) {
     let msg = `Cannot find '${avdName}' emulator. `;
-    if (_.isEmpty(avds)) {
+    if (isEmpty(avds)) {
       msg += `No emulators have been detected on your system`;
     } else {
       msg += `Available avd names are: ${avds.map(({name}) => name)}`;
@@ -407,7 +407,7 @@ export async function checkAvdExist(this: ADB, avdName: string): Promise<boolean
   const avds = await listEmulators();
   if (!avds.some(({name}) => name === avdName)) {
     let msg = `Avd '${avdName}' is not available. `;
-    if (_.isEmpty(avds)) {
+    if (isEmpty(avds)) {
       msg += `No emulators have been detected on your system`;
     } else {
       msg += `Please select your avd name from one of these: '${avds.map(({name}) => name)}'`;
@@ -476,7 +476,7 @@ async function getAvdConfigPaths(avdsRoot: string): Promise<EmuInfo[]> {
       const avdName = path.basename(confPath).split('.').slice(0, -1).join('.');
       return {name: avdName, config: confPath};
     })
-    .filter(({name}) => _.trim(name));
+    .filter(({name}) => trim(name));
 }
 
 /**

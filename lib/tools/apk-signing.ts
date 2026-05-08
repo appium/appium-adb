@@ -1,13 +1,12 @@
-import _ from 'lodash';
 import _fs from 'node:fs';
 import {exec, type ExecError} from 'teen_process';
 import path from 'node:path';
 import {log} from '../logger';
 import {tempDir, system, mkdirp, fs, util, zip} from '@appium/support';
 import {LRUCache} from 'lru-cache';
-import {getJavaForOs, getJavaHome, APKS_EXTENSION, getResourcePath} from '../helpers';
 import type {ADB} from '../adb';
 import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types';
+import {APKS_EXTENSION, getJavaForOs, getJavaHome, getResourcePath, includes, isEmpty, toPairs, trim} from '../utils';
 
 const DEFAULT_PRIVATE_KEY = path.join('keys', 'testkey.pk8');
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
@@ -45,7 +44,7 @@ export async function executeApksigner(this: ADB, args: string[]): Promise<strin
     ['stdout', stdout],
     ['stderr', stderr],
   ] as const) {
-    if (!_.trim(stream)) {
+    if (!trim(stream)) {
       continue;
     }
 
@@ -270,7 +269,7 @@ export async function checkApkCert(
   }
 
   const hashMatches = (apksignerOutput: string, expectedHashes: KeystoreHash): boolean => {
-    for (const [name, value] of _.toPairs(expectedHashes)) {
+    for (const [name, value] of toPairs(expectedHashes)) {
       if (value && new RegExp(`digest:\\s+${value}\\b`, 'i').test(apksignerOutput)) {
         log.debug(`${name} hash did match for '${path.basename(actualAppPath)}'`);
         return true;
@@ -321,12 +320,12 @@ export async function checkApkCert(
   } catch (err) {
     const error = err as ExecError;
     // check if there is no signature
-    if (_.includes(error.stderr, APKSIGNER_VERIFY_FAIL)) {
+    if (includes(error.stderr, APKSIGNER_VERIFY_FAIL)) {
       log.info(`'${actualAppPath}' is not signed`);
       return false;
     }
     const errMsg = error.stderr || error.stdout || error.message;
-    if (_.includes(errMsg, JAVA_PROPS_INIT_ERROR)) {
+    if (includes(errMsg, JAVA_PROPS_INIT_ERROR)) {
       // This error pops up randomly and we are not quite sure why.
       // My guess - a race condition in java vm initialization.
       // Nevertheless, lets make Appium to believe the file is already signed,
@@ -383,7 +382,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
       }
       result[hashName] = match[1].replace(/:/g, '').toLowerCase();
     }
-    if (_.isEmpty(result)) {
+    if (isEmpty(result)) {
       log.debug(stdout);
       throw new Error('Cannot parse the hash value from the keytool output');
     }

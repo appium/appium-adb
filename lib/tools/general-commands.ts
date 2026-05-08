@@ -1,9 +1,9 @@
 import {log} from '../logger';
-import _ from 'lodash';
 import {fs, util} from '@appium/support';
 import {SubProcess, exec, type ExecError} from 'teen_process';
 import type {ADB} from '../adb';
 import type {ScreenrecordOptions, StringRecord} from './types';
+import {includes, isInteger, memoize} from '../utils';
 
 /**
  * Get the path to adb executable amd assign it
@@ -64,7 +64,7 @@ export async function initBundletool(this: ADB): Promise<void> {
  * calls return the same value as the first one.
  */
 export async function getApiLevel(this: ADB): Promise<number> {
-  if (!_.isInteger(this._apiLevel)) {
+  if (!isInteger(this._apiLevel)) {
     try {
       const strOutput = await this.getDeviceProperty('ro.build.version.sdk');
       let apiLevel = parseInt(strOutput.trim(), 10);
@@ -235,7 +235,7 @@ export function screenrecord(
 export async function listFeatures(this: ADB): Promise<string[]> {
   this._memoizedFeatures =
     this._memoizedFeatures ||
-    _.memoize(
+    memoize(
       async () => await this.adbExec(['features']),
       () => this.curDeviceId,
     );
@@ -250,7 +250,7 @@ export async function listFeatures(this: ADB): Promise<string[]> {
       .filter(Boolean);
   } catch (e) {
     const err = e as ExecError;
-    if (_.includes(err.stderr, 'unknown command')) {
+    if (includes(err.stderr, 'unknown command')) {
       return [];
     }
     throw err;

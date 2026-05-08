@@ -1,7 +1,7 @@
 import {log} from '../logger';
-import _ from 'lodash';
 import {sleep, waitForCondition} from 'asyncbox';
 import type {ADB} from '../adb';
+import {every, includes, isBoolean, isEmpty, isInteger, some} from '../utils';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
@@ -17,13 +17,13 @@ const HIDE_KEYBOARD_WAIT_TIME = 100;
  * @return True if the management is supported. The result is cached per ADB instance
  */
 export async function isLockManagementSupported(this: ADB): Promise<boolean> {
-  if (!_.isBoolean(this._isLockManagementSupported)) {
+  if (!isBoolean(this._isLockManagementSupported)) {
     const passFlag = '__PASS__';
     let output = '';
     try {
       output = await this.shell([`locksettings help && echo ${passFlag}`]);
     } catch {}
-    this._isLockManagementSupported = _.includes(output, passFlag);
+    this._isLockManagementSupported = includes(output, passFlag);
     log.debug(
       `Extended lock settings management is ` +
         `${this._isLockManagementSupported ? '' : 'not '}supported`,
@@ -52,12 +52,12 @@ export async function verifyLockCredential(
     const {stdout, stderr} = await this.shell(buildCommand('verify', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     });
-    if (_.includes(stdout, 'verified successfully')) {
+    if (includes(stdout, 'verified successfully')) {
       return true;
     }
     if (
       [`didn't match`, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) =>
-        _.includes(stderr || stdout, x),
+        includes(stderr || stdout, x),
       )
     ) {
       return false;
@@ -97,7 +97,7 @@ export async function clearLockCredential(
     });
     if (
       !['user has no password', 'Lock credential cleared'].some((x) =>
-        _.includes(stderr || stdout, x),
+        includes(stderr || stdout, x),
       )
     ) {
       throw new Error(stderr || stdout);
@@ -129,7 +129,7 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
     if (
       /\bfalse\b/.test(stdout) ||
       [CREDENTIAL_DID_NOT_MATCH_ERROR, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) =>
-        _.includes(stderr || stdout, x),
+        includes(stderr || stdout, x),
       )
     ) {
       return true;
@@ -174,7 +174,7 @@ export async function setLockCredential(
         `Only the following credential types are supported: ${SUPPORTED_LOCK_CREDENTIAL_TYPES}`,
     );
   }
-  if (_.isEmpty(credential) && !_.isInteger(credential)) {
+  if (isEmpty(credential) && !isInteger(credential)) {
     throw new Error('Device lock credential cannot be empty');
   }
   const cmd = buildCommand(`set-${credentialType}`, oldCredential, credential);
@@ -182,7 +182,7 @@ export async function setLockCredential(
     const {stdout, stderr} = await this.shell(cmd, {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     });
-    if (!_.includes(stdout, 'set to')) {
+    if (!includes(stdout, 'set to')) {
       throw new Error(stderr || stdout);
     }
   } catch (e) {
@@ -295,9 +295,9 @@ export async function lock(this: ADB): Promise<void> {
  */
 export function isShowingLockscreen(dumpsys: string): boolean {
   return (
-    _.some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
+    some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
     // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
-    _.every([/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/], (x) =>
+    every([/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/], (x) =>
       x.test(dumpsys),
     )
   );
@@ -327,10 +327,10 @@ function buildCommand(
   ...args: string[]
 ): string[] {
   const cmd = ['locksettings', verb];
-  if (oldCredential && !_.isEmpty(oldCredential)) {
+  if (oldCredential && !isEmpty(oldCredential)) {
     cmd.push('--old', oldCredential);
   }
-  if (!_.isEmpty(args)) {
+  if (!isEmpty(args)) {
     cmd.push(...args);
   }
   return cmd;

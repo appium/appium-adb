@@ -2,11 +2,11 @@ import {log} from '../logger';
 import path from 'node:path';
 import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
-import {unzipFile} from '../helpers';
 import AsyncLock from 'async-lock';
 import crypto from 'node:crypto';
 import type {ADB} from '../adb';
 import type {ApkCreationOptions, StringRecord} from './types';
+import {unzipFile} from '../utils';
 
 const AAB_CACHE = new LRUCache<string, string>({
   max: 10,

@@ -1,8 +1,8 @@
 import {EOL} from 'node:os';
-import _ from 'lodash';
 import {log} from '../logger';
 import type {ADB} from '../adb';
 import type {PortFamily, PortInfo} from './types';
+import {isEmpty} from '../utils';
 
 /**
  * Get TCP port forwarding with adb on the device under test.
@@ -126,7 +126,7 @@ export async function listPorts(this: ADB, family: PortFamily = '4'): Promise<Po
   const sourceProcName = `/proc/net/tcp${family === '6' ? '6' : ''}`;
   const output = await this.shell(['cat', sourceProcName]);
   const lines = output.split('\n');
-  if (_.isEmpty(lines)) {
+  if (isEmpty(lines)) {
     log.debug(output);
     throw new Error(`Cannot parse the payload of ${sourceProcName}`);
   }
