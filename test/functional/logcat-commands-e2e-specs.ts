@@ -9,7 +9,7 @@ chai.use(chaiAsPromised);
 describe('logcat commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  async function runClearDeviceLogTest(adb, logcat, clear = true) {
+  async function runClearDeviceLogTest(adb: ADB, logcat: Logcat, clear = true) {
     const logs = await adb.adbExec(['logcat', '-d']);
     await logcat.startCapture();
     await logcat.stopCapture();
@@ -21,8 +21,8 @@ describe('logcat commands', function () {
     }
   }
 
-  let adb;
-  let logcat;
+  let adb: ADB;
+  let logcat: Logcat;
 
   before(async function () {
     adb = await ADB.createADB();

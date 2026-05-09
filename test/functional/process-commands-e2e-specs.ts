@@ -15,8 +15,8 @@ chai.use(chaiAsPromised);
 describe('process commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  let adb;
-  let apiDemosPath;
+  let adb: ADB;
+  let apiDemosPath: string;
   const androidInstallTimeout = 90000;
 
   before(async function () {
@@ -41,11 +41,7 @@ describe('process commands', function () {
   });
 
   it('should be able to kill processes by name', async function () {
-    await ensureRootAccess(
-      adb,
-      this,
-      'Device does not have root access, which is required for killing processes',
-    );
+    await ensureRootAccess(adb, this);
 
     // Install and start the test app
     await adb.install(apiDemosPath, {
@@ -69,11 +65,7 @@ describe('process commands', function () {
   });
 
   it('should be able to kill process by PID', async function () {
-    await ensureRootAccess(
-      adb,
-      this,
-      'Device does not have root access, which is required for killing processes',
-    );
+    await ensureRootAccess(adb, this);
 
     // Install and start the test app
     await adb.install(apiDemosPath, {
@@ -114,7 +106,7 @@ describe('process commands', function () {
       // Should not reach here
       expect.fail('Expected error for invalid PID');
     } catch (error) {
-      expect(error.message).to.include('valid number');
+      expect((error as Error).message).to.include('valid number');
     }
   });
 });

@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 
 describe('emulator commands', function () {
-  let adb;
+  let adb: ADB;
 
   before(async function () {
     if (process.env.REAL_DEVICE) {
@@ -32,7 +32,8 @@ describe('emulator commands', function () {
     it('should get version info', async function () {
       const {revision, buildId} = await adb.getEmuVersionInfo();
       expect(revision).to.not.be.empty;
-      expect(buildId > 0).to.be.true;
+      expect(buildId).to.be.a('number');
+      expect((buildId ?? 0) > 0).to.be.true;
     });
   });
 

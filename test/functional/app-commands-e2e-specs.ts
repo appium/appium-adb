@@ -9,8 +9,8 @@ chai.use(chaiAsPromised);
 describe('app commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  let adb;
-  let apiDemosPath;
+  let adb: ADB;
+  let apiDemosPath: string;
   const androidInstallTimeout = 90000;
   before(async function () {
     adb = await ADB.createADB({adbExecTimeout: 60000});

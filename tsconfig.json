@@ -6,7 +6,7 @@
     "checkJs": true,
     "esModuleInterop": true,
     "types": ["node", "mocha"],
-    "strict": false
+    "strict": true
   },
   "ts-node": {
     "transpileOnly": true,

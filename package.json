@@ -61,6 +61,8 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/async-lock": "^1.4.0",
+    "@types/chai": "^5.2.3",
+    "@types/chai-as-promised": "^8.0.2",
     "@types/ini": "^4.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^25.0.0",
