@@ -1,6 +1,5 @@
 import {ADB} from '../../lib/adb';
 import sinon from 'sinon';
-import _ from 'lodash';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
@@ -226,7 +225,7 @@ describe('emulator commands', function () {
           'Invalid network speed',
         );
       });
-      for (const [key, value] of _.toPairs(adb.NETWORK_SPEED)) {
+      for (const [key, value] of Object.entries(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async function () {
           mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
           mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();

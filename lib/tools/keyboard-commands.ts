@@ -56,7 +56,9 @@ export async function isSoftKeyboardPresent(this: ADB): Promise<KeyboardState> {
       canCloseKeyboard: !!(inputViewShownMatch && inputViewShownMatch[1] === 'true'),
     };
   } catch (e) {
-    throw new Error(`Error finding softkeyboard. Original error: ${(e as Error).message}`);
+    throw new Error(`Error finding softkeyboard. Original error: ${(e as Error).message}`, {
+      cause: e,
+    });
   }
 }
 
@@ -81,7 +83,7 @@ export async function availableIMEs(this: ADB): Promise<string[]> {
     return getIMEListFromOutput(await this.shell(['ime', 'list', '-a']));
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting available IME's. Original error: ${err.message}`);
+    throw new Error(`Error getting available IME's. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -95,7 +97,7 @@ export async function enabledIMEs(this: ADB): Promise<string[]> {
     return getIMEListFromOutput(await this.shell(['ime', 'list']));
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting enabled IME's. Original error: ${err.message}`);
+    throw new Error(`Error getting enabled IME's. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -140,7 +142,7 @@ export async function defaultIME(this: ADB): Promise<string | null> {
     return engine.trim();
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting default IME. Original error: ${err.message}`);
+    throw new Error(`Error getting default IME. Original error: ${err.message}`, {cause: e});
   }
 }
 

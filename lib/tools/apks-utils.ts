@@ -1,13 +1,12 @@
 import {exec} from 'teen_process';
 import {log} from '../logger';
 import path from 'node:path';
-import _ from 'lodash';
 import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
-import {getJavaForOs, unzipFile, buildInstallArgs, APK_INSTALL_TIMEOUT} from '../helpers';
 import AsyncLock from 'async-lock';
 import type {ADB} from '../adb';
 import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types';
+import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, unzipFile} from '../utils';
 
 const BASE_APK = 'base-master.apk';
 const LANGUAGE_APK = (lang: string) => `base-${lang}.apk`;
@@ -65,7 +64,7 @@ export async function execBundletool(this: ADB, args: string[], errorMsg: string
       env,
       timeout: BUNDLETOOL_TIMEOUT_MS,
     }));
-    log.debug(`Command stdout: ${_.truncate(stdout, {length: 300})}`);
+    log.debug(`Command stdout: ${util.truncateString(stdout, {length: 300})}`);
     return stdout;
   } catch (e) {
     const err = e as Error & {stdout?: string; stderr?: string};
@@ -75,7 +74,7 @@ export async function execBundletool(this: ADB, args: string[], errorMsg: string
     if (err.stderr) {
       log.debug(`Command stderr: ${err.stderr}`);
     }
-    throw new Error(`${errorMsg}. Original error: ${err.message}`);
+    throw new Error(`${errorMsg}. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -240,7 +239,7 @@ export function isTestPackageOnlyError(output: string): boolean {
  * apks file is not a valid bundle
  */
 async function extractFromApks(apks: string, dstPath: string | string[]): Promise<string> {
-  const normalizedDstPath = _.isArray(dstPath) ? dstPath : [dstPath];
+  const normalizedDstPath = Array.isArray(dstPath) ? dstPath : [dstPath];
 
   return await APKS_CACHE_GUARD.acquire(apks, async () => {
     // It might be that the original file has been replaced,

@@ -6,7 +6,6 @@ import chaiAsPromised from 'chai-as-promised';
 import {MOCHA_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
 import {fs, tempDir} from '@appium/support';
 import {waitForCondition} from 'asyncbox';
-import _ from 'lodash';
 
 chai.use(chaiAsPromised);
 
@@ -48,7 +47,7 @@ describe('general commands', function () {
     // Get the default IME to avoid trying to disable it (which may not be allowed)
     const defaultIme = await adb.defaultIME();
     // Find an IME that is not the default one
-    const ime = imes.find((i) => i !== defaultIme) || _.last(imes);
+    const ime = imes.find((i) => i !== defaultIme) || imes[imes.length - 1];
 
     // Skip if we can't find a non-default IME or if the only IME is the default
     if (!ime || ime === defaultIme) {
@@ -78,7 +77,7 @@ describe('general commands', function () {
     } catch {
       // If timeout, the IME couldn't be disabled (system IME that can't be disabled)
       // This is acceptable behavior on some Android versions
-      enabledAfterDisable = await adb.enabledIMEs();
+      await adb.enabledIMEs();
     }
     // Re-enable the IME to restore state (or ensure it's enabled if disable didn't work)
     await adb.enableIME(ime);
@@ -263,7 +262,7 @@ describe('general commands', function () {
   describe('features', function () {
     it('should return the features as a list', async function () {
       const features = await adb.listFeatures();
-      expect(_.isArray(features)).to.be.true;
+      expect(features).to.be.an('array');
     });
   });
 
@@ -280,14 +279,14 @@ describe('general commands', function () {
   describe('isStreamedInstallSupported', function () {
     it('should return boolean value', async function () {
       const result = await adb.isStreamedInstallSupported();
-      expect(_.isBoolean(result)).to.be.true;
+      expect(result).to.be.a('boolean');
     });
   });
 
   describe('isIncrementalInstallSupported', function () {
     it('should return boolean value', async function () {
       const result = await adb.isIncrementalInstallSupported();
-      expect(_.isBoolean(result)).to.be.true;
+      expect(result).to.be.a('boolean');
     });
   });
 
@@ -307,7 +306,7 @@ describe('general commands', function () {
   describe('takeScreenshot', function () {
     it('should return screenshot', async function () {
       const screenshot = await adb.takeScreenshot();
-      expect(_.isEmpty(screenshot)).to.be.false;
+      expect(screenshot).to.not.be.empty;
     });
   });
 
@@ -315,7 +314,7 @@ describe('general commands', function () {
     it('should list opened ports', async function () {
       const ports1 = await adb.listPorts();
       const ports2 = await adb.listPorts('6');
-      expect(_.isEmpty(ports1) && _.isEmpty(ports2)).to.be.false;
+      expect([...ports1, ...ports2]).to.not.be.empty;
     });
   });
 

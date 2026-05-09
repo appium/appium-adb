@@ -1,11 +1,10 @@
 import {ADB} from '../../lib/adb';
 import {MOCHA_TIMEOUT, MOCHA_LONG_TIMEOUT} from './setup';
 import path from 'node:path';
-import {getResourcePath} from '../../lib/helpers';
 import {fs} from '@appium/support';
-import _ from 'lodash';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {getResourcePath} from '../../lib/utils';
 
 chai.use(chaiAsPromised);
 
@@ -111,9 +110,9 @@ describe('system calls', function () {
   it('should return version', async function () {
     const {binary, bridge} = await adb.getVersion();
     if (binary) {
-      expect(_.has(binary, 'version')).to.be.true;
-      expect(_.has(binary, 'build')).to.be.true;
+      expect(binary).to.have.property('version');
+      expect(binary).to.have.property('build');
     }
-    expect(_.has(bridge, 'version')).to.be.true;
+    expect(bridge).to.have.property('version');
   });
 });

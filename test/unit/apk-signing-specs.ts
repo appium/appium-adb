@@ -1,5 +1,4 @@
 import {ADB} from '../../lib/adb';
-import * as helpers from '../../lib/helpers';
 import path from 'node:path';
 import * as teen_process from 'teen_process';
 import * as appiumSupport from '@appium/support';
@@ -10,6 +9,7 @@ import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 import {APIDEMOS_PKG} from '../constants';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import * as helpers from '../../lib/utils';
 
 chai.use(chaiAsPromised);
 const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');

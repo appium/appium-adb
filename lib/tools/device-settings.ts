@@ -1,5 +1,4 @@
 import {log} from '../logger';
-import _ from 'lodash';
 import {retryInterval} from 'asyncbox';
 import {util} from '@appium/support';
 import type {ADB} from '../adb';
@@ -155,10 +154,10 @@ export async function setHttpProxy(
   proxyPort: string | number,
 ): Promise<void> {
   const proxy = `${proxyHost}:${proxyPort}`;
-  if (_.isUndefined(proxyHost)) {
+  if (typeof proxyHost === 'undefined') {
     throw new Error(`Call to setHttpProxy method with undefined proxy_host: ${proxy}`);
   }
-  if (_.isUndefined(proxyPort)) {
+  if (typeof proxyPort === 'undefined') {
     throw new Error(`Call to setHttpProxy method with undefined proxy_port ${proxy}`);
   }
 
@@ -231,7 +230,7 @@ export async function getTimeZone(this: ADB): Promise<string> {
     return await this.getDeviceProperty('persist.sys.timezone');
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting timezone. Original error: ${err.message}`);
+    throw new Error(`Error getting timezone. Original error: ${err.message}`, {cause: e});
   }
 }
 
@@ -247,7 +246,9 @@ export async function getPlatformVersion(this: ADB): Promise<string> {
     return await this.getDeviceProperty('ro.build.version.release');
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`);
+    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`, {
+      cause: e,
+    });
   }
 }
 
@@ -268,7 +269,7 @@ export async function getLocationProviders(this: ADB): Promise<string[]> {
   }
 
   // To emulate the legacy behavior
-  return _.includes(await this.shell(['cmd', 'location', 'is-location-enabled']), 'true')
+  return (await this.shell(['cmd', 'location', 'is-location-enabled'])).includes('true')
     ? ['gps']
     : [];
 }
@@ -401,8 +402,8 @@ export async function ensureCurrentLocale(
   country?: string,
   script?: string,
 ): Promise<boolean> {
-  const hasLanguage = _.isString(language);
-  const hasCountry = _.isString(country);
+  const hasLanguage = typeof language === 'string';
+  const hasCountry = typeof country === 'string';
   if (!hasLanguage && !hasCountry) {
     log.warn('ensureCurrentLocale requires language or country');
     return false;
@@ -439,12 +440,12 @@ export async function ensureCurrentLocale(
         ? `${lcLanguage}-${script.toLowerCase()}-${lcCountry}`
         : `${lcLanguage}-${lcCountry}`;
       log.debug(`Requested locale: ${expectedLocale}. Actual locale: '${actualLocale}'`);
-      const languagePattern = `^${_.escapeRegExp(lcLanguage)}-${script ? _.escapeRegExp(script) + '-' : ''}`;
+      const languagePattern = `^${util.escapeRegExp(lcLanguage)}-${script ? util.escapeRegExp(script) + '-' : ''}`;
       const checkLocalePattern = (p: string) => new RegExp(p, 'i').test(actualLocale);
       if (hasLanguage && !hasCountry) {
         return checkLocalePattern(languagePattern);
       }
-      const countryPattern = `${script ? '-' + _.escapeRegExp(script) : ''}-${_.escapeRegExp(lcCountry)}$`;
+      const countryPattern = `${script ? '-' + util.escapeRegExp(script) : ''}-${util.escapeRegExp(lcCountry)}$`;
       if (!hasLanguage && hasCountry) {
         return checkLocalePattern(countryPattern);
       }
@@ -509,9 +510,10 @@ export async function getDeviceIdleWhitelist(this: ADB): Promise<string[]> {
 
   log.info('Listing packages in Doze whitelist');
   const output = await this.shell(['dumpsys', 'deviceidle', 'whitelist']);
-  return _.trim(output)
+  return output
+    .trim()
     .split(/\n/)
-    .map((line) => _.trim(line))
+    .map((line) => line.trim())
     .filter(Boolean);
 }
 
@@ -525,7 +527,7 @@ export async function getDeviceIdleWhitelist(this: ADB): Promise<string[]> {
  * @returns `true` if the command to add package(s) has been executed
  */
 export async function addToDeviceIdleWhitelist(this: ADB, ...packages: string[]): Promise<boolean> {
-  if (_.isEmpty(packages) || (await this.getApiLevel()) < 23) {
+  if (util.isEmpty(packages) || (await this.getApiLevel()) < 23) {
     // Doze mode has only been added since Android 6
     return false;
   }
@@ -621,7 +623,7 @@ export async function broadcastAirplaneMode(this: ADB, on: boolean): Promise<voi
   } catch (e) {
     const err = e as ExecError;
     // https://github.com/appium/appium/issues/17422
-    if (_.includes(err.stderr, 'SecurityException')) {
+    if ((err.stderr ?? '').includes('SecurityException')) {
       try {
         await this.shell(args, {privileged: true});
         return;
@@ -708,7 +710,7 @@ export async function getScreenOrientation(this: ADB): Promise<number | null> {
  * @returns Either the same error or the decorated one
  */
 function decorateWriteSecureSettingsException(e: Error): Error {
-  if (_.includes(e.message, 'requires:android.permission.WRITE_SECURE_SETTINGS')) {
+  if (e.message?.includes('requires:android.permission.WRITE_SECURE_SETTINGS')) {
     e.message = `Check https://github.com/appium/appium/issues/13802 for throubleshooting. ${e.message}`;
   }
   return e;

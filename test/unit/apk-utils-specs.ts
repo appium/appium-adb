@@ -2,7 +2,6 @@ import * as teen_process from 'teen_process';
 import {fs} from '@appium/support';
 import {ADB} from '../../lib/adb';
 import sinon from 'sinon';
-import _ from 'lodash';
 import {REMOTE_CACHE_ROOT} from '../../lib/tools/apk-utils';
 import * as apksUtilsMethods from '../../lib/tools/apks-utils';
 import chai, {expect} from 'chai';
@@ -554,7 +553,7 @@ describe('Apk-utils', function () {
         .once()
         .withExactArgs([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo _ERROR_`])
         .returns(
-          _.range(adb.remoteAppsCacheLimit! + 2)
+          Array.from({length: adb.remoteAppsCacheLimit! + 2}, (_, x) => x)
             .map((x) => `${x}.apk`)
             .join('\r\n'),
         );

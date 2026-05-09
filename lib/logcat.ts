@@ -1,5 +1,4 @@
 import {logger, util} from '@appium/support';
-import _ from 'lodash';
 import {EventEmitter} from 'node:events';
 import {SubProcess, exec} from 'teen_process';
 import {LRUCache} from 'lru-cache';
@@ -148,7 +147,7 @@ export class Logcat extends EventEmitter {
         result.push(toLogEntry(message, timestamp));
       }
     }
-    if (_.isInteger(recentLogIndex)) {
+    if (Number.isInteger(recentLogIndex)) {
       this.logIndexSinceLastRequest = recentLogIndex;
     }
     return result;
@@ -179,12 +178,8 @@ export class Logcat extends EventEmitter {
 
   private outputHandler(logLine: string, prefix: string = ''): void {
     const timestamp = Date.now();
-    let recentIndex = -1;
-    for (const key of this.logs.keys()) {
-      recentIndex = key;
-      break;
-    }
-    this.logs.set(++recentIndex, [logLine, timestamp]);
+    const recentIndex = this.logs.keys().next().value ?? -1;
+    this.logs.set(recentIndex + 1, [logLine, timestamp]);
     if (this.listenerCount('output')) {
       this.emit('output', toLogEntry(logLine, timestamp));
     }
@@ -225,7 +220,7 @@ function requireSpec(spec: string): string {
     );
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }
-  if (!SUPPORTED_PRIORITIES.some((p) => _.toLower(priority) === _.toLower(p))) {
+  if (!SUPPORTED_PRIORITIES.some((p) => priority.toLowerCase() === p.toLowerCase())) {
     log.info(
       `The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`,
     );
@@ -236,11 +231,11 @@ function requireSpec(spec: string): string {
 }
 
 function formatFilterSpecs(filterSpecs: string | string[]): string[] {
-  if (!_.isArray(filterSpecs)) {
+  if (!Array.isArray(filterSpecs)) {
     filterSpecs = [filterSpecs];
   }
   return filterSpecs
-    .filter((spec) => spec && _.isString(spec) && !spec.startsWith('-'))
+    .filter((spec) => spec && typeof spec === 'string' && !spec.startsWith('-'))
     .map((spec) => (spec.includes(':') ? requireSpec(spec) : spec));
 }
 

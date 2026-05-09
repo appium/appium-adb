@@ -1,6 +1,4 @@
-import _ from 'lodash';
 import os from 'node:os';
-import {DEFAULT_ADB_EXEC_TIMEOUT, requireSdkRoot, getSdkRootFromEnv} from './helpers';
 import {log} from './logger';
 import type {ADBOptions, ADBExecutable} from './types';
 import type {Logcat} from './logcat';
@@ -25,6 +23,14 @@ import * as appCommands from './tools/app-commands';
 import * as networkCommands from './tools/network-commands';
 import * as logcatCommands from './tools/logcat-commands';
 import * as processCommands from './tools/process-commands';
+import {
+  DEFAULT_ADB_EXEC_TIMEOUT,
+  cloneDeep,
+  defaultsDeep,
+  getSdkRootFromEnv,
+  pick,
+  requireSdkRoot,
+} from './utils';
 
 export const DEFAULT_ADB_PORT = 5037;
 export const DEFAULT_OPTS = {
@@ -320,8 +326,8 @@ export class ADB implements ADBOptions {
   getScreenOrientation = deviceSettingsCommands.getScreenOrientation;
 
   constructor(opts: ADBOptions = {} as ADBOptions) {
-    const options: ADBOptions = _.defaultsDeep(opts, _.cloneDeep(DEFAULT_OPTS));
-    _.defaultsDeep(this, options);
+    const options: ADBOptions = defaultsDeep(opts, cloneDeep(DEFAULT_OPTS));
+    defaultsDeep(this, options);
 
     // The above defaultsDeep call guarantees the 'executable' field to be always assigned
     this.executable = options.executable as ADBExecutable;
@@ -372,8 +378,10 @@ export class ADB implements ADBOptions {
    * @returns The resulting class instance.
    */
   clone(opts: ADBOptions = {} as ADBOptions): ADB {
-    const originalOptions = _.cloneDeep(_.pick(this, Object.keys(DEFAULT_OPTS)));
-    const cloneOptions = _.defaultsDeep(opts, originalOptions);
+    const originalOptions = cloneDeep(pick(this, Object.keys(DEFAULT_OPTS)));
+    const cloneOptions = defaultsDeep(opts, originalOptions) as ADBOptions & {
+      executable: ADBExecutable;
+    };
 
     // Reset default arguments created in the constructor.
     // Without this code, -H and -P can be injected into defaultArgs multiple times.

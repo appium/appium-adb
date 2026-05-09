@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {Logcat} from '../logcat';
 import type {ADB} from '../adb';
 import type {LogcatOpts, LogEntry, LogcatListener} from './types';
@@ -10,7 +9,7 @@ import type {LogcatOpts, LogEntry, LogcatListener} from './types';
  * @throws {Error} If restart fails.
  */
 export async function startLogcat(this: ADB, opts: LogcatOpts = {}): Promise<void> {
-  if (!_.isEmpty(this.logcat)) {
+  if (this.logcat) {
     throw new Error("Trying to start logcat capture but it's already started!");
   }
 
@@ -30,7 +29,7 @@ export async function startLogcat(this: ADB, opts: LogcatOpts = {}): Promise<voi
  */
 export async function stopLogcat(this: ADB): Promise<void> {
   const logcat = this.logcat;
-  if (!logcat || _.isEmpty(this.logcat)) {
+  if (!logcat) {
     return;
   }
   try {
@@ -49,7 +48,7 @@ export async function stopLogcat(this: ADB): Promise<void> {
  */
 export function getLogcatLogs(this: ADB): LogEntry[] {
   const logcat = this.logcat;
-  if (!logcat || _.isEmpty(this.logcat)) {
+  if (!logcat) {
     throw new Error(`Can't get logcat logs since logcat hasn't started`);
   }
   return logcat.getLogs();
@@ -63,7 +62,7 @@ export function getLogcatLogs(this: ADB): LogEntry[] {
  */
 export function setLogcatListener(this: ADB, listener: LogcatListener): void {
   const logcat = this.logcat;
-  if (!logcat || _.isEmpty(this.logcat)) {
+  if (!logcat) {
     throw new Error("Logcat process hasn't been started");
   }
   logcat.on('output', listener);
@@ -79,7 +78,7 @@ export function setLogcatListener(this: ADB, listener: LogcatListener): void {
  */
 export function removeLogcatListener(this: ADB, listener: LogcatListener): void {
   const logcat = this.logcat;
-  if (!logcat || _.isEmpty(this.logcat)) {
+  if (!logcat) {
     throw new Error("Logcat process hasn't been started");
   }
   logcat.removeListener('output', listener);

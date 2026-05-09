@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import path from 'node:path';
 import type {ADB} from '../adb';
 import type {TeenProcessExecOptions} from 'teen_process';
@@ -13,7 +12,7 @@ export async function fileExists(this: ADB, remotePath: string): Promise<boolean
   const passFlag = '__PASS__';
   const checkCmd = `[ -e '${shellEscapeSingleQuotes(remotePath)}' ] && echo ${passFlag}`;
   try {
-    return _.includes(await this.shell([checkCmd]), passFlag);
+    return (await this.shell([checkCmd])).includes(passFlag);
   } catch {
     return false;
   }
@@ -60,12 +59,14 @@ export async function fileSize(this: ADB, remotePath: string): Promise<number> {
     }
     // https://regex101.com/r/fOs4P4/8
     const match = /[rwxsStT\-+]{10}[\s\d]*\s[^\s]+\s+[^\s]+\s+(\d+)/.exec(files[0]);
-    if (!match || _.isNaN(parseInt(match[1], 10))) {
+    if (!match || Number.isNaN(parseInt(match[1], 10))) {
       throw new Error(`Unable to parse size from list output: '${files[0]}'`);
     }
     return parseInt(match[1], 10);
   } catch (err) {
-    throw new Error(`Unable to get file size for '${remotePath}': ${(err as Error).message}`);
+    throw new Error(`Unable to get file size for '${remotePath}': ${(err as Error).message}`, {
+      cause: err,
+    });
   }
 }
 

@@ -1,13 +1,12 @@
-import _ from 'lodash';
 import _fs from 'node:fs';
 import {exec, type ExecError} from 'teen_process';
 import path from 'node:path';
 import {log} from '../logger';
 import {tempDir, system, mkdirp, fs, util, zip} from '@appium/support';
 import {LRUCache} from 'lru-cache';
-import {getJavaForOs, getJavaHome, APKS_EXTENSION, getResourcePath} from '../helpers';
 import type {ADB} from '../adb';
 import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types';
+import {APKS_EXTENSION, getJavaForOs, getJavaHome, getResourcePath} from '../utils';
 
 const DEFAULT_PRIVATE_KEY = path.join('keys', 'testkey.pk8');
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
@@ -45,7 +44,7 @@ export async function executeApksigner(this: ADB, args: string[]): Promise<strin
     ['stdout', stdout],
     ['stderr', stderr],
   ] as const) {
-    if (!_.trim(stream)) {
+    if (!stream?.trim()) {
       continue;
     }
 
@@ -90,6 +89,7 @@ export async function signWithDefaultCert(this: ADB, apk: string): Promise<void>
     throw new Error(
       `Could not sign '${apk}' with the default certificate. ` +
         `Original error: ${err.stderr || err.stdout || err.message}`,
+      {cause: e},
     );
   }
 }
@@ -161,6 +161,7 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
       throw new Error(
         `Could not sign with custom certificate. ` +
           `Original error: ${execErr.stderr || execErr.message}`,
+        {cause: e},
       );
     }
   }
@@ -240,6 +241,7 @@ export async function zipAlignApk(this: ADB, apk: string): Promise<boolean> {
     }
     throw new Error(
       `zipAlignApk failed. Original error: ${err.message || (err as ExecError).stderr}`,
+      {cause: e},
     );
   }
 }
@@ -270,7 +272,7 @@ export async function checkApkCert(
   }
 
   const hashMatches = (apksignerOutput: string, expectedHashes: KeystoreHash): boolean => {
-    for (const [name, value] of _.toPairs(expectedHashes)) {
+    for (const [name, value] of Object.entries(expectedHashes)) {
       if (value && new RegExp(`digest:\\s+${value}\\b`, 'i').test(apksignerOutput)) {
         log.debug(`${name} hash did match for '${path.basename(actualAppPath)}'`);
         return true;
@@ -321,12 +323,12 @@ export async function checkApkCert(
   } catch (err) {
     const error = err as ExecError;
     // check if there is no signature
-    if (_.includes(error.stderr, APKSIGNER_VERIFY_FAIL)) {
+    if ((error.stderr ?? '').includes(APKSIGNER_VERIFY_FAIL)) {
       log.info(`'${actualAppPath}' is not signed`);
       return false;
     }
     const errMsg = error.stderr || error.stdout || error.message;
-    if (_.includes(errMsg, JAVA_PROPS_INIT_ERROR)) {
+    if (`${errMsg}`.includes(JAVA_PROPS_INIT_ERROR)) {
       // This error pops up randomly and we are not quite sure why.
       // My guess - a race condition in java vm initialization.
       // Nevertheless, lets make Appium to believe the file is already signed,
@@ -341,6 +343,7 @@ export async function checkApkCert(
     }
     throw new Error(
       `Cannot verify the signature of '${actualAppPath}'. ` + `Original error: ${errMsg}`,
+      {cause: err},
     );
   }
 }
@@ -383,7 +386,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
       }
       result[hashName] = match[1].replace(/:/g, '').toLowerCase();
     }
-    if (_.isEmpty(result)) {
+    if (util.isEmpty(result)) {
       log.debug(stdout);
       throw new Error('Cannot parse the hash value from the keytool output');
     }
@@ -394,6 +397,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
     throw new Error(
       `Cannot get the hash of '${this.keystorePath}' keystore. ` +
         `Original error: ${err.stderr || err.message}`,
+      {cause: e},
     );
   }
 }

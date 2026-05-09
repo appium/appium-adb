@@ -1,7 +1,7 @@
 import {log} from '../logger';
-import _ from 'lodash';
 import {sleep, waitForCondition} from 'asyncbox';
 import type {ADB} from '../adb';
+import {util} from '@appium/support';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
@@ -17,13 +17,13 @@ const HIDE_KEYBOARD_WAIT_TIME = 100;
  * @return True if the management is supported. The result is cached per ADB instance
  */
 export async function isLockManagementSupported(this: ADB): Promise<boolean> {
-  if (!_.isBoolean(this._isLockManagementSupported)) {
+  if (typeof this._isLockManagementSupported !== 'boolean') {
     const passFlag = '__PASS__';
     let output = '';
     try {
       output = await this.shell([`locksettings help && echo ${passFlag}`]);
     } catch {}
-    this._isLockManagementSupported = _.includes(output, passFlag);
+    this._isLockManagementSupported = output.includes(passFlag);
     log.debug(
       `Extended lock settings management is ` +
         `${this._isLockManagementSupported ? '' : 'not '}supported`,
@@ -52,12 +52,12 @@ export async function verifyLockCredential(
     const {stdout, stderr} = await this.shell(buildCommand('verify', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     });
-    if (_.includes(stdout, 'verified successfully')) {
+    if (stdout?.includes('verified successfully')) {
       return true;
     }
     if (
       [`didn't match`, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) =>
-        _.includes(stderr || stdout, x),
+        (stderr || stdout)?.includes(x),
       )
     ) {
       return false;
@@ -71,6 +71,7 @@ export async function verifyLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }
@@ -97,7 +98,7 @@ export async function clearLockCredential(
     });
     if (
       !['user has no password', 'Lock credential cleared'].some((x) =>
-        _.includes(stderr || stdout, x),
+        (stderr || stdout)?.includes(x),
       )
     ) {
       throw new Error(stderr || stdout);
@@ -110,6 +111,7 @@ export async function clearLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }
@@ -129,7 +131,7 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
     if (
       /\bfalse\b/.test(stdout) ||
       [CREDENTIAL_DID_NOT_MATCH_ERROR, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) =>
-        _.includes(stderr || stdout, x),
+        (stderr || stdout)?.includes(x),
       )
     ) {
       return true;
@@ -141,6 +143,7 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
   } catch (e) {
     throw new Error(
       `Cannot check if device lock is enabled. Original error: ${(e as Error).message}`,
+      {cause: e},
     );
   }
 }
@@ -174,7 +177,7 @@ export async function setLockCredential(
         `Only the following credential types are supported: ${SUPPORTED_LOCK_CREDENTIAL_TYPES}`,
     );
   }
-  if (_.isEmpty(credential) && !_.isInteger(credential)) {
+  if (util.isEmpty(credential) && !Number.isInteger(credential)) {
     throw new Error('Device lock credential cannot be empty');
   }
   const cmd = buildCommand(`set-${credentialType}`, oldCredential, credential);
@@ -182,7 +185,7 @@ export async function setLockCredential(
     const {stdout, stderr} = await this.shell(cmd, {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     });
-    if (!_.includes(stdout, 'set to')) {
+    if (!stdout?.includes('set to')) {
       throw new Error(stderr || stdout);
     }
   } catch (e) {
@@ -193,6 +196,7 @@ export async function setLockCredential(
           (e as Error & {stderr?: string; stdout?: string}).stdout ||
           (e as Error).message
         }`,
+      {cause: e},
     );
   }
 }
@@ -295,9 +299,9 @@ export async function lock(this: ADB): Promise<void> {
  */
 export function isShowingLockscreen(dumpsys: string): boolean {
   return (
-    _.some(['mShowingLockscreen=true', 'mDreamingLockscreen=true'], (x) => dumpsys.includes(x)) ||
+    ['mShowingLockscreen=true', 'mDreamingLockscreen=true'].some((x) => dumpsys.includes(x)) ||
     // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
-    _.every([/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/], (x) =>
+    [/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/].every((x) =>
       x.test(dumpsys),
     )
   );
@@ -327,10 +331,10 @@ function buildCommand(
   ...args: string[]
 ): string[] {
   const cmd = ['locksettings', verb];
-  if (oldCredential && !_.isEmpty(oldCredential)) {
+  if (oldCredential && !util.isEmpty(oldCredential)) {
     cmd.push('--old', oldCredential);
   }
-  if (!_.isEmpty(args)) {
+  if (args.length > 0) {
     cmd.push(...args);
   }
   return cmd;
