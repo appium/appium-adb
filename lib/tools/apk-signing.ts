@@ -378,7 +378,8 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
   try {
     const {stdout} = await exec(keytool, args);
     const result: KeystoreHash = {};
-    for (const hashName of [SHA512, SHA256, SHA1, MD5]) {
+    const hashNames: Array<keyof KeystoreHash> = [SHA512, SHA256, SHA1, MD5];
+    for (const hashName of hashNames) {
       const hashRe = new RegExp(`^\\s*${hashName}:\\s*([a-f0-9:]+)`, 'mi');
       const match = hashRe.exec(stdout);
       if (!match) {

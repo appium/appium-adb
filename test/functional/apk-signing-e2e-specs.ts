@@ -13,9 +13,9 @@ const keystorePath = path.resolve(fixturesRoot, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
 
 describe('Apk-signing', function () {
-  let adb;
-  let tmpDir;
-  let apiDemosPath;
+  let adb: ADB;
+  let tmpDir: string;
+  let apiDemosPath: string;
 
   before(async function () {
     adb = await ADB.createADB();

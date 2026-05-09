@@ -10,8 +10,8 @@ import {readPackageManifest, requireSdkRoot} from '../../lib/utils';
 chai.use(chaiAsPromised);
 
 describe('Android-manifest', function () {
-  let adb;
-  let apiDemosPath;
+  let adb: ADB;
+  let apiDemosPath: string;
 
   before(async function () {
     adb = await ADB.createADB();
@@ -20,7 +20,8 @@ describe('Android-manifest', function () {
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     const {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(apiDemosPath);
     expect(apkPackage).to.equal(APIDEMOS_PKG);
-    expect(apkActivity.endsWith(APIDEMOS_ACTIVITY_SHORT)).to.be.true;
+    expect(apkActivity).to.be.a('string');
+    expect(apkActivity?.endsWith(APIDEMOS_ACTIVITY_SHORT)).to.be.true;
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
     expect(await adb.hasInternetPermissionFromManifest(apiDemosPath)).to.be.true;

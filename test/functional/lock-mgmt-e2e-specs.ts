@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 
 describe('Lock Management', function () {
-  let adb;
+  let adb: ADB;
 
   before(async function () {
     adb = await ADB.createADB();

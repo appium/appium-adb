@@ -1,5 +1,6 @@
 import path from 'node:path';
 import {fs, net} from '@appium/support';
+import type {ADB} from '../../lib/adb';
 
 export const MOCHA_TIMEOUT = process.env.CI ? 240000 : 60000;
 export const MOCHA_LONG_TIMEOUT = MOCHA_TIMEOUT * 10;
@@ -18,8 +19,8 @@ let downloadPromise: Promise<string> | null = null;
  * Downloads and caches the ApiDemos APK from GitHub if it doesn't already exist locally.
  * This function handles concurrent requests by reusing the same download promise.
  *
- * @returns {Promise<string>} The path to the cached APK file
- * @throws {Error} If the download fails
+ * @returns The path to the cached APK file
+ * @throws If the download fails
  */
 export async function getApiDemosPath() {
   // If a download is already in progress, wait for it first
@@ -62,22 +63,17 @@ export async function getApiDemosPath() {
  * Ensures the device has root access, skipping the test if root cannot be obtained.
  * This is useful for tests that require root privileges (e.g., killing processes).
  *
- * @param {import('../../lib/adb').ADB} adb - The ADB instance
- * @param {Mocha.Context} testContext - The Mocha test context (this)
- * @param {string} [skipMessage] - Optional custom message for skipping the test
- * @returns {Promise<boolean>} True if root access is available, false if test was skipped
+ * @param adb - The ADB instance
+ * @param testContext - The Mocha test context (this)
+ * @returns True if root access is available, false if test was skipped
  */
-export async function ensureRootAccess(
-  adb,
-  testContext,
-  skipMessage = 'Device does not have root access, which is required for this test',
-) {
+export async function ensureRootAccess(adb: ADB, testContext: Mocha.Context) {
   const hasRoot = await adb.isRoot().catch(() => false);
   if (!hasRoot) {
     // Try to get root, but skip if it fails
     const rootResult = await adb.root();
     if (!rootResult.isSuccessful) {
-      testContext.skip(skipMessage);
+      testContext.skip();
       return false;
     }
   }

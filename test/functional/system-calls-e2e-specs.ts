@@ -14,7 +14,7 @@ const avdName = process.env.ANDROID_AVD || 'Android Emulator';
 describe('system calls', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  let adb;
+  let adb: ADB;
 
   before(async function () {
     adb = await ADB.createADB();
@@ -91,7 +91,7 @@ describe('system calls', function () {
       await adb.reboot();
       await adb.ping();
     } catch (e) {
-      expect(e.message).to.include('must be root');
+      expect((e as Error).message).to.include('must be root');
     }
   });
   it('fileExists should detect when files do and do not exist', async function () {

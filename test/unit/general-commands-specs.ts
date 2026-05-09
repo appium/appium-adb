@@ -533,7 +533,11 @@ describe('general commands', function () {
       });
     });
     describe('isAnimationOn', function () {
-      const mockSetting = function (duration_scale, transition_scale, window_scale) {
+      const mockSetting = function (
+        duration_scale: string,
+        transition_scale: string,
+        window_scale: string,
+      ) {
         mocks.adb
           .expects('getSetting')
           .once()
@@ -755,7 +759,7 @@ describe('general commands', function () {
         .withExactArgs(['wm', 'density'])
         .returns('Physical density: unknown');
       const density = await adb.getScreenDensity();
-      expect(density, null);
+      expect(density).to.equal(null);
     });
   });
   describe('app permission', function () {

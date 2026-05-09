@@ -12,8 +12,8 @@ chai.use(chaiAsPromised);
 describe('general commands', function () {
   this.timeout(MOCHA_TIMEOUT);
 
-  let adb;
-  let apiDemosPath;
+  let adb: ADB;
+  let apiDemosPath: string;
   const androidInstallTimeout = 90000;
   before(async function () {
     adb = await ADB.createADB({adbExecTimeout: 60000});
@@ -36,7 +36,7 @@ describe('general commands', function () {
   it('defaultIME should get default IME', async function () {
     const defaultIME = await adb.defaultIME();
     expect(defaultIME).to.be.a('string');
-    expect(defaultIME.length).to.be.above(0);
+    expect(defaultIME?.length ?? 0).to.be.above(0);
   });
   it('enableIME and disableIME should enable and disable IME', async function () {
     const imes = await adb.availableIMEs();
@@ -118,7 +118,7 @@ describe('general commands', function () {
   });
   it('should start logcat from adb', async function () {
     await adb.startLogcat();
-    const logs = adb.logcat.getLogs();
+    const logs = adb.logcat?.getLogs() ?? [];
     expect(logs).to.have.length.above(0);
     await adb.stopLogcat();
   });
@@ -198,9 +198,9 @@ describe('general commands', function () {
       return `/data/local/tmp/test${Math.random()}`;
     }
 
-    let localFile;
-    let tempFile;
-    let tempRoot;
+    let localFile: string;
+    let tempFile: string;
+    let tempRoot: string;
     const stringData = `random string data ${Math.random()}`;
     before(async function () {
       tempRoot = await tempDir.openDir();
@@ -333,7 +333,7 @@ describe('general commands', function () {
     cases.forEach(({name, textSuffix}) => {
       it(name, async function () {
         // Focus the text input field
-        await adb.keyevent(['KEYCODE_BUTTON_START']);
+        await adb.keyevent('KEYCODE_BUTTON_START');
 
         const randomPrefix = randomUUID().split('-')[0];
         const text = `${randomPrefix}${textSuffix}`;

@@ -907,12 +907,13 @@ describe('Apk-utils', function () {
         User 0: ceDataInode=474317 installed=true hidden=false suspended=false stopped=true notLaunched=true enabled=0
           runtime permissions:`);
       const result = await adb.getPackageInfo('com.example.testapp.first');
-      for (const [name, value] of [
+      const expectedProperties: Array<[string, string | number | boolean]> = [
         ['name', 'com.example.testapp.first'],
         ['versionCode', 1],
         ['versionName', '1.0'],
         ['isInstalled', true],
-      ]) {
+      ];
+      for (const [name, value] of expectedProperties) {
         expect(result).to.have.property(name, value);
       }
     });
