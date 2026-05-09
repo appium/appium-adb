@@ -332,8 +332,8 @@ describe('general commands', function () {
 
     cases.forEach(({name, textSuffix}) => {
       it(name, async function () {
-        // Focus the text input field
-        await adb.keyevent('KEYCODE_BUTTON_START');
+        // Focus the text input field (KEYCODE_BUTTON_START; keyevent() parses with parseInt only)
+        await adb.keyevent(108);
 
         const randomPrefix = randomUUID().split('-')[0];
         const text = `${randomPrefix}${textSuffix}`;
