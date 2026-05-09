@@ -1,3 +1,9 @@
+## [14.4.0](https://github.com/appium/appium-adb/compare/v14.3.5...v14.4.0) (2026-05-09)
+
+### Features
+
+* ditch lodash ([#873](https://github.com/appium/appium-adb/issues/873)) ([b253b5a](https://github.com/appium/appium-adb/commit/b253b5a66a7a8e2e077e728cb783f0f042ab1ce4))
+
 ## [14.3.5](https://github.com/appium/appium-adb/compare/v14.3.4...v14.3.5) (2026-05-06)
 
 ### Miscellaneous Chores
