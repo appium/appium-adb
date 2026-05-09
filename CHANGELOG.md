@@ -1,3 +1,9 @@
+## [14.5.0](https://github.com/appium/appium-adb/compare/v14.4.0...v14.5.0) (2026-05-09)
+
+### Features
+
+* Enable strict TS mode ([#874](https://github.com/appium/appium-adb/issues/874)) ([3a25031](https://github.com/appium/appium-adb/commit/3a25031129d0c40b1774139ff16ff8b87052dd19))
+
 ## [14.4.0](https://github.com/appium/appium-adb/compare/v14.3.5...v14.4.0) (2026-05-09)
 
 ### Features
