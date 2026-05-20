@@ -576,17 +576,6 @@ export function createSubProcess(this: ADB, args: string[] = []): SubProcess {
 }
 
 /**
- * Retrieve the current adb port.
- * @todo can probably deprecate this now that the logic is just to read this.adbPort
- * @deprecated Use this.adbPort instead
- *
- * @returns The ADB server port number
- */
-export function getAdbServerPort(this: ADB): number {
-  return this.adbPort as number;
-}
-
-/**
  * Retrieve the current emulator port from _adb devices_ output.
  *
  * @returns The emulator port number

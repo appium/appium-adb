@@ -6,7 +6,6 @@ import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
 import sinon from 'sinon';
 import * as apkSigningHelpers from '../../lib/tools/apk-signing';
-import {APIDEMOS_PKG} from '../constants';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as helpers from '../../lib/utils';
@@ -17,7 +16,6 @@ const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8'
 const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
 const keyAlias = 'appiumtest';
 const password = 'android';
-const apiDemosPackage = APIDEMOS_PKG;
 const javaDummyPath = 'java_dummy_path';
 const javaHome = 'java_home';
 const apksignerDummyPath = '/path/to/apksigner';
@@ -240,7 +238,7 @@ describe('signing', function () {
   describe('checkApkCert', function () {
     it('should return false for apk not present', async function () {
       mocks.fs.expects('exists').once().withExactArgs('dummyPath').returns(false);
-      expect(await adb.checkApkCert('dummyPath', 'dummyPackage')).to.be.false;
+      expect(await adb.checkApkCert('dummyPath')).to.be.false;
     });
 
     it('should check default signature when not using keystore', async function () {
@@ -272,7 +270,7 @@ describe('signing', function () {
             stderr: '',
           }),
       );
-      expect(await adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.be.true;
+      expect(await adb.checkApkCert(apiDemosPath)).to.be.true;
     });
 
     it('should check non default signature when not using keystore', async function () {
@@ -304,7 +302,7 @@ describe('signing', function () {
             stderr: '',
           }),
       );
-      const result = await adb.checkApkCert(apiDemosPath, apiDemosPackage, {
+      const result = await adb.checkApkCert(apiDemosPath, {
         requireDefaultCert: false,
       });
       expect(result).to.be.true;
@@ -324,7 +322,7 @@ describe('signing', function () {
         .once()
         .withExactArgs('apksigner.jar')
         .throws(new Error('apksigner not found'));
-      await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.rejected;
+      await expect(adb.checkApkCert(apiDemosPath)).to.eventually.be.rejected;
     });
 
     it('should call getKeystoreHash when using keystore', async function () {
@@ -361,7 +359,7 @@ describe('signing', function () {
             stderr: '',
           }),
       );
-      await expect(adb.checkApkCert(apiDemosPath, apiDemosPackage)).to.eventually.be.true;
+      await expect(adb.checkApkCert(apiDemosPath)).to.eventually.be.true;
     });
   });
 });

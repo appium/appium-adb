@@ -211,7 +211,6 @@ export class ADB implements ADBOptions {
   shell = systemCommands.shell;
   shellChunks = systemCommands.shellChunks;
   createSubProcess = systemCommands.createSubProcess;
-  getAdbServerPort = systemCommands.getAdbServerPort;
   getEmulatorPort = systemCommands.getEmulatorPort;
   getPortFromEmulatorString = systemCommands.getPortFromEmulatorString;
   getConnectedEmulators = systemCommands.getConnectedEmulators;
