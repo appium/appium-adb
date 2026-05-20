@@ -206,8 +206,7 @@ export class ADB implements ADBOptions {
   killServer = systemCommands.killServer;
   resetTelnetAuthToken = systemCommands.resetTelnetAuthToken;
   adbExecEmu = systemCommands.adbExecEmu;
-  EXEC_OUTPUT_FORMAT: typeof systemCommands.EXEC_OUTPUT_FORMAT =
-    systemCommands.EXEC_OUTPUT_FORMAT;
+  EXEC_OUTPUT_FORMAT: typeof systemCommands.EXEC_OUTPUT_FORMAT = systemCommands.EXEC_OUTPUT_FORMAT;
   adbExec = systemCommands.adbExec;
   shell = systemCommands.shell;
   shellChunks = systemCommands.shellChunks;
