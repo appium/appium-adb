@@ -1,3 +1,9 @@
+## [14.6.0](https://github.com/appium/appium-adb/compare/v14.5.0...v14.6.0) (2026-05-21)
+
+### Features
+
+* Cleanup deprecated/unused entities and add method overloads ([#876](https://github.com/appium/appium-adb/issues/876)) ([21ece85](https://github.com/appium/appium-adb/commit/21ece85f3eb69f9762d27aea2dbffb1c05966374))
+
 ## [14.5.0](https://github.com/appium/appium-adb/compare/v14.4.0...v14.5.0) (2026-05-09)
 
 ### Features
