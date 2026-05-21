@@ -250,14 +250,12 @@ export async function zipAlignApk(this: ADB, apk: string): Promise<boolean> {
  * Check if the app is already signed with the default Appium certificate.
  *
  * @param appPath - The full path to the local .apk(s) file.
- * @param pkg - The name of application package.
  * @param opts - Certificate checking options
  * @returns True if given application is already signed.
  */
 export async function checkApkCert(
   this: ADB,
   appPath: string,
-  pkg: string,
   opts: CertCheckOptions = {},
 ): Promise<boolean> {
   log.debug(`Checking app cert for ${appPath}`);

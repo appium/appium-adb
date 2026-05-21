@@ -10,14 +10,16 @@ import {DEFAULT_ADB_EXEC_TIMEOUT, cloneDeep, getSdkRootFromEnv, memoize, zip} fr
 import type {
   ConnectedDevicesOptions,
   Device,
+  VerboseDevice,
   AvdLaunchOptions,
   Version,
   RootResult,
   ShellExecOptions,
   SpecialAdbExecOptions,
-  TFullOutputOption,
   ExecResult,
 } from './types';
+
+type AdbExecOptions = ShellExecOptions & SpecialAdbExecOptions;
 
 const DEFAULT_ADB_REBOOT_RETRIES = 90;
 const LINKER_WARNING_REGEXP = /^WARNING: linker.+$/m;
@@ -212,14 +214,29 @@ export async function getBinaryFromPath(this: ADB, binaryName: string): Promise<
 /**
  * Retrieve the list of devices visible to adb.
  *
+ * @param opts - Options with `verbose: true` for long `adb devices -l` output
+ * @returns Array of connected devices with product/model metadata
+ * @throws {Error} If adb devices command fails or returns unexpected output
+ */
+export async function getConnectedDevices(
+  this: ADB,
+  opts: ConnectedDevicesOptions & {verbose: true},
+): Promise<VerboseDevice[]>;
+/**
+ * Retrieve the list of devices visible to adb.
+ *
  * @param opts - Options for device retrieval
  * @returns Array of connected devices
  * @throws {Error} If adb devices command fails or returns unexpected output
  */
 export async function getConnectedDevices(
   this: ADB,
+  opts?: ConnectedDevicesOptions,
+): Promise<Device[]>;
+export async function getConnectedDevices(
+  this: ADB,
   opts: ConnectedDevicesOptions = {},
-): Promise<Device[]> {
+): Promise<Device[] | VerboseDevice[]> {
   log.debug('Getting connected devices');
   const args = [...this.executable.defaultArgs, 'devices'];
   if (opts.verbose) {
@@ -256,15 +273,32 @@ export async function getConnectedDevices(
     .map((line) => {
       // state is "device", afaic
       const [udid, state, ...description] = line.split(/\s+/);
-      const device: Device & Record<string, string> = {udid, state} as Device &
-        Record<string, string>;
-      if (opts.verbose) {
-        for (const entry of description) {
-          if (entry.includes(':')) {
-            // each entry looks like key:value
-            const [key, value] = entry.split(':');
-            device[key] = value;
-          }
+      if (!opts.verbose) {
+        return {udid, state};
+      }
+      const device: VerboseDevice = {
+        udid,
+        state,
+        product: '',
+        model: '',
+        device: '',
+      };
+      for (const entry of description) {
+        if (!entry.includes(':')) {
+          continue;
+        }
+        // each entry looks like key:value
+        const [key, value] = entry.split(':');
+        if (key === 'product') {
+          device.product = value;
+        } else if (key === 'model') {
+          device.model = value;
+        } else if (key === 'device') {
+          device.device = value;
+        } else if (key === 'usb') {
+          device.usb = value;
+        } else if (key === 'transport_id') {
+          device.transport_id = value;
         }
       }
       return device;
@@ -437,23 +471,38 @@ export const EXEC_OUTPUT_FORMAT = {
  * Execute the given adb command.
  *
  * @param cmd - Command string or array of command arguments
- * @param opts - Execution options
- * @returns Command output (string or ExecResult depending on outputFormat)
+ * @param opts - Execution options with `outputFormat: 'full'`
+ * @returns Command stdout and stderr
  * @throws {Error} If command execution fails or timeout is exceeded
  */
-export async function adbExec<
-  TExecOpts extends ShellExecOptions & SpecialAdbExecOptions = ShellExecOptions &
-    SpecialAdbExecOptions,
->(
+export async function adbExec(
   this: ADB,
   cmd: string | string[],
-  opts?: TExecOpts,
-): Promise<TExecOpts extends TFullOutputOption ? ExecResult : string> {
+  opts: AdbExecOptions & {outputFormat: 'full'},
+): Promise<ExecResult>;
+/**
+ * Execute the given adb command.
+ *
+ * @param cmd - Command string or array of command arguments
+ * @param opts - Execution options
+ * @returns Command stdout
+ * @throws {Error} If command execution fails or timeout is exceeded
+ */
+export async function adbExec(
+  this: ADB,
+  cmd: string | string[],
+  opts?: AdbExecOptions,
+): Promise<string>;
+export async function adbExec(
+  this: ADB,
+  cmd: string | string[],
+  opts?: AdbExecOptions,
+): Promise<string | ExecResult> {
   if (!cmd) {
     throw new Error('You need to pass in a command to adbExec()');
   }
 
-  const optsCopy = cloneDeep(opts ?? {}) as TExecOpts;
+  const optsCopy = cloneDeep(opts ?? {}) as AdbExecOptions;
   // setting default timeout for each command to prevent infinite wait.
   optsCopy.timeout = optsCopy.timeout || this.adbExecTimeout || DEFAULT_ADB_EXEC_TIMEOUT;
   optsCopy.timeoutCapName = optsCopy.timeoutCapName || 'adbExecTimeout'; // For error message
@@ -523,7 +572,7 @@ export async function adbExec<
     isExecLocked = true;
   }
   try {
-    return (await execFunc()) as TExecOpts extends TFullOutputOption ? ExecResult : string;
+    return await execFunc();
   } finally {
     if (optsCopy.exclusive) {
       isExecLocked = false;
@@ -535,16 +584,34 @@ export async function adbExec<
  * Execute the given command using _adb shell_ prefix.
  *
  * @param cmd - Command string or array of command arguments
- * @param opts - Execution options
- * @returns Command output (string or ExecResult depending on outputFormat)
+ * @param opts - Execution options with `outputFormat: 'full'`
+ * @returns Command stdout and stderr
  * @throws {Error} If command execution fails
  */
-export async function shell<TShellExecOpts extends ShellExecOptions = ShellExecOptions>(
+export async function shell(
   this: ADB,
   cmd: string | string[],
-  opts?: TShellExecOpts,
-): Promise<TShellExecOpts extends TFullOutputOption ? ExecResult : string> {
-  const {privileged} = opts ?? ({} as TShellExecOpts);
+  opts: ShellExecOptions & {outputFormat: 'full'},
+): Promise<ExecResult>;
+/**
+ * Execute the given command using _adb shell_ prefix.
+ *
+ * @param cmd - Command string or array of command arguments
+ * @param opts - Execution options
+ * @returns Command stdout
+ * @throws {Error} If command execution fails
+ */
+export async function shell(
+  this: ADB,
+  cmd: string | string[],
+  opts?: ShellExecOptions,
+): Promise<string>;
+export async function shell(
+  this: ADB,
+  cmd: string | string[],
+  opts?: ShellExecOptions,
+): Promise<string | ExecResult> {
+  const {privileged} = opts ?? {};
 
   const cmdArr = Array.isArray(cmd) ? cmd : [cmd];
   const fullCmd: string[] = ['shell'];
@@ -573,17 +640,6 @@ export function createSubProcess(this: ADB, args: string[] = []): SubProcess {
   const finalArgs = [...this.executable.defaultArgs, ...args];
   log.debug(`Creating ADB subprocess with args: ${JSON.stringify(finalArgs)}`);
   return new SubProcess(this.getAdbPath(), finalArgs);
-}
-
-/**
- * Retrieve the current adb port.
- * @todo can probably deprecate this now that the logic is just to read this.adbPort
- * @deprecated Use this.adbPort instead
- *
- * @returns The ADB server port number
- */
-export function getAdbServerPort(this: ADB): number {
-  return this.adbPort as number;
 }
 
 /**
@@ -626,18 +682,35 @@ export function getPortFromEmulatorString(this: ADB, emStr: string): number | fa
 /**
  * Retrieve the list of currently connected emulators.
  *
+ * @param opts - Options with `verbose: true` for long `adb devices -l` output
+ * @returns Array of connected emulator devices with product/model metadata
+ * @throws {Error} If error occurs while getting emulators
+ */
+export async function getConnectedEmulators(
+  this: ADB,
+  opts: ConnectedDevicesOptions & {verbose: true},
+): Promise<VerboseDevice[]>;
+/**
+ * Retrieve the list of currently connected emulators.
+ *
  * @param opts - Options for device retrieval
  * @returns Array of connected emulator devices
  * @throws {Error} If error occurs while getting emulators
  */
 export async function getConnectedEmulators(
   this: ADB,
+  opts?: ConnectedDevicesOptions,
+): Promise<Device[]>;
+export async function getConnectedEmulators(
+  this: ADB,
   opts: ConnectedDevicesOptions = {},
-): Promise<Device[]> {
+): Promise<Device[] | VerboseDevice[]> {
   log.debug('Getting connected emulators');
   try {
-    const devices = await this.getConnectedDevices(opts);
-    const emulators: Device[] = [];
+    const devices = opts.verbose
+      ? await this.getConnectedDevices({verbose: true})
+      : await this.getConnectedDevices(opts);
+    const emulators: Array<Device | VerboseDevice> = [];
     for (const device of devices) {
       const port = this.getPortFromEmulatorString(device.udid);
       if (port) {

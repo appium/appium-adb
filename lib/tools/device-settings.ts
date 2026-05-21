@@ -586,9 +586,9 @@ export async function setBluetoothOn(this: ADB, on: boolean): Promise<void> {
  * @throws If there was an error while changing the service state
  */
 export async function setNfcOn(this: ADB, on: boolean): Promise<void> {
-  const {stdout, stderr} = (await this.shell(['svc', 'nfc', on ? 'enable' : 'disable'], {
+  const {stdout, stderr} = await this.shell(['svc', 'nfc', on ? 'enable' : 'disable'], {
     outputFormat: 'full',
-  })) as {stdout: string; stderr: string};
+  });
   const output = stderr || stdout;
   log.debug(output);
   if (output.includes('null NfcAdapter')) {
