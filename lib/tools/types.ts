@@ -658,6 +658,8 @@ export interface ShellExecOptions {
   outputFormat?: ExecOutputFormat;
 }
 
+export type TFullOutputOption = {outputFormat: 'full'};
+
 export interface AvdLaunchOptions {
   /**
    * Additional emulator command line arguments
