@@ -1,3 +1,15 @@
+## [15.0.0](https://github.com/appium/appium-adb/compare/v14.6.1...v15.0.0) (2026-05-21)
+
+### ⚠ BREAKING CHANGES
+
+* `checkApkCert(appPath, pkg, opts?)` is now `checkApkCert(appPath, opts?)`. The `pkg` argument was never used.
+* Deprecated `getAdbServerPort()` has been removed. Use `adb.adbPort` instead.
+* `TFullOutputOption` type has been removed
+
+### Features
+
+* Cleanup deprecated/unused entities and add method overloads ([2e368de](https://github.com/appium/appium-adb/commit/2e368de1ff91f396a11a0858b9421c63156510aa))
+
 ## [14.6.1](https://github.com/appium/appium-adb/compare/v14.6.0...v14.6.1) (2026-05-21)
 
 ### Reverts
