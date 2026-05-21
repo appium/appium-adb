@@ -1,3 +1,9 @@
+## [14.6.1](https://github.com/appium/appium-adb/compare/v14.6.0...v14.6.1) (2026-05-21)
+
+### Reverts
+
+* Revert "feat: Cleanup deprecated/unused entities and add method overloads ([#876](https://github.com/appium/appium-adb/issues/876))" ([#877](https://github.com/appium/appium-adb/issues/877)) ([8395609](https://github.com/appium/appium-adb/commit/83956090307b319bddb2f2973a5d574c9e9aeede))
+
 ## [14.6.0](https://github.com/appium/appium-adb/compare/v14.5.0...v14.6.0) (2026-05-21)
 
 ### Features
