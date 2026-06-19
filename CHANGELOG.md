@@ -1,3 +1,9 @@
+## [15.0.1](https://github.com/appium/appium-adb/compare/v15.0.0...v15.0.1) (2026-06-19)
+
+### Miscellaneous Chores
+
+* **deps-dev:** Bump @types/node from 25.9.4 to 26.0.0 ([#879](https://github.com/appium/appium-adb/issues/879)) ([10bb710](https://github.com/appium/appium-adb/commit/10bb710dbe68f692915115755aba6efada06b83e))
+
 ## [15.0.0](https://github.com/appium/appium-adb/compare/v14.6.1...v15.0.0) (2026-05-21)
 
 ### ⚠ BREAKING CHANGES
