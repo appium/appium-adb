@@ -732,7 +732,9 @@ package:com.android.chrome`;
     }
     for (const payload of injectionPayloads) {
       it(`should reject injection payload '${payload}'`, function () {
-        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(/illegal characters/);
+        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(
+          /illegal characters/,
+        );
       });
     }
   });
