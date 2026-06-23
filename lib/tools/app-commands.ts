@@ -622,7 +622,6 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
   assertSafeComponentName(options.pkg, 'application package name');
   if (options.activity) {
     assertSafeComponentName(options.activity, 'activity name');
-    options.activity = options.activity.replace('$', '\\$');
   }
   // initializing defaults
   defaults(options, {
@@ -965,7 +964,8 @@ export function buildStartCmd(startAppOptions: StartCmdOptions, apiLevel: number
     cmd.push('-W');
   }
   if (activity && pkg) {
-    cmd.push('-n', activity.startsWith(`${pkg}/`) ? activity : `${pkg}/${activity}`);
+    const component = activity.startsWith(`${pkg}/`) ? activity : `${pkg}/${activity}`;
+    cmd.push('-n', component.replace(/[$*]/g, '\\$&'));
   }
   if (stopApp && apiLevel >= 15) {
     cmd.push('-S');
@@ -1077,12 +1077,13 @@ export function parseLaunchableActivityNames(dumpsys: string): string[] {
  */
 export function matchComponentName(classString: string): RegExpExecArray | null {
   // some.package/some.package.Activity
-  return /^[\p{L}0-9./_]+$/u.exec(classString);
+  return /^[\p{L}0-9./_$]+$/u.exec(classString);
 }
 
 /**
- * Asserts that a package or activity name does not contain characters that could be
- * interpreted by the device shell when passed to `adb shell am start`, preventing command injection.
+ * Asserts a package/activity name has only legal component characters, rejecting shell
+ * metacharacters to prevent command injection. The permitted `$` and `*` are still
+ * shell-expansion characters and are escaped separately in `buildStartCmd`.
  *
  * @param value - The package or activity name to verify
  * @param kind - A human-readable label for the value used in the error message
