@@ -1,3 +1,9 @@
+## [15.0.3](https://github.com/appium/appium-adb/compare/v15.0.2...v15.0.3) (2026-06-24)
+
+### Bug Fixes
+
+* Reject shell metacharacters in package and activity names ([#881](https://github.com/appium/appium-adb/issues/881)) ([152d54d](https://github.com/appium/appium-adb/commit/152d54ddc96a63fea6a73e678b36de89a5372623))
+
 ## [15.0.2](https://github.com/appium/appium-adb/compare/v15.0.1...v15.0.2) (2026-06-24)
 
 ### Miscellaneous Chores
