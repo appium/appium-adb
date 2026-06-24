@@ -32,6 +32,7 @@ const MIN_API_LEVEL_WITH_PERMS_SUPPORT = 23;
 const RESOLVER_ACTIVITY_NAME = 'android/com.android.internal.app.ResolverActivity';
 const MAIN_ACTION = 'android.intent.action.MAIN';
 const LAUNCHER_CATEGORY = 'android.intent.category.LAUNCHER';
+const SAFE_COMPONENT_NAME_PATTERN = /^[\p{L}0-9._$/,*-]+$/u;
 
 // Public methods
 
@@ -618,8 +619,9 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
   }
 
   const options = {...startAppOptions};
+  assertSafeComponentName(options.pkg, 'application package name');
   if (options.activity) {
-    options.activity = options.activity.replace('$', '\\$');
+    assertSafeComponentName(options.activity, 'activity name');
   }
   // initializing defaults
   defaults(options, {
@@ -810,6 +812,12 @@ export async function waitForActivityOrNot(
   const splitNames = (names: string) => names.split(',').map((x) => x.trim());
   const allPackages = splitNames(pkg);
   const allActivities = splitNames(activity);
+  for (const onePkg of allPackages) {
+    assertSafeComponentName(onePkg, 'wait package name');
+  }
+  for (const oneActivity of allActivities) {
+    assertSafeComponentName(oneActivity, 'wait activity name');
+  }
 
   const toFullyQualifiedActivityName = (prefix: string, suffix: string) =>
     `${prefix}${suffix}`.replace(/\/\.?/g, '.').replace(/\.{2,}/g, '.');
@@ -956,7 +964,8 @@ export function buildStartCmd(startAppOptions: StartCmdOptions, apiLevel: number
     cmd.push('-W');
   }
   if (activity && pkg) {
-    cmd.push('-n', activity.startsWith(`${pkg}/`) ? activity : `${pkg}/${activity}`);
+    const component = activity.startsWith(`${pkg}/`) ? activity : `${pkg}/${activity}`;
+    cmd.push('-n', component.replace(/[$*]/g, '\\$&'));
   }
   if (stopApp && apiLevel >= 15) {
     cmd.push('-S');
@@ -1068,7 +1077,25 @@ export function parseLaunchableActivityNames(dumpsys: string): string[] {
  */
 export function matchComponentName(classString: string): RegExpExecArray | null {
   // some.package/some.package.Activity
-  return /^[\p{L}0-9./_]+$/u.exec(classString);
+  return /^[\p{L}0-9./_$]+$/u.exec(classString);
+}
+
+/**
+ * Asserts a package/activity name has only legal component characters, rejecting shell
+ * metacharacters to prevent command injection. The permitted `$` and `*` are still
+ * shell-expansion characters and are escaped separately in `buildStartCmd`.
+ *
+ * @param value - The package or activity name to verify
+ * @param kind - A human-readable label for the value used in the error message
+ * @throws {Error} If the value contains characters outside of the allowed component name set
+ */
+export function assertSafeComponentName(value: string, kind: string): void {
+  if (!SAFE_COMPONENT_NAME_PATTERN.test(value)) {
+    throw new Error(
+      `The ${kind} '${value}' contains illegal characters. Only letters, digits and the ` +
+        `'. _ $ / , * -' characters are allowed in package and activity names`,
+    );
+  }
 }
 
 /**
