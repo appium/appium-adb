@@ -1,3 +1,9 @@
+## [15.0.2](https://github.com/appium/appium-adb/compare/v15.0.1...v15.0.2) (2026-06-24)
+
+### Miscellaneous Chores
+
+* **deps:** Bump actions/checkout from 6 to 7 ([#880](https://github.com/appium/appium-adb/issues/880)) ([0e30067](https://github.com/appium/appium-adb/commit/0e30067ca7c6b915d75c069602a4b8ac2d9b0ad3))
+
 ## [15.0.1](https://github.com/appium/appium-adb/compare/v15.0.0...v15.0.1) (2026-06-19)
 
 ### Miscellaneous Chores
