@@ -1,3 +1,5 @@
+## [15.0.4](https://github.com/appium/appium-adb/compare/v15.0.3...v15.0.4) (2026-06-29)
+
 ## [15.0.3](https://github.com/appium/appium-adb/compare/v15.0.2...v15.0.3) (2026-06-24)
 
 ### Bug Fixes
