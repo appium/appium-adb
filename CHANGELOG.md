@@ -1,3 +1,9 @@
+## [15.0.6](https://github.com/appium/appium-adb/compare/v15.0.5...v15.0.6) (2026-07-01)
+
+### Miscellaneous Chores
+
+* downgrade conventional-changelog-conventionalcommits to v9 ([#885](https://github.com/appium/appium-adb/issues/885)) ([47fed7c](https://github.com/appium/appium-adb/commit/47fed7c1ddde3a51a5d3bb32bcd5af6d26cc864f))
+
 ## [15.0.5](https://github.com/appium/appium-adb/compare/v15.0.4...v15.0.5) (2026-07-01)
 
 ## [15.0.4](https://github.com/appium/appium-adb/compare/v15.0.3...v15.0.4) (2026-06-29)
