@@ -1,3 +1,9 @@
+## [15.0.7](https://github.com/appium/appium-adb/compare/v15.0.6...v15.0.7) (2026-07-02)
+
+### Miscellaneous Chores
+
+* **deps-dev:** Bump @types/sinon from 21.0.1 to 22.0.0 ([#884](https://github.com/appium/appium-adb/issues/884)) ([a265b18](https://github.com/appium/appium-adb/commit/a265b1848d1565e7047980a1a5cff6774bc593db))
+
 ## [15.0.6](https://github.com/appium/appium-adb/compare/v15.0.5...v15.0.6) (2026-07-01)
 
 ### Miscellaneous Chores
