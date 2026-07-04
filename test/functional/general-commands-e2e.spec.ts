@@ -3,15 +3,14 @@ import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {MOCHA_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
+import {E2E_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
 import {fs, tempDir} from '@appium/support';
 import {waitForCondition} from 'asyncbox';
+import {describe, it, before, after, afterEach, beforeEach, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
-describe('general commands', function () {
-  this.timeout(MOCHA_TIMEOUT);
-
+describe('general commands', {timeout: E2E_TIMEOUT}, function () {
   let adb: ADB;
   let apiDemosPath: string;
   const androidInstallTimeout = 90000;
@@ -38,10 +37,10 @@ describe('general commands', function () {
     expect(defaultIME).to.be.a('string');
     expect(defaultIME?.length ?? 0).to.be.above(0);
   });
-  it('enableIME and disableIME should enable and disable IME', async function () {
+  it('enableIME and disableIME should enable and disable IME', async function (ctx: TestContext) {
     const imes = await adb.availableIMEs();
     if (imes.length < 2) {
-      return this.skip();
+      return ctx.skip();
     }
 
     // Get the default IME to avoid trying to disable it (which may not be allowed)
@@ -51,7 +50,7 @@ describe('general commands', function () {
 
     // Skip if we can't find a non-default IME or if the only IME is the default
     if (!ime || ime === defaultIme) {
-      this.skip();
+      ctx.skip();
       return;
     }
 
@@ -248,15 +247,19 @@ describe('general commands', function () {
   });
 
   describe('bugreport', function () {
-    it('should return the report as a raw string', async function () {
-      if (process.env.CI) {
-        // skip the test on CI, since it takes a lot of time
-        return this.skip;
-      }
-      const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
-      this.timeout(BUG_REPORT_TIMEOUT);
-      expect(await adb.bugreport()).to.be.a('string');
-    });
+    const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+
+    it(
+      'should return the report as a raw string',
+      {timeout: BUG_REPORT_TIMEOUT},
+      async function (ctx: TestContext) {
+        if (process.env.CI) {
+          // skip the test on CI, since it takes a lot of time
+          return ctx.skip();
+        }
+        expect(await adb.bugreport()).to.be.a('string');
+      },
+    );
   });
 
   describe('features', function () {

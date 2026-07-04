@@ -1,6 +1,7 @@
 import {ADB} from '../../lib/adb';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, before, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
@@ -8,10 +9,6 @@ describe('emulator commands', function () {
   let adb: ADB;
 
   before(async function () {
-    if (process.env.REAL_DEVICE) {
-      return this.skip();
-    }
-
     adb = await ADB.createADB();
     const devices = await adb.getConnectedEmulators();
     adb.setDevice(devices[0]);
@@ -38,9 +35,9 @@ describe('emulator commands', function () {
   });
 
   describe('getEmuImageProperties', function () {
-    it('should get emulator image properties', async function () {
+    it('should get emulator image properties', async function (ctx: TestContext) {
       if (process.env.CI) {
-        return this.skip();
+        return ctx.skip();
       }
 
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);

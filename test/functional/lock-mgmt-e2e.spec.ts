@@ -1,6 +1,7 @@
 import {ADB} from '../../lib/adb';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, before, afterEach, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
@@ -9,14 +10,11 @@ describe('Lock Management', function () {
 
   before(async function () {
     adb = await ADB.createADB();
-    if (!(await adb.isLockManagementSupported())) {
-      return this.skip();
-    }
   });
 
-  it('lock credential cleanup should work', async function () {
-    if ((await adb.getApiLevel()) < 27) {
-      return this.skip();
+  it('lock credential cleanup should work', async function (ctx: TestContext) {
+    if ((await adb.getApiLevel()) < 27 || !(await adb.isLockManagementSupported())) {
+      return ctx.skip();
     }
     await adb.clearLockCredential();
     await expect(adb.verifyLockCredential()).to.eventually.be.true;
@@ -26,17 +24,16 @@ describe('Lock Management', function () {
   describe('Lock and unlock life cycle', function () {
     const password = '1234';
 
-    before(function () {
-      if (process.env.CI) {
-        // We don't want to lock the device for all other tests if this test fails
-        return this.skip();
-      }
-    });
     afterEach(async function () {
       await adb.clearLockCredential(password);
     });
 
-    it('device lock and unlock scenario should work', async function () {
+    it('device lock and unlock scenario should work', async function (ctx: TestContext) {
+      // We don't want to lock the device for all other tests if this test fails
+      if (process.env.CI) {
+        return ctx.skip();
+      }
+
       await adb.setLockCredential('password', password);
       await adb.keyevent(26);
       await expect(adb.isLockEnabled()).to.eventually.be.true;

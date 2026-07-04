@@ -1,6 +1,6 @@
 import {ADB} from '../../lib/adb';
 import {
-  MOCHA_TIMEOUT,
+  E2E_TIMEOUT,
   APIDEMOS_PKG,
   APIDEMOS_ACTIVITY,
   getApiDemosPath,
@@ -9,12 +9,11 @@ import {
 import {waitForCondition} from 'asyncbox';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, before, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
-describe('process commands', function () {
-  this.timeout(MOCHA_TIMEOUT);
-
+describe('process commands', {timeout: E2E_TIMEOUT}, function () {
   let adb: ADB;
   let apiDemosPath: string;
   const androidInstallTimeout = 90000;
@@ -40,8 +39,10 @@ describe('process commands', function () {
     }
   });
 
-  it('should be able to kill processes by name', async function () {
-    await ensureRootAccess(adb, this);
+  it('should be able to kill processes by name', async function (ctx: TestContext) {
+    if (!(await ensureRootAccess(adb))) {
+      return ctx.skip();
+    }
 
     // Install and start the test app
     await adb.install(apiDemosPath, {
@@ -64,8 +65,10 @@ describe('process commands', function () {
     });
   });
 
-  it('should be able to kill process by PID', async function () {
-    await ensureRootAccess(adb, this);
+  it('should be able to kill process by PID', async function (ctx: TestContext) {
+    if (!(await ensureRootAccess(adb))) {
+      return ctx.skip();
+    }
 
     // Install and start the test app
     await adb.install(apiDemosPath, {

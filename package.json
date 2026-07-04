@@ -13,8 +13,8 @@
     "rebuild": "npm run clean && npm run build",
     "format": "prettier -w ./lib ./test",
     "format:check": "prettier --check ./lib ./test",
-    "test": "mocha --exit --timeout 1m \"./test/unit/**/*-specs.ts\"",
-    "e2e-test": "mocha --exit --timeout 5m \"./test/functional/**/*-specs.ts\""
+    "test": "node --test --test-force-exit --test-timeout=60000 \"./build/test/unit/**/*.spec.js\"",
+    "e2e-test": "node --test --test-force-exit --test-concurrency=1 --test-timeout=300000 \"./build/test/functional/**/*.spec.js\""
   },
   "repository": {
     "type": "git",
@@ -64,18 +64,15 @@
     "@types/chai": "^5.2.3",
     "@types/chai-as-promised": "^8.0.2",
     "@types/ini": "^4.1.0",
-    "@types/mocha": "^10.0.1",
     "@types/node": "^26.0.0",
     "@types/semver": "^7.5.0",
     "@types/sinon": "^22.0.0",
     "chai": "^6.0.0",
     "chai-as-promised": "^8.0.0",
     "conventional-changelog-conventionalcommits": "^9.3.1",
-    "mocha": "^11.0.1",
     "prettier": "^3.0.0",
     "semantic-release": "^25.0.2",
     "sinon": "^22.0.0",
-    "ts-node": "^10.9.1",
     "typescript": "^6.0.2"
   },
   "types": "./build/lib/index.d.ts"

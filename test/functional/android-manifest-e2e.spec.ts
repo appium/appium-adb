@@ -6,6 +6,7 @@ import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {readPackageManifest, requireSdkRoot} from '../../lib/utils';
+import {describe, it, before, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
@@ -26,12 +27,12 @@ describe('Android-manifest', function () {
   it('hasInternetPermissionFromManifest should be true', async function () {
     expect(await adb.hasInternetPermissionFromManifest(apiDemosPath)).to.be.true;
   });
-  it('hasInternetPermissionFromManifest should be false', async function () {
+  it('hasInternetPermissionFromManifest should be false', async function (ctx: TestContext) {
     // Note: ApiDemos has internet permission, so we need a different test
     // For now, we'll skip this test or use a different APK
     // Since ApiDemos has internet permission, this test would fail
     // We'll comment it out or modify the test logic
-    this.skip();
+    ctx.skip();
   });
 
   it('should compile and insert manifest', async function () {

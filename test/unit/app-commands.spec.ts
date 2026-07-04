@@ -16,6 +16,7 @@ import {fs} from '@appium/support';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT} from '../constants';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, beforeEach, afterEach} from 'node:test';
 
 chai.use(chaiAsPromised);
 

@@ -3,22 +3,21 @@ import {retryInterval} from 'asyncbox';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
-  MOCHA_TIMEOUT,
-  MOCHA_LONG_TIMEOUT,
+  E2E_TIMEOUT,
+  E2E_LONG_TIMEOUT,
   APIDEMOS_PKG,
   APIDEMOS_ACTIVITY,
   APIDEMOS_ACTIVITY_SHORT,
   getApiDemosPath,
 } from './setup';
+import {describe, it, before, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 
-describe('apk utils', function () {
-  this.timeout(MOCHA_TIMEOUT);
-
+describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
   let adb: any;
   let apiDemosPath: string;
   const deviceTempPath = '/data/local/tmp/';
@@ -56,10 +55,10 @@ describe('apk utils', function () {
     await adb.grantAllPermissions(APIDEMOS_PKG);
   });
   describe('startUri', function () {
-    it('should be able to start a uri', async function () {
+    it('should be able to start a uri', async function (ctx: TestContext) {
       const apiLevel = await adb.getApiLevel();
       if (apiLevel < 23 || apiLevel > 28) {
-        return this.skip();
+        return ctx.skip();
       }
       await adb.goToHome();
       let res = await adb.getFocusedPackageAndActivity();
@@ -96,45 +95,51 @@ describe('apk utils', function () {
         await assertPackageAndActivity();
       });
     });
-    it('should be able to start with an intent and no activity', async function () {
-      if ((await adb.getApiLevel()) < 28 && process.env.CI) {
-        return this.skip();
-      }
+    it(
+      'should be able to start with an intent and no activity',
+      {timeout: E2E_LONG_TIMEOUT},
+      async function (ctx: TestContext) {
+        if ((await adb.getApiLevel()) < 28 && process.env.CI) {
+          return ctx.skip();
+        }
 
-      this.timeout(MOCHA_LONG_TIMEOUT);
-      await adb.install(apiDemosPath, {
-        grantPermissions: true,
-      });
-      await adb.startApp({
-        action: 'android.intent.action.WEB_SEARCH',
-        pkg: 'com.google.android.googlequicksearchbox',
-        optionalIntentArguments: '-e query foo',
-        waitDuration: START_APP_WAIT_DURATION,
-        stopApp: false,
-      });
-      const {appPackage} = await adb.getFocusedPackageAndActivity();
-      const expectedPkgPossibilities = [
-        'com.android.browser',
-        'org.chromium.webview_shell',
-        'com.google.android.googlequicksearchbox',
-      ];
-      expect(expectedPkgPossibilities).to.include(appPackage);
-    });
-    it('should throw an error for unknown activity for intent', async function () {
-      this.timeout(MOCHA_LONG_TIMEOUT);
-      await adb.install(apiDemosPath, {
-        grantPermissions: true,
-      });
-      await expect(
-        adb.startApp({
-          action: 'android.intent.action.DEFAULT',
-          pkg: 'com.google.android.telephony',
-          optionalIntentArguments: '-d tel:555-5555',
+        await adb.install(apiDemosPath, {
+          grantPermissions: true,
+        });
+        await adb.startApp({
+          action: 'android.intent.action.WEB_SEARCH',
+          pkg: 'com.google.android.googlequicksearchbox',
+          optionalIntentArguments: '-e query foo',
           waitDuration: START_APP_WAIT_DURATION,
           stopApp: false,
-        }),
-      ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
-    });
+        });
+        const {appPackage} = await adb.getFocusedPackageAndActivity();
+        const expectedPkgPossibilities = [
+          'com.android.browser',
+          'org.chromium.webview_shell',
+          'com.google.android.googlequicksearchbox',
+        ];
+        expect(expectedPkgPossibilities).to.include(appPackage);
+      },
+    );
+    it(
+      'should throw an error for unknown activity for intent',
+      {timeout: E2E_LONG_TIMEOUT},
+      async function () {
+        await adb.install(apiDemosPath, {
+          grantPermissions: true,
+        });
+        await expect(
+          adb.startApp({
+            action: 'android.intent.action.DEFAULT',
+            pkg: 'com.google.android.telephony',
+            optionalIntentArguments: '-d tel:555-5555',
+            waitDuration: START_APP_WAIT_DURATION,
+            stopApp: false,
+          }),
+        ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
+      },
+    );
     it('should throw error for wrong activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
@@ -297,10 +302,6 @@ describe('apk utils', function () {
   });
   describe('activateApp', function () {
     it('should be able to activate with normal package and activity', async function () {
-      if ((await adb.getApiLevel()) < 23) {
-        return this.skip();
-      }
-
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
