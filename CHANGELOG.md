@@ -1,3 +1,9 @@
+## [15.0.8](https://github.com/appium/appium-adb/compare/v15.0.7...v15.0.8) (2026-07-05)
+
+### Miscellaneous Chores
+
+* Drop mocha ([#887](https://github.com/appium/appium-adb/issues/887)) ([c825e64](https://github.com/appium/appium-adb/commit/c825e6426b0edee20908e0a698fdd0e1c99036f7))
+
 ## [15.0.7](https://github.com/appium/appium-adb/compare/v15.0.6...v15.0.7) (2026-07-02)
 
 ### Miscellaneous Chores
