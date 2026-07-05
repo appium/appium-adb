@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as asyncbox from 'asyncbox';
+import {describe, it, beforeEach, afterEach} from 'node:test';
 
 chai.use(chaiAsPromised);
 
@@ -103,8 +104,7 @@ describe('system calls', function () {
     });
   });
   describe('getDevicesWithRetry', function () {
-    it('should fail when there are no connected devices', async function () {
-      this.timeout(20000);
+    it('should fail when there are no connected devices', {timeout: 20000}, async function () {
       let stubCurrent = 0;
       // Here wants to test out the exact call count for each, so here doesn't use stub chain.
       const execStub = sandbox.stub();

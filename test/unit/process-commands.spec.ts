@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import {APIDEMOS_PKG} from '../constants';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, beforeEach, afterEach} from 'node:test';
 
 chai.use(chaiAsPromised);
 

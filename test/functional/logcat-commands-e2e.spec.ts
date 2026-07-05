@@ -1,14 +1,13 @@
 import {ADB} from '../../lib/adb';
 import {Logcat} from '../../lib/logcat';
-import {MOCHA_TIMEOUT} from './setup';
+import {E2E_TIMEOUT} from './setup';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, before, afterEach, type TestContext} from 'node:test';
 
 chai.use(chaiAsPromised);
 
-describe('logcat commands', function () {
-  this.timeout(MOCHA_TIMEOUT);
-
+describe('logcat commands', {timeout: E2E_TIMEOUT}, function () {
   async function runClearDeviceLogTest(adb: ADB, logcat: Logcat, clear = true) {
     const logs = await adb.adbExec(['logcat', '-d']);
     await logcat.startCapture();
@@ -50,9 +49,9 @@ describe('logcat commands', function () {
       const logs = logcat.getAllLogs();
       expect(logs).to.have.length.above(0);
     });
-    it('should not affect device logs', async function () {
+    it('should not affect device logs', async function (ctx: TestContext) {
       if (process.env.CI) {
-        return this.skip();
+        return ctx.skip();
       }
       await runClearDeviceLogTest(adb, logcat, false);
     });

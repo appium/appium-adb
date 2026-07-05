@@ -3,6 +3,7 @@ import {fs} from '@appium/support';
 import path from 'node:path';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it} from 'node:test';
 
 chai.use(chaiAsPromised);
 

@@ -9,11 +9,15 @@ import * as apkSigningHelpers from '../../lib/tools/apk-signing';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as helpers from '../../lib/utils';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+import {FIXTURES_ROOT, MODULE_ROOT} from '../constants';
 
 chai.use(chaiAsPromised);
-const keystorePath = path.resolve(__dirname, '..', 'fixtures', 'appiumtest.keystore');
-const defaultKeyPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.pk8');
-const defaultCertPath = path.resolve(__dirname, '..', '..', 'keys', 'testkey.x509.pem');
+
+const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
+const keysRoot = path.resolve(MODULE_ROOT, 'keys');
+const defaultKeyPath = path.resolve(keysRoot, 'testkey.pk8');
+const defaultCertPath = path.resolve(keysRoot, 'testkey.x509.pem');
 const keyAlias = 'appiumtest';
 const password = 'android';
 const javaDummyPath = 'java_dummy_path';

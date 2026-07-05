@@ -2,6 +2,7 @@ import {ADB} from '../../lib/adb';
 import sinon from 'sinon';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {describe, it, beforeEach, afterEach} from 'node:test';
 
 chai.use(chaiAsPromised);
 
