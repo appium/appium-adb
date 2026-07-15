@@ -1,3 +1,9 @@
+## [15.0.9](https://github.com/appium/appium-adb/compare/v15.0.8...v15.0.9) (2026-07-15)
+
+### Miscellaneous Chores
+
+* **deps:** Bump actions/setup-node from 6 to 7 ([#891](https://github.com/appium/appium-adb/issues/891)) ([6c34e70](https://github.com/appium/appium-adb/commit/6c34e709e2f50c487d9cbc4248dd816569efc3bf))
+
 ## [15.0.8](https://github.com/appium/appium-adb/compare/v15.0.7...v15.0.8) (2026-07-05)
 
 ### Miscellaneous Chores
