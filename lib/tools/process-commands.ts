@@ -1,7 +1,7 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {util} from '@appium/support';
 import type {ExecError} from 'teen_process';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 
 const PID_COLUMN_TITLE: string = 'PID';
 const PROCESS_NAME_COLUMN_TITLE: string = 'NAME';

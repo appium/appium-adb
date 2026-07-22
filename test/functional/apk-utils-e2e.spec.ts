@@ -1,6 +1,6 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import {retryInterval} from 'asyncbox';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   E2E_TIMEOUT,
@@ -9,10 +9,10 @@ import {
   APIDEMOS_ACTIVITY,
   APIDEMOS_ACTIVITY_SHORT,
   getApiDemosPath,
-} from './setup';
+} from './setup.js';
 import {describe, it, before, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;

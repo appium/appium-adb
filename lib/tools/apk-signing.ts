@@ -1,12 +1,12 @@
 import _fs from 'node:fs';
 import {exec, type ExecError} from 'teen_process';
 import path from 'node:path';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {tempDir, system, mkdirp, fs, util, zip} from '@appium/support';
 import {LRUCache} from 'lru-cache';
-import type {ADB} from '../adb';
-import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types';
-import {APKS_EXTENSION, getJavaForOs, getJavaHome, getResourcePath} from '../utils';
+import type {ADB} from '../adb.js';
+import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types.js';
+import {APKS_EXTENSION, getJavaForOs, getJavaHome, getResourcePath} from '../utils/index.js';
 
 const DEFAULT_PRIVATE_KEY = path.join('keys', 'testkey.pk8');
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');

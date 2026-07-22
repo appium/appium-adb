@@ -1,10 +1,8 @@
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {fs, zip, util} from '@appium/support';
-import {log} from '../../logger';
-import {MODULE_NAME} from './constants';
-
-// Declare __filename for CommonJS compatibility
-declare const __filename: string;
+import {log} from '../../logger.js';
+import {MODULE_NAME} from './constants.js';
 
 export const getResourcePath = util.memoize(async function getResourcePath(
   relPath: string,
@@ -37,7 +35,7 @@ export async function unzipFile(
 }
 
 const getModuleRoot = util.memoize(async function getModuleRoot(): Promise<string> {
-  let moduleRoot = path.dirname(path.resolve(__filename));
+  let moduleRoot = path.dirname(fileURLToPath(import.meta.url));
   let isAtFsRoot = false;
   while (!isAtFsRoot) {
     const manifestPath = path.join(moduleRoot, 'package.json');

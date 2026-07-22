@@ -1,12 +1,12 @@
 import {exec} from 'teen_process';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import path from 'node:path';
 import {fs, tempDir, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
 import AsyncLock from 'async-lock';
-import type {ADB} from '../adb';
-import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types';
-import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, unzipFile} from '../utils';
+import type {ADB} from '../adb.js';
+import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types.js';
+import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, unzipFile} from '../utils/index.js';
 
 const BASE_APK = 'base-master.apk';
 const LANGUAGE_APK = (lang: string) => `base-${lang}.apk`;

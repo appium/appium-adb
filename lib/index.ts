@@ -1,8 +1,8 @@
-export * from './adb';
-export {getAndroidBinaryPath} from './tools/system-calls';
-export {getSdkRootFromEnv} from './utils';
-export type * from './tools/types';
-export type * from './types';
+export * from './adb.js';
+export {getAndroidBinaryPath} from './tools/system-calls.js';
+export {getSdkRootFromEnv} from './utils/index.js';
+export type * from './tools/types.js';
+export type * from './types.js';
 
-import {ADB} from './adb';
+import {ADB} from './adb.js';
 export default ADB;

@@ -1,10 +1,10 @@
 import {exec} from 'teen_process';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {fs, zip, tempDir, util} from '@appium/support';
 import path from 'node:path';
-import type {ADB} from '../adb';
-import type {APKInfo, PlatformInfo, StringRecord} from './types';
-import {APKS_EXTENSION, readPackageManifest, unzipFile} from '../utils';
+import type {ADB} from '../adb.js';
+import type {APKInfo, PlatformInfo, StringRecord} from './types.js';
+import {APKS_EXTENSION, readPackageManifest, unzipFile} from '../utils/index.js';
 
 /**
  * Extract package and main activity name from application manifest.

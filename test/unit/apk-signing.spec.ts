@@ -1,18 +1,15 @@
-import {ADB} from '../../lib/adb';
 import path from 'node:path';
-import * as teen_process from 'teen_process';
+import esmock from 'esmock';
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
 import sinon from 'sinon';
-import * as apkSigningHelpers from '../../lib/tools/apk-signing';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import * as helpers from '../../lib/utils';
 import {describe, it, beforeEach, afterEach} from 'node:test';
-import {FIXTURES_ROOT, MODULE_ROOT} from '../constants';
+import {FIXTURES_ROOT, MODULE_ROOT} from '../constants.js';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
 const keysRoot = path.resolve(MODULE_ROOT, 'keys');
@@ -26,6 +23,27 @@ const apksignerDummyPath = '/path/to/apksigner';
 const tempDir = appiumSupport.tempDir;
 const fs = appiumSupport.fs;
 
+let currentExec: (...args: any[]) => any = async () => ({stdout: '', stderr: ''});
+let currentGetResourcePath: (...args: any[]) => any = async () => '';
+let currentGetJavaForOs: (...args: any[]) => any = async () => javaDummyPath;
+let currentGetJavaHome: (...args: any[]) => any = async () => javaHome;
+
+const {ADB} = await esmock(
+  '../../lib/adb.js',
+  import.meta.url,
+  {},
+  {
+    teen_process: {
+      exec: (...args: any[]) => currentExec(...args),
+    },
+    '../../lib/utils/index.js': {
+      getResourcePath: (...args: any[]) => currentGetResourcePath(...args),
+      getJavaForOs: (...args: any[]) => currentGetJavaForOs(...args),
+      getJavaHome: (...args: any[]) => currentGetJavaHome(...args),
+    },
+  },
+);
+
 const adb = new ADB();
 adb.keystorePath = keystorePath;
 adb.keyAlias = keyAlias;
@@ -35,26 +53,20 @@ adb.keyPassword = password;
 describe('signing', function () {
   let sandbox: sinon.SinonSandbox;
   let mocks: {
-    teen_process: any;
-    helpers: any;
     adb: any;
     appiumSupport: any;
     fs: any;
     tempDir: any;
-    apkSigningHelpers: any;
   };
-  const apiDemosPath = path.resolve(__dirname, '..', 'fixtures', 'ApiDemos-debug.apk');
+  const apiDemosPath = path.resolve(FIXTURES_ROOT, 'ApiDemos-debug.apk');
 
   beforeEach(function () {
     sandbox = sinon.createSandbox();
     mocks = {
-      teen_process: sandbox.mock(teen_process),
-      helpers: sandbox.mock(helpers),
       adb: sandbox.mock(adb),
       appiumSupport: sandbox.mock(appiumSupport),
       fs: sandbox.mock(fs),
       tempDir: sandbox.mock(tempDir),
-      apkSigningHelpers: sandbox.mock(apkSigningHelpers),
     };
   });
 
@@ -66,61 +78,41 @@ describe('signing', function () {
   describe('signWithDefaultCert', function () {
     it('should call exec with correct args', async function () {
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.helpers
-        .expects('getResourcePath')
-        .once()
-        .withExactArgs(path.join('keys', 'testkey.pk8'))
-        .returns(defaultKeyPath);
-      mocks.helpers
-        .expects('getResourcePath')
-        .once()
-        .withExactArgs(path.join('keys', 'testkey.x509.pem'))
-        .returns(defaultCertPath);
+      const getResourcePathStub = sandbox.stub();
+      getResourcePathStub.withArgs(path.join('keys', 'testkey.pk8')).returns(defaultKeyPath);
+      getResourcePathStub.withArgs(path.join('keys', 'testkey.x509.pem')).returns(defaultCertPath);
+      currentGetResourcePath = getResourcePathStub;
       mocks.adb
         .expects('getBinaryFromSdkRoot')
         .once()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox
-        .stub(teen_process, 'exec')
-        .get(() =>
-          sandbox
-            .stub()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .onFirstCall()
-            .returns({stdout: '', stderr: ''}),
-        );
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .returns({stdout: '', stderr: ''});
       await adb.signWithDefaultCert(apiDemosPath);
     });
 
     it('should fail if apksigner fails', async function () {
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.helpers
-        .expects('getResourcePath')
-        .once()
-        .withExactArgs(path.join('keys', 'testkey.pk8'))
-        .returns(defaultKeyPath);
-      mocks.helpers
-        .expects('getResourcePath')
-        .once()
-        .withExactArgs(path.join('keys', 'testkey.x509.pem'))
-        .returns(defaultCertPath);
+      const getResourcePathStub = sandbox.stub();
+      getResourcePathStub.withArgs(path.join('keys', 'testkey.pk8')).returns(defaultKeyPath);
+      getResourcePathStub.withArgs(path.join('keys', 'testkey.x509.pem')).returns(defaultCertPath);
+      currentGetResourcePath = getResourcePathStub;
       mocks.adb
         .expects('getBinaryFromSdkRoot')
         .once()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox
-        .stub(teen_process, 'exec')
-        .get(() =>
-          sandbox
-            .stub()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .onFirstCall()
-            .throws(new Error('apksigner failed')),
-        );
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .throws(new Error('apksigner failed'));
       await expect(adb.signWithDefaultCert(apiDemosPath)).to.eventually.be.rejected;
     });
 
@@ -142,16 +134,12 @@ describe('signing', function () {
         .once()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox
-        .stub(teen_process, 'exec')
-        .get(() =>
-          sandbox
-            .stub()
-            .withArgs(javaDummyPath, sinon.match.array)
-            .onFirstCall()
-            .returns({stdout: '', stderr: ''}),
-        );
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .returns({stdout: '', stderr: ''});
       await adb.signWithCustomCert(apiDemosPath);
     });
 
@@ -169,8 +157,8 @@ describe('signing', function () {
         .once()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      mocks.helpers.expects('getJavaHome').once().returns(javaHome);
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentGetJavaHome = sandbox.stub().returns(javaHome);
       innerExecStub = sandbox.stub();
       innerExecStub.withArgs(javaDummyPath).throws(new Error('apksigner failed'));
       innerExecStub
@@ -189,7 +177,7 @@ describe('signing', function () {
           keyAlias,
         ])
         .returns({});
-      sandbox.stub(teen_process, 'exec').get(() => innerExecStub);
+      currentExec = innerExecStub;
       // Mock zip.readEntries to indicate no META-INF (so unsignApk returns false)
       /* eslint-disable promise/prefer-await-to-callbacks -- zip.readEntries is callback-based */
       sandbox.stub(zip, 'readEntries').callsFake(async (apkPath, callback) => {
@@ -221,15 +209,11 @@ describe('signing', function () {
         .once()
         .withExactArgs(path.dirname(alignedApk))
         .returns({});
-      sandbox
-        .stub(teen_process, 'exec')
-        .get(() =>
-          sandbox
-            .stub()
-            .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
-            .onFirstCall()
-            .returns({}),
-        );
+      currentExec = sandbox
+        .stub()
+        .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
+        .onFirstCall()
+        .returns({});
       mocks.fs
         .expects('mv')
         .once()
@@ -259,21 +243,19 @@ describe('signing', function () {
         .twice()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox
-          .stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .returns({
-            stdout: `
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .returns({
+          stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bd85b0bfaa5af81
       Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`,
-            stderr: '',
-          }),
-      );
+          stderr: '',
+        });
       expect(await adb.checkApkCert(apiDemosPath)).to.be.true;
     });
 
@@ -291,21 +273,19 @@ describe('signing', function () {
         .twice()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox
-          .stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .returns({
-            stdout: `
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .returns({
+          stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
       Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`,
-            stderr: '',
-          }),
-      );
+          stderr: '',
+        });
       const result = await adb.checkApkCert(apiDemosPath, {
         requireDefaultCert: false,
       });
@@ -348,21 +328,19 @@ describe('signing', function () {
         .twice()
         .withExactArgs('apksigner.jar')
         .returns(apksignerDummyPath);
-      mocks.helpers.expects('getJavaForOs').once().returns(javaDummyPath);
-      sandbox.stub(teen_process, 'exec').get(() =>
-        sandbox
-          .stub()
-          .withArgs(javaDummyPath, sinon.match.array)
-          .onFirstCall()
-          .returns({
-            stdout: `
+      currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
+      currentExec = sandbox
+        .stub()
+        .withArgs(javaDummyPath, sinon.match.array)
+        .onFirstCall()
+        .returns({
+          stdout: `
       Signer #1 certificate DN: EMAILADDRESS=android@android.com, CN=Android, OU=Android, O=Android, L=Mountain View, ST=California, C=US
       Signer #1 certificate SHA-256 digest: a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc
       Signer #1 certificate SHA-1 digest: 61ed377e85d386a8dfee6b864bdcccccfaa5af81
       Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`,
-            stderr: '',
-          }),
-      );
+          stderr: '',
+        });
       await expect(adb.checkApkCert(apiDemosPath)).to.eventually.be.true;
     });
   });

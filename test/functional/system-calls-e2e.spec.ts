@@ -1,13 +1,13 @@
-import {ADB} from '../../lib/adb';
-import {E2E_TIMEOUT, E2E_LONG_TIMEOUT} from './setup';
+import {ADB} from '../../lib/adb.js';
+import {E2E_TIMEOUT, E2E_LONG_TIMEOUT} from './setup.js';
 import path from 'node:path';
 import {fs} from '@appium/support';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {getResourcePath} from '../../lib/utils';
+import {getResourcePath} from '../../lib/utils/index.js';
 import {describe, it, before, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
 const avdName = process.env.ANDROID_AVD || 'Android Emulator';

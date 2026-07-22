@@ -1,9 +1,9 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {fs, util} from '@appium/support';
 import {SubProcess, exec, type ExecError} from 'teen_process';
-import type {ADB} from '../adb';
-import type {ScreenrecordOptions, StringRecord} from './types';
-import {memoize} from '../utils';
+import type {ADB} from '../adb.js';
+import type {ScreenrecordOptions, StringRecord} from './types.js';
+import {memoize} from '../utils/index.js';
 
 /**
  * Get the path to adb executable amd assign it

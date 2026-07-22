@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 import type {TeenProcessExecOptions} from 'teen_process';
 
 /**

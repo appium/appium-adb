@@ -1,14 +1,14 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import path from 'node:path';
 import {fs, tempDir} from '@appium/support';
-import {unsignApk} from '../../lib/tools/apk-signing';
-import {getApiDemosPath} from './setup';
-import {FIXTURES_ROOT} from '../constants';
-import chai, {expect} from 'chai';
+import {unsignApk} from '../../lib/tools/apk-signing.js';
+import {getApiDemosPath} from './setup.js';
+import {FIXTURES_ROOT} from '../constants.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, before, beforeEach, afterEach} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';

@@ -1,8 +1,8 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {retryInterval} from 'asyncbox';
 import {util} from '@appium/support';
-import type {ADB} from '../adb';
-import type {SetPropOpts} from './types';
+import type {ADB} from '../adb.js';
+import type {SetPropOpts} from './types.js';
 import type {ExecError} from 'teen_process';
 
 const ANIMATION_SCALE_KEYS = [

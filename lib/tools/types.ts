@@ -1,4 +1,4 @@
-import type * as emuConstants from './emu-constants';
+import type * as emuConstants from './emu-constants.js';
 
 export type StringRecord<T = any> = Record<string, T>;
 

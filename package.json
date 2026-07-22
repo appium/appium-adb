@@ -13,8 +13,8 @@
     "rebuild": "npm run clean && npm run build",
     "format": "prettier -w ./lib ./test",
     "format:check": "prettier --check ./lib ./test",
-    "test": "node --test --test-force-exit --test-timeout=60000 \"./build/test/unit/**/*.spec.js\"",
-    "e2e-test": "node --test --test-force-exit --test-concurrency=1 --test-timeout=300000 \"./build/test/functional/**/*.spec.js\""
+    "test": "node --enable-source-maps --test --test-force-exit --test-timeout=60000 \"./build/test/unit/**/*.spec.js\"",
+    "e2e-test": "node --enable-source-maps --test --test-force-exit --test-concurrency=1 --test-timeout=300000 \"./build/test/functional/**/*.spec.js\""
   },
   "repository": {
     "type": "git",
@@ -70,10 +70,19 @@
     "chai": "^6.0.0",
     "chai-as-promised": "^8.0.0",
     "conventional-changelog-conventionalcommits": "^9.3.1",
+    "esmock": "^2.7.6",
     "prettier": "^3.0.0",
     "semantic-release": "^25.0.2",
     "sinon": "^22.0.0",
     "typescript": "^6.0.2"
   },
-  "types": "./build/lib/index.d.ts"
+  "types": "./build/lib/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.js"
+    },
+    "./package.json": "./package.json"
+  }
 }

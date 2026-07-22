@@ -1,11 +1,11 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import {fs} from '@appium/support';
 import path from 'node:path';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('ADB', function () {
   it('should correctly return adb if present', async function () {

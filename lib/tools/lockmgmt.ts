@@ -1,6 +1,6 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {sleep, waitForCondition} from 'asyncbox';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 import {util} from '@appium/support';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
