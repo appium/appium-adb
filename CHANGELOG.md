@@ -1,3 +1,13 @@
+## [16.0.0](https://github.com/appium/appium-adb/compare/v15.0.9...v16.0.0) (2026-07-23)
+
+### ⚠ BREAKING CHANGES
+
+* Consumers using require('appium-adb') must switch to import/dynamic import() — the package no longer ships a CommonJS entry point.
+
+### Features
+
+* Migrate the package to ESM ([#894](https://github.com/appium/appium-adb/issues/894)) ([aaa946d](https://github.com/appium/appium-adb/commit/aaa946d2a5c132ef6ece194d797081efec64ee03))
+
 ## [15.0.9](https://github.com/appium/appium-adb/compare/v15.0.8...v15.0.9) (2026-07-15)
 
 ### Miscellaneous Chores
