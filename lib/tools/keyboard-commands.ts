@@ -1,7 +1,7 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {sleep, waitForCondition} from 'asyncbox';
-import type {ADB} from '../adb';
-import type {KeyboardState} from './types';
+import type {ADB} from '../adb.js';
+import type {KeyboardState} from './types.js';
 
 const KEYCODE_ESC = 111;
 const KEYCODE_BACK = 4;

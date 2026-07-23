@@ -1,10 +1,10 @@
-import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt';
+import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt.js';
 import sinon from 'sinon';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('lock management', function () {
   let sandbox: sinon.SinonSandbox;

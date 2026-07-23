@@ -1,9 +1,9 @@
-import {log} from '../logger';
+import {log} from '../logger.js';
 import net from 'node:net';
 import {util, fs} from '@appium/support';
 import path from 'node:path';
 import * as ini from 'ini';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 import type {
   EmuInfo,
   EmuVersionInfo,
@@ -15,7 +15,7 @@ import type {
   GsmVoiceStates,
   NetworkSpeed,
   ExecTelnetOptions,
-} from './types';
+} from './types.js';
 
 /**
  * Check the emulator state.

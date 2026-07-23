@@ -1,10 +1,10 @@
 import {fs, tempDir, util, system} from '@appium/support';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {waitForCondition} from 'asyncbox';
 import path from 'node:path';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 import type {ExecError} from 'teen_process';
-import {defaults, intersectionWith} from '../utils';
+import {defaults, intersectionWith} from '../utils/index.js';
 import type {
   StringRecord,
   InstallState,
@@ -16,7 +16,7 @@ import type {
   PackageActivityInfo,
   ListInstalledPackagesOptions,
   ListInstalledPackagesResult,
-} from './types';
+} from './types.js';
 
 // Constants
 export const APP_INSTALL_STATE: StringRecord<InstallState> = {

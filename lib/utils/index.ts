@@ -1,5 +1,5 @@
-import * as helpers from './helpers';
-import * as lodash from './lodash';
+import * as helpers from './helpers/index.js';
+import * as lodash from './lodash/index.js';
 import {util} from '@appium/support';
 
 export const APKS_EXTENSION = helpers.APKS_EXTENSION;
@@ -22,4 +22,4 @@ export const zip = lodash.zip;
 export const pick = lodash.pick;
 export const defaultsDeep = lodash.defaultsDeep;
 
-export type {BuildInstallArgsOptions} from './helpers';
+export type {BuildInstallArgsOptions} from './helpers/index.js';

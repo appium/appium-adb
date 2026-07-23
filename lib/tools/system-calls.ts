@@ -1,12 +1,18 @@
 import path from 'node:path';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import {system, fs, util, tempDir, timing} from '@appium/support';
 import {exec, SubProcess} from 'teen_process';
 import type {ExecError, TeenProcessExecResult} from 'teen_process';
 import {asyncmap, retry, retryInterval, sleep, waitForCondition} from 'asyncbox';
 import * as semver from 'semver';
-import type {ADB} from '../adb';
-import {DEFAULT_ADB_EXEC_TIMEOUT, cloneDeep, getSdkRootFromEnv, memoize, zip} from '../utils';
+import type {ADB} from '../adb.js';
+import {
+  DEFAULT_ADB_EXEC_TIMEOUT,
+  cloneDeep,
+  getSdkRootFromEnv,
+  memoize,
+  zip,
+} from '../utils/index.js';
 import type {
   ConnectedDevicesOptions,
   Device,
@@ -17,7 +23,7 @@ import type {
   ShellExecOptions,
   SpecialAdbExecOptions,
   ExecResult,
-} from './types';
+} from './types.js';
 
 type AdbExecOptions = ShellExecOptions & SpecialAdbExecOptions;
 

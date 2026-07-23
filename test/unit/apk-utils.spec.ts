@@ -1,14 +1,14 @@
 import * as teen_process from 'teen_process';
 import {fs} from '@appium/support';
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import sinon from 'sinon';
-import {REMOTE_CACHE_ROOT} from '../../lib/tools/apk-utils';
-import * as apksUtilsMethods from '../../lib/tools/apks-utils';
-import chai, {expect} from 'chai';
+import {REMOTE_CACHE_ROOT} from '../../lib/tools/apk-utils.js';
+import * as apksUtilsMethods from '../../lib/tools/apks-utils.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const pkg = 'com.example.android.contactmanager',
   uri = 'content://contacts/people/1',

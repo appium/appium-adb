@@ -1,11 +1,11 @@
 import {exec, type ExecError} from 'teen_process';
-import {log} from '../logger';
+import {log} from '../logger.js';
 import path from 'node:path';
 import {fs, util, mkdirp, timing} from '@appium/support';
 import * as semver from 'semver';
 import os from 'node:os';
 import {LRUCache} from 'lru-cache';
-import type {ADB} from '../adb';
+import type {ADB} from '../adb.js';
 import {
   APKS_EXTENSION,
   APK_INSTALL_TIMEOUT,
@@ -14,7 +14,7 @@ import {
   cloneDeep,
   defaults,
   readPackageManifest,
-} from '../utils';
+} from '../utils/index.js';
 import type {
   UninstallOptions,
   ShellExecOptions,
@@ -26,7 +26,7 @@ import type {
   AppInfo,
   InstallState,
   StringRecord,
-} from './types';
+} from './types.js';
 
 export const REMOTE_CACHE_ROOT = '/data/local/tmp/appium_cache';
 

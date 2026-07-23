@@ -1,5 +1,5 @@
-import type {Logcat} from './logcat';
-import type {StringRecord} from './tools/types';
+import type {Logcat} from './logcat.js';
+import type {StringRecord} from './tools/types.js';
 
 export interface ADBOptions {
   sdkRoot?: string;

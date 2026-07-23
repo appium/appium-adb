@@ -1,8 +1,8 @@
 import {util} from '@appium/support';
 import {exec, type ExecError} from 'teen_process';
-import {log} from '../../logger';
-import type {ADB} from '../../adb';
-import type {ApkManifest} from '../../tools/types';
+import {log} from '../../logger.js';
+import type {ADB} from '../../adb.js';
+import type {ApkManifest} from '../../tools/types.js';
 
 /**
  * Reads and parses Android manifest metadata from an APK via `aapt2`.

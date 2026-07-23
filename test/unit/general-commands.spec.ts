@@ -1,15 +1,15 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import net from 'node:net';
-import {Logcat} from '../../lib/logcat';
+import {Logcat} from '../../lib/logcat.js';
 import * as teen_process from 'teen_process';
 import sinon from 'sinon';
 import {EOL} from 'node:os';
-import {APIDEMOS_PKG} from '../constants';
-import chai, {expect} from 'chai';
+import {APIDEMOS_PKG} from '../constants.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const apiLevel = 21,
   platformVersion = '4.4.4',

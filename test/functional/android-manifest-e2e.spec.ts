@@ -1,14 +1,14 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import path from 'node:path';
 import {fs, tempDir} from '@appium/support';
-import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup';
-import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest';
-import chai, {expect} from 'chai';
+import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup.js';
+import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {readPackageManifest, requireSdkRoot} from '../../lib/utils';
+import {readPackageManifest, requireSdkRoot} from '../../lib/utils/index.js';
 import {describe, it, before, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('Android-manifest', function () {
   let adb: ADB;

@@ -1,5 +1,5 @@
 import {util} from '@appium/support';
-import {log} from '../../logger';
+import {log} from '../../logger.js';
 
 export interface BuildInstallArgsOptions {
   replace?: boolean;

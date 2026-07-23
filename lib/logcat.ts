@@ -3,8 +3,8 @@ import {EventEmitter} from 'node:events';
 import {SubProcess, exec} from 'teen_process';
 import {LRUCache} from 'lru-cache';
 import type {ExecError} from 'teen_process';
-import type {ADBExecutable} from './types';
-import type {LogEntry, LogcatOpts as StartCaptureOptions} from './tools/types';
+import type {ADBExecutable} from './types.js';
+import type {LogEntry, LogcatOpts as StartCaptureOptions} from './tools/types.js';
 
 const log = logger.getLogger('Logcat');
 const MAX_BUFFER_SIZE = 10000;

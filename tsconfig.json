@@ -6,7 +6,9 @@
     "checkJs": true,
     "esModuleInterop": true,
     "types": ["node"],
-    "strict": true
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   },
   "include": ["lib", "test"]
 }

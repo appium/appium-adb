@@ -1,6 +1,6 @@
-import {Logcat} from '../logcat';
-import type {ADB} from '../adb';
-import type {LogcatOpts, LogEntry, LogcatListener} from './types';
+import {Logcat} from '../logcat.js';
+import type {ADB} from '../adb.js';
+import type {LogcatOpts, LogEntry, LogcatListener} from './types.js';
 
 /**
  * Start the logcat process to gather logs.

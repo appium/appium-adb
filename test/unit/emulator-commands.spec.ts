@@ -1,10 +1,10 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import sinon from 'sinon';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 const emulators = [
   {udid: 'emulator-5554', state: 'device', port: 5554},

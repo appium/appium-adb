@@ -1,9 +1,9 @@
-import {ADB} from '../../lib/adb';
-import chai, {expect} from 'chai';
+import {ADB} from '../../lib/adb.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, before, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('Lock Management', function () {
   let adb: ADB;

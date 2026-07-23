@@ -1,7 +1,7 @@
 import {EOL} from 'node:os';
-import {log} from '../logger';
-import type {ADB} from '../adb';
-import type {PortFamily, PortInfo} from './types';
+import {log} from '../logger.js';
+import type {ADB} from '../adb.js';
+import type {PortFamily, PortInfo} from './types.js';
 
 /**
  * Get TCP port forwarding with adb on the device under test.

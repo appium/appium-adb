@@ -1,14 +1,14 @@
-import {ADB} from '../../lib/adb';
+import {ADB} from '../../lib/adb.js';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
-import chai, {expect} from 'chai';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {E2E_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup';
+import {E2E_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup.js';
 import {fs, tempDir} from '@appium/support';
 import {waitForCondition} from 'asyncbox';
 import {describe, it, before, after, afterEach, beforeEach, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('general commands', {timeout: E2E_TIMEOUT}, function () {
   let adb: ADB;

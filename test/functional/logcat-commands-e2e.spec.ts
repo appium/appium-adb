@@ -1,11 +1,11 @@
-import {ADB} from '../../lib/adb';
-import {Logcat} from '../../lib/logcat';
-import {E2E_TIMEOUT} from './setup';
-import chai, {expect} from 'chai';
+import {ADB} from '../../lib/adb.js';
+import {Logcat} from '../../lib/logcat.js';
+import {E2E_TIMEOUT} from './setup.js';
+import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {describe, it, before, afterEach, type TestContext} from 'node:test';
 
-chai.use(chaiAsPromised);
+use(chaiAsPromised);
 
 describe('logcat commands', {timeout: E2E_TIMEOUT}, function () {
   async function runClearDeviceLogTest(adb: ADB, logcat: Logcat, clear = true) {
