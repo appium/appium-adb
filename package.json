@@ -49,7 +49,7 @@
     "@appium/support": "^7.2.2",
     "async-lock": "^1.0.0",
     "asyncbox": "^6.0.1",
-    "ini": "^6.0.0",
+    "ini": "^7.0.0",
     "lru-cache": "^11.1.0",
     "semver": "^7.0.0",
     "teen_process": "^4.0.4"
