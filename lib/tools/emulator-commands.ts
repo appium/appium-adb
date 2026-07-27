@@ -74,7 +74,7 @@ export async function rotate(this: ADB): Promise<void> {
 export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<void> {
   if (!(Object.values(this.POWER_AC_STATES) as string[]).includes(state)) {
     throw new TypeError(
-      `Wrong power AC state sent '${state}'. ` + `Supported values: ${Object.values(this.POWER_AC_STATES)}]`,
+      `Wrong power AC state sent '${state}'. Supported values: ${Object.values(this.POWER_AC_STATES)}]`,
     );
   }
   await this.adbExecEmu(['power', 'ac', state]);
@@ -89,7 +89,7 @@ export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<v
  */
 export async function sensorSet(this: ADB, sensor: string, value: Sensors): Promise<void> {
   if (!(Object.values(this.SENSORS) as string[]).includes(sensor)) {
-    throw new TypeError(`Unsupported sensor sent '${sensor}'. ` + `Supported values: ${Object.values(this.SENSORS)}]`);
+    throw new TypeError(`Unsupported sensor sent '${sensor}'. Supported values: ${Object.values(this.SENSORS)}]`);
   }
   if (value == null) {
     throw new TypeError(
@@ -248,7 +248,7 @@ export async function execEmuConsoleCommand(
 
   return await new Promise<string>((resolve, reject) => {
     const connTimeoutObj = setTimeout(
-      () => reject(new Error(`Cannot connect to the Emulator console at ${host}:${port} ` + `after ${connTimeout}ms`)),
+      () => reject(new Error(`Cannot connect to the Emulator console at ${host}:${port} after ${connTimeout}ms`)),
       connTimeout,
     );
     let execTimeoutObj: NodeJS.Timeout;
@@ -258,7 +258,7 @@ export async function execEmuConsoleCommand(
 
     client.once('error', (e) => {
       clearTimeout(connTimeoutObj);
-      reject(new Error(`Cannot connect to the Emulator console at ${host}:${port}. ` + `Original error: ${e.message}`));
+      reject(new Error(`Cannot connect to the Emulator console at ${host}:${port}. Original error: ${e.message}`));
     });
 
     client.once('connect', () => {

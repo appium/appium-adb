@@ -11,7 +11,7 @@ export const getResourcePath = util.memoize(async function getResourcePath(relPa
   const resultPath = path.resolve(moduleRoot, relPath);
   if (!(await fs.exists(resultPath))) {
     throw new Error(
-      `Cannot find the resource '${relPath}' under the '${moduleRoot}' ` + `folder of ${MODULE_NAME} Node.js module`,
+      `Cannot find the resource '${relPath}' under the '${moduleRoot}' folder of ${MODULE_NAME} Node.js module`,
     );
   }
   return resultPath;

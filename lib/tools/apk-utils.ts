@@ -109,7 +109,7 @@ export async function cacheApk(this: ADB, apkPath: string, options: CachingOptio
     }
     if (typeof lsOutput !== 'string' || (lsOutput.includes(errorMarker) && !lsOutput.includes(REMOTE_CACHE_ROOT))) {
       if (typeof this._areExtendedLsOptionsSupported !== 'boolean') {
-        log.debug('The current Android API does not support extended ls options. ' + 'Defaulting to no-options call');
+        log.debug('The current Android API does not support extended ls options. Defaulting to no-options call');
       }
       lsOutput = await this.shell([`ls ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
       this._areExtendedLsOptionsSupported = false;
@@ -349,7 +349,7 @@ export async function installOrUpgrade(
     if ('name' in apkInfo) {
       pkg = apkInfo.name;
     } else {
-      log.warn(`Cannot determine the package name of '${appPath}'. ` + `Continuing with the install anyway`);
+      log.warn(`Cannot determine the package name of '${appPath}'. Continuing with the install anyway`);
     }
   }
 
@@ -457,7 +457,7 @@ export async function extractStringsFromApk(
     apkStrings = parseAaptStrings(stdout, configMarker);
   } catch (e) {
     const err = e as ExecError;
-    log.debug('Cannot extract resources using aapt. Trying aapt2. ' + `Original error: ${err.stderr || err.message}`);
+    log.debug(`Cannot extract resources using aapt. Trying aapt2. Original error: ${err.stderr || err.message}`);
 
     await this.initAapt2();
 
@@ -475,7 +475,7 @@ export async function extractStringsFromApk(
       apkStrings = parseAapt2Strings(stdout, configMarker);
     } catch (e) {
       const error = e as Error;
-      throw new Error(`Cannot extract resources from '${originalAppPath}'. ` + `Original error: ${error.message}`, {
+      throw new Error(`Cannot extract resources from '${originalAppPath}'. Original error: ${error.message}`, {
         cause: e,
       });
     }
@@ -748,7 +748,7 @@ async function formatConfigMarker(
   log.debug(`Resource configurations: ${JSON.stringify(configs)}`);
   // Assume the 'en' configuration is the default one
   if (configMarker.toLowerCase().startsWith('en') && !configs.some((x) => x.trim() === configMarker)) {
-    log.debug(`Resource configuration name '${configMarker}' is unknown. ` + `Replacing it with '${defaultMarker}'`);
+    log.debug(`Resource configuration name '${configMarker}' is unknown. Replacing it with '${defaultMarker}'`);
     configMarker = defaultMarker;
   } else {
     log.debug(`Selected configuration: '${configMarker}'`);

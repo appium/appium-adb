@@ -61,7 +61,7 @@ export async function extractUniversalApk(this: ADB, aabPath: string, opts: ApkC
       let cacheHash = aabHash;
       if (keystore) {
         if (!(await fs.exists(keystore))) {
-          throw new Error(`The keystore file at '${keystore}' either does not exist ` + `or is not accessible`);
+          throw new Error(`The keystore file at '${keystore}' either does not exist or is not accessible`);
         }
         if (!keystorePassword || !keyAlias || !keyPassword) {
           throw new Error(

@@ -47,9 +47,7 @@ export async function targetSdkVersionFromManifest(this: ADB, appPath: string): 
 
   const {targetSdkVersion} = await readPackageManifest.bind(this)(appPath);
   if (!targetSdkVersion) {
-    throw new Error(
-      `Cannot extract targetSdkVersion of '${originalAppPath}'. Does ` + `the package manifest define it?`,
-    );
+    throw new Error(`Cannot extract targetSdkVersion of '${originalAppPath}'. Does the package manifest define it?`);
   }
   return targetSdkVersion;
 }

@@ -899,7 +899,7 @@ export async function killEmulator(
 export async function launchAVD(this: ADB, avdName: string, opts: AvdLaunchOptions = {}): Promise<SubProcess> {
   const {args = [], env = {}, language, country, launchTimeout = 60000, readyTimeout = 60000, retryTimes = 1} = opts;
   log.debug(
-    `Launching Emulator with AVD ${avdName}, launchTimeout ` + `${launchTimeout}ms and readyTimeout ${readyTimeout}ms`,
+    `Launching Emulator with AVD ${avdName}, launchTimeout ${launchTimeout}ms and readyTimeout ${readyTimeout}ms`,
   );
   const emulatorBinaryPath = await this.getSdkBinaryPath('emulator');
   let processedAvdName = avdName;

@@ -616,7 +616,7 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
     if (stdout.includes('Error: Activity class') && stdout.includes('does not exist')) {
       if (options.retry && options.activity && !options.activity.startsWith('.')) {
         log.debug(
-          `We tried to start an activity that doesn't exist, ` + `retrying with '.${options.activity}' activity name`,
+          `We tried to start an activity that doesn't exist, retrying with '.${options.activity}' activity name`,
         );
         options.activity = `.${options.activity}`;
         options.retry = false;

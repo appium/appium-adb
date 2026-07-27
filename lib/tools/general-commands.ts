@@ -323,7 +323,7 @@ export async function takeScreenshot(this: ADB, displayId?: number | string): Pr
       outputStr = typeof stdout === 'string' ? stdout : stdout.toString('utf-8');
     }
     throw new Error(
-      `Screenshot of the ${displayDescr} failed. ` + `Code: '${err.code ?? 'unknown'}', output: '${outputStr}'`,
+      `Screenshot of the ${displayDescr} failed. Code: '${err.code ?? 'unknown'}', output: '${outputStr}'`,
       {cause: e},
     );
   }

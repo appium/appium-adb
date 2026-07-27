@@ -238,7 +238,7 @@ export async function getPlatformVersion(this: ADB): Promise<string> {
     return await this.getDeviceProperty('ro.build.version.release');
   } catch (e) {
     const err = e as Error;
-    throw new Error(`Error getting device platform version. ` + `Original error: ${err.message}`, {
+    throw new Error(`Error getting device platform version. Original error: ${err.message}`, {
       cause: e,
     });
   }
@@ -312,9 +312,7 @@ export async function setHiddenApiPolicy(this: ADB, value: number | string, igno
     if (!ignoreError) {
       throw decorateWriteSecureSettingsException(err);
     }
-    log.info(
-      `Failed to set setting keys '${HIDDEN_API_POLICY_KEYS}' to '${value}'. ` + `Original error: ${err.message}`,
-    );
+    log.info(`Failed to set setting keys '${HIDDEN_API_POLICY_KEYS}' to '${value}'. Original error: ${err.message}`);
   }
 }
 

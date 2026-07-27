@@ -25,7 +25,7 @@ export async function isLockManagementSupported(this: ADB): Promise<boolean> {
       output = await this.shell([`locksettings help && echo ${passFlag}`]);
     } catch {}
     this._isLockManagementSupported = output.includes(passFlag);
-    log.debug(`Extended lock settings management is ` + `${this._isLockManagementSupported ? '' : 'not '}supported`);
+    log.debug(`Extended lock settings management is ${this._isLockManagementSupported ? '' : 'not '}supported`);
   }
   return this._isLockManagementSupported as boolean;
 }

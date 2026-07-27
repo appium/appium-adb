@@ -243,18 +243,14 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('dumpWindows')
         .once()
-        .returns(
-          `mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` + `ActivityRecord{2 u ${pkg}/${act} t181}}}`,
-        );
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{2 u ${pkg}/${act} t181}}}`);
 
       await adb.waitForActivityOrNot(pkg, act, false);
     });
     it('should call shell multiple times and return', async function () {
       mocks.adb
         .expects('dumpWindows')
-        .returns(
-          'mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' + 'ActivityRecord{2c7c4318 u0 foo/bar t181}}}',
-        );
+        .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
       mocks.adb
         .expects('dumpWindows')
         .returns(
@@ -268,21 +264,17 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('dumpWindows')
         .once()
-        .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' + 'ActivityRecord{c 0 foo/bar t181}}}');
+        .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{c 0 foo/bar t181}}}');
 
       await adb.waitForActivityOrNot(pkg, act, true);
     });
     it('should call shell multiple times and return for not', async function () {
       mocks.adb
         .expects('dumpWindows')
-        .returns(
-          `mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` + `ActivityRecord{2 u ${pkg}/${act} t181}}}`,
-        );
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{2 u ${pkg}/${act} t181}}}`);
       mocks.adb
         .expects('dumpWindows')
-        .returns(
-          'mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ' + 'ActivityRecord{2c7c4318 u0 foo/bar t181}}}',
-        );
+        .returns('mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{2c7c4318 u0 foo/bar t181}}}');
       await adb.waitForActivityOrNot(pkg, act, true);
     });
     it('should be able to get first of a comma-separated list of activities', async function () {
@@ -311,9 +303,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('dumpWindows')
         .atLeast(1)
-        .returns(
-          `mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ` + `ActivityRecord{2 u ${pkg}/${act} t181}}}`,
-        );
+        .returns(`mFocusedApp=AppWindowToken{38600b56 token=Token{9ea1171 ActivityRecord{2 u ${pkg}/${act} t181}}}`);
 
       await expect(adb.waitForActivityOrNot(pkg, '.SuperManager, .OtherManager', false, 1000)).to.eventually.be
         .rejected;

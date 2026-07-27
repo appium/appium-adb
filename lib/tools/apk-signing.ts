@@ -156,10 +156,9 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
       await exec(fullCmd[0], fullCmd.slice(1));
     } catch (e) {
       const execErr = e as ExecError;
-      throw new Error(
-        `Could not sign with custom certificate. ` + `Original error: ${execErr.stderr || execErr.message}`,
-        {cause: e},
-      );
+      throw new Error(`Could not sign with custom certificate. Original error: ${execErr.stderr || execErr.message}`, {
+        cause: e,
+      });
     }
   }
 }
@@ -289,9 +288,9 @@ export async function checkApkCert(this: ADB, appPath: string, opts: CertCheckOp
     const output = await this.executeApksigner(['verify', '--print-certs', actualAppPath]);
     const hasMatch = hashMatches(output, expected);
     if (hasMatch) {
-      log.info(`'${actualAppPath}' is signed with the ` + `${this.useKeystore ? 'keystore' : 'default'} certificate`);
+      log.info(`'${actualAppPath}' is signed with the ${this.useKeystore ? 'keystore' : 'default'} certificate`);
     } else {
-      log.info(`'${actualAppPath}' is signed with a ` + `non-${this.useKeystore ? 'keystore' : 'default'} certificate`);
+      log.info(`'${actualAppPath}' is signed with a non-${this.useKeystore ? 'keystore' : 'default'} certificate`);
     }
     const isSigned = (!this.useKeystore && !requireDefaultCert) || hasMatch;
     if (isSigned) {
@@ -323,7 +322,7 @@ export async function checkApkCert(this: ADB, appPath: string, opts: CertCheckOp
       log.warn(`Assuming '${actualAppPath}' is already signed and continuing anyway`);
       return true;
     }
-    throw new Error(`Cannot verify the signature of '${actualAppPath}'. ` + `Original error: ${errMsg}`, {cause: err});
+    throw new Error(`Cannot verify the signature of '${actualAppPath}'. Original error: ${errMsg}`, {cause: err});
   }
 }
 
@@ -371,7 +370,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
   } catch (e) {
     const err = e as ExecError;
     throw new Error(
-      `Cannot get the hash of '${this.keystorePath}' keystore. ` + `Original error: ${err.stderr || err.message}`,
+      `Cannot get the hash of '${this.keystorePath}' keystore. Original error: ${err.stderr || err.message}`,
       {cause: e},
     );
   }
