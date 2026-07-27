@@ -1,16 +1,13 @@
+import assert from 'node:assert/strict';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
 import {ADB} from '../../lib/adb.js';
 import {Logcat} from '../../lib/logcat.js';
 import {APIDEMOS_PKG} from '../constants.js';
-
-use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -48,11 +45,11 @@ describe('process commands', function () {
   describe('processExists', function () {
     it('should call shell with correct args and should find process', async function () {
       mocks.adb.expects('getProcessIdsByName').once().withExactArgs(apiDemosPackage).returns([123]);
-      expect(await adb.processExists(apiDemosPackage)).to.be.true;
+      assert.strictEqual(await adb.processExists(apiDemosPackage), true);
     });
     it('should call shell with correct args and should not find process', async function () {
       mocks.adb.expects('getProcessIdsByName').once().withExactArgs(apiDemosPackage).returns([]);
-      expect(await adb.processExists(apiDemosPackage)).to.be.false;
+      assert.strictEqual(await adb.processExists(apiDemosPackage), false);
     });
   });
 
@@ -79,17 +76,17 @@ describe('process commands', function () {
         root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
         root      1681  60    10672  996   00000000 b6f33508 R ps
         `);
-      expect(await adb.getProcessNameById('1627')).to.eql('com.android.browser');
+      assert.deepStrictEqual(await adb.getProcessNameById('1627'), 'com.android.browser');
     });
     it('should fail if no PID could be found in the name', async function () {
-      await expect(adb.getProcessNameById('bla')).to.eventually.be.rejectedWith(/valid number/);
+      await assert.rejects(adb.getProcessNameById('bla'), /valid number/);
     });
     it('should fail if no PID could be found in ps output', async function () {
       mocks.adb.expects('listProcessStatus').once().returns(`
         USER     PID   PPID  VSIZE  RSS     WCHAN    PC        NAME
         u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
         `);
-      await expect(adb.getProcessNameById(115)).to.eventually.be.rejectedWith(/process name/);
+      await assert.rejects(adb.getProcessNameById(115), /process name/);
     });
   });
 
@@ -102,7 +99,7 @@ u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
 u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
 u0_a15    1627  69    1206440 30480 ffffffff b6db0920 S com.android.browser
 u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
-      expect(await adb.getProcessIdsByName('com.android.browser')).to.eql([1627, 1628]);
+      assert.deepStrictEqual(await adb.getProcessIdsByName('com.android.browser'), [1627, 1628]);
     });
     it('should return empty array when no matching processes found', async function () {
       mocks.adb.expects('listProcessStatus').once().returns(`
@@ -110,13 +107,11 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
         radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
         u0_a12    1156  69    1246756 58588 ffffffff b6db0920 S com.android.systemui
         `);
-      expect(await adb.getProcessIdsByName('com.nonexistent.app')).to.eql([]);
+      assert.deepStrictEqual(await adb.getProcessIdsByName('com.nonexistent.app'), []);
     });
     it('should fail if ps output cannot be parsed', async function () {
       mocks.adb.expects('listProcessStatus').once().returns('Invalid output without proper headers');
-      await expect(adb.getProcessIdsByName('com.android.phone')).to.eventually.be.rejectedWith(
-        /Could not parse process list/,
-      );
+      await assert.rejects(adb.getProcessIdsByName('com.android.phone'), /Could not parse process list/);
     });
   });
 
@@ -136,7 +131,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
         .once()
         .withExactArgs(apiDemosPackage)
         .throws(new Error('Process lookup failed'));
-      await expect(adb.killProcessesByName(apiDemosPackage)).to.eventually.be.rejectedWith(/Unable to kill/);
+      await assert.rejects(adb.killProcessesByName(apiDemosPackage), /Unable to kill/);
     });
   });
 
@@ -201,7 +196,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
         .once()
         .withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
-      await expect(adb.killProcessByPID(pid)).to.eventually.be.rejectedWith('kill failed');
+      await assert.rejects(adb.killProcessByPID(pid), (err) => (err as Error).message.includes('kill failed'));
     });
   });
 });

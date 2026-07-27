@@ -1,9 +1,8 @@
+import assert from 'node:assert/strict';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
 import {fs} from '@appium/support';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
@@ -19,8 +18,6 @@ import {
 } from '../../lib/tools/app-commands.js';
 import {getBuildToolsDirs} from '../../lib/tools/system-calls.js';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT} from '../constants.js';
-
-use(chaiAsPromised);
 
 const apiDemosPackage = APIDEMOS_PKG;
 
@@ -60,11 +57,11 @@ describe('app commands', function () {
   describe('isAppRunning', function () {
     it('should call listAppProcessIds and return true when app is running', async function () {
       mocks.adb.expects('listAppProcessIds').once().withExactArgs(apiDemosPackage).returns([123, 456]);
-      expect(await adb.isAppRunning(apiDemosPackage)).to.be.true;
+      assert.strictEqual(await adb.isAppRunning(apiDemosPackage), true);
     });
     it('should call listAppProcessIds and return false when app is not running', async function () {
       mocks.adb.expects('listAppProcessIds').once().withExactArgs(apiDemosPackage).returns([]);
-      expect(await adb.isAppRunning(apiDemosPackage)).to.be.false;
+      assert.strictEqual(await adb.isAppRunning(apiDemosPackage), false);
     });
   });
 
@@ -73,7 +70,7 @@ describe('app commands', function () {
       const mockOutput = `ProcessRecord{abc123 123:io.appium.android.apis/u0a123}
 ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
       mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'activity', 'processes']).returns(mockOutput);
-      expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([123, 456]);
+      assert.deepStrictEqual(await adb.listAppProcessIds(apiDemosPackage), [123, 456]);
     });
     it('should return empty array when no processes found', async function () {
       mocks.adb
@@ -81,7 +78,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         .once()
         .withExactArgs(['dumpsys', 'activity', 'processes'])
         .returns('No processes found');
-      expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([]);
+      assert.deepStrictEqual(await adb.listAppProcessIds(apiDemosPackage), []);
     });
   });
 
@@ -126,7 +123,7 @@ package:com.android.chrome versionCode:636771932`;
         .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode'])
         .returns(mockOutput);
       const result = await adb.listInstalledPackages();
-      expect(result).to.eql([
+      assert.deepStrictEqual(result, [
         {appPackage: 'com.android.managedprovisioning', versionCode: '35'},
         {appPackage: 'com.google.android.apps.wallpaper.nexus', versionCode: '170000000'},
         {appPackage: 'com.android.chrome', versionCode: '636771932'},
@@ -139,7 +136,7 @@ package:com.google.android.apps.wallpaper.nexus
 package:com.android.chrome`;
       mocks.adb.expects('shell').once().withExactArgs(['cmd', 'package', 'list', 'packages']).returns(mockOutput);
       const result = await adb.listInstalledPackages();
-      expect(result).to.eql([
+      assert.deepStrictEqual(result, [
         {appPackage: 'com.android.managedprovisioning', versionCode: null},
         {appPackage: 'com.google.android.apps.wallpaper.nexus', versionCode: null},
         {appPackage: 'com.android.chrome', versionCode: null},
@@ -154,7 +151,7 @@ package:com.android.chrome`;
         .withExactArgs(['cmd', 'package', 'list', 'packages', '--user', '10'])
         .returns(mockOutput);
       const result = await adb.listInstalledPackages({user: '10'});
-      expect(result).to.eql([{appPackage: 'com.android.chrome', versionCode: null}]);
+      assert.deepStrictEqual(result, [{appPackage: 'com.android.chrome', versionCode: null}]);
     });
     it('should handle user option with api level 28', async function () {
       mocks.adb.expects('getApiLevel').once().returns(28);
@@ -165,7 +162,7 @@ package:com.android.chrome`;
         .withExactArgs(['cmd', 'package', 'list', 'packages', '--show-versioncode', '--user', '10'])
         .returns(mockOutput);
       const result = await adb.listInstalledPackages({user: '10'});
-      expect(result).to.eql([{appPackage: 'com.android.chrome', versionCode: '636771932'}]);
+      assert.deepStrictEqual(result, [{appPackage: 'com.android.chrome', versionCode: '636771932'}]);
     });
   });
 
@@ -195,7 +192,7 @@ package:com.android.chrome`;
       mocks.adb.expects('getApiLevel').once().returns(25);
       mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'window', 'windows']).returns('Window information');
       const result = await adb.dumpWindows();
-      expect(result).to.equal('Window information');
+      assert.strictEqual(result, 'Window information');
     });
   });
 
@@ -208,8 +205,8 @@ package:com.android.chrome`;
       mocks.adb.expects('getApiLevel').once().returns(25);
       mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'window', 'windows']).returns(mockOutput);
       const result = await adb.getFocusedPackageAndActivity();
-      expect(result.appPackage).to.equal(APIDEMOS_PKG);
-      expect(result.appActivity).to.equal(APIDEMOS_ACTIVITY_SHORT);
+      assert.strictEqual(result.appPackage, APIDEMOS_PKG);
+      assert.strictEqual(result.appActivity, APIDEMOS_ACTIVITY_SHORT);
     });
   });
 
@@ -270,11 +267,11 @@ package:com.android.chrome`;
 
     it('should use start', function () {
       const cmd = buildStartCmd(startOptions, 20);
-      expect(cmd[1]).to.eql('start');
+      assert.deepStrictEqual(cmd[1], 'start');
     });
     it('should use start-activity', function () {
       const cmd = buildStartCmd(startOptions, 26);
-      expect(cmd[1]).to.eql('start-activity');
+      assert.deepStrictEqual(cmd[1], 'start-activity');
     });
     it('should not repeat package name', function () {
       const cmd = buildStartCmd(
@@ -284,50 +281,50 @@ package:com.android.chrome`;
         },
         20,
       );
-      expect(cmd.includes('com.package/.activity')).to.be.true;
+      assert.strictEqual(cmd.includes('com.package/.activity'), true);
     });
     it('should include package name', function () {
       const cmd = buildStartCmd(startOptions, 20);
-      expect(cmd.includes(`${startOptions.pkg}/${startOptions.activity}`)).to.be.true;
+      assert.strictEqual(cmd.includes(`${startOptions.pkg}/${startOptions.activity}`), true);
     });
     it('should parse optionalIntentArguments with single key', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key'}, 20);
-      expect(cmd[cmd.length - 2]).to.eql('-d');
-      expect(cmd[cmd.length - 1]).to.eql('key');
+      assert.deepStrictEqual(cmd[cmd.length - 2], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 1], 'key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value'}, 20);
-      expect(cmd[cmd.length - 3]).to.eql('-d');
-      expect(cmd[cmd.length - 2]).to.eql('key');
-      expect(cmd[cmd.length - 1]).to.eql('value');
+      assert.deepStrictEqual(cmd[cmd.length - 3], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
+      assert.deepStrictEqual(cmd[cmd.length - 1], 'value');
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value value2'}, 20);
-      expect(cmd[cmd.length - 3]).to.eql('-d');
-      expect(cmd[cmd.length - 2]).to.eql('key');
-      expect(cmd[cmd.length - 1]).to.eql('value value2');
+      assert.deepStrictEqual(cmd[cmd.length - 3], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
+      assert.deepStrictEqual(cmd[cmd.length - 1], 'value value2');
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 -e key2'}, 20);
-      expect(cmd[cmd.length - 4]).to.eql('-d');
-      expect(cmd[cmd.length - 3]).to.eql('key1');
-      expect(cmd[cmd.length - 2]).to.eql('-e');
-      expect(cmd[cmd.length - 1]).to.eql('key2');
+      assert.deepStrictEqual(cmd[cmd.length - 4], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 3], 'key1');
+      assert.deepStrictEqual(cmd[cmd.length - 2], '-e');
+      assert.deepStrictEqual(cmd[cmd.length - 1], 'key2');
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 value1 -e key2 value2'}, 20);
-      expect(cmd[cmd.length - 6]).to.eql('-d');
-      expect(cmd[cmd.length - 5]).to.eql('key1');
-      expect(cmd[cmd.length - 4]).to.eql('value1');
-      expect(cmd[cmd.length - 3]).to.eql('-e');
-      expect(cmd[cmd.length - 2]).to.eql('key2');
-      expect(cmd[cmd.length - 1]).to.eql('value2');
+      assert.deepStrictEqual(cmd[cmd.length - 6], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 5], 'key1');
+      assert.deepStrictEqual(cmd[cmd.length - 4], 'value1');
+      assert.deepStrictEqual(cmd[cmd.length - 3], '-e');
+      assert.deepStrictEqual(cmd[cmd.length - 2], 'key2');
+      assert.deepStrictEqual(cmd[cmd.length - 1], 'value2');
     });
     it('should parse optionalIntentArguments with hyphens', function () {
       const arg = 'http://some-url-with-hyphens.com/';
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: `-d ${arg}`}, 20);
-      expect(cmd[cmd.length - 2]).to.eql('-d');
-      expect(cmd[cmd.length - 1]).to.eql(arg);
+      assert.deepStrictEqual(cmd[cmd.length - 2], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 1], arg);
     });
     it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
       const arg1 = 'http://some-url-with-hyphens.com/';
@@ -339,26 +336,26 @@ package:com.android.chrome`;
         },
         20,
       );
-      expect(cmd[cmd.length - 5]).to.eql('-d');
-      expect(cmd[cmd.length - 4]).to.eql(arg1);
-      expect(cmd[cmd.length - 3]).to.eql('-e');
-      expect(cmd[cmd.length - 2]).to.eql('key');
-      expect(cmd[cmd.length - 1]).to.eql(arg2);
+      assert.deepStrictEqual(cmd[cmd.length - 5], '-d');
+      assert.deepStrictEqual(cmd[cmd.length - 4], arg1);
+      assert.deepStrictEqual(cmd[cmd.length - 3], '-e');
+      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
+      assert.deepStrictEqual(cmd[cmd.length - 1], arg2);
     });
     it('should have -S option when stopApp is set', function () {
       const cmd = buildStartCmd({...startOptions, stopApp: true}, 20);
-      expect(cmd[cmd.length - 1]).to.eql('-S');
+      assert.deepStrictEqual(cmd[cmd.length - 1], '-S');
     });
     it('should not have -S option when stopApp is not set', function () {
       const cmd = buildStartCmd({...startOptions, stopApp: false}, 20);
-      expect(cmd[cmd.length - 1]).to.not.eql('-S');
+      assert.notDeepStrictEqual(cmd[cmd.length - 1], '-S');
     });
   });
 
   describe('getBuildToolsDirs', function () {
     it('should sort build-tools folder names by semantic version', async function () {
       mocks.fs.expects('glob').once().returns(['/some/path/1.2.3', '/some/path/4.5.6', '/some/path/2.3.1']);
-      expect(await getBuildToolsDirs('/dummy/path')).to.be.eql([
+      assert.deepStrictEqual(await getBuildToolsDirs('/dummy/path'), [
         '/some/path/4.5.6',
         '/some/path/2.3.1',
         '/some/path/1.2.3',
@@ -385,7 +382,7 @@ package:com.android.chrome`;
               (string16) "Horizontal"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, '(default)');
-      expect(aaptStrings.linear_layout_8_horizontal).to.eql('Horizontal');
+      assert.deepStrictEqual(aaptStrings.linear_layout_8_horizontal, 'Horizontal');
     });
     it('should parse plurals received from aapt output', function () {
       const aaptOutput = `
@@ -454,8 +451,8 @@ package:com.android.chrome`;
                   (string8) "res/menu/toolbar_sketch.xml"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, 'de-rDE');
-      expect(aaptStrings.abc_action_bar_home_description).to.eql('Navigate "home"');
-      expect(aaptStrings.calling__conversation_full__message).to.eql([
+      assert.deepStrictEqual(aaptStrings.abc_action_bar_home_description, 'Navigate "home"');
+      assert.deepStrictEqual(aaptStrings.calling__conversation_full__message, [
         'Calls work in conversations with up to 1 person.',
         'Calls work in conversations with up to %1$d people. "blabla"',
       ]);
@@ -479,7 +476,7 @@ package:com.android.chrome`;
             (fr) "Top"
       `;
       const aapt2Strings = parseAapt2Strings(aapt2Output, '');
-      expect(aapt2Strings.linear_layout_8_horizontal).to.eql('Horizontal');
+      assert.deepStrictEqual(aapt2Strings.linear_layout_8_horizontal, 'Horizontal');
     });
     it('should parse plurals received from aapt2 output', function () {
       const aapt2Output = `
@@ -529,7 +526,7 @@ package:com.android.chrome`;
               other="%1$s ludzi oczekujących"
       `;
       const aapt2Strings = parseAapt2Strings(aapt2Output, 'de');
-      expect(aapt2Strings.connect_inbox__link__name).to.eql([
+      assert.deepStrictEqual(aapt2Strings.connect_inbox__link__name, [
         'Eine Kontaktanfrage',
         '%1$s Kontaktanfragen\\n\\n"blabla"',
       ]);
@@ -569,19 +566,19 @@ package:com.android.chrome`;
         `;
     it('test install permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], true);
-      expect(per.length).to.eql(4);
+      assert.deepStrictEqual(per.length, 4);
     });
     it('test install permission with granted false', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], false);
-      expect(per.length).to.eql(0);
+      assert.deepStrictEqual(per.length, 0);
     });
     it('test requested permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['requested'], true);
-      expect(per.length).to.eql(0);
+      assert.deepStrictEqual(per.length, 0);
     });
     it('test runtime permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['runtime'], true);
-      expect(per.length).to.eql(1);
+      assert.deepStrictEqual(per.length, 1);
     });
   });
 
@@ -618,7 +615,7 @@ package:com.android.chrome`;
       Domain verification status:
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      expect(names).to.eql(['com.sunpower.energylink.commissioning2/.MainActivity']);
+      assert.deepStrictEqual(names, ['com.sunpower.energylink.commissioning2/.MainActivity']);
     });
     it('test valid output parsing (older Android versions)', function () {
       const dumpsysOutput = `
@@ -634,7 +631,7 @@ package:com.android.chrome`;
              Signing KeySets: 2
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      expect(names).to.eql([
+      assert.deepStrictEqual(names, [
         'com.example.android.contactmanager/.ContactManager2',
         'com.example.android.contactmanager/.ContactManager3',
         'com.example.android.contactmanager/.ContactManager',
@@ -646,18 +643,18 @@ package:com.android.chrome`;
       Failure printing domain verification information
       `;
       const names = parseLaunchableActivityNames(dumpsysOutput);
-      expect(names).to.be.eql([]);
+      assert.deepStrictEqual(names, []);
     });
   });
   describe('matchComponentName', function () {
     it('test valid activity name', function () {
       const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
       const names = matchComponentName(activity);
-      expect(names).to.eql([activity]);
+      assert.deepStrictEqual(names && [...names], [activity]);
     });
     it('test invalid activity name', function () {
       const activity = 'User@123';
-      expect(matchComponentName(activity)).to.be.null;
+      assert.strictEqual(matchComponentName(activity), null);
     });
   });
 
@@ -688,34 +685,38 @@ package:com.android.chrome`;
 
     for (const name of legitNames) {
       it(`should accept legitimate name '${name}'`, function () {
-        expect(() => assertSafeComponentName(name, 'activity name')).to.not.throw();
+        assert.doesNotThrow(() => assertSafeComponentName(name, 'activity name'));
       });
     }
     for (const payload of injectionPayloads) {
       it(`should reject injection payload '${payload}'`, function () {
-        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(/illegal characters/);
+        assert.throws(() => assertSafeComponentName(payload, 'activity name'), /illegal characters/);
       });
     }
   });
 
   describe('command injection prevention', function () {
     it('startApp should reject an activity name containing shell metacharacters', async function () {
-      await expect(
+      await assert.rejects(
         adb.startApp({pkg: 'org.wikipedia.alpha', activity: 'org.wikipedia.main.M;id>&2;aaaa'}),
-      ).to.be.rejectedWith(/illegal characters/);
+        /illegal characters/,
+      );
     });
     it('startApp should reject a package name containing shell metacharacters', async function () {
-      await expect(adb.startApp({pkg: 'org.wikipedia.alpha`id`', activity: '.MainActivity'})).to.be.rejectedWith(
+      await assert.rejects(
+        adb.startApp({pkg: 'org.wikipedia.alpha`id`', activity: '.MainActivity'}),
         /illegal characters/,
       );
     });
     it('waitForActivityOrNot should reject a wait activity containing shell metacharacters', async function () {
-      await expect(adb.waitForActivityOrNot(apiDemosPackage, '.Main;reboot', false, 1000)).to.be.rejectedWith(
+      await assert.rejects(
+        adb.waitForActivityOrNot(apiDemosPackage, '.Main;reboot', false, 1000),
         /illegal characters/,
       );
     });
     it('waitForActivityOrNot should reject a wait package containing shell metacharacters', async function () {
-      await expect(adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000)).to.be.rejectedWith(
+      await assert.rejects(
+        adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000),
         /illegal characters/,
       );
     });

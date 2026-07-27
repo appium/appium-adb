@@ -1,17 +1,14 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import esmock from 'esmock';
 import sinon from 'sinon';
 
 import {FIXTURES_ROOT, MODULE_ROOT} from '../constants.js';
-
-use(chaiAsPromised);
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
 const keysRoot = path.resolve(MODULE_ROOT, 'keys');
@@ -107,12 +104,12 @@ describe('signing', function () {
         .withArgs(javaDummyPath, sinon.match.array)
         .onFirstCall()
         .throws(new Error('apksigner failed'));
-      await expect(adb.signWithDefaultCert(apiDemosPath)).to.eventually.be.rejected;
+      await assert.rejects(adb.signWithDefaultCert(apiDemosPath));
     });
 
     it('should throw error for invalid file path', async function () {
       const dummyPath = 'dummyPath';
-      await expect(adb.signWithDefaultCert(dummyPath)).to.eventually.be.rejected;
+      await assert.rejects(adb.signWithDefaultCert(dummyPath));
     });
   });
 
@@ -175,7 +172,7 @@ describe('signing', function () {
       });
       /* eslint-enable promise/prefer-await-to-callbacks */
       await adb.signWithCustomCert(apiDemosPath);
-      expect(innerExecStub.callCount).to.eql(2);
+      assert.deepStrictEqual(innerExecStub.callCount, 2);
     });
   });
 
@@ -200,7 +197,7 @@ describe('signing', function () {
   describe('checkApkCert', function () {
     it('should return false for apk not present', async function () {
       mocks.fs.expects('exists').once().withExactArgs('dummyPath').returns(false);
-      expect(await adb.checkApkCert('dummyPath')).to.be.false;
+      assert.strictEqual(await adb.checkApkCert('dummyPath'), false);
     });
 
     it('should check default signature when not using keystore', async function () {
@@ -222,7 +219,7 @@ describe('signing', function () {
       Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f5378e87`,
           stderr: '',
         });
-      expect(await adb.checkApkCert(apiDemosPath)).to.be.true;
+      assert.strictEqual(await adb.checkApkCert(apiDemosPath), true);
     });
 
     it('should check non default signature when not using keystore', async function () {
@@ -247,7 +244,7 @@ describe('signing', function () {
       const result = await adb.checkApkCert(apiDemosPath, {
         requireDefaultCert: false,
       });
-      expect(result).to.be.true;
+      assert.strictEqual(result, true);
     });
 
     it('should fail if apksigner is not found', async function () {
@@ -260,7 +257,7 @@ describe('signing', function () {
         .once()
         .withExactArgs('apksigner.jar')
         .throws(new Error('apksigner not found'));
-      await expect(adb.checkApkCert(apiDemosPath)).to.eventually.be.rejected;
+      await assert.rejects(adb.checkApkCert(apiDemosPath));
     });
 
     it('should call getKeystoreHash when using keystore', async function () {
@@ -287,7 +284,7 @@ describe('signing', function () {
       Signer #1 certificate MD5 digest: e89b158e4bcf988ebd09eb83f53ccccc`,
           stderr: '',
         });
-      await expect(adb.checkApkCert(apiDemosPath)).to.eventually.be.true;
+      assert.strictEqual(await adb.checkApkCert(apiDemosPath), true);
     });
   });
 });

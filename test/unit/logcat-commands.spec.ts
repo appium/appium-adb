@@ -1,12 +1,9 @@
+import assert from 'node:assert/strict';
 import events from 'node:events';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import esmock from 'esmock';
 import sinon from 'sinon';
-
-use(chaiAsPromised);
 
 let currentExec: (...args: any[]) => any = async () => ({stdout: '', stderr: ''});
 let currentSubProcess: (...args: any[]) => any = () => ({});
@@ -54,7 +51,7 @@ describe('logcat commands', function () {
         filterSpecs: ['yolo2:d', ':k', '-asd:e'],
       });
       const logs = logcat.getLogs();
-      expect(logs).to.have.length.above(0);
+      assert.ok(logs.length > 0);
     });
     it('should correctly call subprocess and should reject promise', async function () {
       const conn = new events.EventEmitter();
@@ -67,7 +64,7 @@ describe('logcat commands', function () {
       setTimeout(function () {
         conn.emit('line-stderr', 'execvp()');
       }, 0);
-      await expect(logcat.startCapture()).to.eventually.be.rejectedWith('Logcat');
+      await assert.rejects(logcat.startCapture(), (err: Error) => err.message.includes('Logcat'));
     });
     it('should correctly call subprocess and should resolve promise if it fails on startup', async function () {
       const conn = new events.EventEmitter();
@@ -80,7 +77,7 @@ describe('logcat commands', function () {
       setTimeout(function () {
         conn.emit('line-stderr', 'something');
       }, 0);
-      await expect(logcat.startCapture()).to.eventually.not.be.rejectedWith('Logcat');
+      await logcat.startCapture();
     });
   });
 
@@ -98,7 +95,7 @@ describe('logcat commands', function () {
         .withArgs(adb.path, [...adb.defaultArgs, 'logcat', '-c'])
         .onFirstCall()
         .throws('Failed to clear');
-      await expect(logcat.clear()).to.eventually.not.be.rejected;
+      await assert.doesNotReject(logcat.clear());
     });
   });
 });

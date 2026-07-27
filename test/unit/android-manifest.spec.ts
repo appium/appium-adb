@@ -1,14 +1,11 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
 import {fs} from '@appium/support';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
 import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest.js';
-
-use(chaiAsPromised);
 
 describe('android manifest', function () {
   let sandbox: sinon.SinonSandbox;
@@ -62,8 +59,8 @@ describe('android manifest', function () {
           ro.build.version.codename=REL
           ro.build.version.release=5.1`);
       const platformAndPath = await getAndroidPlatformAndPath(ANDROID_HOME);
-      expect(platformAndPath.platform).to.equal('android-25');
-      expect(platformAndPath.platformPath).to.equal(path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
+      assert.strictEqual(platformAndPath.platform, 'android-25');
+      assert.strictEqual(platformAndPath.platformPath, path.resolve(ANDROID_HOME, 'platforms', 'android-25'));
     });
   });
 });

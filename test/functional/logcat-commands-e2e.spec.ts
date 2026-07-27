@@ -1,13 +1,9 @@
+import assert from 'node:assert/strict';
 import {describe, it, before, afterEach, type TestContext} from 'node:test';
-
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {ADB} from '../../lib/adb.js';
 import {Logcat} from '../../lib/logcat.js';
 import {E2E_TIMEOUT} from './setup.js';
-
-use(chaiAsPromised);
 
 describe('logcat commands', {timeout: E2E_TIMEOUT}, function () {
   async function runClearDeviceLogTest(adb: ADB, logcat: Logcat, clear = true) {
@@ -16,9 +12,9 @@ describe('logcat commands', {timeout: E2E_TIMEOUT}, function () {
     await logcat.stopCapture();
     const newLogs = await adb.adbExec(['logcat', '-d']);
     if (clear) {
-      expect(newLogs).to.not.include(logs);
+      assert.ok(!newLogs.includes(logs));
     } else {
-      expect(newLogs).to.include(logs);
+      assert.ok(newLogs.includes(logs));
     }
   }
 
@@ -44,12 +40,12 @@ describe('logcat commands', {timeout: E2E_TIMEOUT}, function () {
     it('getLogs should return logs', async function () {
       await logcat.startCapture();
       const logs = logcat.getLogs();
-      expect(logs).to.have.length.above(0);
+      assert.ok(logs.length > 0);
     });
     it('getAllLogs should return all logs', async function () {
       await logcat.startCapture();
       const logs = logcat.getAllLogs();
-      expect(logs).to.have.length.above(0);
+      assert.ok(logs.length > 0);
     });
     it('should not affect device logs', async function (ctx: TestContext) {
       if (process.env.CI) {
