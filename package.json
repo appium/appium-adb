@@ -1,6 +1,6 @@
 {
   "name": "appium-adb",
-  "version": "16.0.1",
+  "version": "16.0.2",
   "description": "Android Debug Bridge interface",
   "homepage": "https://github.com/appium/appium-adb",
   "bugs": {

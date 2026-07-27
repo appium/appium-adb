@@ -1,3 +1,9 @@
+## [16.0.2](https://github.com/appium/appium-adb/compare/v16.0.1...v16.0.2) (2026-07-27)
+
+### Miscellaneous Chores
+
+* Drop chai ([#897](https://github.com/appium/appium-adb/issues/897)) ([942b22f](https://github.com/appium/appium-adb/commit/942b22f5fac05ff552ce9f661bddea3ed932b1f3))
+
 ## [16.0.1](https://github.com/appium/appium-adb/compare/v16.0.0...v16.0.1) (2026-07-27)
 
 ### Miscellaneous Chores
