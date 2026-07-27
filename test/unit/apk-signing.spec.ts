@@ -172,7 +172,7 @@ describe('signing', function () {
       });
       /* eslint-enable promise/prefer-await-to-callbacks */
       await adb.signWithCustomCert(apiDemosPath);
-      assert.deepStrictEqual(innerExecStub.callCount, 2);
+      assert.strictEqual(innerExecStub.callCount, 2);
     });
   });
 

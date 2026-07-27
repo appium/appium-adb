@@ -225,14 +225,14 @@ describe('Apk-utils', function () {
     it('should return null if mFocusedApp=null', async function () {
       mocks.adb.expects('dumpWindows').once().returns('mFocusedApp=null');
       const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-      void appPackage;
-      void appActivity;
+      assert.strictEqual(appPackage, null);
+      assert.strictEqual(appActivity, null);
     });
     it('should return null if mCurrentFocus=null', async function () {
       mocks.adb.expects('dumpWindows').once().returns('mCurrentFocus=null');
       const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-      void appPackage;
-      void appActivity;
+      assert.strictEqual(appPackage, null);
+      assert.strictEqual(appActivity, null);
     });
   });
   describe('waitForActivityOrNot', function () {
@@ -658,24 +658,27 @@ describe('Apk-utils', function () {
       const startAppOptionsWithoutPkg = {
         action: 'android.intent.action.VIEW',
       };
-      await assert.rejects(adb.startApp(startAppOptionsWithoutPkg as any), (err: Error) =>
-        err.message.includes('pkg, and activity or intent action, are required to start an application'),
+      await assert.rejects(
+        adb.startApp(startAppOptionsWithoutPkg as any),
+        /pkg, and activity or intent action, are required to start an application/,
       );
     });
     it('should throw error when activity provided, but pkg not provided', async function () {
       const startAppOptionsWithoutPkg = {
         activity: '.MainActivity',
       };
-      await assert.rejects(adb.startApp(startAppOptionsWithoutPkg as any), (err: Error) =>
-        err.message.includes('pkg, and activity or intent action, are required to start an application'),
+      await assert.rejects(
+        adb.startApp(startAppOptionsWithoutPkg as any),
+        /pkg, and activity or intent action, are required to start an application/,
       );
     });
     it('should throw error when neither action nor activity provided', async function () {
       const startAppOptionsWithoutActivityOrAction = {
         pkg: 'pkg',
       };
-      await assert.rejects(adb.startApp(startAppOptionsWithoutActivityOrAction), (err: Error) =>
-        err.message.includes('pkg, and activity or intent action, are required to start an application'),
+      await assert.rejects(
+        adb.startApp(startAppOptionsWithoutActivityOrAction),
+        /pkg, and activity or intent action, are required to start an application/,
       );
     });
     it('should call getApiLevel and shell with correct arguments when activity is inner class', async function () {

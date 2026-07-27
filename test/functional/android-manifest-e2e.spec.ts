@@ -89,8 +89,8 @@ describe('Android-manifest', function () {
   it('getAndroidPlatformAndPath should return platform and path for android', async function () {
     const sdkRoot = await requireSdkRoot();
     const {platform, platformPath} = await getAndroidPlatformAndPath(sdkRoot);
-    assert.ok(platform !== null && platform !== undefined);
-    assert.ok(platformPath !== null && platformPath !== undefined);
+    assert.ok(platform != null);
+    assert.ok(platformPath != null);
   });
 
   it('should read package manifest', async function () {

@@ -71,9 +71,7 @@ describe('system calls', function () {
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .onFirstCall()
         .returns({stdout: 'foobar'});
-      await assert.rejects(adb.getConnectedDevices(), (err: Error) =>
-        err.message.includes('Unexpected output while trying to get devices'),
-      );
+      await assert.rejects(adb.getConnectedDevices(), /Unexpected output while trying to get devices/);
     });
     it('should get all connected devices with verbose output', async function () {
       currentExec = sandbox
@@ -208,10 +206,10 @@ describe('system calls', function () {
       const devices = await adb.getDevicesWithRetry(2000);
       assert.ok(devices.length > 0);
       // '.withArgs(adb.executable.path, ['-P', '5037', 'devices'])' was called twice in total
-      assert.deepStrictEqual(innerStubOne.callCount, 2);
-      assert.deepStrictEqual(innerStubFour.callCount, 2);
-      assert.deepStrictEqual(innerStubTwo.callCount, 1);
-      assert.deepStrictEqual(innerStubThree.callCount, 1);
+      assert.strictEqual(innerStubOne.callCount, 2);
+      assert.strictEqual(innerStubFour.callCount, 2);
+      assert.strictEqual(innerStubTwo.callCount, 1);
+      assert.strictEqual(innerStubThree.callCount, 1);
     });
     it('should fail when exec throws an error', async function () {
       const innerStub = sandbox.stub().throws(new Error('Error foobar'));
@@ -285,7 +283,7 @@ describe('System calls 2', function () {
       .withExactArgs(['ls', '-la', remotePath])
       .returns(`-rw-rw---- 1 root sdcard_rw 39571 2017-06-23 07:33 ${remotePath}`);
     const size = await adb.fileSize(remotePath);
-    assert.deepStrictEqual(size, 39571);
+    assert.strictEqual(size, 39571);
   });
   it('fileSize should return the file size when digit is not after permissions', async function () {
     const remotePath = '/sdcard/test.mp4';
@@ -295,7 +293,7 @@ describe('System calls 2', function () {
       .withExactArgs(['ls', '-la', remotePath])
       .returns(`-rw-rw---- root sdcard_rw 39571 2017-06-23 07:33 ${remotePath}`);
     const size = await adb.fileSize(remotePath);
-    assert.deepStrictEqual(size, 39571);
+    assert.strictEqual(size, 39571);
   });
   describe('shell outputFormat option', function () {
     beforeEach(function () {
@@ -348,7 +346,7 @@ describe('System calls 2', function () {
     it('should throw original error if cause of error is something other than no root access', async function () {
       const originalError = 'some original error';
       mocks.adb.expects('shell').once().throws(new Error(originalError));
-      await assert.rejects(adb.reboot(), (err: Error) => err.message.includes(originalError));
+      await assert.rejects(adb.reboot(), new RegExp(originalError));
     });
   });
   describe('getRunningAVD', function () {

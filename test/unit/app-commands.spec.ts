@@ -267,11 +267,11 @@ package:com.android.chrome`;
 
     it('should use start', function () {
       const cmd = buildStartCmd(startOptions, 20);
-      assert.deepStrictEqual(cmd[1], 'start');
+      assert.strictEqual(cmd[1], 'start');
     });
     it('should use start-activity', function () {
       const cmd = buildStartCmd(startOptions, 26);
-      assert.deepStrictEqual(cmd[1], 'start-activity');
+      assert.strictEqual(cmd[1], 'start-activity');
     });
     it('should not repeat package name', function () {
       const cmd = buildStartCmd(
@@ -289,42 +289,42 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with single key', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key'}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 2], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 1], 'key');
+      assert.strictEqual(cmd[cmd.length - 2], '-d');
+      assert.strictEqual(cmd[cmd.length - 1], 'key');
     });
     it('should parse optionalIntentArguments with single key/value pair', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value'}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 3], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
-      assert.deepStrictEqual(cmd[cmd.length - 1], 'value');
+      assert.strictEqual(cmd[cmd.length - 3], '-d');
+      assert.strictEqual(cmd[cmd.length - 2], 'key');
+      assert.strictEqual(cmd[cmd.length - 1], 'value');
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value value2'}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 3], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
-      assert.deepStrictEqual(cmd[cmd.length - 1], 'value value2');
+      assert.strictEqual(cmd[cmd.length - 3], '-d');
+      assert.strictEqual(cmd[cmd.length - 2], 'key');
+      assert.strictEqual(cmd[cmd.length - 1], 'value value2');
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 -e key2'}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 4], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 3], 'key1');
-      assert.deepStrictEqual(cmd[cmd.length - 2], '-e');
-      assert.deepStrictEqual(cmd[cmd.length - 1], 'key2');
+      assert.strictEqual(cmd[cmd.length - 4], '-d');
+      assert.strictEqual(cmd[cmd.length - 3], 'key1');
+      assert.strictEqual(cmd[cmd.length - 2], '-e');
+      assert.strictEqual(cmd[cmd.length - 1], 'key2');
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 value1 -e key2 value2'}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 6], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 5], 'key1');
-      assert.deepStrictEqual(cmd[cmd.length - 4], 'value1');
-      assert.deepStrictEqual(cmd[cmd.length - 3], '-e');
-      assert.deepStrictEqual(cmd[cmd.length - 2], 'key2');
-      assert.deepStrictEqual(cmd[cmd.length - 1], 'value2');
+      assert.strictEqual(cmd[cmd.length - 6], '-d');
+      assert.strictEqual(cmd[cmd.length - 5], 'key1');
+      assert.strictEqual(cmd[cmd.length - 4], 'value1');
+      assert.strictEqual(cmd[cmd.length - 3], '-e');
+      assert.strictEqual(cmd[cmd.length - 2], 'key2');
+      assert.strictEqual(cmd[cmd.length - 1], 'value2');
     });
     it('should parse optionalIntentArguments with hyphens', function () {
       const arg = 'http://some-url-with-hyphens.com/';
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: `-d ${arg}`}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 2], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 1], arg);
+      assert.strictEqual(cmd[cmd.length - 2], '-d');
+      assert.strictEqual(cmd[cmd.length - 1], arg);
     });
     it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
       const arg1 = 'http://some-url-with-hyphens.com/';
@@ -336,19 +336,19 @@ package:com.android.chrome`;
         },
         20,
       );
-      assert.deepStrictEqual(cmd[cmd.length - 5], '-d');
-      assert.deepStrictEqual(cmd[cmd.length - 4], arg1);
-      assert.deepStrictEqual(cmd[cmd.length - 3], '-e');
-      assert.deepStrictEqual(cmd[cmd.length - 2], 'key');
-      assert.deepStrictEqual(cmd[cmd.length - 1], arg2);
+      assert.strictEqual(cmd[cmd.length - 5], '-d');
+      assert.strictEqual(cmd[cmd.length - 4], arg1);
+      assert.strictEqual(cmd[cmd.length - 3], '-e');
+      assert.strictEqual(cmd[cmd.length - 2], 'key');
+      assert.strictEqual(cmd[cmd.length - 1], arg2);
     });
     it('should have -S option when stopApp is set', function () {
       const cmd = buildStartCmd({...startOptions, stopApp: true}, 20);
-      assert.deepStrictEqual(cmd[cmd.length - 1], '-S');
+      assert.strictEqual(cmd[cmd.length - 1], '-S');
     });
     it('should not have -S option when stopApp is not set', function () {
       const cmd = buildStartCmd({...startOptions, stopApp: false}, 20);
-      assert.notDeepStrictEqual(cmd[cmd.length - 1], '-S');
+      assert.notStrictEqual(cmd[cmd.length - 1], '-S');
     });
   });
 
@@ -382,7 +382,7 @@ package:com.android.chrome`;
               (string16) "Horizontal"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, '(default)');
-      assert.deepStrictEqual(aaptStrings.linear_layout_8_horizontal, 'Horizontal');
+      assert.strictEqual(aaptStrings.linear_layout_8_horizontal, 'Horizontal');
     });
     it('should parse plurals received from aapt output', function () {
       const aaptOutput = `
@@ -451,7 +451,7 @@ package:com.android.chrome`;
                   (string8) "res/menu/toolbar_sketch.xml"
       `;
       const aaptStrings = parseAaptStrings(aaptOutput, 'de-rDE');
-      assert.deepStrictEqual(aaptStrings.abc_action_bar_home_description, 'Navigate "home"');
+      assert.strictEqual(aaptStrings.abc_action_bar_home_description, 'Navigate "home"');
       assert.deepStrictEqual(aaptStrings.calling__conversation_full__message, [
         'Calls work in conversations with up to 1 person.',
         'Calls work in conversations with up to %1$d people. "blabla"',
@@ -476,7 +476,7 @@ package:com.android.chrome`;
             (fr) "Top"
       `;
       const aapt2Strings = parseAapt2Strings(aapt2Output, '');
-      assert.deepStrictEqual(aapt2Strings.linear_layout_8_horizontal, 'Horizontal');
+      assert.strictEqual(aapt2Strings.linear_layout_8_horizontal, 'Horizontal');
     });
     it('should parse plurals received from aapt2 output', function () {
       const aapt2Output = `
@@ -566,19 +566,19 @@ package:com.android.chrome`;
         `;
     it('test install permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], true);
-      assert.deepStrictEqual(per.length, 4);
+      assert.strictEqual(per.length, 4);
     });
     it('test install permission with granted false', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['install'], false);
-      assert.deepStrictEqual(per.length, 0);
+      assert.strictEqual(per.length, 0);
     });
     it('test requested permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['requested'], true);
-      assert.deepStrictEqual(per.length, 0);
+      assert.strictEqual(per.length, 0);
     });
     it('test runtime permission', function () {
       const per = extractMatchingPermissions(dumpsysOutput, ['runtime'], true);
-      assert.deepStrictEqual(per.length, 1);
+      assert.strictEqual(per.length, 1);
     });
   });
 
@@ -650,6 +650,9 @@ package:com.android.chrome`;
     it('test valid activity name', function () {
       const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
       const names = matchComponentName(activity);
+      // matchComponentName returns a RegExpExecArray, which carries extra own
+      // properties (index, input, groups) that a plain array literal doesn't have;
+      // spreading it into a plain array keeps the comparison to just the matched values.
       assert.deepStrictEqual(names && [...names], [activity]);
     });
     it('test invalid activity name', function () {

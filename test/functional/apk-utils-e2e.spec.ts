@@ -146,7 +146,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           activity: 'ApiDemo',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-        (err: Error) => err.message.includes('Activity'),
+        /Activity/,
       );
     });
     it('should throw error for wrong wait activity', async function () {
@@ -160,7 +160,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitActivity: 'foo',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-        (err: Error) => err.message.includes('foo'),
+        /foo/,
       );
     });
     it('should start activity with wait activity', async function () {
@@ -210,7 +210,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-        (err: Error) => err.message.includes('Activity'),
+        /Activity/,
       );
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
@@ -224,7 +224,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitActivity: '*.SuperManager',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-        (err: Error) => err.message.includes('SuperManager'),
+        /SuperManager/,
       );
     });
     it('should start activity with comma separated wait packages list', async function () {
@@ -252,7 +252,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-        (err: Error) => err.message.includes('Activity'),
+        /Activity/,
       );
     });
   });
@@ -290,7 +290,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
   it('extractStringsFromApk should get strings for default language', async function () {
     const {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, null, '/tmp');
     // ApiDemos doesn't have a 'save' string, so we check for a common string instead
-    assert.ok(apkStrings !== null && apkStrings !== undefined);
+    assert.ok(apkStrings);
     assert.ok(Object.keys(apkStrings).length > 0);
   });
   it('extractStringsFromApk should get strings for non-default language', async function () {
@@ -318,12 +318,12 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
         // Add a small delay to allow the home screen to fully appear
         await new Promise((resolve) => setTimeout(resolve, 300));
         const {appPackage} = await adb.getFocusedPackageAndActivity();
-        assert.notDeepStrictEqual(appPackage, APIDEMOS_PKG);
+        assert.notStrictEqual(appPackage, APIDEMOS_PKG);
       });
       await retryInterval(10, 500, async () => {
         await adb.activateApp(APIDEMOS_PKG);
         const {appPackage} = await adb.getFocusedPackageAndActivity();
-        assert.deepStrictEqual(appPackage, APIDEMOS_PKG);
+        assert.strictEqual(appPackage, APIDEMOS_PKG);
       });
     });
   });

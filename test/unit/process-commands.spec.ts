@@ -76,7 +76,7 @@ describe('process commands', function () {
         root      1680  2     0      0     c00d0d8c 00000000 S flush-31:2
         root      1681  60    10672  996   00000000 b6f33508 R ps
         `);
-      assert.deepStrictEqual(await adb.getProcessNameById('1627'), 'com.android.browser');
+      assert.strictEqual(await adb.getProcessNameById('1627'), 'com.android.browser');
     });
     it('should fail if no PID could be found in the name', async function () {
       await assert.rejects(adb.getProcessNameById('bla'), /valid number/);
@@ -196,7 +196,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
         .once()
         .withExactArgs(['kill', '-SIGTERM', `${pid}`])
         .throws(error);
-      await assert.rejects(adb.killProcessByPID(pid), (err) => (err as Error).message.includes('kill failed'));
+      await assert.rejects(adb.killProcessByPID(pid), /kill failed/);
     });
   });
 });

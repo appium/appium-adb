@@ -78,7 +78,7 @@ describe('emulator commands', function () {
     });
     describe('power methods', function () {
       it('should throw exception on invalid power ac state', async function () {
-        await assert.rejects(adb.powerAC('dead' as any), (err: Error) => err.message.includes('Wrong power AC state'));
+        await assert.rejects(adb.powerAC('dead' as any), /Wrong power AC state/);
       });
       it('should set the power ac off', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -101,15 +101,9 @@ describe('emulator commands', function () {
         await adb.powerAC('on');
       });
       it('should throw exception on invalid power battery percent', async function () {
-        await assert.rejects(adb.powerCapacity(-1), (err: Error) =>
-          err.message.includes('should be valid integer between 0 and 100'),
-        );
-        await assert.rejects(adb.powerCapacity('a' as any), (err: Error) =>
-          err.message.includes('should be valid integer between 0 and 100'),
-        );
-        await assert.rejects(adb.powerCapacity(500), (err: Error) =>
-          err.message.includes('should be valid integer between 0 and 100'),
-        );
+        await assert.rejects(adb.powerCapacity(-1), /should be valid integer between 0 and 100/);
+        await assert.rejects(adb.powerCapacity('a' as any), /should be valid integer between 0 and 100/);
+        await assert.rejects(adb.powerCapacity(500), /should be valid integer between 0 and 100/);
       });
       it('should set the power capacity', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -145,7 +139,7 @@ describe('emulator commands', function () {
     });
     describe('gsm signal method', function () {
       it('should throw exception on invalid strength', async function () {
-        await assert.rejects(adb.gsmSignal(5 as any), (err: Error) => err.message.includes('Invalid signal strength'));
+        await assert.rejects(adb.gsmSignal(5 as any), /Invalid signal strength/);
       });
       it('should call adbExecEmu with the correct args', async function () {
         const signalStrength = 0;
@@ -213,9 +207,7 @@ describe('emulator commands', function () {
     });
     describe('network speed method', function () {
       it('should throw exception on invalid speed', async function () {
-        await assert.rejects(adb.networkSpeed('light' as any), (err: Error) =>
-          err.message.includes('Invalid network speed'),
-        );
+        await assert.rejects(adb.networkSpeed('light' as any), /Invalid network speed/);
       });
       for (const [key, value] of Object.entries(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async function () {
@@ -228,9 +220,7 @@ describe('emulator commands', function () {
     });
     describe('gsm voice method', function () {
       it('should throw exception on invalid strength', async function () {
-        await assert.rejects(adb.gsmVoice('weird' as any), (err: Error) =>
-          err.message.includes('Invalid gsm voice state'),
-        );
+        await assert.rejects(adb.gsmVoice('weird' as any), /Invalid gsm voice state/);
       });
       it('should set gsm voice to unregistered', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);

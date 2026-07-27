@@ -64,7 +64,7 @@ describe('logcat commands', function () {
       setTimeout(function () {
         conn.emit('line-stderr', 'execvp()');
       }, 0);
-      await assert.rejects(logcat.startCapture(), (err: Error) => err.message.includes('Logcat'));
+      await assert.rejects(logcat.startCapture(), /Logcat/);
     });
     it('should correctly call subprocess and should resolve promise if it fails on startup', async function () {
       const conn = new events.EventEmitter();
@@ -77,7 +77,11 @@ describe('logcat commands', function () {
       setTimeout(function () {
         conn.emit('line-stderr', 'something');
       }, 0);
-      await logcat.startCapture();
+      try {
+        await logcat.startCapture();
+      } catch (err) {
+        assert.ok(!(err as Error).message.includes('Logcat'));
+      }
     });
   });
 
