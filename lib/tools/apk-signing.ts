@@ -1,12 +1,14 @@
 import _fs from 'node:fs';
-import {exec, type ExecError} from 'teen_process';
 import path from 'node:path';
-import {log} from '../logger.js';
+
 import {tempDir, system, mkdirp, fs, util, zip} from '@appium/support';
 import {LRUCache} from 'lru-cache';
+import {exec, type ExecError} from 'teen_process';
+
 import type {ADB} from '../adb.js';
-import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types.js';
+import {log} from '../logger.js';
 import {APKS_EXTENSION, getJavaForOs, getJavaHome, getResourcePath} from '../utils/index.js';
+import type {StringRecord, SignedAppCacheValue, CertCheckOptions, KeystoreHash} from './types.js';
 
 const DEFAULT_PRIVATE_KEY = path.join('keys', 'testkey.pk8');
 const DEFAULT_CERTIFICATE = path.join('keys', 'testkey.x509.pem');
@@ -134,11 +136,7 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
       } else {
         log.debug(`'${apk}' does not need to be unsigned`);
       }
-      const jarsigner = path.resolve(
-        await getJavaHome(),
-        'bin',
-        `jarsigner${system.isWindows() ? '.exe' : ''}`,
-      );
+      const jarsigner = path.resolve(await getJavaHome(), 'bin', `jarsigner${system.isWindows() ? '.exe' : ''}`);
       const fullCmd: string[] = [
         jarsigner,
         '-sigalg',
@@ -158,11 +156,9 @@ export async function signWithCustomCert(this: ADB, apk: string): Promise<void> 
       await exec(fullCmd[0], fullCmd.slice(1));
     } catch (e) {
       const execErr = e as ExecError;
-      throw new Error(
-        `Could not sign with custom certificate. ` +
-          `Original error: ${execErr.stderr || execErr.message}`,
-        {cause: e},
-      );
+      throw new Error(`Could not sign with custom certificate. Original error: ${execErr.stderr || execErr.message}`, {
+        cause: e,
+      });
     }
   }
 }
@@ -239,10 +235,7 @@ export async function zipAlignApk(this: ADB, apk: string): Promise<boolean> {
     if (await fs.exists(alignedApk)) {
       await fs.unlink(alignedApk);
     }
-    throw new Error(
-      `zipAlignApk failed. Original error: ${err.message || (err as ExecError).stderr}`,
-      {cause: e},
-    );
+    throw new Error(`zipAlignApk failed. Original error: ${err.message || (err as ExecError).stderr}`, {cause: e});
   }
 }
 
@@ -253,11 +246,7 @@ export async function zipAlignApk(this: ADB, apk: string): Promise<boolean> {
  * @param opts - Certificate checking options
  * @returns True if given application is already signed.
  */
-export async function checkApkCert(
-  this: ADB,
-  appPath: string,
-  opts: CertCheckOptions = {},
-): Promise<boolean> {
+export async function checkApkCert(this: ADB, appPath: string, opts: CertCheckOptions = {}): Promise<boolean> {
   log.debug(`Checking app cert for ${appPath}`);
   if (!(await fs.exists(appPath))) {
     log.debug(`'${appPath}' does not exist`);
@@ -299,15 +288,9 @@ export async function checkApkCert(
     const output = await this.executeApksigner(['verify', '--print-certs', actualAppPath]);
     const hasMatch = hashMatches(output, expected);
     if (hasMatch) {
-      log.info(
-        `'${actualAppPath}' is signed with the ` +
-          `${this.useKeystore ? 'keystore' : 'default'} certificate`,
-      );
+      log.info(`'${actualAppPath}' is signed with the ${this.useKeystore ? 'keystore' : 'default'} certificate`);
     } else {
-      log.info(
-        `'${actualAppPath}' is signed with a ` +
-          `non-${this.useKeystore ? 'keystore' : 'default'} certificate`,
-      );
+      log.info(`'${actualAppPath}' is signed with a non-${this.useKeystore ? 'keystore' : 'default'} certificate`);
     }
     const isSigned = (!this.useKeystore && !requireDefaultCert) || hasMatch;
     if (isSigned) {
@@ -339,10 +322,7 @@ export async function checkApkCert(
       log.warn(`Assuming '${actualAppPath}' is already signed and continuing anyway`);
       return true;
     }
-    throw new Error(
-      `Cannot verify the signature of '${actualAppPath}'. ` + `Original error: ${errMsg}`,
-      {cause: err},
-    );
+    throw new Error(`Cannot verify the signature of '${actualAppPath}'. Original error: ${errMsg}`, {cause: err});
   }
 }
 
@@ -354,11 +334,7 @@ export async function checkApkCert(
  */
 export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
   log.debug(`Getting hash of the '${this.keystorePath}' keystore`);
-  const keytool = path.resolve(
-    await getJavaHome(),
-    'bin',
-    `keytool${system.isWindows() ? '.exe' : ''}`,
-  );
+  const keytool = path.resolve(await getJavaHome(), 'bin', `keytool${system.isWindows() ? '.exe' : ''}`);
   if (!(await fs.exists(keytool))) {
     throw new Error(`The keytool utility cannot be found at '${keytool}'`);
   }
@@ -394,8 +370,7 @@ export async function getKeystoreHash(this: ADB): Promise<KeystoreHash> {
   } catch (e) {
     const err = e as ExecError;
     throw new Error(
-      `Cannot get the hash of '${this.keystorePath}' keystore. ` +
-        `Original error: ${err.stderr || err.message}`,
+      `Cannot get the hash of '${this.keystorePath}' keystore. Original error: ${err.stderr || err.message}`,
       {cause: e},
     );
   }

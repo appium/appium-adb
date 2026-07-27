@@ -1,12 +1,14 @@
 import path from 'node:path';
-import esmock from 'esmock';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
-import sinon from 'sinon';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import esmock from 'esmock';
+import sinon from 'sinon';
+
 import {FIXTURES_ROOT, MODULE_ROOT} from '../constants.js';
 
 use(chaiAsPromised);
@@ -82,11 +84,7 @@ describe('signing', function () {
       getResourcePathStub.withArgs(path.join('keys', 'testkey.pk8')).returns(defaultKeyPath);
       getResourcePathStub.withArgs(path.join('keys', 'testkey.x509.pem')).returns(defaultCertPath);
       currentGetResourcePath = getResourcePathStub;
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .once()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()
@@ -102,11 +100,7 @@ describe('signing', function () {
       getResourcePathStub.withArgs(path.join('keys', 'testkey.pk8')).returns(defaultKeyPath);
       getResourcePathStub.withArgs(path.join('keys', 'testkey.x509.pem')).returns(defaultCertPath);
       currentGetResourcePath = getResourcePathStub;
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .once()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()
@@ -129,11 +123,7 @@ describe('signing', function () {
 
       mocks.fs.expects('exists').once().withExactArgs(keystorePath).returns(true);
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .once()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()
@@ -152,11 +142,7 @@ describe('signing', function () {
 
       mocks.fs.expects('exists').once().withExactArgs(keystorePath).returns(true);
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .once()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.adb.expects('getBinaryFromSdkRoot').once().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentGetJavaHome = sandbox.stub().returns(javaHome);
       innerExecStub = sandbox.stub();
@@ -198,27 +184,15 @@ describe('signing', function () {
   describe.skip('zipAlignApk', function () {
     it('should call exec with correct args', async function () {
       const alignedApk = 'dummy_path';
-      mocks.tempDir
-        .expects('path')
-        .once()
-        .withExactArgs({prefix: 'appium', suffix: '.tmp'})
-        .returns(alignedApk);
+      mocks.tempDir.expects('path').once().withExactArgs({prefix: 'appium', suffix: '.tmp'}).returns(alignedApk);
       mocks.adb.expects('initZipAlign').once().withExactArgs().returns('');
-      mocks.appiumSupport
-        .expects('mkdirp')
-        .once()
-        .withExactArgs(path.dirname(alignedApk))
-        .returns({});
+      mocks.appiumSupport.expects('mkdirp').once().withExactArgs(path.dirname(alignedApk)).returns({});
       currentExec = sandbox
         .stub()
         .withArgs(adb.binaries!.zipalign, ['-f', '4', apiDemosPath, alignedApk])
         .onFirstCall()
         .returns({});
-      mocks.fs
-        .expects('mv')
-        .once()
-        .withExactArgs(alignedApk, apiDemosPath, {mkdirp: true})
-        .returns('');
+      mocks.fs.expects('mv').once().withExactArgs(alignedApk, apiDemosPath, {mkdirp: true}).returns('');
       await adb.zipAlignApk(apiDemosPath);
     });
   });
@@ -233,16 +207,8 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs
-        .expects('hash')
-        .once()
-        .withExactArgs(apiDemosPath)
-        .returns(Math.random().toString(36));
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .twice()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
+      mocks.adb.expects('getBinaryFromSdkRoot').twice().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()
@@ -263,16 +229,8 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs
-        .expects('hash')
-        .once()
-        .withExactArgs(apiDemosPath)
-        .returns(Math.random().toString(36));
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .twice()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
+      mocks.adb.expects('getBinaryFromSdkRoot').twice().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()
@@ -296,11 +254,7 @@ describe('signing', function () {
       adb.useKeystore = false;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs
-        .expects('hash')
-        .once()
-        .withExactArgs(apiDemosPath)
-        .returns(Math.random().toString(36));
+      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
       mocks.adb
         .expects('getBinaryFromSdkRoot')
         .once()
@@ -313,21 +267,13 @@ describe('signing', function () {
       adb.useKeystore = true;
 
       mocks.fs.expects('exists').once().withExactArgs(apiDemosPath).returns(true);
-      mocks.fs
-        .expects('hash')
-        .once()
-        .withExactArgs(apiDemosPath)
-        .returns(Math.random().toString(36));
+      mocks.fs.expects('hash').once().withExactArgs(apiDemosPath).returns(Math.random().toString(36));
       mocks.adb.expects('getKeystoreHash').once().returns({
         md5: 'e89b158e4bcf988ebd09eb83f53ccccc',
         sha1: '61ed377e85d386a8dfee6b864bdcccccfaa5af81',
         sha256: 'a40da80a59d170caa950cf15cccccc4d47a39b26989d8b640ecd745ba71bf5dc',
       });
-      mocks.adb
-        .expects('getBinaryFromSdkRoot')
-        .twice()
-        .withExactArgs('apksigner.jar')
-        .returns(apksignerDummyPath);
+      mocks.adb.expects('getBinaryFromSdkRoot').twice().withExactArgs('apksigner.jar').returns(apksignerDummyPath);
       currentGetJavaForOs = sandbox.stub().returns(javaDummyPath);
       currentExec = sandbox
         .stub()

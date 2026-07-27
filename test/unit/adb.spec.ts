@@ -1,7 +1,9 @@
-import {ADB, DEFAULT_ADB_PORT} from '../../lib/adb.js';
+import {describe, it} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it} from 'node:test';
+
+import {ADB, DEFAULT_ADB_PORT} from '../../lib/adb.js';
 
 use(chaiAsPromised);
 
@@ -26,13 +28,7 @@ describe('ADB', function () {
       });
 
       expect(clone.executable.path).to.equal(original.executable.path);
-      expect(clone.executable.defaultArgs).to.deep.equal([
-        '-a',
-        '-H',
-        'example.com',
-        '-P',
-        String(DEFAULT_ADB_PORT),
-      ]);
+      expect(clone.executable.defaultArgs).to.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
       expect(clone.remoteAdbHost).to.equal('example.com');
       expect(clone.adbHost).to.not.equal(original.adbHost);
     });

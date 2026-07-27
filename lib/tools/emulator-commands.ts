@@ -1,9 +1,11 @@
-import {log} from '../logger.js';
 import net from 'node:net';
-import {util, fs} from '@appium/support';
 import path from 'node:path';
+
+import {util, fs} from '@appium/support';
 import * as ini from 'ini';
+
 import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 import type {
   EmuInfo,
   EmuVersionInfo,
@@ -72,8 +74,7 @@ export async function rotate(this: ADB): Promise<void> {
 export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<void> {
   if (!(Object.values(this.POWER_AC_STATES) as string[]).includes(state)) {
     throw new TypeError(
-      `Wrong power AC state sent '${state}'. ` +
-        `Supported values: ${Object.values(this.POWER_AC_STATES)}]`,
+      `Wrong power AC state sent '${state}'. Supported values: ${Object.values(this.POWER_AC_STATES)}]`,
     );
   }
   await this.adbExecEmu(['power', 'ac', state]);
@@ -88,9 +89,7 @@ export async function powerAC(this: ADB, state: PowerAcStates = 'on'): Promise<v
  */
 export async function sensorSet(this: ADB, sensor: string, value: Sensors): Promise<void> {
   if (!(Object.values(this.SENSORS) as string[]).includes(sensor)) {
-    throw new TypeError(
-      `Unsupported sensor sent '${sensor}'. ` + `Supported values: ${Object.values(this.SENSORS)}]`,
-    );
+    throw new TypeError(`Unsupported sensor sent '${sensor}'. Supported values: ${Object.values(this.SENSORS)}]`);
   }
   if (value == null) {
     throw new TypeError(
@@ -130,11 +129,7 @@ export async function powerOFF(this: ADB): Promise<void> {
  * @param message - The message content.
  * @throws If phone number has invalid format.
  */
-export async function sendSMS(
-  this: ADB,
-  phoneNumber: string | number,
-  message = '',
-): Promise<void> {
+export async function sendSMS(this: ADB, phoneNumber: string | number, message = ''): Promise<void> {
   if (!message) {
     throw new TypeError('SMS message must not be empty');
   }
@@ -152,11 +147,7 @@ export async function sendSMS(
  * @throws If phone number has invalid format.
  * @throws If _action_ value is invalid.
  */
-export async function gsmCall(
-  this: ADB,
-  phoneNumber: string | number,
-  action: GsmCallActions,
-): Promise<void> {
+export async function gsmCall(this: ADB, phoneNumber: string | number, action: GsmCallActions): Promise<void> {
   if (!Object.values(this.GSM_CALL_ACTIONS).includes(action)) {
     throw new TypeError(
       `Invalid gsm action param ${action}. Supported values: ${Object.values(this.GSM_CALL_ACTIONS)}`,
@@ -211,9 +202,7 @@ export async function gsmVoice(this: ADB, state: GsmVoiceStates = 'on'): Promise
 export async function networkSpeed(this: ADB, speed: NetworkSpeed = 'full'): Promise<void> {
   // network speed <speed> allows you to set the network speed emulation.
   if (!Object.values(this.NETWORK_SPEED).includes(speed)) {
-    throw new Error(
-      `Invalid network speed param ${speed}. Supported values: ${Object.values(this.NETWORK_SPEED)}`,
-    );
+    throw new Error(`Invalid network speed param ${speed}. Supported values: ${Object.values(this.NETWORK_SPEED)}`);
   }
   await this.adbExecEmu(['network', 'speed', speed]);
 }
@@ -259,12 +248,7 @@ export async function execEmuConsoleCommand(
 
   return await new Promise<string>((resolve, reject) => {
     const connTimeoutObj = setTimeout(
-      () =>
-        reject(
-          new Error(
-            `Cannot connect to the Emulator console at ${host}:${port} ` + `after ${connTimeout}ms`,
-          ),
-        ),
+      () => reject(new Error(`Cannot connect to the Emulator console at ${host}:${port} after ${connTimeout}ms`)),
       connTimeout,
     );
     let execTimeoutObj: NodeJS.Timeout;
@@ -274,12 +258,7 @@ export async function execEmuConsoleCommand(
 
     client.once('error', (e) => {
       clearTimeout(connTimeoutObj);
-      reject(
-        new Error(
-          `Cannot connect to the Emulator console at ${host}:${port}. ` +
-            `Original error: ${e.message}`,
-        ),
-      );
+      reject(new Error(`Cannot connect to the Emulator console at ${host}:${port}. Original error: ${e.message}`));
     });
 
     client.once('connect', () => {
@@ -440,9 +419,7 @@ async function listEmulators(): Promise<EmuInfo[]> {
   }
 
   if (avdsRoot) {
-    log.warn(
-      `The value of the ANDROID_AVD_HOME environment variable '${avdsRoot}' is not an existing directory`,
-    );
+    log.warn(`The value of the ANDROID_AVD_HOME environment variable '${avdsRoot}' is not an existing directory`);
   }
 
   const prefsRoot = await getAndroidPrefsRoot();
@@ -490,9 +467,7 @@ async function getAndroidPrefsRoot(): Promise<string | null> {
   }
 
   if (location) {
-    log.warn(
-      `The value of the ANDROID_EMULATOR_HOME environment variable '${location}' is not an existing directory`,
-    );
+    log.warn(`The value of the ANDROID_EMULATOR_HOME environment variable '${location}' is not an existing directory`);
   }
 
   const home = process.env.HOME || process.env.USERPROFILE;

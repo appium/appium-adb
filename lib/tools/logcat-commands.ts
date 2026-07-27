@@ -1,5 +1,5 @@
-import {Logcat} from '../logcat.js';
 import type {ADB} from '../adb.js';
+import {Logcat} from '../logcat.js';
 import type {LogcatOpts, LogEntry, LogcatListener} from './types.js';
 
 /**

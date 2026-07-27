@@ -1,11 +1,13 @@
-import {exec, type ExecError} from 'teen_process';
-import {log} from '../logger.js';
-import path from 'node:path';
-import {fs, util, mkdirp, timing} from '@appium/support';
-import * as semver from 'semver';
 import os from 'node:os';
+import path from 'node:path';
+
+import {fs, util, mkdirp, timing} from '@appium/support';
 import {LRUCache} from 'lru-cache';
+import * as semver from 'semver';
+import {exec, type ExecError} from 'teen_process';
+
 import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 import {
   APKS_EXTENSION,
   APK_INSTALL_TIMEOUT,
@@ -38,11 +40,7 @@ export const REMOTE_CACHE_ROOT = '/data/local/tmp/appium_cache';
  * @returns True if the package was found on the device and
  *                   successfully uninstalled.
  */
-export async function uninstallApk(
-  this: ADB,
-  pkg: string,
-  options: UninstallOptions = {},
-): Promise<boolean> {
+export async function uninstallApk(this: ADB, pkg: string, options: UninstallOptions = {}): Promise<boolean> {
   log.debug(`Uninstalling ${pkg}`);
   if (!options.skipInstallCheck && !(await this.isAppInstalled(pkg))) {
     log.info(`${pkg} was not uninstalled, because it was not present on the device`);
@@ -98,11 +96,7 @@ export async function installFromDevicePath(
  * @returns Full path to the cached apk on the remote file system
  * @throws if there was a failure while caching the app
  */
-export async function cacheApk(
-  this: ADB,
-  apkPath: string,
-  options: CachingOptions = {},
-): Promise<string> {
+export async function cacheApk(this: ADB, apkPath: string, options: CachingOptions = {}): Promise<string> {
   const appHash = await fs.hash(apkPath);
   const remotePath = path.posix.join(REMOTE_CACHE_ROOT, `${appHash}.apk`);
   const remoteCachedFiles: string[] = [];
@@ -110,21 +104,12 @@ export async function cacheApk(
   try {
     const errorMarker = '_ERROR_';
     let lsOutput: string | null = null;
-    if (
-      this._areExtendedLsOptionsSupported === true ||
-      typeof this._areExtendedLsOptionsSupported !== 'boolean'
-    ) {
+    if (this._areExtendedLsOptionsSupported === true || typeof this._areExtendedLsOptionsSupported !== 'boolean') {
       lsOutput = await this.shell([`ls -t -1 ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
     }
-    if (
-      typeof lsOutput !== 'string' ||
-      (lsOutput.includes(errorMarker) && !lsOutput.includes(REMOTE_CACHE_ROOT))
-    ) {
+    if (typeof lsOutput !== 'string' || (lsOutput.includes(errorMarker) && !lsOutput.includes(REMOTE_CACHE_ROOT))) {
       if (typeof this._areExtendedLsOptionsSupported !== 'boolean') {
-        log.debug(
-          'The current Android API does not support extended ls options. ' +
-            'Defaulting to no-options call',
-        );
+        log.debug('The current Android API does not support extended ls options. Defaulting to no-options call');
       }
       lsOutput = await this.shell([`ls ${REMOTE_CACHE_ROOT} 2>&1 || echo ${errorMarker}`]);
       this._areExtendedLsOptionsSupported = false;
@@ -206,11 +191,7 @@ export async function cacheApk(
  * @param options - The set of installation options.
  * @throws If an unexpected error happens during install.
  */
-export async function install(
-  this: ADB,
-  appPath: string,
-  options: InstallOptions = {},
-): Promise<void> {
+export async function install(this: ADB, appPath: string, options: InstallOptions = {}): Promise<void> {
   if (appPath.endsWith(APKS_EXTENSION)) {
     return await this.installApks(appPath, options);
   }
@@ -218,8 +199,7 @@ export async function install(
   options = cloneDeep(options);
   defaults(options, {
     replace: true,
-    timeout:
-      this.adbExecTimeout === DEFAULT_ADB_EXEC_TIMEOUT ? APK_INSTALL_TIMEOUT : this.adbExecTimeout,
+    timeout: this.adbExecTimeout === DEFAULT_ADB_EXEC_TIMEOUT ? APK_INSTALL_TIMEOUT : this.adbExecTimeout,
     timeoutCapName: 'androidInstallTimeout',
   });
 
@@ -237,9 +217,7 @@ export async function install(
   try {
     const timer = new timing.Timer().start();
     const output = await this.adbExec(installCmd, installOpts);
-    log.info(
-      `The installation of '${path.basename(appPath)}' took ${timer.getDuration().asMilliSeconds.toFixed(0)}ms`,
-    );
+    log.info(`The installation of '${path.basename(appPath)}' took ${timer.getDuration().asMilliSeconds.toFixed(0)}ms`);
     log.debug(`Install command stdout: ${util.truncateString(output, {length: 300})}`);
     if (/\[INSTALL[A-Z_]+FAILED[A-Z_]+\]/.test(output)) {
       if (this.isTestPackageOnlyError(output)) {
@@ -283,11 +261,7 @@ export async function getApplicationInstallState(
     return this.APP_INSTALL_STATE.UNKNOWN;
   }
 
-  const {
-    versionCode: pkgVersionCode,
-    versionName: pkgVersionNameStr,
-    isInstalled,
-  } = await this.getPackageInfo(pkg);
+  const {versionCode: pkgVersionCode, versionName: pkgVersionNameStr, isInstalled} = await this.getPackageInfo(pkg);
   if (!isInstalled) {
     log.debug(`App '${appPath}' is not installed`);
     return this.APP_INSTALL_STATE.NOT_INSTALLED;
@@ -375,10 +349,7 @@ export async function installOrUpgrade(
     if ('name' in apkInfo) {
       pkg = apkInfo.name;
     } else {
-      log.warn(
-        `Cannot determine the package name of '${appPath}'. ` +
-          `Continuing with the install anyway`,
-      );
+      log.warn(`Cannot determine the package name of '${appPath}'. Continuing with the install anyway`);
     }
   }
 
@@ -431,9 +402,7 @@ export async function installOrUpgrade(
     await this.install(appPath, {...options, replace: true});
   } catch (err) {
     const error = err as Error;
-    log.warn(
-      `Cannot install/upgrade '${pkg}' because of '${error.message}'. Trying full reinstall`,
-    );
+    log.warn(`Cannot install/upgrade '${pkg}' because of '${error.message}'. Trying full reinstall`);
     await uninstallPackage();
     await this.install(appPath, {...options, replace: false});
   }
@@ -472,11 +441,7 @@ export async function extractStringsFromApk(
 
     configMarker = await formatConfigMarker(
       async () => {
-        const {stdout} = await exec((this.binaries as StringRecord).aapt as string, [
-          'd',
-          'configurations',
-          appPath,
-        ]);
+        const {stdout} = await exec((this.binaries as StringRecord).aapt as string, ['d', 'configurations', appPath]);
         return util.uniq(stdout.split(os.EOL));
       },
       language,
@@ -492,20 +457,13 @@ export async function extractStringsFromApk(
     apkStrings = parseAaptStrings(stdout, configMarker);
   } catch (e) {
     const err = e as ExecError;
-    log.debug(
-      'Cannot extract resources using aapt. Trying aapt2. ' +
-        `Original error: ${err.stderr || err.message}`,
-    );
+    log.debug(`Cannot extract resources using aapt. Trying aapt2. Original error: ${err.stderr || err.message}`);
 
     await this.initAapt2();
 
     configMarker = await formatConfigMarker(
       async () => {
-        const {stdout} = await exec((this.binaries as StringRecord).aapt2 as string, [
-          'd',
-          'configurations',
-          appPath,
-        ]);
+        const {stdout} = await exec((this.binaries as StringRecord).aapt2 as string, ['d', 'configurations', appPath]);
         return util.uniq(stdout.split(os.EOL));
       },
       language,
@@ -513,18 +471,13 @@ export async function extractStringsFromApk(
     );
 
     try {
-      const {stdout} = await exec((this.binaries as StringRecord).aapt2 as string, [
-        'd',
-        'resources',
-        appPath,
-      ]);
+      const {stdout} = await exec((this.binaries as StringRecord).aapt2 as string, ['d', 'resources', appPath]);
       apkStrings = parseAapt2Strings(stdout, configMarker);
     } catch (e) {
       const error = e as Error;
-      throw new Error(
-        `Cannot extract resources from '${originalAppPath}'. ` + `Original error: ${error.message}`,
-        {cause: e},
-      );
+      throw new Error(`Cannot extract resources from '${originalAppPath}'. Original error: ${error.message}`, {
+        cause: e,
+      });
     }
   }
 
@@ -673,9 +626,7 @@ export function parseAapt2Strings(rawOutput: string, configMarker: string): Stri
           lineIndex = idx;
           if (typeof content === 'string') {
             apkStrings[currentResourceId] = [
-              ...(Array.isArray(apkStrings[currentResourceId])
-                ? apkStrings[currentResourceId]
-                : []),
+              ...(Array.isArray(apkStrings[currentResourceId]) ? apkStrings[currentResourceId] : []),
               content,
             ];
           }
@@ -796,14 +747,8 @@ async function formatConfigMarker(
   const configs = await configsGetter();
   log.debug(`Resource configurations: ${JSON.stringify(configs)}`);
   // Assume the 'en' configuration is the default one
-  if (
-    configMarker.toLowerCase().startsWith('en') &&
-    !configs.some((x) => x.trim() === configMarker)
-  ) {
-    log.debug(
-      `Resource configuration name '${configMarker}' is unknown. ` +
-        `Replacing it with '${defaultMarker}'`,
-    );
+  if (configMarker.toLowerCase().startsWith('en') && !configs.some((x) => x.trim() === configMarker)) {
+    log.debug(`Resource configuration name '${configMarker}' is unknown. Replacing it with '${defaultMarker}'`);
     configMarker = defaultMarker;
   } else {
     log.debug(`Selected configuration: '${configMarker}'`);

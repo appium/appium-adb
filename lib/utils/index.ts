@@ -1,6 +1,7 @@
+import {util} from '@appium/support';
+
 import * as helpers from './helpers/index.js';
 import * as lodash from './lodash/index.js';
-import {util} from '@appium/support';
 
 export const APKS_EXTENSION = helpers.APKS_EXTENSION;
 export const APK_INSTALL_TIMEOUT = helpers.APK_INSTALL_TIMEOUT;

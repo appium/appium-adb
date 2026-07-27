@@ -1,9 +1,11 @@
+import {describe, it, before, afterEach, type TestContext} from 'node:test';
+
+import {use, expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
 import {ADB} from '../../lib/adb.js';
 import {Logcat} from '../../lib/logcat.js';
 import {E2E_TIMEOUT} from './setup.js';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import {describe, it, before, afterEach, type TestContext} from 'node:test';
 
 use(chaiAsPromised);
 

@@ -732,14 +732,10 @@ export interface RootResult {
 }
 
 export type Sensors = (typeof emuConstants.SENSORS)[keyof typeof emuConstants.SENSORS];
-export type NetworkSpeed =
-  (typeof emuConstants.NETWORK_SPEED)[keyof typeof emuConstants.NETWORK_SPEED];
-export type GsmVoiceStates =
-  (typeof emuConstants.GSM_VOICE_STATES)[keyof typeof emuConstants.GSM_VOICE_STATES];
-export type GsmCallActions =
-  (typeof emuConstants.GSM_CALL_ACTIONS)[keyof typeof emuConstants.GSM_CALL_ACTIONS];
-export type PowerAcStates =
-  (typeof emuConstants.POWER_AC_STATES)[keyof typeof emuConstants.POWER_AC_STATES];
+export type NetworkSpeed = (typeof emuConstants.NETWORK_SPEED)[keyof typeof emuConstants.NETWORK_SPEED];
+export type GsmVoiceStates = (typeof emuConstants.GSM_VOICE_STATES)[keyof typeof emuConstants.GSM_VOICE_STATES];
+export type GsmCallActions = (typeof emuConstants.GSM_CALL_ACTIONS)[keyof typeof emuConstants.GSM_CALL_ACTIONS];
+export type PowerAcStates = (typeof emuConstants.POWER_AC_STATES)[keyof typeof emuConstants.POWER_AC_STATES];
 
 export interface PlatformInfo {
   /**

@@ -1,28 +1,29 @@
 import os from 'node:os';
-import {log} from './logger.js';
-import type {ADBOptions, ADBExecutable} from './types.js';
-import type {Logcat} from './logcat.js';
-import type {LogcatOpts, StringRecord} from './tools/types.js';
+
 import type {LRUCache} from 'lru-cache';
 import type {ExecError} from 'teen_process';
 
-import * as generalCommands from './tools/general-commands.js';
+import type {Logcat} from './logcat.js';
+import {log} from './logger.js';
+import * as aabUtilCommands from './tools/aab-utils.js';
 import * as manifestCommands from './tools/android-manifest.js';
-import * as systemCommands from './tools/system-calls.js';
 import * as signingCommands from './tools/apk-signing.js';
 import * as apkUtilCommands from './tools/apk-utils.js';
 import * as apksUtilCommands from './tools/apks-utils.js';
-import * as aabUtilCommands from './tools/aab-utils.js';
-import * as emuCommands from './tools/emulator-commands.js';
-import * as emuConstants from './tools/emu-constants.js';
-import * as lockManagementCommands from './tools/lockmgmt.js';
-import * as keyboardCommands from './tools/keyboard-commands.js';
-import * as deviceSettingsCommands from './tools/device-settings.js';
-import * as fsCommands from './tools/fs-commands.js';
 import * as appCommands from './tools/app-commands.js';
-import * as networkCommands from './tools/network-commands.js';
+import * as deviceSettingsCommands from './tools/device-settings.js';
+import * as emuConstants from './tools/emu-constants.js';
+import * as emuCommands from './tools/emulator-commands.js';
+import * as fsCommands from './tools/fs-commands.js';
+import * as generalCommands from './tools/general-commands.js';
+import * as keyboardCommands from './tools/keyboard-commands.js';
+import * as lockManagementCommands from './tools/lockmgmt.js';
 import * as logcatCommands from './tools/logcat-commands.js';
+import * as networkCommands from './tools/network-commands.js';
 import * as processCommands from './tools/process-commands.js';
+import * as systemCommands from './tools/system-calls.js';
+import type {LogcatOpts, StringRecord} from './tools/types.js';
+import type {ADBOptions, ADBExecutable} from './types.js';
 import {
   DEFAULT_ADB_EXEC_TIMEOUT,
   cloneDeep,

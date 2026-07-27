@@ -1,11 +1,13 @@
-import {ADB} from '../../lib/adb.js';
-import {E2E_TIMEOUT, E2E_LONG_TIMEOUT} from './setup.js';
 import path from 'node:path';
+import {describe, it, before, type TestContext} from 'node:test';
+
 import {fs} from '@appium/support';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+
+import {ADB} from '../../lib/adb.js';
 import {getResourcePath} from '../../lib/utils/index.js';
-import {describe, it, before, type TestContext} from 'node:test';
+import {E2E_TIMEOUT, E2E_LONG_TIMEOUT} from './setup.js';
 
 use(chaiAsPromised);
 
@@ -42,12 +44,10 @@ describe('system calls', {timeout: E2E_TIMEOUT}, function () {
   it('shell should return stderr from adb with full output', async function () {
     const apiLevel = await adb.getApiLevel();
     const minStderrApiLevel = 24;
-    const fullShellOutput = await adb.shell(
-      ['content', 'read', '--uri', 'content://doesnotexist'],
-      {outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL},
-    );
-    const outputWithError =
-      apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
+    const fullShellOutput = await adb.shell(['content', 'read', '--uri', 'content://doesnotexist'], {
+      outputFormat: adb.EXEC_OUTPUT_FORMAT.FULL,
+    });
+    const outputWithError = apiLevel < minStderrApiLevel ? fullShellOutput.stdout : fullShellOutput.stderr;
     expect(outputWithError).to.contain('Error while accessing provider');
   });
   it('shell should return stdout from adb shell with full output', async function () {
@@ -68,37 +68,29 @@ describe('system calls', {timeout: E2E_TIMEOUT}, function () {
     expect(await adb.getRunningAVDWithRetry(avdName)).to.not.be.null;
   });
   // Skipping for now. Will unskip depending on how it behaves on CI
-  it.skip(
-    'launchAVD should get all connected avds',
-    {timeout: E2E_LONG_TIMEOUT},
-    async function () {
-      const proc = await adb.launchAVD(avdName);
-      try {
-        expect(await adb.getConnectedEmulators()).to.have.length.above(0);
-      } finally {
-        await proc.stop();
-      }
-    },
-  );
+  it.skip('launchAVD should get all connected avds', {timeout: E2E_LONG_TIMEOUT}, async function () {
+    const proc = await adb.launchAVD(avdName);
+    try {
+      expect(await adb.getConnectedEmulators()).to.have.length.above(0);
+    } finally {
+      await proc.stop();
+    }
+  });
   it('waitForDevice should get all connected avds', async function () {
     await adb.waitForDevice(2);
   });
-  it(
-    'reboot should reboot the device',
-    {timeout: E2E_LONG_TIMEOUT},
-    async function (ctx: TestContext) {
-      if (process.env.CI) {
-        // The test makes CI unstable
-        return ctx.skip();
-      }
-      try {
-        await adb.reboot();
-        await adb.ping();
-      } catch (e) {
-        expect((e as Error).message).to.include('must be root');
-      }
-    },
-  );
+  it('reboot should reboot the device', {timeout: E2E_LONG_TIMEOUT}, async function (ctx: TestContext) {
+    if (process.env.CI) {
+      // The test makes CI unstable
+      return ctx.skip();
+    }
+    try {
+      await adb.reboot();
+      await adb.ping();
+    } catch (e) {
+      expect((e as Error).message).to.include('must be root');
+    }
+  });
   it('fileExists should detect when files do and do not exist', async function () {
     expect(await adb.fileExists('/foo/bar/baz.zip')).to.be.false;
     expect(await adb.fileExists('/data/local/tmp')).to.be.true;

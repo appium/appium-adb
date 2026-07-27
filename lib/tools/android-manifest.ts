@@ -1,10 +1,12 @@
-import {exec} from 'teen_process';
-import {log} from '../logger.js';
-import {fs, zip, tempDir, util} from '@appium/support';
 import path from 'node:path';
+
+import {fs, zip, tempDir, util} from '@appium/support';
+import {exec} from 'teen_process';
+
 import type {ADB} from '../adb.js';
-import type {APKInfo, PlatformInfo, StringRecord} from './types.js';
+import {log} from '../logger.js';
 import {APKS_EXTENSION, readPackageManifest, unzipFile} from '../utils/index.js';
+import type {APKInfo, PlatformInfo, StringRecord} from './types.js';
 
 /**
  * Extract package and main activity name from application manifest.
@@ -14,10 +16,7 @@ import {APKS_EXTENSION, readPackageManifest, unzipFile} from '../utils/index.js'
  * @throws {error} If there was an error while getting the data from the given
  *                 application package.
  */
-export async function packageAndLaunchActivityFromManifest(
-  this: ADB,
-  appPath: string,
-): Promise<APKInfo> {
+export async function packageAndLaunchActivityFromManifest(this: ADB, appPath: string): Promise<APKInfo> {
   if (appPath.endsWith(APKS_EXTENSION)) {
     appPath = await this.extractBaseApk(appPath);
   }
@@ -48,10 +47,7 @@ export async function targetSdkVersionFromManifest(this: ADB, appPath: string): 
 
   const {targetSdkVersion} = await readPackageManifest.bind(this)(appPath);
   if (!targetSdkVersion) {
-    throw new Error(
-      `Cannot extract targetSdkVersion of '${originalAppPath}'. Does ` +
-        `the package manifest define it?`,
-    );
+    throw new Error(`Cannot extract targetSdkVersion of '${originalAppPath}'. Does the package manifest define it?`);
   }
   return targetSdkVersion;
 }
@@ -71,9 +67,7 @@ export async function targetSdkVersionUsingPKG(
 ): Promise<number> {
   const stdout = cmdOutput || (await this.shell(['dumpsys', 'package', pkg]));
   const targetSdkVersionMatch = new RegExp(/targetSdk=([^\s\s]+)/g).exec(stdout);
-  return targetSdkVersionMatch && targetSdkVersionMatch.length >= 2
-    ? parseInt(targetSdkVersionMatch[1], 10)
-    : 0;
+  return targetSdkVersionMatch && targetSdkVersionMatch.length >= 2 ? parseInt(targetSdkVersionMatch[1], 10) : 0;
 }
 
 /**
@@ -93,9 +87,7 @@ export async function compileManifest(
 ): Promise<void> {
   const {platform, platformPath} = await getAndroidPlatformAndPath(this.sdkRoot as string);
   if (!platform || !platformPath) {
-    throw new Error(
-      'Cannot compile the manifest. The required platform does not exist (API level >= 17)',
-    );
+    throw new Error('Cannot compile the manifest. The required platform does not exist (API level >= 17)');
   }
   const resultPath = `${manifest}.apk`;
   const androidJarPath = path.resolve(platformPath, 'android.jar');
@@ -169,12 +161,7 @@ export async function compileManifest(
  * @param dstApk - Full path to the resulting package.
  *                          The file will be overridden if it already exists.
  */
-export async function insertManifest(
-  this: ADB,
-  manifest: string,
-  srcApk: string,
-  dstApk: string,
-): Promise<void> {
+export async function insertManifest(this: ADB, manifest: string, srcApk: string, dstApk: string): Promise<void> {
   log.debug(`Inserting manifest '${manifest}', src: '${srcApk}', dst: '${dstApk}'`);
   await zip.assertValidZip(srcApk);
   await unzipFile(`${manifest}.apk`);
@@ -221,10 +208,7 @@ export async function insertManifest(
  * @param appPath - The full path to .apk(s) package.
  * @return True if the manifest requires Internet access permission.
  */
-export async function hasInternetPermissionFromManifest(
-  this: ADB,
-  appPath: string,
-): Promise<boolean> {
+export async function hasInternetPermissionFromManifest(this: ADB, appPath: string): Promise<boolean> {
   log.debug(`Checking if '${appPath}' requires internet access permission in the manifest`);
   if (appPath.endsWith(APKS_EXTENSION)) {
     appPath = await this.extractBaseApk(appPath);

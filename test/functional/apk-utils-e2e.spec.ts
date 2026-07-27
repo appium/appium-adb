@@ -1,7 +1,10 @@
-import {ADB} from '../../lib/adb.js';
+import {describe, it, before, type TestContext} from 'node:test';
+
 import {retryInterval} from 'asyncbox';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+
+import {ADB} from '../../lib/adb.js';
 import {
   E2E_TIMEOUT,
   E2E_LONG_TIMEOUT,
@@ -10,7 +13,6 @@ import {
   APIDEMOS_ACTIVITY_SHORT,
   getApiDemosPath,
 } from './setup.js';
-import {describe, it, before, type TestContext} from 'node:test';
 
 use(chaiAsPromised);
 
@@ -122,24 +124,20 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
         expect(expectedPkgPossibilities).to.include(appPackage);
       },
     );
-    it(
-      'should throw an error for unknown activity for intent',
-      {timeout: E2E_LONG_TIMEOUT},
-      async function () {
-        await adb.install(apiDemosPath, {
-          grantPermissions: true,
-        });
-        await expect(
-          adb.startApp({
-            action: 'android.intent.action.DEFAULT',
-            pkg: 'com.google.android.telephony',
-            optionalIntentArguments: '-d tel:555-5555',
-            waitDuration: START_APP_WAIT_DURATION,
-            stopApp: false,
-          }),
-        ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
-      },
-    );
+    it('should throw an error for unknown activity for intent', {timeout: E2E_LONG_TIMEOUT}, async function () {
+      await adb.install(apiDemosPath, {
+        grantPermissions: true,
+      });
+      await expect(
+        adb.startApp({
+          action: 'android.intent.action.DEFAULT',
+          pkg: 'com.google.android.telephony',
+          optionalIntentArguments: '-d tel:555-5555',
+          waitDuration: START_APP_WAIT_DURATION,
+          stopApp: false,
+        }),
+      ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
+    });
     it('should throw error for wrong activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,

@@ -1,12 +1,14 @@
-import {log} from '../logger.js';
-import path from 'node:path';
-import {fs, tempDir, util} from '@appium/support';
-import {LRUCache} from 'lru-cache';
-import AsyncLock from 'async-lock';
 import crypto from 'node:crypto';
+import path from 'node:path';
+
+import {fs, tempDir, util} from '@appium/support';
+import AsyncLock from 'async-lock';
+import {LRUCache} from 'lru-cache';
+
 import type {ADB} from '../adb.js';
-import type {ApkCreationOptions, StringRecord} from './types.js';
+import {log} from '../logger.js';
 import {unzipFile} from '../utils/index.js';
+import type {ApkCreationOptions, StringRecord} from './types.js';
 
 const AAB_CACHE = new LRUCache<string, string>({
   max: 10,
@@ -21,9 +23,7 @@ process.on('exit', () => {
   }
 
   const paths = [...AAB_CACHE.values()];
-  log.debug(
-    `Performing cleanup of ${paths.length} cached .aab ` + util.pluralize('package', paths.length),
-  );
+  log.debug(`Performing cleanup of ${paths.length} cached .aab ` + util.pluralize('package', paths.length));
   for (const appPath of paths) {
     try {
       // Asynchronous calls are not supported in onExit handler
@@ -45,11 +45,7 @@ process.on('exit', () => {
  * by default.
  * @throws {Error} If there was an error while creating the universal .apk
  */
-export async function extractUniversalApk(
-  this: ADB,
-  aabPath: string,
-  opts: ApkCreationOptions = {},
-): Promise<string> {
+export async function extractUniversalApk(this: ADB, aabPath: string, opts: ApkCreationOptions = {}): Promise<string> {
   if (!(await fs.exists(aabPath))) {
     throw new Error(`The file at '${aabPath}' either does not exist or is not accessible`);
   }
@@ -65,9 +61,7 @@ export async function extractUniversalApk(
       let cacheHash = aabHash;
       if (keystore) {
         if (!(await fs.exists(keystore))) {
-          throw new Error(
-            `The keystore file at '${keystore}' either does not exist ` + `or is not accessible`,
-          );
+          throw new Error(`The keystore file at '${keystore}' either does not exist or is not accessible`);
         }
         if (!keystorePassword || !keyAlias || !keyPassword) {
           throw new Error(

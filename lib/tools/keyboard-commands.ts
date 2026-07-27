@@ -1,6 +1,7 @@
-import {log} from '../logger.js';
 import {sleep, waitForCondition} from 'asyncbox';
+
 import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 import type {KeyboardState} from './types.js';
 
 const KEYCODE_ESC = 111;

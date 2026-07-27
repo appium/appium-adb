@@ -1,7 +1,8 @@
-import {log} from '../logger.js';
 import {util} from '@appium/support';
 import type {ExecError} from 'teen_process';
+
 import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 
 const PID_COLUMN_TITLE: string = 'PID';
 const PROCESS_NAME_COLUMN_TITLE: string = 'NAME';
@@ -118,11 +119,7 @@ export async function getProcessIdsByName(this: ADB, name: string): Promise<numb
  * @param signal - The signal to send to the process. Default is 'SIGTERM' ('15').
  * @throws {Error} If the processes cannot be killed.
  */
-export async function killProcessesByName(
-  this: ADB,
-  name: string,
-  signal: string = 'SIGTERM',
-): Promise<void> {
+export async function killProcessesByName(this: ADB, name: string, signal: string = 'SIGTERM'): Promise<void> {
   try {
     log.debug(`Attempting to kill all ${name} processes`);
     const pids: number[] = await this.getProcessIdsByName(name);
@@ -148,11 +145,7 @@ export async function killProcessesByName(
  * @param signal - The signal to send to the process. Default is 'SIGTERM' ('15').
  * @throws {Error} If the process cannot be killed.
  */
-export async function killProcessByPID(
-  this: ADB,
-  pid: string | number,
-  signal: string = 'SIGTERM',
-): Promise<void> {
+export async function killProcessByPID(this: ADB, pid: string | number, signal: string = 'SIGTERM'): Promise<void> {
   log.debug(`Attempting to kill process ${pid}`);
   const noProcessFlag: string = 'No such process';
   try {

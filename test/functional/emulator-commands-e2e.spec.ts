@@ -1,7 +1,9 @@
-import {ADB} from '../../lib/adb.js';
+import {describe, it, before, type TestContext} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, before, type TestContext} from 'node:test';
+
+import {ADB} from '../../lib/adb.js';
 
 use(chaiAsPromised);
 

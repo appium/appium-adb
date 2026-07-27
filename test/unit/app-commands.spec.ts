@@ -1,8 +1,15 @@
-import {ADB} from '../../lib/adb.js';
 import net from 'node:net';
-import {Logcat} from '../../lib/logcat.js';
-import * as teen_process from 'teen_process';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
+import {fs} from '@appium/support';
+import {use, expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
+import * as teen_process from 'teen_process';
+
+import {ADB} from '../../lib/adb.js';
+import {Logcat} from '../../lib/logcat.js';
+import {parseAapt2Strings, parseAaptStrings} from '../../lib/tools/apk-utils.js';
 import {
   parseLaunchableActivityNames,
   matchComponentName,
@@ -11,12 +18,7 @@ import {
   assertSafeComponentName,
 } from '../../lib/tools/app-commands.js';
 import {getBuildToolsDirs} from '../../lib/tools/system-calls.js';
-import {parseAapt2Strings, parseAaptStrings} from '../../lib/tools/apk-utils.js';
-import {fs} from '@appium/support';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT} from '../constants.js';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
 
 use(chaiAsPromised);
 
@@ -57,11 +59,7 @@ describe('app commands', function () {
 
   describe('isAppRunning', function () {
     it('should call listAppProcessIds and return true when app is running', async function () {
-      mocks.adb
-        .expects('listAppProcessIds')
-        .once()
-        .withExactArgs(apiDemosPackage)
-        .returns([123, 456]);
+      mocks.adb.expects('listAppProcessIds').once().withExactArgs(apiDemosPackage).returns([123, 456]);
       expect(await adb.isAppRunning(apiDemosPackage)).to.be.true;
     });
     it('should call listAppProcessIds and return false when app is not running', async function () {
@@ -74,11 +72,7 @@ describe('app commands', function () {
     it('should call shell with correct args and parse process IDs', async function () {
       const mockOutput = `ProcessRecord{abc123 123:io.appium.android.apis/u0a123}
 ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
-      mocks.adb
-        .expects('shell')
-        .once()
-        .withExactArgs(['dumpsys', 'activity', 'processes'])
-        .returns(mockOutput);
+      mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'activity', 'processes']).returns(mockOutput);
       expect(await adb.listAppProcessIds(apiDemosPackage)).to.eql([123, 456]);
     });
     it('should return empty array when no processes found', async function () {
@@ -100,11 +94,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
 
   describe('forceStop', function () {
     it('should call shell with correct args', async function () {
-      mocks.adb
-        .expects('shell')
-        .once()
-        .withExactArgs(['am', 'force-stop', apiDemosPackage])
-        .returns('');
+      mocks.adb.expects('shell').once().withExactArgs(['am', 'force-stop', apiDemosPackage]).returns('');
       await adb.forceStop(apiDemosPackage);
     });
   });
@@ -147,11 +137,7 @@ package:com.android.chrome versionCode:636771932`;
       const mockOutput = `package:com.android.managedprovisioning
 package:com.google.android.apps.wallpaper.nexus
 package:com.android.chrome`;
-      mocks.adb
-        .expects('shell')
-        .once()
-        .withExactArgs(['cmd', 'package', 'list', 'packages'])
-        .returns(mockOutput);
+      mocks.adb.expects('shell').once().withExactArgs(['cmd', 'package', 'list', 'packages']).returns(mockOutput);
       const result = await adb.listInstalledPackages();
       expect(result).to.eql([
         {appPackage: 'com.android.managedprovisioning', versionCode: null},
@@ -198,16 +184,7 @@ package:com.android.chrome`;
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs([
-          'am',
-          'start',
-          '-W',
-          '-a',
-          'android.intent.action.VIEW',
-          '-d',
-          uri,
-          apiDemosPackage,
-        ])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, apiDemosPackage])
         .returns('');
       await adb.startUri(uri, apiDemosPackage);
     });
@@ -216,11 +193,7 @@ package:com.android.chrome`;
   describe('dumpWindows', function () {
     it('should call shell with correct args', async function () {
       mocks.adb.expects('getApiLevel').once().returns(25);
-      mocks.adb
-        .expects('shell')
-        .once()
-        .withExactArgs(['dumpsys', 'window', 'windows'])
-        .returns('Window information');
+      mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'window', 'windows']).returns('Window information');
       const result = await adb.dumpWindows();
       expect(result).to.equal('Window information');
     });
@@ -233,11 +206,7 @@ package:com.android.chrome`;
       // APIDEMOS_ACTIVITY_SHORT is '.ApiDemos', so we use package/.ApiDemos
       const mockOutput = `mFocusedApp=AppWindowToken{abc123 token=Token{def456 ActivityRecord{ghi789 u0 ${APIDEMOS_PKG}/${APIDEMOS_ACTIVITY_SHORT} t181}}}`;
       mocks.adb.expects('getApiLevel').once().returns(25);
-      mocks.adb
-        .expects('shell')
-        .once()
-        .withExactArgs(['dumpsys', 'window', 'windows'])
-        .returns(mockOutput);
+      mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'window', 'windows']).returns(mockOutput);
       const result = await adb.getFocusedPackageAndActivity();
       expect(result.appPackage).to.equal(APIDEMOS_PKG);
       expect(result.appActivity).to.equal(APIDEMOS_ACTIVITY_SHORT);
@@ -333,10 +302,7 @@ package:com.android.chrome`;
       expect(cmd[cmd.length - 1]).to.eql('value');
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
-      const cmd = buildStartCmd(
-        {...startOptions, optionalIntentArguments: '-d key value value2'},
-        20,
-      );
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value value2'}, 20);
       expect(cmd[cmd.length - 3]).to.eql('-d');
       expect(cmd[cmd.length - 2]).to.eql('key');
       expect(cmd[cmd.length - 1]).to.eql('value value2');
@@ -349,10 +315,7 @@ package:com.android.chrome`;
       expect(cmd[cmd.length - 1]).to.eql('key2');
     });
     it('should parse optionalIntentArguments with multiple key/value pairs', function () {
-      const cmd = buildStartCmd(
-        {...startOptions, optionalIntentArguments: '-d key1 value1 -e key2 value2'},
-        20,
-      );
+      const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 value1 -e key2 value2'}, 20);
       expect(cmd[cmd.length - 6]).to.eql('-d');
       expect(cmd[cmd.length - 5]).to.eql('key1');
       expect(cmd[cmd.length - 4]).to.eql('value1');
@@ -394,10 +357,7 @@ package:com.android.chrome`;
 
   describe('getBuildToolsDirs', function () {
     it('should sort build-tools folder names by semantic version', async function () {
-      mocks.fs
-        .expects('glob')
-        .once()
-        .returns(['/some/path/1.2.3', '/some/path/4.5.6', '/some/path/2.3.1']);
+      mocks.fs.expects('glob').once().returns(['/some/path/1.2.3', '/some/path/4.5.6', '/some/path/2.3.1']);
       expect(await getBuildToolsDirs('/dummy/path')).to.be.eql([
         '/some/path/4.5.6',
         '/some/path/2.3.1',
@@ -733,9 +693,7 @@ package:com.android.chrome`;
     }
     for (const payload of injectionPayloads) {
       it(`should reject injection payload '${payload}'`, function () {
-        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(
-          /illegal characters/,
-        );
+        expect(() => assertSafeComponentName(payload, 'activity name')).to.throw(/illegal characters/);
       });
     }
   });
@@ -747,19 +705,19 @@ package:com.android.chrome`;
       ).to.be.rejectedWith(/illegal characters/);
     });
     it('startApp should reject a package name containing shell metacharacters', async function () {
-      await expect(
-        adb.startApp({pkg: 'org.wikipedia.alpha`id`', activity: '.MainActivity'}),
-      ).to.be.rejectedWith(/illegal characters/);
+      await expect(adb.startApp({pkg: 'org.wikipedia.alpha`id`', activity: '.MainActivity'})).to.be.rejectedWith(
+        /illegal characters/,
+      );
     });
     it('waitForActivityOrNot should reject a wait activity containing shell metacharacters', async function () {
-      await expect(
-        adb.waitForActivityOrNot(apiDemosPackage, '.Main;reboot', false, 1000),
-      ).to.be.rejectedWith(/illegal characters/);
+      await expect(adb.waitForActivityOrNot(apiDemosPackage, '.Main;reboot', false, 1000)).to.be.rejectedWith(
+        /illegal characters/,
+      );
     });
     it('waitForActivityOrNot should reject a wait package containing shell metacharacters', async function () {
-      await expect(
-        adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000),
-      ).to.be.rejectedWith(/illegal characters/);
+      await expect(adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000)).to.be.rejectedWith(
+        /illegal characters/,
+      );
     });
   });
 });

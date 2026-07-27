@@ -1,12 +1,14 @@
-import {ADB} from '../../lib/adb.js';
 import path from 'node:path';
+import {describe, it, before, beforeEach, afterEach} from 'node:test';
+
 import {fs, tempDir} from '@appium/support';
-import {unsignApk} from '../../lib/tools/apk-signing.js';
-import {getApiDemosPath} from './setup.js';
-import {FIXTURES_ROOT} from '../constants.js';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, before, beforeEach, afterEach} from 'node:test';
+
+import {ADB} from '../../lib/adb.js';
+import {unsignApk} from '../../lib/tools/apk-signing.js';
+import {FIXTURES_ROOT} from '../constants.js';
+import {getApiDemosPath} from './setup.js';
 
 use(chaiAsPromised);
 

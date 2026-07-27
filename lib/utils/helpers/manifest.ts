@@ -1,7 +1,8 @@
 import {util} from '@appium/support';
 import {exec, type ExecError} from 'teen_process';
-import {log} from '../../logger.js';
+
 import type {ADB} from '../../adb.js';
+import {log} from '../../logger.js';
 import type {ApkManifest} from '../../tools/types.js';
 
 /**
@@ -34,22 +35,14 @@ export async function readPackageManifest(this: ADB, apkPath: string): Promise<A
     throw new Error(`${prefix}. ${suffix}`, {cause: e});
   }
 
-  const extractValue = (
-    line: string,
-    propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null,
-  ): any => {
+  const extractValue = (line: string, propPattern: RegExp, valueTransformer: ((x: string) => any) | null): any => {
     const match = propPattern.exec(line);
     if (match) {
       return valueTransformer ? valueTransformer(match[1]) : match[1];
     }
     return undefined;
   };
-  const extractArray = (
-    line: string,
-    propPattern: RegExp,
-    valueTransformer: ((x: string) => any) | null,
-  ): any[] => {
+  const extractArray = (line: string, propPattern: RegExp, valueTransformer: ((x: string) => any) | null): any[] => {
     let match: RegExpExecArray | null;
     const resultArray: any[] = [];
     while ((match = propPattern.exec(line))) {

@@ -1,12 +1,14 @@
-import {ADB} from '../../lib/adb.js';
 import net from 'node:net';
-import {Logcat} from '../../lib/logcat.js';
-import * as teen_process from 'teen_process';
-import sinon from 'sinon';
-import {APIDEMOS_PKG} from '../constants.js';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import sinon from 'sinon';
+import * as teen_process from 'teen_process';
+
+import {ADB} from '../../lib/adb.js';
+import {Logcat} from '../../lib/logcat.js';
+import {APIDEMOS_PKG} from '../constants.js';
 
 use(chaiAsPromised);
 
@@ -93,8 +95,7 @@ describe('process commands', function () {
 
   describe('getProcessIdsByName', function () {
     it('should properly parse ps output to find process IDs by name', async function () {
-      mocks.adb.expects('listProcessStatus').once()
-        .returns(`USER     PID   PPID  VSIZE  RSS     WCHAN    PC   S    NAME
+      mocks.adb.expects('listProcessStatus').once().returns(`USER     PID   PPID  VSIZE  RSS     WCHAN    PC   S    NAME
 radio     929   69    1228184 40844 ffffffff b6db0920 S com.android.phone
 radio     930   69    1228184 40844 ffffffff b6db0920 S com.android.phone
 u0_a7     951   69    1256464 72208 ffffffff b6db0920 S com.android.launcher
@@ -112,10 +113,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
       expect(await adb.getProcessIdsByName('com.nonexistent.app')).to.eql([]);
     });
     it('should fail if ps output cannot be parsed', async function () {
-      mocks.adb
-        .expects('listProcessStatus')
-        .once()
-        .returns('Invalid output without proper headers');
+      mocks.adb.expects('listProcessStatus').once().returns('Invalid output without proper headers');
       await expect(adb.getProcessIdsByName('com.android.phone')).to.eventually.be.rejectedWith(
         /Could not parse process list/,
       );
@@ -124,11 +122,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
 
   describe('killProcessesByName', function () {
     it('should call getProcessIdsByName and kill process correctly', async function () {
-      mocks.adb
-        .expects('getProcessIdsByName')
-        .once()
-        .withExactArgs(apiDemosPackage)
-        .returns([5078]);
+      mocks.adb.expects('getProcessIdsByName').once().withExactArgs(apiDemosPackage).returns([5078]);
       mocks.adb.expects('killProcessByPID').once().withExactArgs(5078, 'SIGTERM').returns('');
       await adb.killProcessesByName(apiDemosPackage);
     });
@@ -142,9 +136,7 @@ u0_a15    1628  69    1206440 30480 ffffffff b6db0920 S com.android.browser`);
         .once()
         .withExactArgs(apiDemosPackage)
         .throws(new Error('Process lookup failed'));
-      await expect(adb.killProcessesByName(apiDemosPackage)).to.eventually.be.rejectedWith(
-        /Unable to kill/,
-      );
+      await expect(adb.killProcessesByName(apiDemosPackage)).to.eventually.be.rejectedWith(/Unable to kill/);
     });
   });
 

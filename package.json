@@ -2,41 +2,19 @@
   "name": "appium-adb",
   "version": "16.0.0",
   "description": "Android Debug Bridge interface",
-  "main": "./build/lib/index.js",
-  "scripts": {
-    "build": "tsc -b",
-    "clean": "npm run build -- --clean",
-    "dev": "npm run build -- --watch",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
-    "prepare": "npm run rebuild",
-    "rebuild": "npm run clean && npm run build",
-    "format": "prettier -w ./lib ./test",
-    "format:check": "prettier --check ./lib ./test",
-    "test": "node --enable-source-maps --test --test-force-exit --test-timeout=60000 \"./build/test/unit/**/*.spec.js\"",
-    "e2e-test": "node --enable-source-maps --test --test-force-exit --test-concurrency=1 --test-timeout=300000 \"./build/test/functional/**/*.spec.js\""
+  "homepage": "https://github.com/appium/appium-adb",
+  "bugs": {
+    "url": "https://github.com/appium/appium-adb/issues"
   },
+  "license": "Apache-2.0",
+  "author": "Appium Contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/appium/appium-adb.git"
   },
-  "author": "Appium Contributors",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/appium/appium-adb/issues"
-  },
-  "engines": {
-    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
-    "npm": ">=10"
-  },
   "bin": {},
   "directories": {
     "lib": "lib"
-  },
-  "prettier": {
-    "bracketSpacing": false,
-    "printWidth": 100,
-    "singleQuote": true
   },
   "files": [
     "keys",
@@ -44,7 +22,29 @@
     "build/lib",
     "CHANGELOG.md"
   ],
-  "homepage": "https://github.com/appium/appium-adb",
+  "type": "module",
+  "main": "./build/lib/index.js",
+  "types": "./build/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/lib/index.d.ts",
+      "import": "./build/lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "npm run build -- --clean",
+    "dev": "npm run build -- --watch",
+    "lint": "oxlint -c oxlint.config.mjs .",
+    "lint:fix": "oxlint -c oxlint.config.mjs --fix .",
+    "prepare": "npm run rebuild",
+    "rebuild": "npm run clean && npm run build",
+    "format": "oxfmt -c oxfmt.config.mjs .",
+    "format:check": "oxfmt -c oxfmt.config.mjs --check .",
+    "test": "node --enable-source-maps --test --test-force-exit --test-timeout=60000 \"./build/test/unit/**/*.spec.js\"",
+    "e2e-test": "node --enable-source-maps --test --test-force-exit --test-concurrency=1 --test-timeout=300000 \"./build/test/functional/**/*.spec.js\""
+  },
   "dependencies": {
     "@appium/support": "^7.2.2",
     "async-lock": "^1.0.0",
@@ -55,11 +55,10 @@
     "teen_process": "^4.0.4"
   },
   "devDependencies": {
-    "@appium/eslint-config-appium-ts": "^3.0.0",
-    "@appium/tsconfig": "^1.0.0-rc.1",
+    "@appium/oxc-config": "^1.1.0",
+    "@appium/semantic-release-config": "^1.1.0",
+    "@appium/tsconfig": "^1.2.0",
     "@appium/types": "^1.0.0-rc.1",
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/git": "^10.0.1",
     "@types/async-lock": "^1.4.0",
     "@types/chai": "^5.2.3",
     "@types/chai-as-promised": "^8.0.2",
@@ -69,20 +68,11 @@
     "@types/sinon": "^22.0.0",
     "chai": "^6.0.0",
     "chai-as-promised": "^8.0.0",
-    "conventional-changelog-conventionalcommits": "^9.3.1",
     "esmock": "^2.7.6",
-    "prettier": "^3.0.0",
-    "semantic-release": "^25.0.2",
-    "sinon": "^22.0.0",
-    "typescript": "^6.0.2"
+    "sinon": "^22.0.0"
   },
-  "types": "./build/lib/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./build/lib/index.d.ts",
-      "import": "./build/lib/index.js"
-    },
-    "./package.json": "./package.json"
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
+    "npm": ">=10"
   }
 }
