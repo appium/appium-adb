@@ -1,3 +1,9 @@
+## [16.0.1](https://github.com/appium/appium-adb/compare/v16.0.0...v16.0.1) (2026-07-27)
+
+### Miscellaneous Chores
+
+* Integrate oxc and release configs ([#896](https://github.com/appium/appium-adb/issues/896)) ([1c2a8c5](https://github.com/appium/appium-adb/commit/1c2a8c5748cb4c1a086de2525448c66dbc4d91c7))
+
 ## [16.0.0](https://github.com/appium/appium-adb/compare/v15.0.9...v16.0.0) (2026-07-23)
 
 ### ⚠ BREAKING CHANGES
