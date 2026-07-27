@@ -715,10 +715,7 @@ package:com.android.chrome`;
       );
     });
     it('waitForActivityOrNot should reject a wait package containing shell metacharacters', async function () {
-      await assert.rejects(
-        adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000),
-        /illegal characters/,
-      );
+      await assert.rejects(adb.waitForActivityOrNot('com.foo$(id)', '.Main', false, 1000), /illegal characters/);
     });
   });
 });

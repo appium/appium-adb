@@ -379,9 +379,7 @@ describe('Apk-utils', function () {
             `ActivityRecord{2 u com.example.android.supermanager/.SuperManager t181}}}`,
         );
 
-      await assert.rejects(
-        adb.waitForActivityOrNot('com.example.android.supermanager', `${pkg}.*`, false, 1000),
-      );
+      await assert.rejects(adb.waitForActivityOrNot('com.example.android.supermanager', `${pkg}.*`, false, 1000));
     });
     it('should be able to get an activity that is an inner class', async function () {
       mocks.adb

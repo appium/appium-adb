@@ -71,9 +71,8 @@ describe('system calls', function () {
         .withArgs(adb.executable.path, ['-P', '5037', 'devices'])
         .onFirstCall()
         .returns({stdout: 'foobar'});
-      await assert.rejects(
-        adb.getConnectedDevices(),
-        (err: Error) => err.message.includes('Unexpected output while trying to get devices'),
+      await assert.rejects(adb.getConnectedDevices(), (err: Error) =>
+        err.message.includes('Unexpected output while trying to get devices'),
       );
     });
     it('should get all connected devices with verbose output', async function () {
@@ -131,10 +130,7 @@ describe('system calls', function () {
         stubCurrent = 0;
         return innerStubThree(...args);
       };
-      await assert.rejects(
-        adb.getDevicesWithRetry(1000),
-        /Could not find a connected Android device/,
-      );
+      await assert.rejects(adb.getDevicesWithRetry(1000), /Could not find a connected Android device/);
       assert.ok(innerStubOne.callCount >= 2);
       assert.ok(innerStubTwo.callCount >= 2);
       assert.ok(innerStubThree.callCount >= 2);
@@ -163,10 +159,7 @@ describe('system calls', function () {
         stubCurrent = 0;
         return innerStubThree(...args);
       };
-      await assert.rejects(
-        adb.getDevicesWithRetry(1000),
-        /Could not find a connected Android device/,
-      );
+      await assert.rejects(adb.getDevicesWithRetry(1000), /Could not find a connected Android device/);
       assert.ok(innerStubOne.callCount >= 2);
       assert.ok(innerStubTwo.callCount >= 2);
       assert.ok(innerStubThree.callCount >= 2);
@@ -224,10 +217,7 @@ describe('system calls', function () {
       const innerStub = sandbox.stub().throws(new Error('Error foobar'));
       currentExec = (...args: any[]) => innerStub(...args);
 
-      await assert.rejects(
-        adb.getDevicesWithRetry(1000),
-        /Could not find a connected Android device/,
-      );
+      await assert.rejects(adb.getDevicesWithRetry(1000), /Could not find a connected Android device/);
 
       assert.ok(innerStub.callCount >= 2);
     });

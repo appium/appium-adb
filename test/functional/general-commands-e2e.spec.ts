@@ -292,7 +292,10 @@ describe('general commands', {timeout: E2E_TIMEOUT}, function () {
       });
       if (await adb.addToDeviceIdleWhitelist(APIDEMOS_PKG)) {
         const pkgList = await adb.getDeviceIdleWhitelist();
-        assert.strictEqual(pkgList.some((item) => item.includes(APIDEMOS_PKG)), true);
+        assert.strictEqual(
+          pkgList.some((item) => item.includes(APIDEMOS_PKG)),
+          true,
+        );
       }
     });
   });

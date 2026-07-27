@@ -213,7 +213,9 @@ describe('emulator commands', function () {
     });
     describe('network speed method', function () {
       it('should throw exception on invalid speed', async function () {
-        await assert.rejects(adb.networkSpeed('light' as any), (err: Error) => err.message.includes('Invalid network speed'));
+        await assert.rejects(adb.networkSpeed('light' as any), (err: Error) =>
+          err.message.includes('Invalid network speed'),
+        );
       });
       for (const [key, value] of Object.entries(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async function () {
@@ -226,7 +228,9 @@ describe('emulator commands', function () {
     });
     describe('gsm voice method', function () {
       it('should throw exception on invalid strength', async function () {
-        await assert.rejects(adb.gsmVoice('weird' as any), (err: Error) => err.message.includes('Invalid gsm voice state'));
+        await assert.rejects(adb.gsmVoice('weird' as any), (err: Error) =>
+          err.message.includes('Invalid gsm voice state'),
+        );
       });
       it('should set gsm voice to unregistered', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
