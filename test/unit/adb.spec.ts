@@ -1,11 +1,7 @@
+import assert from 'node:assert/strict';
 import {describe, it} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-
 import {ADB, DEFAULT_ADB_PORT} from '../../lib/adb.js';
-
-use(chaiAsPromised);
 
 describe('ADB', function () {
   describe('clone', function () {
@@ -15,8 +11,8 @@ describe('ADB', function () {
       });
       const clone = original.clone();
 
-      expect(clone.executable.path).to.equal(original.executable.path);
-      expect(clone.executable.defaultArgs).to.deep.equal(original.executable.defaultArgs);
+      assert.strictEqual(clone.executable.path, original.executable.path);
+      assert.deepStrictEqual(clone.executable.defaultArgs, original.executable.defaultArgs);
     });
 
     it('should replace specified options', function () {
@@ -27,10 +23,10 @@ describe('ADB', function () {
         remoteAdbHost: 'example.com',
       });
 
-      expect(clone.executable.path).to.equal(original.executable.path);
-      expect(clone.executable.defaultArgs).to.deep.equal(['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
-      expect(clone.remoteAdbHost).to.equal('example.com');
-      expect(clone.adbHost).to.not.equal(original.adbHost);
+      assert.strictEqual(clone.executable.path, original.executable.path);
+      assert.deepStrictEqual(clone.executable.defaultArgs, ['-a', '-H', 'example.com', '-P', String(DEFAULT_ADB_PORT)]);
+      assert.strictEqual(clone.remoteAdbHost, 'example.com');
+      assert.notStrictEqual(clone.adbHost, original.adbHost);
     });
 
     describe('-a option', function () {
@@ -110,13 +106,13 @@ describe('ADB', function () {
             const original = new ADB(originalOptions);
             const clone = original.clone(cloneOptions);
 
-            expect(original.executable.defaultArgs).to.deep.equal(expectedOriginalArgs);
-            expect(original.listenAllNetwork).to.equal(expectedOriginalListen);
+            assert.deepStrictEqual(original.executable.defaultArgs, expectedOriginalArgs);
+            assert.strictEqual(original.listenAllNetwork, expectedOriginalListen);
 
-            expect(clone.executable.path).to.equal(original.executable.path);
-            expect(clone.executable.defaultArgs).to.deep.equal(expectedCloneArgs);
-            expect(clone.remoteAdbHost).to.equal(cloneOptions.remoteAdbHost);
-            expect(clone.listenAllNetwork).to.equal(expectedCloneListen);
+            assert.strictEqual(clone.executable.path, original.executable.path);
+            assert.deepStrictEqual(clone.executable.defaultArgs, expectedCloneArgs);
+            assert.strictEqual(clone.remoteAdbHost, cloneOptions.remoteAdbHost);
+            assert.strictEqual(clone.listenAllNetwork, expectedCloneListen);
           });
         },
       );

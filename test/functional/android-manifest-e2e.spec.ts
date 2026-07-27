@@ -1,16 +1,13 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
 import {describe, it, before, type TestContext} from 'node:test';
 
 import {fs, tempDir} from '@appium/support';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {ADB} from '../../lib/adb.js';
 import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest.js';
 import {readPackageManifest, requireSdkRoot} from '../../lib/utils/index.js';
 import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup.js';
-
-use(chaiAsPromised);
 
 describe('Android-manifest', function () {
   let adb: ADB;
@@ -22,12 +19,12 @@ describe('Android-manifest', function () {
   });
   it('packageAndLaunchActivityFromManifest should parse package and Activity', async function () {
     const {apkPackage, apkActivity} = await adb.packageAndLaunchActivityFromManifest(apiDemosPath);
-    expect(apkPackage).to.equal(APIDEMOS_PKG);
-    expect(apkActivity).to.be.a('string');
-    expect(apkActivity?.endsWith(APIDEMOS_ACTIVITY_SHORT)).to.be.true;
+    assert.strictEqual(apkPackage, APIDEMOS_PKG);
+    assert.strictEqual(typeof apkActivity, 'string');
+    assert.strictEqual(apkActivity?.endsWith(APIDEMOS_ACTIVITY_SHORT), true);
   });
   it('hasInternetPermissionFromManifest should be true', async function () {
-    expect(await adb.hasInternetPermissionFromManifest(apiDemosPath)).to.be.true;
+    assert.strictEqual(await adb.hasInternetPermissionFromManifest(apiDemosPath), true);
   });
   it('hasInternetPermissionFromManifest should be false', async function (ctx: TestContext) {
     // Note: ApiDemos has internet permission, so we need a different test
@@ -74,16 +71,16 @@ describe('Android-manifest', function () {
 
       // Compile the manifest
       await adb.compileManifest(dstManifest, newPackage, appPackage);
-      expect(await fs.exists(dstManifest)).to.be.true;
-      expect(await fs.exists(`${dstManifest}.apk`)).to.be.true;
+      assert.strictEqual(await fs.exists(dstManifest), true);
+      assert.strictEqual(await fs.exists(`${dstManifest}.apk`), true);
 
       // Insert the compiled manifest into the temporary copy of the source APK
       await adb.insertManifest(dstManifest, srcApkCopy, newServerPath);
-      expect(await fs.exists(newServerPath)).to.be.true;
+      assert.strictEqual(await fs.exists(newServerPath), true);
 
       // Verify the new APK has the updated manifest
       const {name: packageName} = await readPackageManifest.bind(adb)(newServerPath);
-      expect(packageName).to.equal(newPackage);
+      assert.strictEqual(packageName, newPackage);
     } finally {
       await fs.rimraf(tmpDir);
     }
@@ -92,8 +89,8 @@ describe('Android-manifest', function () {
   it('getAndroidPlatformAndPath should return platform and path for android', async function () {
     const sdkRoot = await requireSdkRoot();
     const {platform, platformPath} = await getAndroidPlatformAndPath(sdkRoot);
-    expect(platform).to.exist;
-    expect(platformPath).to.exist;
+    assert.ok(platform != null);
+    assert.ok(platformPath != null);
   });
 
   it('should read package manifest', async function () {
@@ -221,6 +218,6 @@ describe('Android-manifest', function () {
 
     const adb = await ADB.createADB();
     const manifest = await readPackageManifest.bind(adb)(apiDemosPath);
-    expect(manifest).to.eql(expected);
+    assert.deepStrictEqual(manifest, expected);
   });
 });

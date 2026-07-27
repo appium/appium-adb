@@ -1,8 +1,7 @@
+import assert from 'node:assert/strict';
 import {describe, it, before, type TestContext} from 'node:test';
 
 import {retryInterval} from 'asyncbox';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {ADB} from '../../lib/adb.js';
 import {
@@ -14,8 +13,6 @@ import {
   getApiDemosPath,
 } from './setup.js';
 
-use(chaiAsPromised);
-
 const START_APP_WAIT_DURATION = 60000;
 const START_APP_WAIT_DURATION_FAIL = process.env.CI ? 20000 : 10000;
 
@@ -25,8 +22,8 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
   const deviceTempPath = '/data/local/tmp/';
   const assertPackageAndActivity = async () => {
     const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-    expect(appPackage).to.equal(APIDEMOS_PKG);
-    expect(appActivity).to.equal(APIDEMOS_ACTIVITY_SHORT);
+    assert.strictEqual(appPackage, APIDEMOS_PKG);
+    assert.strictEqual(appActivity, APIDEMOS_ACTIVITY_SHORT);
   };
 
   before(async function () {
@@ -37,18 +34,18 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
     apiDemosPath = await getApiDemosPath();
   });
   it('should be able to check status of third party app', async function () {
-    expect(await adb.isAppInstalled('com.android.phone')).to.be.true;
+    assert.strictEqual(await adb.isAppInstalled('com.android.phone'), true);
   });
   it('should be able to install/remove app and detect its status', async function () {
     const apkNameOnDevice = 'ApiDemos-debug.apk';
-    expect(await adb.isAppInstalled('foo')).to.be.false;
+    assert.strictEqual(await adb.isAppInstalled('foo'), false);
     await adb.install(apiDemosPath, {
       grantPermissions: true,
     });
-    expect(await adb.isAppInstalled(APIDEMOS_PKG)).to.be.true;
-    expect(await adb.uninstallApk(APIDEMOS_PKG)).to.be.true;
-    expect(await adb.isAppInstalled(APIDEMOS_PKG)).to.be.false;
-    expect(await adb.uninstallApk(APIDEMOS_PKG)).to.be.false;
+    assert.strictEqual(await adb.isAppInstalled(APIDEMOS_PKG), true);
+    assert.strictEqual(await adb.uninstallApk(APIDEMOS_PKG), true);
+    assert.strictEqual(await adb.isAppInstalled(APIDEMOS_PKG), false);
+    assert.strictEqual(await adb.uninstallApk(APIDEMOS_PKG), false);
     await adb.rimraf(deviceTempPath + apkNameOnDevice);
     await adb.push(apiDemosPath, deviceTempPath);
     await adb.installFromDevicePath(deviceTempPath + apkNameOnDevice);
@@ -64,7 +61,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
       }
       await adb.goToHome();
       let res = await adb.getFocusedPackageAndActivity();
-      expect(res.appPackage).to.not.equal('com.android.contacts');
+      assert.notStrictEqual(res.appPackage, 'com.android.contacts');
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
@@ -75,7 +72,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
         // two dumpsys output formats
         const focusRe1 = '(mCurrentFocus.+\\.PeopleActivity)';
         const focusRe2 = '(mFocusedApp.+\\.PeopleActivity)';
-        expect(res).to.match(new RegExp(`${focusRe1}|${focusRe2}`));
+        assert.match(res, new RegExp(`${focusRe1}|${focusRe2}`));
       });
       await adb.goToHome();
     });
@@ -121,14 +118,14 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           'org.chromium.webview_shell',
           'com.google.android.googlequicksearchbox',
         ];
-        expect(expectedPkgPossibilities).to.include(appPackage);
+        assert.ok(expectedPkgPossibilities.includes(appPackage));
       },
     );
     it('should throw an error for unknown activity for intent', {timeout: E2E_LONG_TIMEOUT}, async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           action: 'android.intent.action.DEFAULT',
           pkg: 'com.google.android.telephony',
@@ -136,32 +133,35 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitDuration: START_APP_WAIT_DURATION,
           stopApp: false,
         }),
-      ).to.eventually.be.rejectedWith(/Cannot start the .* application/);
+        /Cannot start the .* application/,
+      );
     });
     it('should throw error for wrong activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           pkg: APIDEMOS_PKG,
           activity: 'ApiDemo',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-      ).to.eventually.be.rejectedWith('Activity');
+        /Activity/,
+      );
     });
     it('should throw error for wrong wait activity', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           pkg: APIDEMOS_PKG,
           activity: APIDEMOS_ACTIVITY,
           waitActivity: 'foo',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-      ).to.eventually.be.rejectedWith('foo');
+        /foo/,
+      );
     });
     it('should start activity with wait activity', async function () {
       await adb.install(apiDemosPath, {
@@ -203,27 +203,29 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           pkg: APIDEMOS_PKG,
           activity: 'SuperManager',
           waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-      ).to.eventually.be.rejectedWith('Activity');
+        /Activity/,
+      );
     });
     it('should throw error for wrong wait activity which contains wildcard', async function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           pkg: APIDEMOS_PKG,
           activity: APIDEMOS_ACTIVITY,
           waitActivity: '*.SuperManager',
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-      ).to.eventually.be.rejectedWith('SuperManager');
+        /SuperManager/,
+      );
     });
     it('should start activity with comma separated wait packages list', async function () {
       await adb.install(apiDemosPath, {
@@ -242,7 +244,7 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
       await adb.install(apiDemosPath, {
         grantPermissions: true,
       });
-      await expect(
+      await assert.rejects(
         adb.startApp({
           pkg: APIDEMOS_PKG,
           waitPkg: 'com.android.settings, com.example.somethingelse',
@@ -250,7 +252,8 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
           waitActivity: `*${APIDEMOS_ACTIVITY_SHORT}`,
           waitDuration: START_APP_WAIT_DURATION_FAIL,
         }),
-      ).to.eventually.be.rejectedWith('Activity');
+        /Activity/,
+      );
     });
   });
   it('should start activity when start activity is an inner class', async function () {
@@ -263,13 +266,13 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
       waitDuration: START_APP_WAIT_DURATION,
     });
     const {appPackage, appActivity} = await adb.getFocusedPackageAndActivity();
-    expect(appPackage).to.equal('com.android.settings');
+    assert.strictEqual(appPackage, 'com.android.settings');
 
     // The appActivity is different depending on the API level.
     if ((await adb.getApiLevel()) > 35) {
-      expect(appActivity).to.equal('.spa.SpaActivity');
+      assert.strictEqual(appActivity, '.spa.SpaActivity');
     } else {
-      expect(appActivity).to.equal('.Settings$NotificationAppListActivity');
+      assert.strictEqual(appActivity, '.Settings$NotificationAppListActivity');
     }
   });
   it('getFocusedPackageAndActivity should be able get package and activity', async function () {
@@ -287,16 +290,16 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
   it('extractStringsFromApk should get strings for default language', async function () {
     const {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, null, '/tmp');
     // ApiDemos doesn't have a 'save' string, so we check for a common string instead
-    expect(apkStrings).to.exist;
-    expect(Object.keys(apkStrings)).to.have.length.above(0);
+    assert.ok(apkStrings);
+    assert.ok(Object.keys(apkStrings).length > 0);
   });
   it('extractStringsFromApk should get strings for non-default language', async function () {
     const {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, 'fr', '/tmp');
-    expect(apkStrings.linear_layout_8_horizontal).to.equal('Horizontal');
+    assert.strictEqual(apkStrings.linear_layout_8_horizontal, 'Horizontal');
   });
   it('extractStringsFromApk should get strings for en language', async function () {
     const {apkStrings} = await adb.extractStringsFromApk(apiDemosPath, 'en', '/tmp');
-    expect(apkStrings.linear_layout_8_horizontal).to.equal('Horizontal');
+    assert.strictEqual(apkStrings.linear_layout_8_horizontal, 'Horizontal');
   });
   describe('activateApp', function () {
     it('should be able to activate with normal package and activity', async function () {
@@ -315,12 +318,12 @@ describe('apk utils', {timeout: E2E_TIMEOUT}, function () {
         // Add a small delay to allow the home screen to fully appear
         await new Promise((resolve) => setTimeout(resolve, 300));
         const {appPackage} = await adb.getFocusedPackageAndActivity();
-        expect(appPackage).to.not.eql(APIDEMOS_PKG);
+        assert.notStrictEqual(appPackage, APIDEMOS_PKG);
       });
       await retryInterval(10, 500, async () => {
         await adb.activateApp(APIDEMOS_PKG);
         const {appPackage} = await adb.getFocusedPackageAndActivity();
-        expect(appPackage).to.eql(APIDEMOS_PKG);
+        assert.strictEqual(appPackage, APIDEMOS_PKG);
       });
     });
   });

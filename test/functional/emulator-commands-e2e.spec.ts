@@ -1,11 +1,7 @@
+import assert from 'node:assert/strict';
 import {describe, it, before, type TestContext} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-
 import {ADB} from '../../lib/adb.js';
-
-use(chaiAsPromised);
 
 describe('emulator commands', function () {
   let adb: ADB;
@@ -19,20 +15,20 @@ describe('emulator commands', function () {
   describe('execEmuConsoleCommand', function () {
     it('should print name', async function () {
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);
-      expect(name).to.not.be.empty;
+      assert.ok(name.length > 0);
     });
 
     it('should fail if the command is unknown', async function () {
-      await expect(adb.execEmuConsoleCommand(['avd', 'namer'])).to.eventually.be.rejected;
+      await assert.rejects(adb.execEmuConsoleCommand(['avd', 'namer']));
     });
   });
 
   describe('getEmuVersionInfo', function () {
     it('should get version info', async function () {
       const {revision, buildId} = await adb.getEmuVersionInfo();
-      expect(revision).to.not.be.empty;
-      expect(buildId).to.be.a('number');
-      expect((buildId ?? 0) > 0).to.be.true;
+      assert.ok((revision ?? '').length > 0);
+      assert.strictEqual(typeof buildId, 'number');
+      assert.strictEqual((buildId ?? 0) > 0, true);
     });
   });
 
@@ -45,7 +41,7 @@ describe('emulator commands', function () {
       const name = await adb.execEmuConsoleCommand(['avd', 'name']);
       const {target} = await adb.getEmuImageProperties(name);
       const apiMatch = /\d+/.exec(target);
-      expect(apiMatch && parseInt(apiMatch[0], 10) > 0).to.be.true;
+      assert.strictEqual(apiMatch && parseInt(apiMatch[0], 10) > 0, true);
     });
   });
 });

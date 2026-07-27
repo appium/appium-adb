@@ -1,16 +1,13 @@
+import assert from 'node:assert/strict';
 import path from 'node:path';
 import {describe, it, before, beforeEach, afterEach} from 'node:test';
 
 import {fs, tempDir} from '@appium/support';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {ADB} from '../../lib/adb.js';
 import {unsignApk} from '../../lib/tools/apk-signing.js';
 import {FIXTURES_ROOT} from '../constants.js';
 import {getApiDemosPath} from './setup.js';
-
-use(chaiAsPromised);
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
 const keyAlias = 'appiumtest';
@@ -39,19 +36,19 @@ describe('Apk-signing', function () {
     const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
     await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
-    expect(await adb.checkApkCert(apkCopy)).to.be.false;
+    assert.strictEqual(await adb.checkApkCert(apkCopy), false);
   });
   it('checkApkCert should return true for signed apk', async function () {
     // ApiDemos APK is signed but not with the default Appium certificate
     // So we check with requireDefaultCert: false to verify it's signed
-    expect(await adb.checkApkCert(apiDemosPath, {requireDefaultCert: false})).to.be.true;
+    assert.strictEqual(await adb.checkApkCert(apiDemosPath, {requireDefaultCert: false}), true);
   });
   it('signWithDefaultCert should sign apk', async function () {
     const apkCopy = path.resolve(tmpDir, path.basename(apiDemosPath));
     await fs.copyFile(apiDemosPath, apkCopy);
     await unsignApk(apkCopy);
     await adb.signWithDefaultCert(apkCopy);
-    expect(await adb.checkApkCert(apkCopy)).to.be.true;
+    assert.strictEqual(await adb.checkApkCert(apkCopy), true);
   });
   it('signWithCustomCert should sign apk with custom certificate', async function () {
     const customAdb = await ADB.createADB();
@@ -64,6 +61,6 @@ describe('Apk-signing', function () {
     customAdb.keystorePassword = 'android';
     customAdb.keyPassword = 'android';
     await customAdb.signWithCustomCert(apkCopy);
-    expect(await customAdb.checkApkCert(apkCopy)).to.be.true;
+    assert.strictEqual(await customAdb.checkApkCert(apkCopy), true);
   });
 });

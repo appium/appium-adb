@@ -1,12 +1,9 @@
+import assert from 'node:assert/strict';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
 import {ADB} from '../../lib/adb.js';
-
-use(chaiAsPromised);
 
 const emulators = [
   {udid: 'emulator-5554', state: 'device', port: 5554},
@@ -37,27 +34,27 @@ describe('emulator commands', function () {
       it('should verify emulators state', async function () {
         mocks.adb.expects('getConnectedEmulators').atLeast(3).returns(emulators);
         adb.curDeviceId = 'emulator-5554';
-        expect(await adb.isEmulatorConnected()).to.equal(true);
+        assert.strictEqual(await adb.isEmulatorConnected(), true);
         adb.curDeviceId = 'emulator-5556';
-        expect(await adb.isEmulatorConnected()).to.equal(true);
+        assert.strictEqual(await adb.isEmulatorConnected(), true);
         adb.curDeviceId = 'emulator-5558';
-        expect(await adb.isEmulatorConnected()).to.equal(false);
+        assert.strictEqual(await adb.isEmulatorConnected(), false);
       });
     });
     describe('verifyEmulatorConnected', function () {
       it('should throw an exception on emulator not connected', async function () {
         adb.curDeviceId = 'emulator-5558';
         mocks.adb.expects('isEmulatorConnected').once().returns(false);
-        await expect(adb.verifyEmulatorConnected()).to.eventually.be.rejected;
+        await assert.rejects(adb.verifyEmulatorConnected());
       });
     });
     describe('fingerprint', function () {
       it('should throw exception on undefined fingerprintId', async function () {
-        await expect(adb.fingerprint(undefined as any)).to.eventually.be.rejected;
+        await assert.rejects(adb.fingerprint(undefined as any));
       });
       it('should throw exception on apiLevel lower than 23', async function () {
         mocks.adb.expects('getApiLevel').once().withExactArgs().returns(21);
-        await expect(adb.fingerprint(String(fingerprintId))).to.eventually.be.rejected;
+        await assert.rejects(adb.fingerprint(String(fingerprintId)));
       });
       it('should call adbExec with the correct args', async function () {
         mocks.adb.expects('getApiLevel').once().withExactArgs().returns(23);
@@ -81,7 +78,7 @@ describe('emulator commands', function () {
     });
     describe('power methods', function () {
       it('should throw exception on invalid power ac state', async function () {
-        await expect(adb.powerAC('dead' as any)).to.eventually.be.rejectedWith('Wrong power AC state');
+        await assert.rejects(adb.powerAC('dead' as any), /Wrong power AC state/);
       });
       it('should set the power ac off', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -104,11 +101,9 @@ describe('emulator commands', function () {
         await adb.powerAC('on');
       });
       it('should throw exception on invalid power battery percent', async function () {
-        await expect(adb.powerCapacity(-1)).to.eventually.be.rejectedWith('should be valid integer between 0 and 100');
-        await expect(adb.powerCapacity('a' as any)).to.eventually.be.rejectedWith(
-          'should be valid integer between 0 and 100',
-        );
-        await expect(adb.powerCapacity(500)).to.eventually.be.rejectedWith('should be valid integer between 0 and 100');
+        await assert.rejects(adb.powerCapacity(-1), /should be valid integer between 0 and 100/);
+        await assert.rejects(adb.powerCapacity('a' as any), /should be valid integer between 0 and 100/);
+        await assert.rejects(adb.powerCapacity(500), /should be valid integer between 0 and 100/);
       });
       it('should set the power capacity', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -124,10 +119,10 @@ describe('emulator commands', function () {
     });
     describe('sendSMS', function () {
       it('should throw exception on invalid message', async function () {
-        await expect(adb.sendSMS('+549341312345678' as any)).to.be.rejected;
+        await assert.rejects(adb.sendSMS('+549341312345678' as any));
       });
       it('should throw exception on invalid phoneNumber', async function () {
-        await expect(adb.sendSMS('' as any, 'Hello Appium')).to.be.rejected;
+        await assert.rejects(adb.sendSMS('' as any, 'Hello Appium'));
       });
       it('should call adbExec with the correct args', async function () {
         const phoneNumber = 4509;
@@ -144,7 +139,7 @@ describe('emulator commands', function () {
     });
     describe('gsm signal method', function () {
       it('should throw exception on invalid strength', async function () {
-        await expect(adb.gsmSignal(5 as any)).to.eventually.be.rejectedWith('Invalid signal strength');
+        await assert.rejects(adb.gsmSignal(5 as any), /Invalid signal strength/);
       });
       it('should call adbExecEmu with the correct args', async function () {
         const signalStrength = 0;
@@ -160,10 +155,10 @@ describe('emulator commands', function () {
     });
     describe('gsm call methods', function () {
       it('should throw exception on invalid action', async function () {
-        await expect(adb.gsmCall('+549341312345678' as any, 'call' as any)).to.be.rejected;
+        await assert.rejects(adb.gsmCall('+549341312345678' as any, 'call' as any));
       });
       it('should throw exception on invalid phoneNumber', async function () {
-        await expect(adb.gsmCall('' as any, 'call')).to.be.rejected;
+        await assert.rejects(adb.gsmCall('' as any, 'call'));
       });
       it('should set the correct method for making gsm call', async function () {
         const phoneNumber = 4509;
@@ -212,7 +207,7 @@ describe('emulator commands', function () {
     });
     describe('network speed method', function () {
       it('should throw exception on invalid speed', async function () {
-        await expect(adb.networkSpeed('light' as any)).to.eventually.be.rejectedWith('Invalid network speed');
+        await assert.rejects(adb.networkSpeed('light' as any), /Invalid network speed/);
       });
       for (const [key, value] of Object.entries(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async function () {
@@ -225,7 +220,7 @@ describe('emulator commands', function () {
     });
     describe('gsm voice method', function () {
       it('should throw exception on invalid strength', async function () {
-        await expect(adb.gsmVoice('weird' as any)).to.eventually.be.rejectedWith('Invalid gsm voice state');
+        await assert.rejects(adb.gsmVoice('weird' as any), /Invalid gsm voice state/);
       });
       it('should set gsm voice to unregistered', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -300,10 +295,10 @@ describe('emulator commands', function () {
     });
     describe('sensorSet method', function () {
       it('should throw exception on missing sensor name', async function () {
-        await expect(adb.sensorSet('sensor' as any, undefined as any)).to.eventually.be.rejected;
+        await assert.rejects(adb.sensorSet('sensor' as any, undefined as any));
       });
       it('should throw exception on missing sensor value', async function () {
-        await expect(adb.sensorSet('light' as any, undefined as any)).to.eventually.be.rejected;
+        await assert.rejects(adb.sensorSet('light' as any, undefined as any));
       });
       it('should call adb emu sensor set with the correct values', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);

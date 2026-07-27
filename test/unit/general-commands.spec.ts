@@ -1,17 +1,14 @@
+import assert from 'node:assert/strict';
 import net from 'node:net';
 import {EOL} from 'node:os';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
 import {ADB} from '../../lib/adb.js';
 import {Logcat} from '../../lib/logcat.js';
 import {APIDEMOS_PKG} from '../constants.js';
-
-use(chaiAsPromised);
 
 const apiLevel = 21,
   platformVersion = '4.4.4',
@@ -70,19 +67,19 @@ describe('general commands', function () {
     describe('getApiLevel', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('getDeviceProperty').once().withExactArgs('ro.build.version.sdk').returns(`${apiLevel}`);
-        expect(await adb.getApiLevel()).to.equal(apiLevel);
+        assert.strictEqual(await adb.getApiLevel(), apiLevel);
       });
       it('should call shell with correct args with Q preview device', async function () {
         adb._apiLevel = undefined;
         mocks.adb.expects('getDeviceProperty').once().withExactArgs('ro.build.version.sdk').returns('28');
         mocks.adb.expects('getDeviceProperty').once().withExactArgs('ro.build.version.release').returns('q');
-        expect(await adb.getApiLevel()).to.equal(29);
+        assert.strictEqual(await adb.getApiLevel(), 29);
       });
       it('should call shell with correct args with R preview device', async function () {
         adb._apiLevel = undefined;
         mocks.adb.expects('getDeviceProperty').once().withExactArgs('ro.build.version.sdk').returns('29');
         mocks.adb.expects('getDeviceProperty').once().withExactArgs('ro.build.version.release').returns('R');
-        expect(await adb.getApiLevel()).to.equal(30);
+        assert.strictEqual(await adb.getApiLevel(), 30);
       });
     });
     describe('getPlatformVersion', function () {
@@ -92,19 +89,19 @@ describe('general commands', function () {
           .once()
           .withExactArgs('ro.build.version.release')
           .returns(platformVersion);
-        expect(await adb.getPlatformVersion()).to.equal(platformVersion);
+        assert.strictEqual(await adb.getPlatformVersion(), platformVersion);
       });
     });
     describe('getDeviceSysLanguage', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'persist.sys.language']).returns(language);
-        expect(await adb.getDeviceSysLanguage()).to.equal(language);
+        assert.strictEqual(await adb.getDeviceSysLanguage(), language);
       });
     });
     describe('getDeviceSysCountry', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'persist.sys.country']).returns(country);
-        expect(await adb.getDeviceSysCountry()).to.equal(country);
+        assert.strictEqual(await adb.getDeviceSysCountry(), country);
       });
     });
     describe('getLocationProviders', function () {
@@ -112,16 +109,16 @@ describe('general commands', function () {
         mocks.adb.expects('getApiLevel').once().returns(27);
         mocks.adb.expects('getSetting').once().withExactArgs('secure', 'location_providers_allowed').returns('');
         const providers = await adb.getLocationProviders();
-        expect(providers).to.be.an('array');
-        expect(providers.length).to.equal(0);
+        assert.ok(Array.isArray(providers));
+        assert.strictEqual(providers.length, 0);
       });
       it('should return one location_providers_allowed', async function () {
         mocks.adb.expects('getApiLevel').once().returns(27);
         mocks.adb.expects('getSetting').once().withExactArgs('secure', 'location_providers_allowed').returns('gps');
         const providers = await adb.getLocationProviders();
-        expect(providers).to.be.an('array');
-        expect(providers.length).to.equal(1);
-        expect(providers).to.include('gps');
+        assert.ok(Array.isArray(providers));
+        assert.strictEqual(providers.length, 1);
+        assert.ok(providers.includes('gps'));
       });
       it('should return both location_providers_allowed', async function () {
         mocks.adb.expects('getApiLevel').once().returns(27);
@@ -131,10 +128,10 @@ describe('general commands', function () {
           .withExactArgs('secure', 'location_providers_allowed')
           .returns('gps ,wifi');
         const providers = await adb.getLocationProviders();
-        expect(providers).to.be.an('array');
-        expect(providers.length).to.equal(2);
-        expect(providers).to.include('gps');
-        expect(providers).to.include('wifi');
+        assert.ok(Array.isArray(providers));
+        assert.strictEqual(providers.length, 2);
+        assert.ok(providers.includes('gps'));
+        assert.ok(providers.includes('wifi'));
       });
     });
     describe('toggleGPSLocationProvider', function () {
@@ -156,25 +153,25 @@ describe('general commands', function () {
     describe('getDeviceSysLocale', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'persist.sys.locale']).returns(locale);
-        expect(await adb.getDeviceSysLocale()).to.equal(locale);
+        assert.strictEqual(await adb.getDeviceSysLocale(), locale);
       });
     });
     describe('getDeviceProductLanguage', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'ro.product.locale.language']).returns(language);
-        expect(await adb.getDeviceProductLanguage()).to.equal(language);
+        assert.strictEqual(await adb.getDeviceProductLanguage(), language);
       });
     });
     describe('getDeviceProductCountry', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'ro.product.locale.region']).returns(country);
-        expect(await adb.getDeviceProductCountry()).to.equal(country);
+        assert.strictEqual(await adb.getDeviceProductCountry(), country);
       });
     });
     describe('getDeviceProductLocale', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['getprop', 'ro.product.locale']).returns(locale);
-        expect(await adb.getDeviceProductLocale()).to.equal(locale);
+        assert.strictEqual(await adb.getDeviceProductLocale(), locale);
       });
     });
     describe('setDeviceProperty', function () {
@@ -191,20 +188,20 @@ describe('general commands', function () {
     describe('availableIMEs', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withArgs(['ime', 'list', '-a']).returns(imeList);
-        expect(await adb.availableIMEs()).to.have.length.above(0);
+        assert.ok((await adb.availableIMEs()).length > 0);
       });
     });
     describe('enabledIMEs', function () {
       it('should call shell with correct args', async function () {
         mocks.adb.expects('shell').once().withArgs(['ime', 'list']).returns(imeList);
-        expect(await adb.enabledIMEs()).to.have.length.above(0);
+        assert.ok((await adb.enabledIMEs()).length > 0);
       });
     });
     describe('defaultIME', function () {
       const defaultIME = 'com.android.inputmethod.latin/.LatinIME';
       it('should call shell with correct args', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('secure', 'default_input_method').returns(defaultIME);
-        expect(await adb.defaultIME()).to.equal(defaultIME);
+        assert.strictEqual(await adb.defaultIME(), defaultIME);
       });
     });
     describe('disableIME', function () {
@@ -311,8 +308,8 @@ describe('general commands', function () {
       it('should call shell with correct args and should return false', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['dumpsys', 'input_method']).returns('mInputShown=false');
         const {isKeyboardShown, canCloseKeyboard} = await adb.isSoftKeyboardPresent();
-        expect(canCloseKeyboard).to.be.false;
-        expect(isKeyboardShown).to.be.false;
+        assert.strictEqual(canCloseKeyboard, false);
+        assert.strictEqual(isKeyboardShown, false);
       });
       it('should call shell with correct args and should return true', async function () {
         mocks.adb
@@ -321,18 +318,18 @@ describe('general commands', function () {
           .withExactArgs(['dumpsys', 'input_method'])
           .returns('mInputShown=true mIsInputViewShown=true');
         const {isKeyboardShown, canCloseKeyboard} = await adb.isSoftKeyboardPresent();
-        expect(isKeyboardShown).to.be.true;
-        expect(canCloseKeyboard).to.be.true;
+        assert.strictEqual(isKeyboardShown, true);
+        assert.strictEqual(canCloseKeyboard, true);
       });
     });
     describe('isAirplaneModeOn', function () {
       it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'airplane_mode_on').returns('1');
-        expect(await adb.isAirplaneModeOn()).to.be.true;
+        assert.strictEqual(await adb.isAirplaneModeOn(), true);
       });
       it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'airplane_mode_on').returns('0');
-        expect(await adb.isAirplaneModeOn()).to.be.false;
+        assert.strictEqual(await adb.isAirplaneModeOn(), false);
       });
     });
     describe('setAirplaneMode', function () {
@@ -360,11 +357,11 @@ describe('general commands', function () {
     describe('isWifiOn', function () {
       it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'wifi_on').returns('1');
-        expect(await adb.isWifiOn()).to.be.true;
+        assert.strictEqual(await adb.isWifiOn(), true);
       });
       it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'wifi_on').returns('0');
-        expect(await adb.isWifiOn()).to.be.false;
+        assert.strictEqual(await adb.isWifiOn(), false);
       });
     });
     describe('setWifiState', function () {
@@ -391,11 +388,11 @@ describe('general commands', function () {
     describe('isDataOn', function () {
       it('should call shell with correct args and should be true', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'mobile_data').returns('1');
-        expect(await adb.isDataOn()).to.be.true;
+        assert.strictEqual(await adb.isDataOn(), true);
       });
       it('should call shell with correct args and should be false', async function () {
         mocks.adb.expects('getSetting').once().withExactArgs('global', 'mobile_data').returns('0');
-        expect(await adb.isDataOn()).to.be.false;
+        assert.strictEqual(await adb.isDataOn(), false);
       });
     });
     describe('setDataState', function () {
@@ -431,19 +428,19 @@ describe('general commands', function () {
       };
       it('should return false if all animation settings are equal to zero', async function () {
         mockSetting('0.0', '0.0', '0.0');
-        expect(await adb.isAnimationOn()).to.be.false;
+        assert.strictEqual(await adb.isAnimationOn(), false);
       });
       it('should return true if animator_duration_scale setting is NOT equal to zero', async function () {
         mockSetting('0.5', '0.0', '0.0');
-        expect(await adb.isAnimationOn()).to.be.true;
+        assert.strictEqual(await adb.isAnimationOn(), true);
       });
       it('should return true if transition_animation_scale setting is NOT equal to zero', async function () {
         mockSetting('0.0', '0.5', '0.0');
-        expect(await adb.isAnimationOn()).to.be.true;
+        assert.strictEqual(await adb.isAnimationOn(), true);
       });
       it('should return true if window_animation_scale setting is NOT equal to zero', async function () {
         mockSetting('0.0', '0.0', '0.5');
-        expect(await adb.isAnimationOn()).to.be.true;
+        assert.strictEqual(await adb.isAnimationOn(), true);
       });
     });
     describe('setAnimation', function () {
@@ -451,25 +448,25 @@ describe('general commands', function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1.5);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1.5);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1.5);
-        expect(await adb.setAnimationScale(1.5)).not.throws;
+        await assert.doesNotReject(adb.setAnimationScale(1.5));
       });
       it('should set 1 for 1', async function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 1);
-        expect(await adb.setAnimationScale(1)).not.throws;
+        await assert.doesNotReject(adb.setAnimationScale(1));
       });
       it('should set 0 for 0', async function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', 0);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', 0);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', 0);
-        expect(await adb.setAnimationScale(0)).not.throws;
+        await assert.doesNotReject(adb.setAnimationScale(0));
       });
       it('should set 0 for negative values', async function () {
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'animator_duration_scale', -1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'transition_animation_scale', -1);
         mocks.adb.expects('setSetting').once().withExactArgs('global', 'window_animation_scale', -1);
-        expect(await adb.setAnimationScale(-1)).not.throws;
+        await assert.doesNotReject(adb.setAnimationScale(-1));
       });
     });
     describe('forwardPort', function () {
@@ -523,7 +520,7 @@ describe('general commands', function () {
     describe('ping', function () {
       it('should call shell with correct args and should return true', async function () {
         mocks.adb.expects('shell').once().withExactArgs(['echo', 'ping']).returns('ping');
-        expect(await adb.ping()).to.be.true;
+        assert.strictEqual(await adb.ping(), true);
       });
     });
     describe('restart', function () {
@@ -557,7 +554,7 @@ describe('general commands', function () {
       });
       it('should throw error for invalid intent', async function () {
         mocks.adb.expects('isValidClass').once().withExactArgs('invalid-intent').returns(false);
-        await expect(adb.broadcast('invalid-intent')).to.eventually.be.rejectedWith(/Invalid intent/);
+        await assert.rejects(adb.broadcast('invalid-intent'), /Invalid intent/);
       });
     });
   });
@@ -577,12 +574,12 @@ describe('general commands', function () {
     it('should get device screen density', async function () {
       mocks.adb.expects('shell').once().withExactArgs(['wm', 'density']).returns('Physical density: 420');
       const density = await adb.getScreenDensity();
-      expect(density).to.equal(420);
+      assert.strictEqual(density, 420);
     });
     it('should return null for invalid screen density', async function () {
       mocks.adb.expects('shell').once().withExactArgs(['wm', 'density']).returns('Physical density: unknown');
       const density = await adb.getScreenDensity();
-      expect(density).to.equal(null);
+      assert.strictEqual(density, null);
     });
   });
   describe('app permission', function () {
@@ -731,7 +728,7 @@ describe('general commands', function () {
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.RECEIVE_BOOT_COMPLETED',
       ]) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
     });
     it('should properly list requested permissions for output without install permissions', async function () {
@@ -754,7 +751,7 @@ describe('general commands', function () {
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.RECEIVE_BOOT_COMPLETED',
       ]) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
     });
     it('should properly list granted permissions', async function () {
@@ -775,10 +772,10 @@ describe('general commands', function () {
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.RECORD_AUDIO',
       ]) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
       for (const perm of ['android.permission.READ_CONTACTS', 'android.permission.CAMERA']) {
-        expect(result).to.not.include(perm);
+        assert.ok(!result.includes(perm));
       }
     });
     it('should properly list granted permissions for output without install permissions', async function () {
@@ -791,10 +788,10 @@ describe('general commands', function () {
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.RECORD_AUDIO',
       ]) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
       for (const perm of ['android.permission.READ_CONTACTS', 'android.permission.CAMERA']) {
-        expect(result).to.not.include(perm);
+        assert.ok(!result.includes(perm));
       }
     });
     it('should properly list denied permissions', async function () {
@@ -815,10 +812,10 @@ describe('general commands', function () {
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.RECORD_AUDIO',
       ]) {
-        expect(result).to.not.include(perm);
+        assert.ok(!result.includes(perm));
       }
       for (const perm of ['android.permission.READ_CONTACTS', 'android.permission.CAMERA']) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
     });
     it('should properly list denied permissions for output without install permissions', async function () {
@@ -831,26 +828,26 @@ describe('general commands', function () {
         'android.permission.WRITE_EXTERNAL_STORAGE',
         'android.permission.RECORD_AUDIO',
       ]) {
-        expect(result).to.not.include(perm);
+        assert.ok(!result.includes(perm));
       }
       for (const perm of ['android.permission.READ_CONTACTS', 'android.permission.CAMERA']) {
-        expect(result).to.include(perm);
+        assert.ok(result.includes(perm));
       }
     });
   });
   it('isValidClass should correctly validate class names', function () {
-    expect(adb.isValidClass('some.package/some.package.Activity')).to.be.true;
-    expect(adb.isValidClass('illegalPackage#/adsasd')).to.be.false;
+    assert.strictEqual(adb.isValidClass('some.package/some.package.Activity'), true);
+    assert.strictEqual(adb.isValidClass('illegalPackage#/adsasd'), false);
   });
   it('getAdbPath should correctly return adbPath', function () {
-    expect(adb.getAdbPath()).to.equal(adb.executable.path);
+    assert.strictEqual(adb.getAdbPath(), adb.executable.path);
   });
   describe('setHttpProxy', function () {
     it('should throw an error on undefined proxy_host', async function () {
-      await expect(adb.setHttpProxy(undefined as any, undefined as any)).to.eventually.be.rejected;
+      await assert.rejects(adb.setHttpProxy(undefined as any, undefined as any));
     });
     it('should throw an error on undefined proxy_port', async function () {
-      await expect(adb.setHttpProxy('http://localhost', undefined as any)).to.eventually.be.rejected;
+      await assert.rejects(adb.setHttpProxy('http://localhost', undefined as any));
     });
     it('should call setSetting method with correct args', async function () {
       const proxyHost = 'http://localhost';
@@ -882,17 +879,17 @@ describe('general commands', function () {
   describe('getSetting', function () {
     it('should call shell settings get', async function () {
       mocks.adb.expects('shell').once().withArgs(['settings', 'get', 'namespace', 'setting']).returns('value');
-      expect(await adb.getSetting('namespace', 'setting')).to.be.equal('value');
+      assert.strictEqual(await adb.getSetting('namespace', 'setting'), 'value');
     });
   });
   describe('getCurrentTimeZone', function () {
     it('should call shell with correct args', async function () {
       mocks.adb.expects('shell').once().withExactArgs(['getprop', 'persist.sys.timezone']).returns(`Asia/Tokyo${EOL}`);
-      expect(await adb.getTimeZone()).to.equal('Asia/Tokyo');
+      assert.strictEqual(await adb.getTimeZone(), 'Asia/Tokyo');
     });
     it('should raise an error', async function () {
       mocks.adb.expects('shell').throws();
-      await expect(adb.getTimeZone()).to.eventually.be.rejected;
+      await assert.rejects(adb.getTimeZone());
     });
   });
   describe('setHiddenApiPolicy', function () {

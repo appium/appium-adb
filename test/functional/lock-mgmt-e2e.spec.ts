@@ -1,11 +1,7 @@
+import assert from 'node:assert/strict';
 import {describe, it, before, type TestContext} from 'node:test';
 
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-
 import {ADB} from '../../lib/adb.js';
-
-use(chaiAsPromised);
 
 describe('Lock Management', function () {
   let adb: ADB;
@@ -19,8 +15,8 @@ describe('Lock Management', function () {
       return ctx.skip();
     }
     await adb.clearLockCredential();
-    await expect(adb.verifyLockCredential()).to.eventually.be.true;
-    await expect(adb.isLockEnabled()).to.eventually.be.false;
+    assert.strictEqual(await adb.verifyLockCredential(), true);
+    assert.strictEqual(await adb.isLockEnabled(), false);
   });
 
   describe('Lock and unlock life cycle', function () {
@@ -35,13 +31,13 @@ describe('Lock Management', function () {
       try {
         await adb.setLockCredential('password', password);
         await adb.keyevent(26);
-        await expect(adb.isLockEnabled()).to.eventually.be.true;
-        await expect(adb.isScreenLocked()).to.eventually.be.true;
+        assert.strictEqual(await adb.isLockEnabled(), true);
+        assert.strictEqual(await adb.isScreenLocked(), true);
         await adb.clearLockCredential(password);
         await adb.cycleWakeUp();
         await adb.dismissKeyguard();
-        await expect(adb.isLockEnabled()).to.eventually.be.false;
-        await expect(adb.isScreenLocked()).to.eventually.be.false;
+        assert.strictEqual(await adb.isLockEnabled(), false);
+        assert.strictEqual(await adb.isScreenLocked(), false);
       } finally {
         await adb.clearLockCredential(password);
       }

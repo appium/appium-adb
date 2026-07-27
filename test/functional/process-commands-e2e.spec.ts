@@ -1,13 +1,10 @@
+import assert from 'node:assert/strict';
 import {describe, it, before, type TestContext} from 'node:test';
 
 import {waitForCondition} from 'asyncbox';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {ADB} from '../../lib/adb.js';
 import {E2E_TIMEOUT, APIDEMOS_PKG, APIDEMOS_ACTIVITY, getApiDemosPath, ensureRootAccess} from './setup.js';
-
-use(chaiAsPromised);
 
 describe('process commands', {timeout: E2E_TIMEOUT}, function () {
   let adb: ADB;
@@ -20,18 +17,18 @@ describe('process commands', {timeout: E2E_TIMEOUT}, function () {
   });
 
   it('processExists should be able to find ui process', async function () {
-    expect(await adb.processExists('com.android.systemui')).to.be.true;
+    assert.strictEqual(await adb.processExists('com.android.systemui'), true);
   });
 
   it('getProcessIdsByName should return pids', async function () {
-    expect(await adb.getProcessIdsByName('com.android.phone')).to.have.length.above(0);
+    assert.ok((await adb.getProcessIdsByName('com.android.phone')).length > 0);
   });
 
   it('should be able to get process name by ID', async function () {
     const pids = await adb.getProcessIdsByName('com.android.systemui');
     if (pids.length > 0) {
       const processName = await adb.getProcessNameById(pids[0]);
-      expect(processName).to.equal('com.android.systemui');
+      assert.strictEqual(processName, 'com.android.systemui');
     }
   });
 
@@ -49,7 +46,7 @@ describe('process commands', {timeout: E2E_TIMEOUT}, function () {
 
     // Verify the process is running
     const pids = await adb.getProcessIdsByName(APIDEMOS_PKG);
-    expect(pids).to.have.length.above(0);
+    assert.ok(pids.length > 0);
 
     // Kill the processes by name
     await adb.killProcessesByName(APIDEMOS_PKG);
@@ -75,7 +72,7 @@ describe('process commands', {timeout: E2E_TIMEOUT}, function () {
 
     // Get the process ID
     const pids = await adb.getProcessIdsByName(APIDEMOS_PKG);
-    expect(pids).to.have.length.above(0);
+    assert.ok(pids.length > 0);
     const pid = pids[0];
 
     // Kill the process by PID
@@ -91,7 +88,7 @@ describe('process commands', {timeout: E2E_TIMEOUT}, function () {
   it('should handle non-existent process gracefully', async function () {
     // Try to get process IDs for a non-existent process
     const pids = await adb.getProcessIdsByName('com.nonexistent.app');
-    expect(pids).to.have.length(0);
+    assert.strictEqual(pids.length, 0);
 
     // Try to kill a non-existent process
     await adb.killProcessesByName('com.nonexistent.app');
@@ -103,9 +100,9 @@ describe('process commands', {timeout: E2E_TIMEOUT}, function () {
     try {
       await adb.getProcessNameById('invalid');
       // Should not reach here
-      expect.fail('Expected error for invalid PID');
+      assert.fail('Expected error for invalid PID');
     } catch (error) {
-      expect((error as Error).message).to.include('valid number');
+      assert.ok((error as Error).message.includes('valid number'));
     }
   });
 });
