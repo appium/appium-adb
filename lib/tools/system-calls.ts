@@ -939,7 +939,11 @@ export async function launchAVD(this: ADB, avdName: string, opts: AvdLaunchOptio
   }
 
   if (!util.isEmpty(args)) {
-    launchArgs.push(...(Array.isArray(args) ? args : util.shellParse(`${args}`)));
+    launchArgs.push(
+      ...(Array.isArray(args)
+        ? args
+        : util.shellParse(`${args}`).filter((token): token is string => typeof token === 'string')),
+    );
   }
 
   log.debug(`Running '${emulatorBinaryPath}' with args: ${util.quote(launchArgs)}`);
