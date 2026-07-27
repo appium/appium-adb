@@ -1,7 +1,8 @@
-import {log} from '../logger.js';
-import {sleep, waitForCondition} from 'asyncbox';
-import type {ADB} from '../adb.js';
 import {util} from '@appium/support';
+import {sleep, waitForCondition} from 'asyncbox';
+
+import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 
 const CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR = `Credential can't be null or empty`;
 const CREDENTIAL_DID_NOT_MATCH_ERROR = `didn't match`;
@@ -24,10 +25,7 @@ export async function isLockManagementSupported(this: ADB): Promise<boolean> {
       output = await this.shell([`locksettings help && echo ${passFlag}`]);
     } catch {}
     this._isLockManagementSupported = output.includes(passFlag);
-    log.debug(
-      `Extended lock settings management is ` +
-        `${this._isLockManagementSupported ? '' : 'not '}supported`,
-    );
+    log.debug(`Extended lock settings management is ` + `${this._isLockManagementSupported ? '' : 'not '}supported`);
   }
   return this._isLockManagementSupported as boolean;
 }
@@ -44,10 +42,7 @@ export async function isLockManagementSupported(this: ADB): Promise<boolean> {
  * @return True if the given credential matches to the device's one
  * @throws {Error} If the verification faces an unexpected error
  */
-export async function verifyLockCredential(
-  this: ADB,
-  credential: string | null = null,
-): Promise<boolean> {
+export async function verifyLockCredential(this: ADB, credential: string | null = null): Promise<boolean> {
   try {
     const {stdout, stderr} = await this.shell(buildCommand('verify', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
@@ -55,11 +50,7 @@ export async function verifyLockCredential(
     if (stdout?.includes('verified successfully')) {
       return true;
     }
-    if (
-      [`didn't match`, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) =>
-        (stderr || stdout)?.includes(x),
-      )
-    ) {
+    if ([`didn't match`, CREDENTIAL_CANNOT_BE_NULL_OR_EMPTY_ERROR].some((x) => (stderr || stdout)?.includes(x))) {
       return false;
     }
     throw new Error(stderr || stdout);
@@ -88,19 +79,12 @@ export async function verifyLockCredential(
  * null/empty value assumes the device has no lock currently set.
  * @throws {Error} If operation faces an unexpected error
  */
-export async function clearLockCredential(
-  this: ADB,
-  credential: string | null = null,
-): Promise<void> {
+export async function clearLockCredential(this: ADB, credential: string | null = null): Promise<void> {
   try {
     const {stdout, stderr} = await this.shell(buildCommand('clear', credential), {
       outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
     });
-    if (
-      !['user has no password', 'Lock credential cleared'].some((x) =>
-        (stderr || stdout)?.includes(x),
-      )
-    ) {
+    if (!['user has no password', 'Lock credential cleared'].some((x) => (stderr || stdout)?.includes(x))) {
       throw new Error(stderr || stdout);
     }
   } catch (e) {
@@ -141,10 +125,7 @@ export async function isLockEnabled(this: ADB): Promise<boolean> {
     }
     throw new Error(stderr || stdout);
   } catch (e) {
-    throw new Error(
-      `Cannot check if device lock is enabled. Original error: ${(e as Error).message}`,
-      {cause: e},
-    );
+    throw new Error(`Cannot check if device lock is enabled. Original error: ${(e as Error).message}`, {cause: e});
   }
 }
 
@@ -301,9 +282,7 @@ export function isShowingLockscreen(dumpsys: string): boolean {
   return (
     ['mShowingLockscreen=true', 'mDreamingLockscreen=true'].some((x) => dumpsys.includes(x)) ||
     // `mIsShowing` and `mInputRestricted` are `true` in lock condition. `false` is unlock condition.
-    [/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/].every((x) =>
-      x.test(dumpsys),
-    )
+    [/KeyguardStateMonitor[\n\s]+mIsShowing=true/, /\s+mInputRestricted=true/].every((x) => x.test(dumpsys))
   );
 }
 
@@ -325,11 +304,7 @@ export function isScreenStateOff(dumpsys: string): boolean {
  * @param oldCredential
  * @param args
  */
-function buildCommand(
-  verb: string,
-  oldCredential: string | null = null,
-  ...args: string[]
-): string[] {
+function buildCommand(verb: string, oldCredential: string | null = null, ...args: string[]): string[] {
   const cmd = ['locksettings', verb];
   if (oldCredential && !util.isEmpty(oldCredential)) {
     cmd.push('--old', oldCredential);
@@ -357,12 +332,7 @@ async function swipeUp(this: ADB, windowDumpsys: string): Promise<void> {
   const y0 = (displayHeight / 5) * 4;
   const x1 = x0;
   const y1 = displayHeight / 5;
-  await this.shell([
-    'input',
-    'touchscreen',
-    'swipe',
-    ...[x0, y0, x1, y1].map((c) => `${Math.trunc(c)}`),
-  ]);
+  await this.shell(['input', 'touchscreen', 'swipe', ...[x0, y0, x1, y1].map((c) => `${Math.trunc(c)}`)]);
 }
 
 /**

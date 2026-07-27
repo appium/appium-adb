@@ -1,19 +1,16 @@
-import * as teen_process from 'teen_process';
-import esmock from 'esmock';
-import sinon from 'sinon';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import esmock from 'esmock';
+import sinon from 'sinon';
+import * as teen_process from 'teen_process';
 
 use(chaiAsPromised);
 
 let currentExec: (...args: any[]) => any = async () => ({stdout: '', stderr: '', code: 0});
 let currentSleep: (...args: any[]) => any = async () => {};
-let currentRetryInterval: (...args: any[]) => any = async (
-  _retries: number,
-  _interval: number,
-  fn: () => any,
-) => fn();
+let currentRetryInterval: (...args: any[]) => any = async (_retries: number, _interval: number, fn: () => any) => fn();
 
 const {ADB} = await esmock(
   '../../lib/adb.js',
@@ -281,11 +278,7 @@ describe('System calls 2', function () {
   });
 
   it('fileExists should return true if file/dir exists', async function () {
-    mocks.adb
-      .expects('shell')
-      .once()
-      .withExactArgs([`[ -e 'foo' ] && echo __PASS__`])
-      .returns('__PASS__');
+    mocks.adb.expects('shell').once().withExactArgs([`[ -e 'foo' ] && echo __PASS__`]).returns('__PASS__');
     await expect(adb.fileExists('foo')).to.eventually.equal(true);
   });
   it('ls should return list', async function () {
@@ -315,10 +308,7 @@ describe('System calls 2', function () {
   });
   describe('shell outputFormat option', function () {
     beforeEach(function () {
-      currentExec = sandbox
-        .stub()
-        .onFirstCall()
-        .returns({stdout: 'a value', stderr: 'an error', code: 0});
+      currentExec = sandbox.stub().onFirstCall().returns({stdout: 'a value', stderr: 'an error', code: 0});
     });
     it('should default to stdout', async function () {
       const output = await adb.shell(['command']);
@@ -337,16 +327,9 @@ describe('System calls 2', function () {
     it('should call stop and start using shell', async function () {
       mocks.adb.expects('isRoot').once().returns(true);
       mocks.adb.expects('shell').once().withExactArgs(['stop']);
-      mocks.adb
-        .expects('setDeviceProperty')
-        .once()
-        .withExactArgs('sys.boot_completed', '0', {privileged: false});
+      mocks.adb.expects('setDeviceProperty').once().withExactArgs('sys.boot_completed', '0', {privileged: false});
       mocks.adb.expects('shell').once().withExactArgs(['start']);
-      mocks.adb
-        .expects('getDeviceProperty')
-        .atLeast(1)
-        .withExactArgs('sys.boot_completed')
-        .returns('1');
+      mocks.adb.expects('getDeviceProperty').atLeast(1).withExactArgs('sys.boot_completed').returns('1');
       await expect(adb.reboot()).to.eventually.not.be.rejected;
       sinon.assert.calledOnceWithExactly(sleepStub, 2000);
     });
@@ -360,11 +343,7 @@ describe('System calls 2', function () {
         .withExactArgs('sys.boot_completed', '0', sinon.match.object)
         .returns();
       mocks.adb.expects('shell').once().withExactArgs(['start']).returns();
-      mocks.adb
-        .expects('getDeviceProperty')
-        .once()
-        .withExactArgs('sys.boot_completed')
-        .returns('1');
+      mocks.adb.expects('getDeviceProperty').once().withExactArgs('sys.boot_completed').returns('1');
       mocks.adb.expects('unroot').once().returns({isSuccessful: true, wasAlreadyRooted: false});
       await expect(adb.reboot()).to.eventually.not.be.rejected;
       sinon.assert.calledOnceWithExactly(sleepStub, 2000);
@@ -372,10 +351,7 @@ describe('System calls 2', function () {
     it('should error with helpful message if cause of error is no root access', async function () {
       mocks.adb.expects('isRoot').once().returns(false);
       mocks.adb.expects('root').once().returns({wasAlreadyRooted: false});
-      mocks.adb
-        .expects('shell')
-        .once()
-        .throws(new Error('something something ==must be root== something something'));
+      mocks.adb.expects('shell').once().throws(new Error('something something ==must be root== something something'));
       await expect(adb.reboot()).to.eventually.be.rejectedWith(/requires root access/);
     });
     it('should throw original error if cause of error is something other than no root access', async function () {
@@ -438,11 +414,7 @@ describe('System calls 2', function () {
     });
     it('should call "unroot" on shell if call .unroot', async function () {
       mocks.adb.expects('isRoot').once().returns(true);
-      mocks.adb
-        .expects('adbExec')
-        .once()
-        .withExactArgs(['unroot'])
-        .returns({stdout: 'Hello World'});
+      mocks.adb.expects('adbExec').once().withExactArgs(['unroot']).returns({stdout: 'Hello World'});
       await expect(adb.unroot()).to.eventually.eql({isSuccessful: true, wasAlreadyRooted: true});
     });
     it('should tell us if "wasAlreadyRooted"', async function () {

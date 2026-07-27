@@ -1,12 +1,14 @@
-import {ADB} from '../../lib/adb.js';
-import path from 'node:path';
 import {randomUUID} from 'node:crypto';
-import {use, expect} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import {E2E_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup.js';
+import path from 'node:path';
+import {describe, it, before, after, afterEach, beforeEach, type TestContext} from 'node:test';
+
 import {fs, tempDir} from '@appium/support';
 import {waitForCondition} from 'asyncbox';
-import {describe, it, before, after, afterEach, beforeEach, type TestContext} from 'node:test';
+import {use, expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+import {ADB} from '../../lib/adb.js';
+import {E2E_TIMEOUT, APIDEMOS_PKG, getApiDemosPath} from './setup.js';
 
 use(chaiAsPromised);
 
@@ -180,15 +182,11 @@ describe('general commands', {timeout: E2E_TIMEOUT}, function () {
     });
     it('should revoke permission', async function () {
       await adb.revokePermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.not.have.members([
-        'android.permission.RECEIVE_SMS',
-      ]);
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.not.have.members(['android.permission.RECEIVE_SMS']);
     });
     it('should grant permission', async function () {
       await adb.grantPermission(APIDEMOS_PKG, 'android.permission.RECEIVE_SMS');
-      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.include.members([
-        'android.permission.RECEIVE_SMS',
-      ]);
+      expect(await adb.getGrantedPermissions(APIDEMOS_PKG)).to.include.members(['android.permission.RECEIVE_SMS']);
     });
   });
 
@@ -249,17 +247,13 @@ describe('general commands', {timeout: E2E_TIMEOUT}, function () {
   describe('bugreport', function () {
     const BUG_REPORT_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
-    it(
-      'should return the report as a raw string',
-      {timeout: BUG_REPORT_TIMEOUT},
-      async function (ctx: TestContext) {
-        if (process.env.CI) {
-          // skip the test on CI, since it takes a lot of time
-          return ctx.skip();
-        }
-        expect(await adb.bugreport()).to.be.a('string');
-      },
-    );
+    it('should return the report as a raw string', {timeout: BUG_REPORT_TIMEOUT}, async function (ctx: TestContext) {
+      if (process.env.CI) {
+        // skip the test on CI, since it takes a lot of time
+        return ctx.skip();
+      }
+      expect(await adb.bugreport()).to.be.a('string');
+    });
   });
 
   describe('features', function () {

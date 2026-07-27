@@ -1,24 +1,17 @@
-import {logger, util} from '@appium/support';
 import {EventEmitter} from 'node:events';
-import {SubProcess, exec} from 'teen_process';
+
+import {logger, util} from '@appium/support';
 import {LRUCache} from 'lru-cache';
+import {SubProcess, exec} from 'teen_process';
 import type {ExecError} from 'teen_process';
-import type {ADBExecutable} from './types.js';
+
 import type {LogEntry, LogcatOpts as StartCaptureOptions} from './tools/types.js';
+import type {ADBExecutable} from './types.js';
 
 const log = logger.getLogger('Logcat');
 const MAX_BUFFER_SIZE = 10000;
 const LOGCAT_PROC_STARTUP_TIMEOUT = 10000;
-const SUPPORTED_FORMATS = [
-  'brief',
-  'process',
-  'tag',
-  'thread',
-  'raw',
-  'time',
-  'threadtime',
-  'long',
-] as const;
+const SUPPORTED_FORMATS = ['brief', 'process', 'tag', 'thread', 'raw', 'time', 'threadtime', 'long'] as const;
 const SUPPORTED_PRIORITIES = ['v', 'd', 'i', 'w', 'e', 'f', 's'] as const;
 const DEFAULT_PRIORITY = 'v';
 const DEFAULT_TAG = '*';
@@ -139,10 +132,7 @@ export class Logcat extends EventEmitter {
         continue;
       }
       const [message, timestamp] = value;
-      if (
-        (this.logIndexSinceLastRequest && index > this.logIndexSinceLastRequest) ||
-        !this.logIndexSinceLastRequest
-      ) {
+      if ((this.logIndexSinceLastRequest && index > this.logIndexSinceLastRequest) || !this.logIndexSinceLastRequest) {
         recentLogIndex = index;
         result.push(toLogEntry(message, timestamp));
       }
@@ -215,15 +205,11 @@ function requireSpec(spec: string): string {
     resultTag = DEFAULT_TAG;
   }
   if (!priority) {
-    log.info(
-      `The priority value in spec '${spec}' is empty. Defaulting to Verbose (${DEFAULT_PRIORITY})`,
-    );
+    log.info(`The priority value in spec '${spec}' is empty. Defaulting to Verbose (${DEFAULT_PRIORITY})`);
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }
   if (!SUPPORTED_PRIORITIES.some((p) => priority.toLowerCase() === p.toLowerCase())) {
-    log.info(
-      `The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`,
-    );
+    log.info(`The priority value in spec '${spec}' is unknown. Supported values are: ${SUPPORTED_PRIORITIES}`);
     log.info(`Defaulting to Verbose (${DEFAULT_PRIORITY})`);
     return `${resultTag}:${DEFAULT_PRIORITY}`;
   }

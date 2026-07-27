@@ -1,12 +1,14 @@
-import {ADB} from '../../lib/adb.js';
 import path from 'node:path';
+import {describe, it, before, type TestContext} from 'node:test';
+
 import {fs, tempDir} from '@appium/support';
-import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup.js';
-import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest.js';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+
+import {ADB} from '../../lib/adb.js';
+import {getAndroidPlatformAndPath} from '../../lib/tools/android-manifest.js';
 import {readPackageManifest, requireSdkRoot} from '../../lib/utils/index.js';
-import {describe, it, before, type TestContext} from 'node:test';
+import {APIDEMOS_PKG, APIDEMOS_ACTIVITY_SHORT, getApiDemosPath} from './setup.js';
 
 use(chaiAsPromised);
 

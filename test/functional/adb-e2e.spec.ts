@@ -1,9 +1,11 @@
-import {ADB} from '../../lib/adb.js';
-import {fs} from '@appium/support';
 import path from 'node:path';
+import {describe, it} from 'node:test';
+
+import {fs} from '@appium/support';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it} from 'node:test';
+
+import {ADB} from '../../lib/adb.js';
 
 use(chaiAsPromised);
 

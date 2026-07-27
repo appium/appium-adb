@@ -1,8 +1,10 @@
-import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt.js';
-import sinon from 'sinon';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import sinon from 'sinon';
+
+import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt.js';
 
 use(chaiAsPromised);
 
@@ -77,13 +79,11 @@ describe('lock management', function () {
 
   describe('isShowingLockscreen', function () {
     it('should return true if mShowingLockscreen is true', async function () {
-      const dumpsys =
-        'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      const dumpsys = 'mShowingLockscreen=true mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       expect(await isShowingLockscreen(dumpsys)).to.be.true;
     });
     it('should return true if mDreamingLockscreen is true', async function () {
-      const dumpsys =
-        'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
+      const dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=true mTopIsFullscreen=false';
       expect(await isShowingLockscreen(dumpsys)).to.be.true;
     });
     it('should assume that screen is unlocked if keyguard is shown, but mInputRestricted is false', async function () {
@@ -100,8 +100,7 @@ describe('lock management', function () {
       expect(await isShowingLockscreen(dumpsys)).to.be.false;
     });
     it('should return false if mShowingLockscreen and mDreamingLockscreen are false', async function () {
-      const dumpsys =
-        'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
+      const dumpsys = 'mShowingLockscreen=false mShowingDream=false mDreamingLockscreen=false mTopIsFullscreen=false';
       expect(await isShowingLockscreen(dumpsys)).to.be.false;
     });
     it('should assume that screen is unlocked if can not determine lock state', async function () {

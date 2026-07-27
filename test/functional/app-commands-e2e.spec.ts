@@ -1,9 +1,11 @@
-import {ADB} from '../../lib/adb.js';
-import {E2E_TIMEOUT, APIDEMOS_PKG, APIDEMOS_ACTIVITY, getApiDemosPath} from './setup.js';
+import {describe, it, before, type TestContext} from 'node:test';
+
 import {waitForCondition} from 'asyncbox';
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, before, type TestContext} from 'node:test';
+
+import {ADB} from '../../lib/adb.js';
+import {E2E_TIMEOUT, APIDEMOS_PKG, APIDEMOS_ACTIVITY, getApiDemosPath} from './setup.js';
 
 use(chaiAsPromised);
 

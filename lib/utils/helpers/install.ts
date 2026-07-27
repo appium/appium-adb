@@ -1,4 +1,5 @@
 import {util} from '@appium/support';
+
 import {log} from '../../logger.js';
 
 export interface BuildInstallArgsOptions {
@@ -16,10 +17,7 @@ export interface BuildInstallArgsOptions {
  * @param options - Install options mapped to adb flags
  * @returns A list of install flags
  */
-export function buildInstallArgs(
-  apiLevel: number,
-  options: BuildInstallArgsOptions = {},
-): string[] {
+export function buildInstallArgs(apiLevel: number, options: BuildInstallArgsOptions = {}): string[] {
   const result: string[] = [];
 
   if (!util.hasValue(options.replace) || options.replace) {

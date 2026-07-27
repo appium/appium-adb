@@ -1,6 +1,8 @@
 import path from 'node:path';
-import type {ADB} from '../adb.js';
+
 import type {TeenProcessExecOptions} from 'teen_process';
+
+import type {ADB} from '../adb.js';
 
 /**
  * Verify whether a remote path exists on the device under test.

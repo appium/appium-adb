@@ -1,6 +1,7 @@
 import {EOL} from 'node:os';
-import {log} from '../logger.js';
+
 import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 import type {PortFamily, PortInfo} from './types.js';
 
 /**
@@ -21,11 +22,7 @@ export async function getForwardList(this: ADB): Promise<string[]> {
  * @param systemPort - The number of the local system port.
  * @param devicePort - The number of the remote device port.
  */
-export async function forwardPort(
-  this: ADB,
-  systemPort: string | number,
-  devicePort: string | number,
-): Promise<void> {
+export async function forwardPort(this: ADB, systemPort: string | number, devicePort: string | number): Promise<void> {
   log.debug(`Forwarding system: ${systemPort} to device: ${devicePort}`);
   await this.adbExec(['forward', `tcp:${systemPort}`, `tcp:${devicePort}`]);
 }
@@ -61,11 +58,7 @@ export async function getReverseList(this: ADB): Promise<string[]> {
  * @param devicePort - The number of the remote device port.
  * @param systemPort - The number of the local system port.
  */
-export async function reversePort(
-  this: ADB,
-  devicePort: string | number,
-  systemPort: string | number,
-): Promise<void> {
+export async function reversePort(this: ADB, devicePort: string | number, systemPort: string | number): Promise<void> {
   log.debug(`Forwarding device: ${devicePort} to system: ${systemPort}`);
   await this.adbExec(['reverse', `tcp:${devicePort}`, `tcp:${systemPort}`]);
 }

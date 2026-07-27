@@ -1,9 +1,11 @@
-import {fs, tempDir, util, system} from '@appium/support';
-import {log} from '../logger.js';
-import {waitForCondition} from 'asyncbox';
 import path from 'node:path';
-import type {ADB} from '../adb.js';
+
+import {fs, tempDir, util, system} from '@appium/support';
+import {waitForCondition} from 'asyncbox';
 import type {ExecError} from 'teen_process';
+
+import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
 import {defaults, intersectionWith} from '../utils/index.js';
 import type {
   StringRecord,
@@ -82,9 +84,7 @@ export async function resolveLaunchableActivity(
     const names = parseLaunchableActivityNames(stdout);
     if (util.isEmpty(names)) {
       log.debug(stdout);
-      throw new Error(
-        `Unable to resolve the launchable activity of '${pkg}'. Is it installed on the device?`,
-      );
+      throw new Error(`Unable to resolve the launchable activity of '${pkg}'. Is it installed on the device?`);
     }
     if (names.length === 1) {
       return names[0];
@@ -108,20 +108,15 @@ export async function resolveLaunchableActivity(
       await fs.rimraf(tmpRoot);
     }
   }
-  const {stdout, stderr} = await this.shell(
-    ['cmd', 'package', 'resolve-activity', '--brief', pkg],
-    {
-      outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
-    },
-  );
+  const {stdout, stderr} = await this.shell(['cmd', 'package', 'resolve-activity', '--brief', pkg], {
+    outputFormat: this.EXEC_OUTPUT_FORMAT.FULL,
+  });
   for (const line of (stdout || '').split('\n').map((x) => x.trim())) {
     if (this.isValidClass(line)) {
       return line;
     }
   }
-  throw new Error(
-    `Unable to resolve the launchable activity of '${pkg}'. Original error: ${stderr || stdout}`,
-  );
+  throw new Error(`Unable to resolve the launchable activity of '${pkg}'. Original error: ${stderr || stdout}`);
 }
 
 /**
@@ -193,10 +188,7 @@ export async function grantAllPermissions(this: ADB, pkg: string, apk?: string):
     //avoiding logging error stack, as calling library function would have logged
     log.warn(`Ran into problem getting target SDK version; ignoring...`);
   }
-  if (
-    apiLevel >= MIN_API_LEVEL_WITH_PERMS_SUPPORT &&
-    targetSdk >= MIN_API_LEVEL_WITH_PERMS_SUPPORT
-  ) {
+  if (apiLevel >= MIN_API_LEVEL_WITH_PERMS_SUPPORT && targetSdk >= MIN_API_LEVEL_WITH_PERMS_SUPPORT) {
     /**
      * If the device is running Android 6.0(API 23) or higher, and your app's target SDK is 23 or higher:
      * The app has to list the permissions in the manifest.
@@ -234,11 +226,7 @@ export async function grantAllPermissions(this: ADB, pkg: string, apk?: string):
  * @param permissions - The list of permissions to be granted.
  * @throws {Error} If there was an error while changing permissions.
  */
-export async function grantPermissions(
-  this: ADB,
-  pkg: string,
-  permissions: string[],
-): Promise<void> {
+export async function grantPermissions(this: ADB, pkg: string, permissions: string[]): Promise<void> {
   // As it consumes more time for granting each permission,
   // trying to grant all permission by forming equivalent command.
   // Also, it is necessary to split long commands into chunks, since the maximum length of
@@ -317,11 +305,7 @@ export async function getGrantedPermissions(
  * _dumpsys package_ command. It may speed up the method execution.
  * @returns The list of denied permissions or an empty list.
  */
-export async function getDeniedPermissions(
-  this: ADB,
-  pkg: string,
-  cmdOutput: string | null = null,
-): Promise<string[]> {
+export async function getDeniedPermissions(this: ADB, pkg: string, cmdOutput: string | null = null): Promise<string[]> {
   log.debug('Retrieving denied permissions');
   const stdout = cmdOutput || (await this.shell(['dumpsys', 'package', pkg]));
   return extractMatchingPermissions(stdout, ['install', 'runtime'], false);
@@ -335,11 +319,7 @@ export async function getDeniedPermissions(
  *                                    _dumpsys package_ command. It may speed up the method execution.
  * @returns The list of requested permissions or an empty list.
  */
-export async function getReqPermissions(
-  this: ADB,
-  pkg: string,
-  cmdOutput: string | null = null,
-): Promise<string[]> {
+export async function getReqPermissions(this: ADB, pkg: string, cmdOutput: string | null = null): Promise<string[]> {
   log.debug('Retrieving requested permissions');
   const stdout = cmdOutput || (await this.shell(['dumpsys', 'package', pkg]));
   return extractMatchingPermissions(stdout, ['requested']);
@@ -379,10 +359,7 @@ export async function getPackageInfo(this: ADB, pkg: string): Promise<AppInfo> {
     return result;
   }
 
-  const installedPattern = new RegExp(
-    `^\\s*Package\\s+\\[${util.escapeRegExp(pkg)}\\][^:]+:$`,
-    'm',
-  );
+  const installedPattern = new RegExp(`^\\s*Package\\s+\\[${util.escapeRegExp(pkg)}\\][^:]+:$`, 'm');
   result.isInstalled = installedPattern.test(stdout);
   if (!result.isInstalled) {
     return result;
@@ -489,11 +466,7 @@ export async function activateApp(this: ADB, appId: string): Promise<void> {
  * @param opts - Options for checking installation
  * @returns True if the package is installed.
  */
-export async function isAppInstalled(
-  this: ADB,
-  pkg: string,
-  opts: IsAppInstalledOptions = {},
-): Promise<boolean> {
+export async function isAppInstalled(this: ADB, pkg: string, opts: IsAppInstalledOptions = {}): Promise<boolean> {
   const {user} = opts;
 
   log.debug(`Getting install status for ${pkg}`);
@@ -549,10 +522,7 @@ export async function listInstalledPackages(
   } catch (e) {
     const error = e as ExecError;
     // https://github.com/appium/appium-uiautomator2-driver/issues/810
-    if (
-      (error.stderr || error.stdout || error.message)?.includes('access user') &&
-      util.isEmpty(user)
-    ) {
+    if ((error.stderr || error.stdout || error.message)?.includes('access user') && util.isEmpty(user)) {
       stdout = await this.shell([...cmd, '--user', '0']);
     } else {
       throw e;
@@ -636,24 +606,17 @@ export async function startApp(this: ADB, startAppOptions: StartAppOptions): Pro
 
   const apiLevel = await this.getApiLevel();
   const cmd = buildStartCmd(options, apiLevel);
-  const intentName = `${options.action}${
-    options.optionalIntentArguments ? ' ' + options.optionalIntentArguments : ''
-  }`;
+  const intentName = `${options.action}${options.optionalIntentArguments ? ' ' + options.optionalIntentArguments : ''}`;
   try {
     const shellOpts: {timeout?: number} = {};
-    if (
-      options.waitDuration !== undefined &&
-      Number.isInteger(options.waitDuration) &&
-      options.waitDuration >= 0
-    ) {
+    if (options.waitDuration !== undefined && Number.isInteger(options.waitDuration) && options.waitDuration >= 0) {
       shellOpts.timeout = options.waitDuration;
     }
     const stdout = await this.shell(cmd, shellOpts);
     if (stdout.includes('Error: Activity class') && stdout.includes('does not exist')) {
       if (options.retry && options.activity && !options.activity.startsWith('.')) {
         log.debug(
-          `We tried to start an activity that doesn't exist, ` +
-            `retrying with '.${options.activity}' activity name`,
+          `We tried to start an activity that doesn't exist, ` + `retrying with '.${options.activity}' activity name`,
         );
         options.activity = `.${options.activity}`;
         options.retry = false;
@@ -722,10 +685,9 @@ export async function getFocusedPackageAndActivity(this: ADB): Promise<PackageAc
     stdout = await this.dumpWindows();
   } catch (e) {
     const error = e as Error;
-    throw new Error(
-      `Could not retrieve the currently focused package and activity. Original error: ${error.message}`,
-      {cause: e},
-    );
+    throw new Error(`Could not retrieve the currently focused package and activity. Original error: ${error.message}`, {
+      cause: e,
+    });
   }
 
   const nullFocusedAppRe = /^\s*mFocusedApp=null/m;
@@ -735,10 +697,7 @@ export async function getFocusedPackageAndActivity(this: ADB): Promise<PackageAc
     'mg',
   );
   const nullCurrentFocusRe = /^\s*mCurrentFocus=null/m;
-  const currentFocusAppRe = new RegExp(
-    '^\\s*mCurrentFocus.+\\{.+\\s([^\\s\\/]+)\\/([^\\s]+)\\b',
-    'mg',
-  );
+  const currentFocusAppRe = new RegExp('^\\s*mCurrentFocus.+\\{.+\\s([^\\s\\/]+)\\/([^\\s]+)\\b', 'mg');
 
   const focusedAppCandidates: PackageActivityInfo[] = [];
   const currentFocusAppCandidates: PackageActivityInfo[] = [];
@@ -848,8 +807,7 @@ export async function waitForActivityOrNot(
   );
   const possibleActivityNames = [...possibleActivityNamesSet];
   const possibleActivityPatterns = possibleActivityNames.map(
-    (actName) =>
-      new RegExp(`^${actName.replace(/\./g, '\\.').replace(/\*/g, '.*?').replace(/\$/g, '\\$')}$`),
+    (actName) => new RegExp(`^${actName.replace(/\./g, '\\.').replace(/\*/g, '.*?').replace(/\$/g, '\\$')}$`),
   );
   log.debug(
     `Expected activity name patterns to ${waitForStop ? 'not ' : ''}be focused within ${waitMs}ms: ` +
@@ -874,15 +832,12 @@ export async function waitForActivityOrNot(
       );
       log.debug(`Focused fully qualified activity name: ${fullyQualifiedActivity}`);
       const isFound =
-        allPackages.includes(appPackage) &&
-        possibleActivityPatterns.some((p) => p.test(fullyQualifiedActivity));
+        allPackages.includes(appPackage) && possibleActivityPatterns.some((p) => p.test(fullyQualifiedActivity));
       if ((!waitForStop && isFound) || (waitForStop && !isFound)) {
         return true;
       }
     }
-    log.debug(
-      'None of the expected package/activity combinations matched to the currently focused one. Retrying',
-    );
+    log.debug('None of the expected package/activity combinations matched to the currently focused one. Retrying');
     return false;
   };
 
@@ -909,12 +864,7 @@ export async function waitForActivityOrNot(
  * @param waitMs - Number of milliseconds to wait before timeout occurs.
  * @throws {Error} If timeout happens.
  */
-export async function waitForActivity(
-  this: ADB,
-  pkg: string,
-  act: string,
-  waitMs: number = 20000,
-): Promise<void> {
+export async function waitForActivity(this: ADB, pkg: string, act: string, waitMs: number = 20000): Promise<void> {
   await this.waitForActivityOrNot(pkg, act, false, waitMs);
 }
 
@@ -927,12 +877,7 @@ export async function waitForActivity(
  * @param waitMs - Number of milliseconds to wait before timeout occurs.
  * @throws {Error} If timeout happens.
  */
-export async function waitForNotActivity(
-  this: ADB,
-  pkg: string,
-  act: string,
-  waitMs: number = 20000,
-): Promise<void> {
+export async function waitForNotActivity(this: ADB, pkg: string, act: string, waitMs: number = 20000): Promise<void> {
   await this.waitForActivityOrNot(pkg, act, true, waitMs);
 }
 
@@ -945,17 +890,8 @@ export async function waitForNotActivity(
  * @returns The actual command line array
  */
 export function buildStartCmd(startAppOptions: StartCmdOptions, apiLevel: number): string[] {
-  const {
-    user,
-    waitForLaunch,
-    pkg,
-    activity,
-    action,
-    category,
-    stopApp,
-    flags,
-    optionalIntentArguments,
-  } = startAppOptions;
+  const {user, waitForLaunch, pkg, activity, action, category, stopApp, flags, optionalIntentArguments} =
+    startAppOptions;
   const cmd = ['am', apiLevel < 26 ? 'start' : 'start-activity'];
   if (util.hasValue(user)) {
     cmd.push('--user', `${user}`);

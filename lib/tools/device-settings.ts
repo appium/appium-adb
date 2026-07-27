@@ -1,9 +1,10 @@
-import {log} from '../logger.js';
-import {retryInterval} from 'asyncbox';
 import {util} from '@appium/support';
-import type {ADB} from '../adb.js';
-import type {SetPropOpts} from './types.js';
+import {retryInterval} from 'asyncbox';
 import type {ExecError} from 'teen_process';
+
+import type {ADB} from '../adb.js';
+import {log} from '../logger.js';
+import type {SetPropOpts} from './types.js';
 
 const ANIMATION_SCALE_KEYS = [
   'animator_duration_scale',
@@ -41,12 +42,7 @@ export async function getDeviceProperty(this: ADB, property: string): Promise<st
  *
  * @throws If _setprop_ utility fails to change property value.
  */
-export async function setDeviceProperty(
-  this: ADB,
-  prop: string,
-  val: string,
-  opts: SetPropOpts = {},
-): Promise<void> {
+export async function setDeviceProperty(this: ADB, prop: string, val: string, opts: SetPropOpts = {}): Promise<void> {
   const {privileged = true} = opts;
   log.debug(`Setting device property '${prop}' to '${val}'`);
   await this.shell(['setprop', prop, val], {
@@ -148,11 +144,7 @@ export async function getScreenDensity(this: ADB): Promise<number | null> {
  * @param proxyHost - The host name of the proxy.
  * @param proxyPort - The port number to be set.
  */
-export async function setHttpProxy(
-  this: ADB,
-  proxyHost: string,
-  proxyPort: string | number,
-): Promise<void> {
+export async function setHttpProxy(this: ADB, proxyHost: string, proxyPort: string | number): Promise<void> {
   const proxy = `${proxyHost}:${proxyPort}`;
   if (typeof proxyHost === 'undefined') {
     throw new Error(`Call to setHttpProxy method with undefined proxy_host: ${proxy}`);
@@ -269,9 +261,7 @@ export async function getLocationProviders(this: ADB): Promise<string[]> {
   }
 
   // To emulate the legacy behavior
-  return (await this.shell(['cmd', 'location', 'is-location-enabled'])).includes('true')
-    ? ['gps']
-    : [];
+  return (await this.shell(['cmd', 'location', 'is-location-enabled'])).includes('true') ? ['gps'] : [];
 }
 
 /**
@@ -314,23 +304,16 @@ export async function toggleGPSLocationProvider(this: ADB, enabled: boolean): Pr
  * @throws If there was an error and ignoreError was true while executing 'adb shell settings put global'
  *                 command on the device under test.
  */
-export async function setHiddenApiPolicy(
-  this: ADB,
-  value: number | string,
-  ignoreError = false,
-): Promise<void> {
+export async function setHiddenApiPolicy(this: ADB, value: number | string, ignoreError = false): Promise<void> {
   try {
-    await this.shell(
-      HIDDEN_API_POLICY_KEYS.map((k) => `settings put global ${k} ${value}`).join(';'),
-    );
+    await this.shell(HIDDEN_API_POLICY_KEYS.map((k) => `settings put global ${k} ${value}`).join(';'));
   } catch (e) {
     const err = e as Error;
     if (!ignoreError) {
       throw decorateWriteSecureSettingsException(err);
     }
     log.info(
-      `Failed to set setting keys '${HIDDEN_API_POLICY_KEYS}' to '${value}'. ` +
-        `Original error: ${err.message}`,
+      `Failed to set setting keys '${HIDDEN_API_POLICY_KEYS}' to '${value}'. ` + `Original error: ${err.message}`,
     );
   }
 }
@@ -532,9 +515,7 @@ export async function addToDeviceIdleWhitelist(this: ADB, ...packages: string[])
     return false;
   }
 
-  log.info(
-    `Adding ${util.pluralize('package', packages.length)} ${JSON.stringify(packages)} to Doze whitelist`,
-  );
+  log.info(`Adding ${util.pluralize('package', packages.length)} ${JSON.stringify(packages)} to Doze whitelist`);
   await this.shellChunks((pkg) => ['dumpsys', 'deviceidle', 'whitelist', `+${pkg}`], packages);
   return true;
 }
@@ -592,9 +573,7 @@ export async function setNfcOn(this: ADB, on: boolean): Promise<void> {
   const output = stderr || stdout;
   log.debug(output);
   if (output.includes('null NfcAdapter')) {
-    throw new Error(
-      `Cannot turn ${on ? 'on' : 'off'} the NFC adapter. Does the device under test have it?`,
-    );
+    throw new Error(`Cannot turn ${on ? 'on' : 'off'} the NFC adapter. Does the device under test have it?`);
   }
 }
 
@@ -609,15 +588,7 @@ export async function setNfcOn(this: ADB, on: boolean): Promise<void> {
  * @param on - True to broadcast enable and false to broadcast disable.
  */
 export async function broadcastAirplaneMode(this: ADB, on: boolean): Promise<void> {
-  const args = [
-    'am',
-    'broadcast',
-    '-a',
-    'android.intent.action.AIRPLANE_MODE',
-    '--ez',
-    'state',
-    on ? 'true' : 'false',
-  ];
+  const args = ['am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE', '--ez', 'state', on ? 'true' : 'false'];
   try {
     await this.shell(args);
   } catch (e) {
@@ -666,9 +637,7 @@ export async function isDataOn(this: ADB): Promise<boolean> {
  */
 export async function isAnimationOn(this: ADB): Promise<boolean> {
   return (
-    await Promise.all(
-      ANIMATION_SCALE_KEYS.map(async (k) => (await this.getSetting('global', k)) !== '0.0'),
-    )
+    await Promise.all(ANIMATION_SCALE_KEYS.map(async (k) => (await this.getSetting('global', k)) !== '0.0'))
   ).includes(true);
 }
 

@@ -1,8 +1,10 @@
-import {ADB} from '../../lib/adb.js';
-import sinon from 'sinon';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import sinon from 'sinon';
+
+import {ADB} from '../../lib/adb.js';
 
 use(chaiAsPromised);
 
@@ -79,9 +81,7 @@ describe('emulator commands', function () {
     });
     describe('power methods', function () {
       it('should throw exception on invalid power ac state', async function () {
-        await expect(adb.powerAC('dead' as any)).to.eventually.be.rejectedWith(
-          'Wrong power AC state',
-        );
+        await expect(adb.powerAC('dead' as any)).to.eventually.be.rejectedWith('Wrong power AC state');
       });
       it('should set the power ac off', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
@@ -104,24 +104,16 @@ describe('emulator commands', function () {
         await adb.powerAC('on');
       });
       it('should throw exception on invalid power battery percent', async function () {
-        await expect(adb.powerCapacity(-1)).to.eventually.be.rejectedWith(
-          'should be valid integer between 0 and 100',
-        );
+        await expect(adb.powerCapacity(-1)).to.eventually.be.rejectedWith('should be valid integer between 0 and 100');
         await expect(adb.powerCapacity('a' as any)).to.eventually.be.rejectedWith(
           'should be valid integer between 0 and 100',
         );
-        await expect(adb.powerCapacity(500)).to.eventually.be.rejectedWith(
-          'should be valid integer between 0 and 100',
-        );
+        await expect(adb.powerCapacity(500)).to.eventually.be.rejectedWith('should be valid integer between 0 and 100');
       });
       it('should set the power capacity', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
         mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-        mocks.adb
-          .expects('adbExec')
-          .once()
-          .withExactArgs(['emu', 'power', 'capacity', '0'])
-          .returns();
+        mocks.adb.expects('adbExec').once().withExactArgs(['emu', 'power', 'capacity', '0']).returns();
         await adb.powerCapacity(0);
       });
       it('should call methods to power off the emulator', async function () {
@@ -152,9 +144,7 @@ describe('emulator commands', function () {
     });
     describe('gsm signal method', function () {
       it('should throw exception on invalid strength', async function () {
-        await expect(adb.gsmSignal(5 as any)).to.eventually.be.rejectedWith(
-          'Invalid signal strength',
-        );
+        await expect(adb.gsmSignal(5 as any)).to.eventually.be.rejectedWith('Invalid signal strength');
       });
       it('should call adbExecEmu with the correct args', async function () {
         const signalStrength = 0;
@@ -222,28 +212,20 @@ describe('emulator commands', function () {
     });
     describe('network speed method', function () {
       it('should throw exception on invalid speed', async function () {
-        await expect(adb.networkSpeed('light' as any)).to.eventually.be.rejectedWith(
-          'Invalid network speed',
-        );
+        await expect(adb.networkSpeed('light' as any)).to.eventually.be.rejectedWith('Invalid network speed');
       });
       for (const [key, value] of Object.entries(adb.NETWORK_SPEED)) {
         it(`should set network speed(${key}) correctly`, async function () {
           mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);
           mocks.adb.expects('resetTelnetAuthToken').once().withExactArgs().returns();
-          mocks.adb
-            .expects('adbExec')
-            .once()
-            .withExactArgs(['emu', 'network', 'speed', value])
-            .returns();
+          mocks.adb.expects('adbExec').once().withExactArgs(['emu', 'network', 'speed', value]).returns();
           await adb.networkSpeed(value);
         });
       }
     });
     describe('gsm voice method', function () {
       it('should throw exception on invalid strength', async function () {
-        await expect(adb.gsmVoice('weird' as any)).to.eventually.be.rejectedWith(
-          'Invalid gsm voice state',
-        );
+        await expect(adb.gsmVoice('weird' as any)).to.eventually.be.rejectedWith('Invalid gsm voice state');
       });
       it('should set gsm voice to unregistered', async function () {
         mocks.adb.expects('isEmulatorConnected').once().withExactArgs().returns(true);

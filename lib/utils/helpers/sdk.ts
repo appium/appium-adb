@@ -1,5 +1,6 @@
-import {fs, system, util} from '@appium/support';
 import path from 'node:path';
+
+import {fs, system, util} from '@appium/support';
 
 /**
  * Gets Android SDK root from environment variables.
@@ -18,17 +19,12 @@ export function getSdkRootFromEnv(): string | undefined {
  */
 export async function requireSdkRoot(customRoot: string | null = null): Promise<string> {
   const sdkRoot = customRoot || getSdkRootFromEnv();
-  const docMsg =
-    'Read https://developer.android.com/studio/command-line/variables for more details';
+  const docMsg = 'Read https://developer.android.com/studio/command-line/variables for more details';
   if (!sdkRoot || util.isEmpty(sdkRoot)) {
-    throw new Error(
-      `Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`,
-    );
+    throw new Error(`Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. ${docMsg}`);
   }
   if (!(await fs.exists(sdkRoot))) {
-    throw new Error(
-      `The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`,
-    );
+    throw new Error(`The Android SDK root folder '${sdkRoot}' does not exist on the local file system. ${docMsg}`);
   }
 
   const stats = await fs.stat(sdkRoot);

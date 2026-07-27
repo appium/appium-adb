@@ -1,12 +1,14 @@
-import {exec} from 'teen_process';
-import {log} from '../logger.js';
 import path from 'node:path';
+
 import {fs, tempDir, util} from '@appium/support';
-import {LRUCache} from 'lru-cache';
 import AsyncLock from 'async-lock';
+import {LRUCache} from 'lru-cache';
+import {exec} from 'teen_process';
+
 import type {ADB} from '../adb.js';
-import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types.js';
+import {log} from '../logger.js';
 import {APK_INSTALL_TIMEOUT, buildInstallArgs, getJavaForOs, unzipFile} from '../utils/index.js';
+import type {InstallMultipleApksOptions, InstallApksOptions, StringRecord} from './types.js';
 
 const BASE_APK = 'base-master.apk';
 const LANGUAGE_APK = (lang: string) => `base-${lang}.apk`;
@@ -24,9 +26,7 @@ process.on('exit', () => {
   }
 
   const paths = [...APKS_CACHE.values()];
-  log.debug(
-    `Performing cleanup of ${paths.length} cached .apks ` + util.pluralize('package', paths.length),
-  );
+  log.debug(`Performing cleanup of ${paths.length} cached .apks ` + util.pluralize('package', paths.length));
   for (const appPath of paths) {
     try {
       // Asynchronous calls are not supported in onExit handler
@@ -125,11 +125,7 @@ export async function installMultipleApks(
  * @param options - Installation options
  * @throws {Error} If the .apks bundle cannot be installed
  */
-export async function installApks(
-  this: ADB,
-  apks: string,
-  options: InstallApksOptions = {},
-): Promise<void> {
+export async function installApks(this: ADB, apks: string, options: InstallApksOptions = {}): Promise<void> {
   const {grantPermissions, allowTestPackages, timeout} = options;
 
   const args: string[] = [
@@ -147,10 +143,7 @@ export async function installApks(
     args.push('--allow-test-only');
   }
   const tasks: Promise<any>[] = [
-    this.execBundletool(
-      args,
-      `Cannot install '${path.basename(apks)}' to the device ${this.curDeviceId}`,
-    ),
+    this.execBundletool(args, `Cannot install '${path.basename(apks)}' to the device ${this.curDeviceId}`),
   ];
   if (grantPermissions) {
     tasks.push(this.getApkInfo(apks));
@@ -184,11 +177,7 @@ export async function extractBaseApk(this: ADB, apks: string): Promise<string> {
  * if language split is not enabled for the bundle.
  * @throws {Error} If there was an error while extracting/finding the file
  */
-export async function extractLanguageApk(
-  this: ADB,
-  apks: string,
-  language: string | null = null,
-): Promise<string> {
+export async function extractLanguageApk(this: ADB, apks: string, language: string | null = null): Promise<string> {
   if (language) {
     try {
       return await extractFromApks(apks, ['splits', LANGUAGE_APK(language)]);

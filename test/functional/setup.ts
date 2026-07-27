@@ -1,5 +1,7 @@
 import path from 'node:path';
+
 import {fs, net} from '@appium/support';
+
 import type {ADB} from '../../lib/adb.js';
 import {FIXTURES_ROOT} from '../constants.js';
 export const E2E_TIMEOUT = process.env.CI ? 240000 : 60000;
@@ -8,8 +10,7 @@ export const E2E_LONG_TIMEOUT = E2E_TIMEOUT * 10;
 // Re-export ApiDemos constants from common constants file
 export {APIDEMOS_PKG, APIDEMOS_ACTIVITY, APIDEMOS_ACTIVITY_SHORT} from '../constants.js';
 
-const APIDEMOS_URL =
-  'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
+const APIDEMOS_URL = 'https://github.com/appium/android-apidemos/releases/download/v6.0.0/ApiDemos-debug.apk';
 const APIDEMOS_CACHE_PATH = path.resolve(FIXTURES_ROOT, 'ApiDemos-debug.apk');
 
 // Cache the download promise to prevent concurrent downloads

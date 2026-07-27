@@ -1,9 +1,10 @@
 import events from 'node:events';
-import esmock from 'esmock';
-import sinon from 'sinon';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {use, expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import esmock from 'esmock';
+import sinon from 'sinon';
 
 use(chaiAsPromised);
 

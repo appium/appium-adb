@@ -1,9 +1,10 @@
-import {log} from '../logger.js';
 import {fs, util} from '@appium/support';
 import {SubProcess, exec, type ExecError} from 'teen_process';
+
 import type {ADB} from '../adb.js';
-import type {ScreenrecordOptions, StringRecord} from './types.js';
+import {log} from '../logger.js';
 import {memoize} from '../utils/index.js';
+import type {ScreenrecordOptions, StringRecord} from './types.js';
 
 /**
  * Get the path to adb executable amd assign it
@@ -191,11 +192,7 @@ export async function bugreport(this: ADB, timeout: number = 120000): Promise<st
  * @param options - Screenrecord options
  * @returns screenrecord process, which can be then controlled by the client code
  */
-export function screenrecord(
-  this: ADB,
-  destination: string,
-  options: ScreenrecordOptions = {},
-): SubProcess {
+export function screenrecord(this: ADB, destination: string, options: ScreenrecordOptions = {}): SubProcess {
   const cmd: string[] = ['screenrecord'];
   const {videoSize, bitRate, timeLimit, bugReport} = options;
   if (util.hasValue(videoSize)) {
@@ -293,10 +290,7 @@ export async function isIncrementalInstallSupported(this: ADB): Promise<boolean>
   if (!binary) {
     return false;
   }
-  return (
-    util.compareVersions(`${binary.version}`, '>=', '30.0.1') &&
-    (await this.listFeatures()).includes('abb_exec')
-  );
+  return util.compareVersions(`${binary.version}`, '>=', '30.0.1') && (await this.listFeatures()).includes('abb_exec');
 }
 
 /**
@@ -329,8 +323,7 @@ export async function takeScreenshot(this: ADB, displayId?: number | string): Pr
       outputStr = typeof stdout === 'string' ? stdout : stdout.toString('utf-8');
     }
     throw new Error(
-      `Screenshot of the ${displayDescr} failed. ` +
-        `Code: '${err.code ?? 'unknown'}', output: '${outputStr}'`,
+      `Screenshot of the ${displayDescr} failed. ` + `Code: '${err.code ?? 'unknown'}', output: '${outputStr}'`,
       {cause: e},
     );
   }
