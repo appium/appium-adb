@@ -77,11 +77,11 @@ describe('logcat commands', function () {
       setTimeout(function () {
         conn.emit('line-stderr', 'something');
       }, 0);
-      try {
-        await logcat.startCapture();
-      } catch (err) {
-        assert.ok(!(err as Error).message.includes('Logcat'));
-      }
+      const rejectedWithLogcat = await logcat.startCapture().then(
+        () => false,
+        (err: Error) => err.message.includes('Logcat'),
+      );
+      assert.ok(!rejectedWithLogcat);
     });
   });
 

@@ -650,10 +650,11 @@ package:com.android.chrome`;
     it('test valid activity name', function () {
       const activity = 'ןذأצЮυπиС.נפשוקשΤπΟ.ЦοКسئοهΦΦ';
       const names = matchComponentName(activity);
+      assert.ok(names);
       // matchComponentName returns a RegExpExecArray, which carries extra own
       // properties (index, input, groups) that a plain array literal doesn't have;
       // spreading it into a plain array keeps the comparison to just the matched values.
-      assert.deepStrictEqual(names && [...names], [activity]);
+      assert.deepStrictEqual([...names], [activity]);
     });
     it('test invalid activity name', function () {
       const activity = 'User@123';
