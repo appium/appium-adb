@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import {describe, it, beforeEach, afterEach, mock} from 'node:test';
 
 import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
-import esmock from 'esmock';
 import sinon from 'sinon';
+import * as teenProcess from 'teen_process';
 
+import * as utilsIndex from '../../lib/utils/index.js';
 import {FIXTURES_ROOT, MODULE_ROOT} from '../constants.js';
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
@@ -27,21 +28,22 @@ let currentGetResourcePath: (...args: any[]) => any = async () => '';
 let currentGetJavaForOs: (...args: any[]) => any = async () => javaDummyPath;
 let currentGetJavaHome: (...args: any[]) => any = async () => javaHome;
 
-const {ADB} = await esmock(
-  '../../lib/adb.js',
-  import.meta.url,
-  {},
-  {
-    teen_process: {
-      exec: (...args: any[]) => currentExec(...args),
-    },
-    '../../lib/utils/index.js': {
-      getResourcePath: (...args: any[]) => currentGetResourcePath(...args),
-      getJavaForOs: (...args: any[]) => currentGetJavaForOs(...args),
-      getJavaHome: (...args: any[]) => currentGetJavaHome(...args),
-    },
+mock.module('teen_process', {
+  namedExports: {
+    ...teenProcess,
+    exec: (...args: any[]) => currentExec(...args),
   },
-);
+});
+mock.module('../../lib/utils/index.js', {
+  namedExports: {
+    ...utilsIndex,
+    getResourcePath: (...args: any[]) => currentGetResourcePath(...args),
+    getJavaForOs: (...args: any[]) => currentGetJavaForOs(...args),
+    getJavaHome: (...args: any[]) => currentGetJavaHome(...args),
+  },
+});
+
+const {ADB} = await import('../../lib/adb.js');
 
 const adb = new ADB();
 adb.keystorePath = keystorePath;
