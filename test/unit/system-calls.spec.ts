@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {describe, it, beforeEach, afterEach, mock} from 'node:test';
 
+import * as asyncbox from 'asyncbox';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
@@ -14,10 +15,9 @@ mock.module('teen_process', {
     exec: (...args: any[]) => currentExec(...args),
   },
 });
-const realAsyncbox = await import('asyncbox');
 mock.module('asyncbox', {
   namedExports: {
-    ...realAsyncbox,
+    ...asyncbox,
     sleep: (...args: any[]) => currentSleep(...args),
     retryInterval: (...args: any[]) => currentRetryInterval(...args),
   },

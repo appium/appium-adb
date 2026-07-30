@@ -6,7 +6,9 @@ import * as appiumSupport from '@appium/support';
 import {zip} from '@appium/support';
 import type {ZipEntry} from '@appium/support';
 import sinon from 'sinon';
+import * as teenProcess from 'teen_process';
 
+import * as utilsIndex from '../../lib/utils/index.js';
 import {FIXTURES_ROOT, MODULE_ROOT} from '../constants.js';
 
 const keystorePath = path.resolve(FIXTURES_ROOT, 'appiumtest.keystore');
@@ -26,17 +28,15 @@ let currentGetResourcePath: (...args: any[]) => any = async () => '';
 let currentGetJavaForOs: (...args: any[]) => any = async () => javaDummyPath;
 let currentGetJavaHome: (...args: any[]) => any = async () => javaHome;
 
-const realTeenProcess = await import('teen_process');
 mock.module('teen_process', {
   namedExports: {
-    ...realTeenProcess,
+    ...teenProcess,
     exec: (...args: any[]) => currentExec(...args),
   },
 });
-const realUtils = await import('../../lib/utils/index.js');
 mock.module('../../lib/utils/index.js', {
   namedExports: {
-    ...realUtils,
+    ...utilsIndex,
     getResourcePath: (...args: any[]) => currentGetResourcePath(...args),
     getJavaForOs: (...args: any[]) => currentGetJavaForOs(...args),
     getJavaHome: (...args: any[]) => currentGetJavaHome(...args),
