@@ -13,7 +13,7 @@ function SubProcessMock(...args: any[]) {
 }
 
 mock.module('teen_process', {
-  exports: {
+  namedExports: {
     exec: (...args: any[]) => currentExec(...args),
     SubProcess: SubProcessMock,
   },

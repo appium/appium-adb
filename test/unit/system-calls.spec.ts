@@ -9,14 +9,14 @@ let currentSleep: (...args: any[]) => any = async () => {};
 let currentRetryInterval: (...args: any[]) => any = async (_retries: number, _interval: number, fn: () => any) => fn();
 
 mock.module('teen_process', {
-  exports: {
+  namedExports: {
     ...teen_process,
     exec: (...args: any[]) => currentExec(...args),
   },
 });
 const realAsyncbox = await import('asyncbox');
 mock.module('asyncbox', {
-  exports: {
+  namedExports: {
     ...realAsyncbox,
     sleep: (...args: any[]) => currentSleep(...args),
     retryInterval: (...args: any[]) => currentRetryInterval(...args),

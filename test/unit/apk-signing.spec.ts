@@ -28,14 +28,14 @@ let currentGetJavaHome: (...args: any[]) => any = async () => javaHome;
 
 const realTeenProcess = await import('teen_process');
 mock.module('teen_process', {
-  exports: {
+  namedExports: {
     ...realTeenProcess,
     exec: (...args: any[]) => currentExec(...args),
   },
 });
 const realUtils = await import('../../lib/utils/index.js');
 mock.module('../../lib/utils/index.js', {
-  exports: {
+  namedExports: {
     ...realUtils,
     getResourcePath: (...args: any[]) => currentGetResourcePath(...args),
     getJavaForOs: (...args: any[]) => currentGetJavaForOs(...args),
