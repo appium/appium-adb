@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import {describe, it, beforeEach, afterEach, mock} from 'node:test';
 
-import esmock from 'esmock';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
@@ -9,20 +8,22 @@ let currentExec: (...args: any[]) => any = async () => ({stdout: '', stderr: '',
 let currentSleep: (...args: any[]) => any = async () => {};
 let currentRetryInterval: (...args: any[]) => any = async (_retries: number, _interval: number, fn: () => any) => fn();
 
-const {ADB} = await esmock(
-  '../../lib/adb.js',
-  import.meta.url,
-  {},
-  {
-    teen_process: {
-      exec: (...args: any[]) => currentExec(...args),
-    },
-    asyncbox: {
-      sleep: (...args: any[]) => currentSleep(...args),
-      retryInterval: (...args: any[]) => currentRetryInterval(...args),
-    },
+mock.module('teen_process', {
+  exports: {
+    ...teen_process,
+    exec: (...args: any[]) => currentExec(...args),
   },
-);
+});
+const realAsyncbox = await import('asyncbox');
+mock.module('asyncbox', {
+  exports: {
+    ...realAsyncbox,
+    sleep: (...args: any[]) => currentSleep(...args),
+    retryInterval: (...args: any[]) => currentRetryInterval(...args),
+  },
+});
+
+const {ADB} = await import('../../lib/adb.js');
 
 const adb = new ADB();
 adb.executable.path = 'adb_path';

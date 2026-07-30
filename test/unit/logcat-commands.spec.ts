@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import events from 'node:events';
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import {describe, it, beforeEach, afterEach, mock} from 'node:test';
 
-import esmock from 'esmock';
 import sinon from 'sinon';
 
 let currentExec: (...args: any[]) => any = async () => ({stdout: '', stderr: ''});
@@ -13,12 +12,14 @@ function SubProcessMock(...args: any[]) {
   return currentSubProcess(...args);
 }
 
-const {Logcat} = await esmock('../../lib/logcat.js', import.meta.url, {
-  teen_process: {
+mock.module('teen_process', {
+  exports: {
     exec: (...args: any[]) => currentExec(...args),
     SubProcess: SubProcessMock,
   },
 });
+
+const {Logcat} = await import('../../lib/logcat.js');
 
 describe('logcat commands', function () {
   let sandbox: sinon.SinonSandbox;
