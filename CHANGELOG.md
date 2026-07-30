@@ -1,3 +1,9 @@
+## [16.0.3](https://github.com/appium/appium-adb/compare/v16.0.2...v16.0.3) (2026-07-30)
+
+### Miscellaneous Chores
+
+* Drop esmock ([#898](https://github.com/appium/appium-adb/issues/898)) ([cad9af2](https://github.com/appium/appium-adb/commit/cad9af28cd2f8a118447ba3bc234a0119140534b))
+
 ## [16.0.2](https://github.com/appium/appium-adb/compare/v16.0.1...v16.0.2) (2026-07-28)
 
 ### Miscellaneous Chores
