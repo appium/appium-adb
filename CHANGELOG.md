@@ -1,3 +1,9 @@
+## [16.0.9](https://github.com/appium/appium-adb/compare/v16.0.8...v16.0.9) (2026-09-26)
+
+### Bug Fixes
+
+* require API 27 for extended lock management ([#906](https://github.com/appium/appium-adb/issues/906)) ([70e6e4e](https://github.com/appium/appium-adb/commit/70e6e4ea146e606b8f309505fdb31da5edc31261))
+
 ## [16.0.8](https://github.com/appium/appium-adb/compare/v16.0.7...v16.0.8) (2026-09-26)
 
 ### Bug Fixes
