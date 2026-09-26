@@ -41,7 +41,9 @@ const pkg = 'com.example.android.contactmanager',
     'argument',
     '-z',
     'option',
-    'arg with spaces',
+    'arg',
+    'with',
+    'spaces',
   ],
   language = 'en',
   country = 'US',
@@ -647,7 +649,7 @@ describe('Apk-utils', function () {
         '-c',
         'android.intent.category.DEFAULT',
         '-d',
-        'scheme://127.0.0.1',
+        util.quote('scheme://127.0.0.1'),
       ];
 
       mocks.adb.expects('getApiLevel').once().withExactArgs().returns(17);

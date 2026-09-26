@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import {execFile} from 'node:child_process';
 import net from 'node:net';
 import {EOL} from 'node:os';
 import {describe, it, beforeEach, afterEach} from 'node:test';
+import {promisify} from 'node:util';
 
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
@@ -871,6 +873,47 @@ describe('general commands', function () {
     });
   });
   describe('setSetting', function () {
+    it(
+      'preserves literal setting arguments and numeric values',
+      {skip: process.platform === 'win32'},
+      async function () {
+        const shell = sandbox.stub(adb, 'shell').resolves('');
+        const values = ['', 0, -1, 1.5, "a'b", 'two words', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*'];
+        for (const value of values) {
+          await adb.setSetting('global', "setting'name", value);
+          assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+            'settings',
+            'put',
+            'global',
+            "setting'name",
+            `${value}`,
+          ]);
+        }
+        await adb.setSetting('name space', 'setting', 'value');
+        assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+          'settings',
+          'put',
+          'name space',
+          'setting',
+          'value',
+        ]);
+      },
+    );
+
+    it('preserves proxy values through setSetting', {skip: process.platform === 'win32'}, async function () {
+      const shell = sandbox.stub(adb, 'shell').resolves('');
+      const host = "proxy' host;$APPIUM_QUOTE_TEST";
+      await adb.setHttpProxy(host, 8080);
+      assert.deepEqual(
+        await Promise.all(shell.getCalls().map((call) => parseDeviceCommand(call.args[0] as string[]))),
+        [
+          ['settings', 'put', 'global', 'http_proxy', `${host}:8080`],
+          ['settings', 'put', 'global', 'global_http_proxy_host', host],
+          ['settings', 'put', 'global', 'global_http_proxy_port', '8080'],
+        ],
+      );
+    });
+
     it('should call shell settings put', async function () {
       mocks.adb.expects('shell').once().withExactArgs(['settings', 'put', 'namespace', 'setting', 'value']);
       await adb.setSetting('namespace', 'setting', 'value');
@@ -919,3 +962,15 @@ describe('general commands', function () {
     });
   });
 });
+
+// Model remote POSIX shell parsing independently of the quoting helper.
+async function parseDeviceCommand(command: string | string[]): Promise<string[]> {
+  const {stdout} = await promisify(execFile)(
+    '/bin/sh',
+    ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
+    {
+      env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+    },
+  );
+  return stdout.toString().split('\0').slice(0, -1);
+}
