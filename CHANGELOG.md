@@ -1,3 +1,9 @@
+## [16.0.8](https://github.com/appium/appium-adb/compare/v16.0.7...v16.0.8) (2026-09-26)
+
+### Bug Fixes
+
+* preserve URI and package arguments in adb shell command ([#902](https://github.com/appium/appium-adb/issues/902)) ([2b92a42](https://github.com/appium/appium-adb/commit/2b92a4222e4f550546a091c02e3cb37522b2b5bd))
+
 ## [16.0.7](https://github.com/appium/appium-adb/compare/v16.0.6...v16.0.7) (2026-09-26)
 
 ### Bug Fixes
