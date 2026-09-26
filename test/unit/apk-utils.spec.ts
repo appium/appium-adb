@@ -596,7 +596,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, pkg])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri), pkg])
         .returns('Something something something Unable to resolve intent something something');
 
       await assert.rejects(adb.startUri(uri, pkg), /Unable to resolve intent/);
@@ -605,7 +605,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri)])
         .returns('Passable result');
 
       await adb.startUri(uri);
@@ -614,7 +614,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, pkg])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri), pkg])
         .returns('Passable result');
 
       await adb.startUri(uri, pkg);

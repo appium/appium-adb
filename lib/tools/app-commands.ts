@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import {fs, tempDir, util, system} from '@appium/support';
+import {fs, tempDir, util} from '@appium/support';
 import {waitForCondition} from 'asyncbox';
 import type {ExecError} from 'teen_process';
 
@@ -131,7 +131,8 @@ export async function resolveLaunchableActivity(
  * @returns The output of the corresponding adb command.
  */
 export async function forceStop(this: ADB, pkg: string): Promise<string> {
-  return await this.shell(['am', 'force-stop', pkg]);
+  assertSafeComponentName(pkg, 'application package name');
+  return await this.shell(['am', 'force-stop', util.quote(pkg)]);
 }
 
 /**
@@ -560,9 +561,12 @@ export async function startUri(
   if (waitForLaunch) {
     args.push('-W');
   }
-  args.push('-a', 'android.intent.action.VIEW', '-d', escapeShellArg(uri));
+  // adb joins these arguments into a command parsed by the device's shell,
+  // regardless of the host operating system.
+  args.push('-a', 'android.intent.action.VIEW', '-d', util.quote(uri));
   if (pkg) {
-    args.push(pkg);
+    assertSafeComponentName(pkg, 'application package name');
+    args.push(util.quote(pkg));
   }
 
   try {
@@ -1200,22 +1204,4 @@ function parseOptionalIntentArguments(value: string): string[] {
     result.push(argument);
   }
   return result;
-}
-
-/**
- * Escapes special characters in command line arguments.
- * This is needed to avoid possible issues with how system `spawn`
- * call handles them.
- * See https://discuss.appium.io/t/how-to-modify-wd-proxy-and-uiautomator2-source-code-to-support-unicode/33466
- * for more details.
- *
- * @param arg - Non-escaped argument string
- * @returns The escaped argument
- */
-function escapeShellArg(arg: string): string {
-  arg = `${arg}`;
-  if (system.isWindows()) {
-    return /[&|^\s]/.test(arg) ? `"${arg.replace(/"/g, '""')}"` : arg;
-  }
-  return arg.replace(/&/g, '\\&');
 }
