@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {fs} from '@appium/support';
+import {fs, util} from '@appium/support';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
@@ -594,7 +594,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, pkg])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri), pkg])
         .returns('Something something something Unable to resolve intent something something');
 
       await assert.rejects(adb.startUri(uri, pkg), /Unable to resolve intent/);
@@ -603,7 +603,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri)])
         .returns('Passable result');
 
       await adb.startUri(uri);
@@ -612,7 +612,7 @@ describe('Apk-utils', function () {
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, pkg])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', util.quote(uri), pkg])
         .returns('Passable result');
 
       await adb.startUri(uri, pkg);

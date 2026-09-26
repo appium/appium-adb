@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
@@ -90,6 +91,25 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
   });
 
   describe('forceStop', function () {
+    for (const pkg of ['com.example;:', 'com.example app', 'com.example\napp']) {
+      it(`rejects invalid package names before invoking shell: ${JSON.stringify(pkg)}`, async function () {
+        const shell = sandbox.stub(adb, 'shell');
+        await assert.rejects(adb.forceStop(pkg), /illegal characters/);
+        assert.strictEqual(shell.called, false);
+      });
+    }
+
+    it(
+      'preserves allowed expansion characters as literal package data',
+      {skip: process.platform === 'win32'},
+      async function () {
+        const pkg = 'com.example.$APPIUM_QUOTE_TEST*';
+        const shell = sandbox.stub(adb, 'shell').resolves('');
+        await adb.forceStop(pkg);
+        assert.deepStrictEqual(parseDeviceCommand(shell.firstCall.args[0]), ['am', 'force-stop', pkg]);
+      },
+    );
+
     it('should call shell with correct args', async function () {
       mocks.adb.expects('shell').once().withExactArgs(['am', 'force-stop', apiDemosPackage]).returns('');
       await adb.forceStop(apiDemosPackage);
@@ -167,12 +187,44 @@ package:com.android.chrome`;
   });
 
   describe('startUri', function () {
+    for (const uri of [
+      'https://example.com/a b?one=1&two=2#fragment',
+      `example://O'Brien/"quoted"/$APPIUM_QUOTE_TEST`,
+      'example://$(printf unexpected)/`printf unexpected`;:#fragment',
+      'example://line\nbreak/[*]',
+    ]) {
+      it(
+        `preserves the complete URI as one shell argument: ${JSON.stringify(uri)}`,
+        {skip: process.platform === 'win32'},
+        async function () {
+          const shell = sandbox.stub(adb, 'shell').resolves('');
+          const pkg = 'com.example.$APPIUM_QUOTE_TEST';
+          await adb.startUri(uri, pkg, {waitForLaunch: false});
+          assert.deepStrictEqual(parseDeviceCommand(shell.firstCall.args[0]), [
+            'am',
+            'start',
+            '-a',
+            'android.intent.action.VIEW',
+            '-d',
+            uri,
+            pkg,
+          ]);
+        },
+      );
+    }
+
+    it('rejects invalid package names before invoking shell', async function () {
+      const shell = sandbox.stub(adb, 'shell');
+      await assert.rejects(adb.startUri('https://example.com', 'com.example;:'), /illegal characters/);
+      assert.strictEqual(shell.called, false);
+    });
+
     it('should call shell with correct args', async function () {
       const uri = 'https://example.com';
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri])
+        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', 'https\\://example.com'])
         .returns('');
       await adb.startUri(uri);
     });
@@ -181,7 +233,16 @@ package:com.android.chrome`;
       mocks.adb
         .expects('shell')
         .once()
-        .withExactArgs(['am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', uri, apiDemosPackage])
+        .withExactArgs([
+          'am',
+          'start',
+          '-W',
+          '-a',
+          'android.intent.action.VIEW',
+          '-d',
+          'https\\://example.com',
+          apiDemosPackage,
+        ])
         .returns('');
       await adb.startUri(uri, apiDemosPackage);
     });
@@ -723,3 +784,15 @@ package:com.android.chrome`;
     });
   });
 });
+
+// Model the remote POSIX shell's parsing independently of the quoting helper.
+function parseDeviceCommand(command: string | string[]): string[] {
+  const output = execFileSync(
+    '/bin/sh',
+    ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
+    {
+      env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+    },
+  );
+  return output.toString().split('\0').slice(0, -1);
+}
