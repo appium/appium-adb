@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execFile} from 'node:child_process';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
+import {promisify} from 'node:util';
 
 import {fs, util} from '@appium/support';
 import sinon from 'sinon';
@@ -266,35 +267,35 @@ package:com.android.chrome`;
       activity: '.SomeActivity',
     };
 
-    it('preserves structured intent fields as literal arguments', {skip: process.platform === 'win32'}, function () {
-      for (const value of ["a'b", 'two words', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*', '$(printf unexpected)']) {
-        const cmd = buildStartCmd({action: value, category: value, flags: value, user: value}, 26);
-        assert.deepEqual(parseDeviceCommand(cmd), [
-          'am',
-          'start-activity',
-          '--user',
-          value,
-          '-a',
-          value,
-          '-c',
-          value,
-          '-f',
-          value,
-        ]);
-      }
-      assert.deepEqual(parseDeviceCommand(buildStartCmd({user: 0, pkg: 'com.example', activity: '.Main$Inner'}, 26)), [
-        'am',
-        'start-activity',
-        '--user',
-        '0',
-        '-n',
-        'com.example/.Main$Inner',
-      ]);
-    });
+    it(
+      'preserves structured intent fields as literal arguments',
+      {skip: process.platform === 'win32'},
+      async function () {
+        for (const value of ["a'b", 'two words', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*', '$(printf unexpected)']) {
+          const cmd = buildStartCmd({action: value, category: value, flags: value, user: value}, 26);
+          assert.deepEqual(await parseDeviceCommand(cmd), [
+            'am',
+            'start-activity',
+            '--user',
+            value,
+            '-a',
+            value,
+            '-c',
+            value,
+            '-f',
+            value,
+          ]);
+        }
+        assert.deepEqual(
+          await parseDeviceCommand(buildStartCmd({user: 0, pkg: 'com.example', activity: '.Main$Inner'}, 26)),
+          ['am', 'start-activity', '--user', '0', '-n', 'com.example/.Main$Inner'],
+        );
+      },
+    );
 
-    it('preserves quoted and escaped optional arguments', {skip: process.platform === 'win32'}, function () {
+    it('preserves quoted and escaped optional arguments', {skip: process.platform === 'win32'}, async function () {
       const optionalIntentArguments = String.raw`--es title "two words" --es apostrophe 'it'"'"'s' --es empty "" --es path a\ b --ei count -1 --es dash "a -b c"`;
-      assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+      assert.deepEqual(await parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
         'am',
         'start-activity',
         '--es',
@@ -321,10 +322,10 @@ package:com.android.chrome`;
     it(
       'does not expand optional argument values or interpret shell operators',
       {skip: process.platform === 'win32'},
-      function () {
+      async function () {
         const optionalIntentArguments =
           '--es value "$APPIUM_QUOTE_TEST ${APPIUM_QUOTE_TEST} $(printf unexpected) `printf unexpected`" --es glob * --es punctuation a;b --es url https://example.test/?a=1&b=2';
-        assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+        assert.deepEqual(await parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
           'am',
           'start-activity',
           '--es',
@@ -346,9 +347,9 @@ package:com.android.chrome`;
     it(
       'handles whitespace, line continuation, and double-quoted backslashes',
       {skip: process.platform === 'win32'},
-      function () {
+      async function () {
         const optionalIntentArguments = '--es\tkey\t"a\\q" \\\n--es other "line\nbreak"';
-        assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+        assert.deepEqual(await parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
           'am',
           'start-activity',
           '--es',
@@ -361,7 +362,7 @@ package:com.android.chrome`;
       },
     );
 
-    it('rejects incomplete optional argument quoting', function () {
+    it('rejects incomplete optional argument quoting', async function () {
       for (const optionalIntentArguments of ['--es key "unfinished', "--es key 'unfinished", '--es key value\\']) {
         assert.throws(() => buildStartCmd({optionalIntentArguments}, 26), /optionalIntentArguments contains/);
       }
@@ -825,11 +826,13 @@ package:com.android.chrome`;
 });
 
 // Model remote POSIX shell parsing independently of the quoting helper.
-function parseDeviceCommand(command: string[]): string[] {
-  return execFileSync('/bin/sh', ['-c', `set -- ${command.join(' ')}; printf '%s\\0' "$@"`], {
-    env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
-  })
-    .toString()
-    .split('\0')
-    .slice(0, -1);
+async function parseDeviceCommand(command: string | string[]): Promise<string[]> {
+  const {stdout} = await promisify(execFile)(
+    '/bin/sh',
+    ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
+    {
+      env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+    },
+  );
+  return stdout.toString().split('\0').slice(0, -1);
 }
