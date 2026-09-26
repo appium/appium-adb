@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
-import {fs} from '@appium/support';
+import {fs, util} from '@appium/support';
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
 
@@ -265,6 +266,107 @@ package:com.android.chrome`;
       activity: '.SomeActivity',
     };
 
+    it('preserves structured intent fields as literal arguments', {skip: process.platform === 'win32'}, function () {
+      for (const value of ["a'b", 'two words', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*', '$(printf unexpected)']) {
+        const cmd = buildStartCmd({action: value, category: value, flags: value, user: value}, 26);
+        assert.deepEqual(parseDeviceCommand(cmd), [
+          'am',
+          'start-activity',
+          '--user',
+          value,
+          '-a',
+          value,
+          '-c',
+          value,
+          '-f',
+          value,
+        ]);
+      }
+      assert.deepEqual(parseDeviceCommand(buildStartCmd({user: 0, pkg: 'com.example', activity: '.Main$Inner'}, 26)), [
+        'am',
+        'start-activity',
+        '--user',
+        '0',
+        '-n',
+        'com.example/.Main$Inner',
+      ]);
+    });
+
+    it('preserves quoted and escaped optional arguments', {skip: process.platform === 'win32'}, function () {
+      const optionalIntentArguments = String.raw`--es title "two words" --es apostrophe 'it'"'"'s' --es empty "" --es path a\ b --ei count -1 --es dash "a -b c"`;
+      assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+        'am',
+        'start-activity',
+        '--es',
+        'title',
+        'two words',
+        '--es',
+        'apostrophe',
+        "it's",
+        '--es',
+        'empty',
+        '',
+        '--es',
+        'path',
+        'a b',
+        '--ei',
+        'count',
+        '-1',
+        '--es',
+        'dash',
+        'a -b c',
+      ]);
+    });
+
+    it(
+      'does not expand optional argument values or interpret shell operators',
+      {skip: process.platform === 'win32'},
+      function () {
+        const optionalIntentArguments =
+          '--es value "$APPIUM_QUOTE_TEST ${APPIUM_QUOTE_TEST} $(printf unexpected) `printf unexpected`" --es glob * --es punctuation a;b --es url https://example.test/?a=1&b=2';
+        assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+          'am',
+          'start-activity',
+          '--es',
+          'value',
+          '$APPIUM_QUOTE_TEST ${APPIUM_QUOTE_TEST} $(printf unexpected) `printf unexpected`',
+          '--es',
+          'glob',
+          '*',
+          '--es',
+          'punctuation',
+          'a;b',
+          '--es',
+          'url',
+          'https://example.test/?a=1&b=2',
+        ]);
+      },
+    );
+
+    it(
+      'handles whitespace, line continuation, and double-quoted backslashes',
+      {skip: process.platform === 'win32'},
+      function () {
+        const optionalIntentArguments = '--es\tkey\t"a\\q" \\\n--es other "line\nbreak"';
+        assert.deepEqual(parseDeviceCommand(buildStartCmd({optionalIntentArguments}, 26)), [
+          'am',
+          'start-activity',
+          '--es',
+          'key',
+          'a\\q',
+          '--es',
+          'other',
+          'line\nbreak',
+        ]);
+      },
+    );
+
+    it('rejects incomplete optional argument quoting', function () {
+      for (const optionalIntentArguments of ['--es key "unfinished', "--es key 'unfinished", '--es key value\\']) {
+        assert.throws(() => buildStartCmd({optionalIntentArguments}, 26), /optionalIntentArguments contains/);
+      }
+    });
+
     it('should use start', function () {
       const cmd = buildStartCmd(startOptions, 20);
       assert.strictEqual(cmd[1], 'start');
@@ -300,9 +402,7 @@ package:com.android.chrome`;
     });
     it('should parse optionalIntentArguments with single key/value pair with spaces', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key value value2'}, 20);
-      assert.strictEqual(cmd[cmd.length - 3], '-d');
-      assert.strictEqual(cmd[cmd.length - 2], 'key');
-      assert.strictEqual(cmd[cmd.length - 1], 'value value2');
+      assert.deepEqual(cmd.slice(-4), ['-d', 'key', 'value', 'value2']);
     });
     it('should parse optionalIntentArguments with multiple keys', function () {
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: '-d key1 -e key2'}, 20);
@@ -324,7 +424,7 @@ package:com.android.chrome`;
       const arg = 'http://some-url-with-hyphens.com/';
       const cmd = buildStartCmd({...startOptions, optionalIntentArguments: `-d ${arg}`}, 20);
       assert.strictEqual(cmd[cmd.length - 2], '-d');
-      assert.strictEqual(cmd[cmd.length - 1], arg);
+      assert.strictEqual(cmd[cmd.length - 1], util.quote(arg));
     });
     it('should parse optionalIntentArguments with multiple arguments with hyphens', function () {
       const arg1 = 'http://some-url-with-hyphens.com/';
@@ -337,10 +437,10 @@ package:com.android.chrome`;
         20,
       );
       assert.strictEqual(cmd[cmd.length - 5], '-d');
-      assert.strictEqual(cmd[cmd.length - 4], arg1);
+      assert.strictEqual(cmd[cmd.length - 4], util.quote(arg1));
       assert.strictEqual(cmd[cmd.length - 3], '-e');
       assert.strictEqual(cmd[cmd.length - 2], 'key');
-      assert.strictEqual(cmd[cmd.length - 1], arg2);
+      assert.strictEqual(cmd[cmd.length - 1], util.quote(arg2));
     });
     it('should have -S option when stopApp is set', function () {
       const cmd = buildStartCmd({...startOptions, stopApp: true}, 20);
@@ -723,3 +823,13 @@ package:com.android.chrome`;
     });
   });
 });
+
+// Model remote POSIX shell parsing independently of the quoting helper.
+function parseDeviceCommand(command: string[]): string[] {
+  return execFileSync('/bin/sh', ['-c', `set -- ${command.join(' ')}; printf '%s\\0' "$@"`], {
+    env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+  })
+    .toString()
+    .split('\0')
+    .slice(0, -1);
+}
