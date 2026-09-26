@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {describe, it, beforeEach, afterEach} from 'node:test';
 
 import sinon from 'sinon';
 
+import {ADB} from '../../lib/adb.js';
 import {isShowingLockscreen, isScreenStateOff} from '../../lib/tools/lockmgmt.js';
 
 describe('lock management', function () {
@@ -15,6 +17,50 @@ describe('lock management', function () {
   afterEach(function () {
     sandbox.verify();
     sandbox.restore();
+  });
+
+  describe('credential arguments', {skip: process.platform === 'win32'}, function () {
+    const credentials = ['1234', "pass'word", 'two words', 'a"b', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*'];
+
+    it('preserves old credentials when verifying and clearing a lock', async function () {
+      const adb = new ADB();
+      const shell = sandbox.stub(adb, 'shell');
+      for (const credential of credentials) {
+        shell.resolves({stdout: 'verified successfully', stderr: ''} as any);
+        assert.equal(await adb.verifyLockCredential(credential), true);
+        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+          'locksettings',
+          'verify',
+          '--old',
+          credential,
+        ]);
+        shell.resolves({stdout: 'Lock credential cleared', stderr: ''} as any);
+        await adb.clearLockCredential(credential);
+        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+          'locksettings',
+          'clear',
+          '--old',
+          credential,
+        ]);
+      }
+    });
+
+    it('preserves new and old credentials when setting a lock', async function () {
+      const adb = new ADB();
+      const shell = sandbox.stub(adb, 'shell').resolves({stdout: 'Password set to value', stderr: ''} as any);
+      for (const credential of credentials) {
+        await adb.setLockCredential('password', credential, "old' password");
+        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+          'locksettings',
+          'set-password',
+          '--old',
+          "old' password",
+          credential,
+        ]);
+      }
+      await adb.setLockCredential('pin', '1234');
+      assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), ['locksettings', 'set-pin', '1234']);
+    });
   });
 
   describe('isScreenStateOff', function () {
@@ -132,3 +178,13 @@ describe('lock management', function () {
     });
   });
 });
+
+// Model remote POSIX shell parsing independently of the quoting helper.
+function parseDeviceCommand(command: string[]): string[] {
+  return execFileSync('/bin/sh', ['-c', `set -- ${command.join(' ')}; printf '%s\\0' "$@"`], {
+    env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+  })
+    .toString()
+    .split('\0')
+    .slice(0, -1);
+}
