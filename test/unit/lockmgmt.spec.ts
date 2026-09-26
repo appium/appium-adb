@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execFile} from 'node:child_process';
 import {describe, it, beforeEach, afterEach} from 'node:test';
+import {promisify} from 'node:util';
 
 import sinon from 'sinon';
 
@@ -28,7 +29,7 @@ describe('lock management', function () {
       for (const credential of credentials) {
         shell.resolves({stdout: 'verified successfully', stderr: ''} as any);
         assert.equal(await adb.verifyLockCredential(credential), true);
-        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+        assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
           'locksettings',
           'verify',
           '--old',
@@ -36,7 +37,7 @@ describe('lock management', function () {
         ]);
         shell.resolves({stdout: 'Lock credential cleared', stderr: ''} as any);
         await adb.clearLockCredential(credential);
-        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+        assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
           'locksettings',
           'clear',
           '--old',
@@ -50,7 +51,7 @@ describe('lock management', function () {
       const shell = sandbox.stub(adb, 'shell').resolves({stdout: 'Password set to value', stderr: ''} as any);
       for (const credential of credentials) {
         await adb.setLockCredential('password', credential, "old' password");
-        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+        assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
           'locksettings',
           'set-password',
           '--old',
@@ -59,7 +60,11 @@ describe('lock management', function () {
         ]);
       }
       await adb.setLockCredential('pin', '1234');
-      assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), ['locksettings', 'set-pin', '1234']);
+      assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+        'locksettings',
+        'set-pin',
+        '1234',
+      ]);
     });
   });
 
@@ -180,11 +185,13 @@ describe('lock management', function () {
 });
 
 // Model remote POSIX shell parsing independently of the quoting helper.
-function parseDeviceCommand(command: string[]): string[] {
-  return execFileSync('/bin/sh', ['-c', `set -- ${command.join(' ')}; printf '%s\\0' "$@"`], {
-    env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
-  })
-    .toString()
-    .split('\0')
-    .slice(0, -1);
+async function parseDeviceCommand(command: string | string[]): Promise<string[]> {
+  const {stdout} = await promisify(execFile)(
+    '/bin/sh',
+    ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
+    {
+      env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+    },
+  );
+  return stdout.toString().split('\0').slice(0, -1);
 }
