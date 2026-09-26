@@ -32,11 +32,12 @@ describe('lock management', function () {
       });
     }
 
-    it('does not report support when locksettings fails on a supported API level', async function () {
+    it('returns false without querying the API level when locksettings fails', async function () {
       const adb = new ADB();
-      sandbox.stub(adb, 'getApiLevel').resolves(27);
+      const getApiLevel = sandbox.stub(adb, 'getApiLevel').rejects(new Error('device unavailable'));
       sandbox.stub(adb, 'shell').rejects(new Error('locksettings unavailable'));
       assert.strictEqual(await adb.isLockManagementSupported(), false);
+      sinon.assert.notCalled(getApiLevel);
     });
   });
 

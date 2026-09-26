@@ -24,7 +24,7 @@ export async function isLockManagementSupported(this: ADB): Promise<boolean> {
     try {
       output = await this.shell([`locksettings help && echo ${passFlag}`]);
     } catch {}
-    this._isLockManagementSupported = (await this.getApiLevel()) >= 27 && output.includes(passFlag);
+    this._isLockManagementSupported = output.includes(passFlag) && (await this.getApiLevel()) >= 27;
     log.debug(`Extended lock settings management is ${this._isLockManagementSupported ? '' : 'not '}supported`);
   }
   return this._isLockManagementSupported as boolean;
