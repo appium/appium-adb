@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execFile} from 'node:child_process';
 import net from 'node:net';
 import {describe, it, beforeEach, afterEach} from 'node:test';
+import {promisify} from 'node:util';
 
 import {fs} from '@appium/support';
 import sinon from 'sinon';
@@ -106,7 +107,7 @@ ProcessRecord{def456 456:io.appium.android.apis/u0a123}`;
         const pkg = 'com.example.$APPIUM_QUOTE_TEST*';
         const shell = sandbox.stub(adb, 'shell').resolves('');
         await adb.forceStop(pkg);
-        assert.deepStrictEqual(parseDeviceCommand(shell.firstCall.args[0]), ['am', 'force-stop', pkg]);
+        assert.deepStrictEqual(await parseDeviceCommand(shell.firstCall.args[0]), ['am', 'force-stop', pkg]);
       },
     );
 
@@ -200,7 +201,7 @@ package:com.android.chrome`;
           const shell = sandbox.stub(adb, 'shell').resolves('');
           const pkg = 'com.example.$APPIUM_QUOTE_TEST';
           await adb.startUri(uri, pkg, {waitForLaunch: false});
-          assert.deepStrictEqual(parseDeviceCommand(shell.firstCall.args[0]), [
+          assert.deepStrictEqual(await parseDeviceCommand(shell.firstCall.args[0]), [
             'am',
             'start',
             '-a',
@@ -786,13 +787,13 @@ package:com.android.chrome`;
 });
 
 // Model the remote POSIX shell's parsing independently of the quoting helper.
-function parseDeviceCommand(command: string | string[]): string[] {
-  const output = execFileSync(
+async function parseDeviceCommand(command: string | string[]): Promise<string[]> {
+  const {stdout} = await promisify(execFile)(
     '/bin/sh',
     ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
     {
       env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
     },
   );
-  return output.toString().split('\0').slice(0, -1);
+  return stdout.toString().split('\0').slice(0, -1);
 }
