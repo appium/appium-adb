@@ -401,6 +401,10 @@ export interface StartAppOptions {
   waitForLaunch?: boolean;
   category?: string;
   flags?: string;
+  /**
+   * Additional intent arguments, separated by whitespace. Single/double quotes
+   * and backslash escapes group literal values; shell expansion is not performed.
+   */
   optionalIntentArguments?: string;
 }
 

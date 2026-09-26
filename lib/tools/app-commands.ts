@@ -894,29 +894,29 @@ export function buildStartCmd(startAppOptions: StartCmdOptions, apiLevel: number
     startAppOptions;
   const cmd = ['am', apiLevel < 26 ? 'start' : 'start-activity'];
   if (util.hasValue(user)) {
-    cmd.push('--user', `${user}`);
+    cmd.push('--user', util.quote(`${user}`));
   }
   if (waitForLaunch) {
     cmd.push('-W');
   }
   if (activity && pkg) {
     const component = activity.startsWith(`${pkg}/`) ? activity : `${pkg}/${activity}`;
-    cmd.push('-n', component.replace(/[$*]/g, '\\$&'));
+    cmd.push('-n', util.quote(component));
   }
   if (stopApp && apiLevel >= 15) {
     cmd.push('-S');
   }
   if (action) {
-    cmd.push('-a', action);
+    cmd.push('-a', util.quote(action));
   }
   if (category) {
-    cmd.push('-c', category);
+    cmd.push('-c', util.quote(category));
   }
   if (flags) {
-    cmd.push('-f', flags);
+    cmd.push('-f', util.quote(flags));
   }
   if (optionalIntentArguments) {
-    cmd.push(...parseOptionalIntentArguments(optionalIntentArguments));
+    cmd.push(...parseOptionalIntentArguments(optionalIntentArguments).map((arg) => util.quote(arg)));
   }
   return cmd;
 }
@@ -1147,54 +1147,59 @@ export async function isAppRunning(this: ADB, pkg: string): Promise<boolean> {
  *     "-flag key"
  *     "-flag key value"
  * or a combination of these (e.g., "-flag1 key1 -flag2 key2 value2")
+ * Supports single/double quotes and backslash escapes for argument grouping.
+ * Shell expansions and operators are treated as literal data.
  * @returns Parsed arguments array
  */
 function parseOptionalIntentArguments(value: string): string[] {
-  // take a string and parse out the part before any spaces, and anything after
-  // the first space
-  const parseKeyValue = (str: string): string[] => {
-    str = str.trim();
-    const spacePos = str.indexOf(' ');
-    if (spacePos < 0) {
-      return str.length ? [str] : [];
-    } else {
-      return [str.substring(0, spacePos).trim(), str.substring(spacePos + 1).trim()];
-    }
-  };
-
-  // cycle through the optionalIntentArguments and pull out the arguments
-  // add a space initially so flags can be distinguished from arguments that
-  // have internal hyphens
-  let optionalIntentArguments = ` ${value}`;
-  const re = / (-[^\s]+) (.+)/;
   const result: string[] = [];
-  while (true) {
-    const args = re.exec(optionalIntentArguments);
-    if (!args) {
-      if (optionalIntentArguments.length) {
-        // no more flags, so the remainder can be treated as 'key' or 'key value'
-        result.push(...parseKeyValue(optionalIntentArguments));
+  let argument = '';
+  let quote: "'" | '"' | null = null;
+  let started = false;
+  for (let i = 0; i < value.length; i++) {
+    const char = value[i];
+    if (char === '\\' && quote !== "'") {
+      const next = value[i + 1];
+      if (next === undefined) {
+        throw new Error('optionalIntentArguments contains a trailing escape');
       }
-      // we are done
-      return result;
+      // Inside double quotes, POSIX shells only escape these characters.
+      if (quote === '"' && !['$', '`', '"', '\\', '\n'].includes(next)) {
+        argument += char;
+      } else {
+        i++;
+        if (next !== '\n') {
+          argument += next;
+          started = true;
+        }
+      }
+    } else if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        argument += char;
+      }
+    } else if (char === "'" || char === '"') {
+      quote = char;
+      started = true;
+    } else if (char === ' ' || char === '\t' || char === '\n') {
+      if (started) {
+        result.push(argument);
+        argument = '';
+        started = false;
+      }
+    } else {
+      argument += char;
+      started = true;
     }
-
-    // take the flag and see if it is at the beginning of the string
-    // if it is not, then it means we have been through already, and
-    // what is before the flag is the argument for the previous flag
-    const flag = args[1];
-    const flagPos = optionalIntentArguments.indexOf(flag);
-    if (flagPos !== 0) {
-      const prevArgs = optionalIntentArguments.substring(0, flagPos);
-      result.push(...parseKeyValue(prevArgs));
-    }
-
-    // add the flag, as there are no more earlier arguments
-    result.push(flag);
-
-    // make optionalIntentArguments hold the remainder
-    optionalIntentArguments = args[2];
   }
+  if (quote) {
+    throw new Error('optionalIntentArguments contains an unterminated quote');
+  }
+  if (started) {
+    result.push(argument);
+  }
+  return result;
 }
 
 /**
