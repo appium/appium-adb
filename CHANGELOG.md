@@ -1,3 +1,9 @@
+## [16.0.6](https://github.com/appium/appium-adb/compare/v16.0.5...v16.0.6) (2026-09-26)
+
+### Bug Fixes
+
+* preserve literal settings and proxy arguments ([#904](https://github.com/appium/appium-adb/issues/904)) ([5d43867](https://github.com/appium/appium-adb/commit/5d438672fe62182c1f79322b82c6cf121184ed50))
+
 ## [16.0.5](https://github.com/appium/appium-adb/compare/v16.0.4...v16.0.5) (2026-09-01)
 
 ### Miscellaneous Chores
