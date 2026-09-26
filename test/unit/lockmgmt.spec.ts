@@ -22,22 +22,25 @@ describe('lock management', function () {
 
   describe('isLockManagementSupported', function () {
     for (const apiLevel of [26, 27, 36]) {
-      it(`checks the minimum API level even if locksettings help exits successfully (API ${apiLevel})`, async function () {
+      it(`checks and caches support using only the API level (API ${apiLevel})`, async function () {
         const adb = new ADB();
-        sandbox.stub(adb, 'getApiLevel').resolves(apiLevel);
-        const shell = sandbox.stub(adb, 'shell').resolves('__PASS__');
+        const getApiLevel = sandbox.stub(adb, 'getApiLevel').resolves(apiLevel);
+        const shell = sandbox.stub(adb, 'shell');
         assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
         assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
-        sinon.assert.calledOnce(shell);
+        sinon.assert.calledOnce(getApiLevel);
+        sinon.assert.notCalled(shell);
       });
     }
 
-    it('returns false without querying the API level when locksettings fails', async function () {
+    it('does not cache a failed API lookup', async function () {
       const adb = new ADB();
-      const getApiLevel = sandbox.stub(adb, 'getApiLevel').rejects(new Error('device unavailable'));
-      sandbox.stub(adb, 'shell').rejects(new Error('locksettings unavailable'));
-      assert.strictEqual(await adb.isLockManagementSupported(), false);
-      sinon.assert.notCalled(getApiLevel);
+      const getApiLevel = sandbox.stub(adb, 'getApiLevel');
+      getApiLevel.onFirstCall().rejects(new Error('device unavailable'));
+      getApiLevel.onSecondCall().resolves(27);
+      await assert.rejects(adb.isLockManagementSupported(), /device unavailable/);
+      assert.strictEqual(await adb.isLockManagementSupported(), true);
+      sinon.assert.calledTwice(getApiLevel);
     });
   });
 
