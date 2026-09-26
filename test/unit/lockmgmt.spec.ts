@@ -20,6 +20,30 @@ describe('lock management', function () {
     sandbox.restore();
   });
 
+  describe('isLockManagementSupported', function () {
+    for (const apiLevel of [26, 27, 36]) {
+      it(`checks and caches support using only the API level (API ${apiLevel})`, async function () {
+        const adb = new ADB();
+        const getApiLevel = sandbox.stub(adb, 'getApiLevel').resolves(apiLevel);
+        const shell = sandbox.stub(adb, 'shell');
+        assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
+        assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
+        sinon.assert.calledOnce(getApiLevel);
+        sinon.assert.notCalled(shell);
+      });
+    }
+
+    it('does not cache a failed API lookup', async function () {
+      const adb = new ADB();
+      const getApiLevel = sandbox.stub(adb, 'getApiLevel');
+      getApiLevel.onFirstCall().rejects(new Error('device unavailable'));
+      getApiLevel.onSecondCall().resolves(27);
+      await assert.rejects(adb.isLockManagementSupported(), /device unavailable/);
+      assert.strictEqual(await adb.isLockManagementSupported(), true);
+      sinon.assert.calledTwice(getApiLevel);
+    });
+  });
+
   describe('credential arguments', {skip: process.platform === 'win32'}, function () {
     const credentials = ['1234', "pass'word", 'two words', 'a"b', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*'];
 

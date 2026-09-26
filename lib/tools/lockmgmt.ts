@@ -19,12 +19,7 @@ const HIDE_KEYBOARD_WAIT_TIME = 100;
  */
 export async function isLockManagementSupported(this: ADB): Promise<boolean> {
   if (typeof this._isLockManagementSupported !== 'boolean') {
-    const passFlag = '__PASS__';
-    let output = '';
-    try {
-      output = await this.shell([`locksettings help && echo ${passFlag}`]);
-    } catch {}
-    this._isLockManagementSupported = output.includes(passFlag);
+    this._isLockManagementSupported = (await this.getApiLevel()) >= 27;
     log.debug(`Extended lock settings management is ${this._isLockManagementSupported ? '' : 'not '}supported`);
   }
   return this._isLockManagementSupported as boolean;
