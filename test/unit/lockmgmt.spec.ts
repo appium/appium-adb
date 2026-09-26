@@ -20,6 +20,26 @@ describe('lock management', function () {
     sandbox.restore();
   });
 
+  describe('isLockManagementSupported', function () {
+    for (const apiLevel of [26, 27, 36]) {
+      it(`checks the minimum API level even if locksettings help exits successfully (API ${apiLevel})`, async function () {
+        const adb = new ADB();
+        sandbox.stub(adb, 'getApiLevel').resolves(apiLevel);
+        const shell = sandbox.stub(adb, 'shell').resolves('__PASS__');
+        assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
+        assert.strictEqual(await adb.isLockManagementSupported(), apiLevel >= 27);
+        sinon.assert.calledOnce(shell);
+      });
+    }
+
+    it('does not report support when locksettings fails on a supported API level', async function () {
+      const adb = new ADB();
+      sandbox.stub(adb, 'getApiLevel').resolves(27);
+      sandbox.stub(adb, 'shell').rejects(new Error('locksettings unavailable'));
+      assert.strictEqual(await adb.isLockManagementSupported(), false);
+    });
+  });
+
   describe('credential arguments', {skip: process.platform === 'win32'}, function () {
     const credentials = ['1234', "pass'word", 'two words', 'a"b', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*'];
 
