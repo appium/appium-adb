@@ -1,3 +1,10 @@
+## [16.0.7](https://github.com/appium/appium-adb/compare/v16.0.6...v16.0.7) (2026-09-26)
+
+### Bug Fixes
+
+* preserve literal intent arguments in activity commands ([#905](https://github.com/appium/appium-adb/issues/905)) ([cc25f2f](https://github.com/appium/appium-adb/commit/cc25f2f4edb36bb940861124d8ca9692cc7d7b32))
+* preserve literal lock credentials in shell commands ([#903](https://github.com/appium/appium-adb/issues/903)) ([8709d8e](https://github.com/appium/appium-adb/commit/8709d8ee85804cc0f7d0a2f1f566ef41aede52a8))
+
 ## [16.0.6](https://github.com/appium/appium-adb/compare/v16.0.5...v16.0.6) (2026-09-26)
 
 ### Bug Fixes
