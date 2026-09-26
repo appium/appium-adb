@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execFile} from 'node:child_process';
 import net from 'node:net';
 import {EOL} from 'node:os';
 import {describe, it, beforeEach, afterEach} from 'node:test';
+import {promisify} from 'node:util';
 
 import sinon from 'sinon';
 import * as teen_process from 'teen_process';
@@ -880,7 +881,7 @@ describe('general commands', function () {
         const values = ['', 0, -1, 1.5, "a'b", 'two words', '$APPIUM_QUOTE_TEST', 'a;b', 'a\nb', '*'];
         for (const value of values) {
           await adb.setSetting('global', "setting'name", value);
-          assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+          assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
             'settings',
             'put',
             'global',
@@ -889,7 +890,7 @@ describe('general commands', function () {
           ]);
         }
         await adb.setSetting('name space', 'setting', 'value');
-        assert.deepEqual(parseDeviceCommand(shell.lastCall.args[0] as string[]), [
+        assert.deepEqual(await parseDeviceCommand(shell.lastCall.args[0] as string[]), [
           'settings',
           'put',
           'name space',
@@ -904,7 +905,7 @@ describe('general commands', function () {
       const host = "proxy' host;$APPIUM_QUOTE_TEST";
       await adb.setHttpProxy(host, 8080);
       assert.deepEqual(
-        shell.getCalls().map((call) => parseDeviceCommand(call.args[0] as string[])),
+        await Promise.all(shell.getCalls().map((call) => parseDeviceCommand(call.args[0] as string[]))),
         [
           ['settings', 'put', 'global', 'http_proxy', `${host}:8080`],
           ['settings', 'put', 'global', 'global_http_proxy_host', host],
@@ -963,11 +964,13 @@ describe('general commands', function () {
 });
 
 // Model remote POSIX shell parsing independently of the quoting helper.
-function parseDeviceCommand(command: string[]): string[] {
-  return execFileSync('/bin/sh', ['-c', `set -- ${command.join(' ')}; printf '%s\\0' "$@"`], {
-    env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
-  })
-    .toString()
-    .split('\0')
-    .slice(0, -1);
+async function parseDeviceCommand(command: string | string[]): Promise<string[]> {
+  const {stdout} = await promisify(execFile)(
+    '/bin/sh',
+    ['-c', `set -- ${Array.isArray(command) ? command.join(' ') : command}; printf '%s\\0' "$@"`],
+    {
+      env: {...process.env, APPIUM_QUOTE_TEST: 'unexpected-expansion'},
+    },
+  );
+  return stdout.toString().split('\0').slice(0, -1);
 }
