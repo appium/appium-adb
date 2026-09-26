@@ -307,10 +307,10 @@ export function isScreenStateOff(dumpsys: string): boolean {
 function buildCommand(verb: string, oldCredential: string | null = null, ...args: string[]): string[] {
   const cmd = ['locksettings', verb];
   if (oldCredential && !util.isEmpty(oldCredential)) {
-    cmd.push('--old', oldCredential);
+    cmd.push('--old', util.quote(`${oldCredential}`));
   }
   if (args.length > 0) {
-    cmd.push(...args);
+    cmd.push(...args.map((arg) => util.quote(`${arg}`)));
   }
   return cmd;
 }
