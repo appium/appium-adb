@@ -4,6 +4,9 @@ appium-adb
 [![NPM version](http://img.shields.io/npm/v/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 [![Downloads](http://img.shields.io/npm/dm/appium-adb.svg)](https://npmjs.org/package/appium-adb)
 
+> **This repository has moved.** Development now continues in the [appium-android monorepo](https://github.com/appium/appium-android/tree/main/packages/adb).
+
+
 A wrapper over [Android Debugger Bridge](https://developer.android.com/tools/adb), implemented using ES6
 and along with `async/await`. This package is mainly used by Appium to perform all adb operations on Android devices.
 
